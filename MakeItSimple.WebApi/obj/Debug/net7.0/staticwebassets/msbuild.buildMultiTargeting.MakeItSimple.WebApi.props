@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\MakeItSimple.WebApi.props" />
+</Project>

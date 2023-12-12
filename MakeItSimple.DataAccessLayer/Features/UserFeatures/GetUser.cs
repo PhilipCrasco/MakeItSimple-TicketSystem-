@@ -64,7 +64,8 @@ namespace MakeItSimple.DataAccessLayer.Feature.UserFeatures
                     fullname = x.Fullname,
                     username = x.Username, 
                     password = x.Password,
-                    created_at = x.CreatedAt,
+                    created_at = x.CreatedAt
+
 
                 }).ToListAsync();
 

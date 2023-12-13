@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "TxrEylKnAzYD/+LPqo0eEQwxtw8WyHtWq58qdRdLk5GbCVmg05vD0W+F0g2eCGnTC3mhCjz56bdxejPPhew3tQ==",
+  "dgSpecHash": "cS5z2IhwMvUpoW+H6SqB5JWVNrC6aqISLAgeuKfCglhqA/6dK056DCNf8qEED3tQ5VrkWCh4+giRrJ3x4Ynppg==",
   "success": true,
   "projectFilePath": "D:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\philipcrasco\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\philipcrasco\\.nuget\\packages\\efcore.namingconventions\\7.0.2\\efcore.namingconventions.7.0.2.nupkg.sha512",
     "C:\\Users\\philipcrasco\\.nuget\\packages\\fluentvalidation\\11.8.1\\fluentvalidation.11.8.1.nupkg.sha512",
     "C:\\Users\\philipcrasco\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.8.1\\fluentvalidation.dependencyinjectionextensions.11.8.1.nupkg.sha512",

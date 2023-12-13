@@ -5,15 +5,9 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeItSimple.Domain", "MakeItSimple.Domain\MakeItSimple.Domain.csproj", "{9295FF95-90CC-4078-BC0B-6FA5685A49B1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0A46CC87-0BC8-417F-93F8-4924D5C7424F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeItSimple.DataAccessLayer", "MakeItSimple.DataAccessLayer\MakeItSimple.DataAccessLayer.csproj", "{D4AB7F35-049A-4FF2-A206-36B512696CAA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeItSimple.Utility", "MakeItSimple.Utility\MakeItSimple.Utility.csproj", "{8886F449-2708-45A0-9CFF-9CCE921709EF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeItSimple.WebApi", "MakeItSimple.WebApi\MakeItSimple.WebApi.csproj", "{12ECBD99-9F88-492F-B3D6-9080D55EF843}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MakeItSimple.WebApi", "MakeItSimple.WebApi\MakeItSimple.WebApi.csproj", "{12ECBD99-9F88-492F-B3D6-9080D55EF843}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9295FF95-90CC-4078-BC0B-6FA5685A49B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9295FF95-90CC-4078-BC0B-6FA5685A49B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9295FF95-90CC-4078-BC0B-6FA5685A49B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9295FF95-90CC-4078-BC0B-6FA5685A49B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4AB7F35-049A-4FF2-A206-36B512696CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4AB7F35-049A-4FF2-A206-36B512696CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4AB7F35-049A-4FF2-A206-36B512696CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4AB7F35-049A-4FF2-A206-36B512696CAA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8886F449-2708-45A0-9CFF-9CCE921709EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8886F449-2708-45A0-9CFF-9CCE921709EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8886F449-2708-45A0-9CFF-9CCE921709EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8886F449-2708-45A0-9CFF-9CCE921709EF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{12ECBD99-9F88-492F-B3D6-9080D55EF843}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12ECBD99-9F88-492F-B3D6-9080D55EF843}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12ECBD99-9F88-492F-B3D6-9080D55EF843}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,9 +24,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9295FF95-90CC-4078-BC0B-6FA5685A49B1} = {AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}
-		{D4AB7F35-049A-4FF2-A206-36B512696CAA} = {AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}
-		{8886F449-2708-45A0-9CFF-9CCE921709EF} = {AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}
 		{12ECBD99-9F88-492F-B3D6-9080D55EF843} = {AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

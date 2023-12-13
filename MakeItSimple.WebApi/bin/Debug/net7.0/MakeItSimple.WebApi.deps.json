@@ -8,10 +8,9 @@
     ".NETCoreApp,Version=v7.0": {
       "MakeItSimple.WebApi/1.0.0": {
         "dependencies": {
+          "BCrypt.Net-Next": "4.0.3",
           "EFCore.NamingConventions": "7.0.2",
-          "FluentValidation": "11.8.1",
           "FluentValidation.DependencyInjectionExtensions": "11.8.1",
-          "MakeItSimple.DataAccessLayer": "1.0.0",
           "MediatR": "12.2.0",
           "MediatR.Extensions.Microsoft.DependencyInjectionFixed": "5.1.2",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "7.0.14",
@@ -30,6 +29,14 @@
         },
         "runtime": {
           "MakeItSimple.WebApi.dll": {}
+        }
+      },
+      "BCrypt.Net-Next/4.0.3": {
+        "runtime": {
+          "lib/net6.0/BCrypt.Net-Next.dll": {
+            "assemblyVersion": "4.0.3.0",
+            "fileVersion": "4.0.3.0"
+          }
         }
       },
       "EFCore.NamingConventions/7.0.2": {
@@ -2553,67 +2560,6 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
         }
-      },
-      "MakeItSimple.DataAccessLayer/1.0.0": {
-        "dependencies": {
-          "EFCore.NamingConventions": "7.0.2",
-          "FluentValidation": "11.8.1",
-          "FluentValidation.DependencyInjectionExtensions": "11.8.1",
-          "MakeItSimple.Domain": "1.0.0",
-          "MakeItSimple.Utility": "1.0.0",
-          "MediatR": "12.2.0",
-          "MediatR.Extensions.Microsoft.DependencyInjectionFixed": "5.1.2",
-          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.14",
-          "Microsoft.Extensions.DependencyInjection": "8.0.0",
-          "Microsoft.VisualStudio.Web.CodeGeneration.Design": "7.0.11",
-          "MySql.EntityFrameworkCore": "7.0.10",
-          "Pomelo.EntityFrameworkCore.MySql": "7.0.0",
-          "Pomelo.EntityFrameworkCore.MySql.Design": "1.1.2"
-        },
-        "runtime": {
-          "MakeItSimple.DataAccessLayer.dll": {}
-        }
-      },
-      "MakeItSimple.Domain/1.0.0": {
-        "dependencies": {
-          "EFCore.NamingConventions": "7.0.2",
-          "FluentValidation": "11.8.1",
-          "FluentValidation.DependencyInjectionExtensions": "11.8.1",
-          "MakeItSimple.Utility": "1.0.0",
-          "MediatR": "12.2.0",
-          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.14",
-          "Microsoft.Extensions.DependencyInjection": "8.0.0",
-          "Microsoft.VisualStudio.Web.CodeGeneration.Design": "7.0.11",
-          "MySql.EntityFrameworkCore": "7.0.10",
-          "Pomelo.EntityFrameworkCore.MySql": "7.0.0",
-          "Pomelo.EntityFrameworkCore.MySql.Design": "1.1.2"
-        },
-        "runtime": {
-          "MakeItSimple.Domain.dll": {}
-        }
-      },
-      "MakeItSimple.Utility/1.0.0": {
-        "dependencies": {
-          "EFCore.NamingConventions": "7.0.2",
-          "FluentValidation": "11.8.1",
-          "FluentValidation.DependencyInjectionExtensions": "11.8.1",
-          "MediatR": "12.2.0",
-          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore": "7.0.14",
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.14",
-          "Microsoft.Extensions.DependencyInjection": "8.0.0",
-          "Microsoft.VisualStudio.Web.CodeGeneration.Design": "7.0.11",
-          "MySql.EntityFrameworkCore": "7.0.10",
-          "Pomelo.EntityFrameworkCore.MySql": "7.0.0",
-          "Pomelo.EntityFrameworkCore.MySql.Design": "1.1.2"
-        },
-        "runtime": {
-          "MakeItSimple.Utility.dll": {}
-        }
       }
     }
   },
@@ -2622,6 +2568,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "BCrypt.Net-Next/4.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
+      "path": "bcrypt.net-next/4.0.3",
+      "hashPath": "bcrypt.net-next.4.0.3.nupkg.sha512"
     },
     "EFCore.NamingConventions/7.0.2": {
       "type": "package",
@@ -4232,21 +4185,6 @@
       "sha512": "sha512-5zJ0XDxAIg8iy+t4aMnQAu0MqVbqyvfoUVl1yDV61xdo3Vth45oA2FoY4pPkxYAH5f8ixpmTqXeEIya95x0aCQ==",
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
-    },
-    "MakeItSimple.DataAccessLayer/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "MakeItSimple.Domain/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "MakeItSimple.Utility/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }

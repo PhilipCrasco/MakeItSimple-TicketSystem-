@@ -14,14 +14,12 @@ namespace MakeItSimple.WebApi.Controllers.UserController
     {
 
         private readonly IMediator _mediator;
-        //private readonly IValidator<AddNewUserCommand> _validator;
         private readonly ValidatorHandler _validatorHandler;
 
 
-        public UserControllers(IMediator mediator , ValidatorHandler validatorHandler/*, IValidator<AddNewUserCommand> validator*/)
+        public UserControllers(IMediator mediator , ValidatorHandler validatorHandler)
         {
             _mediator = mediator;
-            //_validator = validator;
             _validatorHandler = validatorHandler;
 
         }
@@ -73,7 +71,9 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             {
                 return BadRequest(ex.Message);
             }
+
         }
+
 
         //[HttpPut("UpdateUserInfo")]
         //public async Task<IActionResult> Update( [FromBody] UpdateUserCommand command)

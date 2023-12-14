@@ -13,7 +13,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         {
             AddNewUserValidator = new User.UserValidator();
 
-
         }
         
     }

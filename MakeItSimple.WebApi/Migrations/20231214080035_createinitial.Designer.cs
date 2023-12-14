@@ -3,6 +3,7 @@ using System;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    partial class MisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231214080035_createinitial")]
+    partial class createinitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,10 +36,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext")
-                        .HasColumnName("email");
 
                     b.Property<string>("Fullname")
                         .HasColumnType("longtext")
@@ -83,11 +82,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b22c048a-27c5-47a7-a6da-839a4e0f3c63"),
-                            CreatedAt = new DateTime(2023, 12, 14, 16, 18, 44, 218, DateTimeKind.Local).AddTicks(5635),
+                            Id = new Guid("247aaa0f-aaa9-4b46-9839-8426b8c9c19f"),
+                            CreatedAt = new DateTime(2023, 12, 14, 16, 0, 34, 746, DateTimeKind.Local).AddTicks(6834),
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$HIcdLGxZp2YAJmnWjMfHRuwaJNZyDgrMeiP5oBmVVGONIHosqtWom",
+                            Password = "$2a$11$ceebJ6k5IaBmCYUfLBQE.uKsZBnNZ/q9H1mckaYzLwX5f1oCPuH.W",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserRoleId = 1,
                             Username = "admin"
@@ -144,7 +143,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 14, 16, 18, 44, 486, DateTimeKind.Local).AddTicks(9284),
+                            CreatedAt = new DateTime(2023, 12, 14, 16, 0, 35, 19, DateTimeKind.Local).AddTicks(691),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

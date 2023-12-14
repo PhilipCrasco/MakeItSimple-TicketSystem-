@@ -16,6 +16,7 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
             public string Fullname { get; set; }
             public string Username { get; set; }
             public string Password { get; set; }
+            public string Email { get; set; }
             
         }
 
@@ -25,6 +26,8 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
             public string Fullname { set; get; }
             public string Username { get; set; }
             public string Password { get; set; }
+
+            public string Email { get; set; }
 
         }
 
@@ -55,6 +58,7 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
                     Fullname = command.Fullname,
                     Username = command.Username,
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Password),
+                    Email = command.Email,
                 };
                 
                 await _context.Users.AddAsync(users , cancellationToken);
@@ -67,6 +71,7 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
                     Fullname = users.Fullname,
                     Username = users.Username,
                     Password = users.Password,
+                    Email = users.Email,
 
                 };
 

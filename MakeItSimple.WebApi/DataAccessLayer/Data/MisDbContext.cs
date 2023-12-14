@@ -1,5 +1,9 @@
-﻿using MakeItSimple.WebApi.Models;
+﻿using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
+using MakeItSimple.WebApi.Models;
+using MakeItSimple.WebApi.Models.UserManagement.UserRoleModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text.Json;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Data
 {
@@ -8,17 +12,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public MisDbContext(DbContextOptions<MisDbContext> options) : base(options) { }
 
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasData(new User
-            {
-                Id = Guid.NewGuid(),
-                Fullname = "Crasco , Philip Lorenz R.",
-                Username = "pcrasco",
-                Password = "$2a$12$SxkZHwqc0st2uk2fxsnQduvfm6GZxJXymbcsueo4Fnw1wKSmNDcs2"
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
 
-            });
         }
 
 

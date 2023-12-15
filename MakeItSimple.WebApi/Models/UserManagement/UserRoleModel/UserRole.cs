@@ -12,11 +12,9 @@ namespace MakeItSimple.WebApi.Models.UserManagement.UserRoleModel
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; }
 
-        [ForeignKey("AddedByUser")]
         public Guid ? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }
-
-        [ForeignKey("ModifiedByUser")]
+      
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
 

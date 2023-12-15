@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using static MakeItSimple.DataAccessLayer.Features.UserFeatures.AddNewUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
 
 namespace MakeItSimple.WebApi.Models
 {
@@ -9,7 +10,7 @@ namespace MakeItSimple.WebApi.Models
         {
             public UserValidator()
             {
-                RuleFor(x => x.Id).NotNull();
+
                 RuleFor(x => x.Fullname).NotEmpty().WithMessage("Fullname is required!")
                 .MinimumLength(3).WithMessage("Fullname must be at least 3 character long!");
                 RuleFor(x => x.Username).NotEmpty().WithMessage("Username is required!")
@@ -18,10 +19,31 @@ namespace MakeItSimple.WebApi.Models
                 .MinimumLength(6).WithMessage("Password must be at least 6 character/number long!");
                 RuleFor(em => em.Email).NotEmpty().WithMessage("Email is required!")
                 .EmailAddress().WithMessage("A valid email address is required!");
-                    
-              
+               
             }
+
         }
+
+
+        public class UserUpdateValidator : AbstractValidator<UpdateUserCommand>
+        {
+            public UserUpdateValidator()
+            {
+
+                RuleFor(x => x.Fullname).NotEmpty().WithMessage("Fullname is required!")
+                .MinimumLength(3).WithMessage("Fullname must be at least 3 character long!");
+                RuleFor(x => x.Username).NotEmpty().WithMessage("Username is required!")
+                .MinimumLength(3).WithMessage("Username must be at least 3 character long!");
+                RuleFor(em => em.Email).NotEmpty().WithMessage("Email is required!")
+                .EmailAddress().WithMessage("A valid email address is required!");
+
+            }
+
+        }
+
+
+
+
 
 
 

@@ -2,7 +2,7 @@
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static MakeItSimple.DataAccessLayer.Features.UserFeatures.AddNewUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures.GetUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
 
@@ -23,6 +23,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             _validatorHandler = validatorHandler;
 
         }
+
 
         [HttpGet("GetUser")]
         public async Task<IActionResult> GetUser([FromQuery] GetUsersQuery query)
@@ -47,7 +48,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
 
 
         [HttpPost("AddNewUser")]
-
         public async Task<IActionResult> AddNewUser([FromBody] AddNewUserCommand command)
         {
             try
@@ -75,25 +75,36 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         }
 
 
-        //[HttpPut("UpdateUserInfo")]
-        //public async Task<IActionResult> Update( [FromBody] UpdateUserCommand command)
-        //{
-        //    try
-        //    {
-        
-        //        var result = await _mediator.Send(command);
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
+        {
+            try
+            {
+                var validationResult = await _validatorHandler.UpdateUserValidator.ValidateAsync(command);
+                if(!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);
 
-        //        if (result.IsFailure)
-        //        {
-        //            return BadRequest(result);
-        //        }
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+                }
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
+
+
 
 
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    [Migration("20231214080035_createinitial")]
+    [Migration("20231215081231_createinitial")]
     partial class createinitial
     {
         /// <inheritdoc />
@@ -37,6 +37,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext")
+                        .HasColumnName("email");
+
                     b.Property<string>("Fullname")
                         .HasColumnType("longtext")
                         .HasColumnName("fullname");
@@ -44,6 +48,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsPasswordChange")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_password_change");
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)")
@@ -82,11 +90,12 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("247aaa0f-aaa9-4b46-9839-8426b8c9c19f"),
-                            CreatedAt = new DateTime(2023, 12, 14, 16, 0, 34, 746, DateTimeKind.Local).AddTicks(6834),
+                            Id = new Guid("c2b4d858-08f2-4432-bd33-0ee6f3fe9167"),
+                            CreatedAt = new DateTime(2023, 12, 15, 16, 12, 31, 74, DateTimeKind.Local).AddTicks(4165),
+                            Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$ceebJ6k5IaBmCYUfLBQE.uKsZBnNZ/q9H1mckaYzLwX5f1oCPuH.W",
+                            Password = "$2a$11$pLWkI5tO4qfvfHpVXj3h8evM6P5w4xPkmiqGScM8YirxpFfRHIIeW",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserRoleId = 1,
                             Username = "admin"
@@ -143,7 +152,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 14, 16, 0, 35, 19, DateTimeKind.Local).AddTicks(691),
+                            CreatedAt = new DateTime(2023, 12, 15, 16, 12, 31, 341, DateTimeKind.Local).AddTicks(908),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -185,13 +194,13 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("AddedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_user_roles_users_added_by");
+                        .HasConstraintName("fk_user_roles_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_user_roles_users_modified_by");
+                        .HasConstraintName("fk_user_roles_users_modified_by_user_id");
 
                     b.Navigation("AddedByUser");
 

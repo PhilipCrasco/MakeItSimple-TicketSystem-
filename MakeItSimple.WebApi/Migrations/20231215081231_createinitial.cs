@@ -45,10 +45,13 @@ namespace MakeItSimple.WebApi.Migrations
                     is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     fullname = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    email = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     username = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     password = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    is_password_change = table.Column<bool>(type: "tinyint(1)", nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     added_by = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
@@ -82,12 +85,12 @@ namespace MakeItSimple.WebApi.Migrations
             migrationBuilder.InsertData(
                 table: "user_roles",
                 columns: new[] { "id", "added_by", "created_at", "is_active", "modified_by", "permissions", "updated_at", "user_role_name" },
-                values: new object[] { 1, null, new DateTime(2023, 12, 14, 16, 0, 35, 19, DateTimeKind.Local).AddTicks(691), true, null, "[\"User Management\"]", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin" });
+                values: new object[] { 1, null, new DateTime(2023, 12, 15, 16, 12, 31, 341, DateTimeKind.Local).AddTicks(908), true, null, "[\"User Management\"]", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin" });
 
             migrationBuilder.InsertData(
                 table: "users",
-                columns: new[] { "id", "added_by", "created_at", "fullname", "is_active", "modified_by", "password", "updated_at", "user_role_id", "username" },
-                values: new object[] { new Guid("247aaa0f-aaa9-4b46-9839-8426b8c9c19f"), null, new DateTime(2023, 12, 14, 16, 0, 34, 746, DateTimeKind.Local).AddTicks(6834), "Admin", true, null, "$2a$11$ceebJ6k5IaBmCYUfLBQE.uKsZBnNZ/q9H1mckaYzLwX5f1oCPuH.W", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "admin" });
+                columns: new[] { "id", "added_by", "created_at", "email", "fullname", "is_active", "is_password_change", "modified_by", "password", "updated_at", "user_role_id", "username" },
+                values: new object[] { new Guid("c2b4d858-08f2-4432-bd33-0ee6f3fe9167"), null, new DateTime(2023, 12, 15, 16, 12, 31, 74, DateTimeKind.Local).AddTicks(4165), "admin@gmail.com", "Admin", true, null, null, "$2a$11$pLWkI5tO4qfvfHpVXj3h8evM6P5w4xPkmiqGScM8YirxpFfRHIIeW", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_roles_added_by",
@@ -115,7 +118,7 @@ namespace MakeItSimple.WebApi.Migrations
                 column: "user_role_id");
 
             migrationBuilder.AddForeignKey(
-                name: "fk_user_roles_users_added_by",
+                name: "fk_user_roles_users_added_by_user_id",
                 table: "user_roles",
                 column: "added_by",
                 principalTable: "users",
@@ -123,7 +126,7 @@ namespace MakeItSimple.WebApi.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "fk_user_roles_users_modified_by",
+                name: "fk_user_roles_users_modified_by_user_id",
                 table: "user_roles",
                 column: "modified_by",
                 principalTable: "users",
@@ -135,11 +138,11 @@ namespace MakeItSimple.WebApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "fk_user_roles_users_added_by",
+                name: "fk_user_roles_users_added_by_user_id",
                 table: "user_roles");
 
             migrationBuilder.DropForeignKey(
-                name: "fk_user_roles_users_modified_by",
+                name: "fk_user_roles_users_modified_by_user_id",
                 table: "user_roles");
 
             migrationBuilder.DropTable(

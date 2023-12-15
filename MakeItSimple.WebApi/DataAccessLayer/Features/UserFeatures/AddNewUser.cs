@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MakeItSimple.WebApi.Models;
 
-namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 {
     public class AddNewUser
     {
@@ -17,7 +17,8 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
             public string Username { get; set; }
             public string Password { get; set; }
             public string Email { get; set; }
-            
+            public int UserRoleId { get; set; }
+
         }
 
         public class AddNewUserCommand : IRequest<Result>
@@ -26,8 +27,8 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
             public string Fullname { set; get; }
             public string Username { get; set; }
             public string Password { get; set; }
-
             public string Email { get; set; }
+            public int UserRoleId { get; set; }
 
         }
 
@@ -45,11 +46,18 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
             public async Task<Result> Handle(AddNewUserCommand command, CancellationToken cancellationToken)
             {
 
-                var UserAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Fullname == command.Fullname);
+                var UserAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Fullname == command.Fullname , cancellationToken);
 
                 if (UserAlreadyExist != null)
                 {
                     return Result.Failure(UserError.UserAlreadyExist(command.Fullname));
+                }
+
+                var UserRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
+
+                if (UserRoleNotExist == null)
+                {
+                    return Result.Failure(UserError.UserRoleNotExist());
                 }
 
 
@@ -59,6 +67,7 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
                     Username = command.Username,
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Password),
                     Email = command.Email,
+                    UserRoleId = command.UserRoleId
                 };
                 
                 await _context.Users.AddAsync(users , cancellationToken);
@@ -72,7 +81,7 @@ namespace MakeItSimple.DataAccessLayer.Features.UserFeatures
                     Username = users.Username,
                     Password = users.Password,
                     Email = users.Email,
-
+                    UserRoleId = users.UserRoleId
                 };
 
                 return Result.Success(result);

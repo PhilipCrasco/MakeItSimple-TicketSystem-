@@ -252,3 +252,12 @@ D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\obj\Deb
 D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\obj\Debug\net7.0\MakeItSimple.WebApi.pdb
 D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\obj\Debug\net7.0\MakeItSimple.WebApi.genruntimeconfig.cache
 D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\obj\Debug\net7.0\ref\MakeItSimple.WebApi.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\JWT.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\MakeItSimple.WebApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll

@@ -1,10 +1,15 @@
 ﻿using FluentValidation;
+using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
+using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures.GetUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
+
 
 namespace MakeItSimple.WebApi.Controllers.UserController
 {
@@ -31,17 +36,36 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             try
             {
 
-                var result = await _mediator.Send(query);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
+                var users = await _mediator.Send(query);
+
+                Response.AddPaginationHeader(
                 
-                return Ok(result);
+                users.CurrentPage,
+                users.PageSize,
+                users.TotalCount,
+                users.TotalPages,
+                users.HasPreviousPage,
+                users.HasNextPage
+                
+                );
+
+                var result = new
+                {
+                    users,
+                    users.CurrentPage,
+                    users.PageSize,
+                    users.TotalCount,
+                    users.TotalPages,
+                    users.HasPreviousPage,
+                    users.HasNextPage
+                };
+
+                var successResult = Result.Success(result);
+                return Ok(successResult);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Conflict(ex.Message);
             }
         }
 
@@ -59,6 +83,10 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                     return BadRequest(validationResult.Errors);
                 }
 
+                if(User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.AddedBy = userId;
+                }
 
                 var result = await _mediator.Send(command);
                 if (result.IsFailure)
@@ -69,11 +97,10 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Conflict(ex.Message);
             }
 
         }
-
 
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
@@ -86,6 +113,12 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                     return BadRequest(validationResult.Errors);
 
                 }
+
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.ModifiedBy = userId;
+                }
+
                 var result = await _mediator.Send(command);
                 if (result.IsFailure)
                 {
@@ -96,9 +129,31 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             }
             catch(Exception ex) 
             {
-                return BadRequest(ex.Message);
+                return Conflict(ex.Message);
             }
         }
+
+
+        [HttpPatch("UpdateUserStatus")]
+        public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserCommand command)
+        {
+            try
+            {
+
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
 
 
 

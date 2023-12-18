@@ -26,14 +26,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
                     c => c.ToList()));
 
 
-            builder.HasOne(x => x.AddedByUser)
+            builder.HasOne(ur => ur.AddedByUser)
                     .WithMany()
-                    .HasForeignKey(x => x.AddedBy)
+                    .HasForeignKey(ur => ur.AddedBy)
                      .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(x => x.ModifiedByUser)
+            builder.HasOne(ur =>ur.ModifiedByUser)
                    .WithMany()
-                   .HasForeignKey(x => x.ModifiedBy)
+                   .HasForeignKey(ur => ur.ModifiedBy)
                    .OnDelete(DeleteBehavior.Restrict);
 
            

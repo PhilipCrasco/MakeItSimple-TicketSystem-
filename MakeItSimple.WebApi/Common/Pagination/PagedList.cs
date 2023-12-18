@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures;
+using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.Common.Pagination
 {
@@ -15,11 +16,12 @@ namespace MakeItSimple.WebApi.Common.Pagination
         public bool HasPreviousPage { get; private set; }
 
         public bool HasNextPage { get; private set; }
+        public bool IsFailure { get; internal set; }
 
         public PagedList(List<T> items , int count , int pageNumber , int pageSize)
         {
             
-            TotalCount = count;
+            TotalCount = count ;
             PageSize = pageSize;
             CurrentPage = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
@@ -34,5 +36,9 @@ namespace MakeItSimple.WebApi.Common.Pagination
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
 
+        internal static Task<PagedList<GetUser.GetUserResult>> CreateAsync(List<GetUser.GetUserResult> users, int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

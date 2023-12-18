@@ -87,12 +87,12 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c2b4d858-08f2-4432-bd33-0ee6f3fe9167"),
-                            CreatedAt = new DateTime(2023, 12, 15, 16, 12, 31, 74, DateTimeKind.Local).AddTicks(4165),
+                            Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
+                            CreatedAt = new DateTime(2023, 12, 18, 9, 32, 44, 437, DateTimeKind.Local).AddTicks(7897),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$pLWkI5tO4qfvfHpVXj3h8evM6P5w4xPkmiqGScM8YirxpFfRHIIeW",
+                            Password = "$2a$11$lGXiYKF276plczW5/ICsT.nUe0IWI5Cid5n4wThkP5gCytwn5Btb.",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserRoleId = 1,
                             Username = "admin"
@@ -149,7 +149,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 15, 16, 12, 31, 341, DateTimeKind.Local).AddTicks(908),
+                            CreatedAt = new DateTime(2023, 12, 18, 9, 32, 44, 711, DateTimeKind.Local).AddTicks(4208),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

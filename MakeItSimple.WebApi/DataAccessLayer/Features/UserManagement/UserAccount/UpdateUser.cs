@@ -18,6 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Fullname { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
+            public Guid ? ModifiedBy { get; set; }
             public DateTime Updated_At { get; set; }
 
         }
@@ -28,9 +29,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Username { get; set; }
             public string Fullname { get; set; }
             public string Email { get; set; }
-            public int UserRoleId { get; set; }
-            public DateTime Updated_At { get; set; }
-
+            public int UserRoleId { get; set; }       
+            public Guid? ModifiedBy { get; set; }
         }
 
         public class Handler : IRequestHandler<UpdateUserCommand, Result>
@@ -59,6 +59,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserAlreadyExist(command.Fullname));
                 }
 
+                var UsernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.Username, cancellationToken);
+                if (UsernameAlreadyExist != null)
+                {
+                    return Result.Failure(UserError.UsernameAlreadyExist(command.Username));
+                }
+
                 var UserRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
 
                 if (UserRoleNotExist == null)
@@ -71,17 +77,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 User.Email = command.Email;
                 User.UserRoleId = command.UserRoleId;
                 User.UpdatedAt = DateTime.Now;
+                User.ModifiedBy = command.ModifiedBy;
 
                 await _context.SaveChangesAsync(cancellationToken);
 
                 var result = new UpdateUserResult
                 {
+                    Id = command.Id,    
                     Fullname = User.Fullname,
                     Username = User.Username,
                     Email = User.Email,
                     UserRoleId = User.UserRoleId,
                     Updated_At = User.UpdatedAt,
-
+                    ModifiedBy = User.ModifiedBy,
                 };
 
                 return Result.Success(result);

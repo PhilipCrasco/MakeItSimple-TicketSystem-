@@ -13,22 +13,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
         public class AddNewUserResult
         {   
             public Guid Id {  get; set; }
+            public string EmpId { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
-            public Guid ? AddedBy { get; set; }
+            public Guid ? Added_By { get; set; }
 
         }
 
         public class AddNewUserCommand : IRequest<Result>
         {
             public Guid Id { get; set; }
+            public string EmpId { get; set; }
             public string Fullname { set; get; }
             public string Username { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
-            public Guid ? AddedBy { get; set; }
+            public Guid ? Added_By { get; set; }
 
         }
 
@@ -46,11 +48,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public async Task<Result> Handle(AddNewUserCommand command, CancellationToken cancellationToken)
             {
 
-                var UserAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Fullname == command.Fullname , cancellationToken);
+                var UserAlreadyExist = await _context.Users.FirstOrDefaultAsync(x =>  x.EmpId == command.EmpId && x.Fullname == command.Fullname , cancellationToken);
 
                 if (UserAlreadyExist != null)
                 {
-                    return Result.Failure(UserError.UserAlreadyExist(command.Fullname));
+                    return Result.Failure(UserError.UserAlreadyExist(command.EmpId , command.Fullname));
                 }
 
                 var UsernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.Username , cancellationToken);
@@ -82,7 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     Email = command.Email,
                     UserRoleId = command.UserRoleId,
-                    AddedBy = command.AddedBy,
+                    AddedBy = command.Added_By,
                     
                 };
                 
@@ -96,7 +98,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Username = users.Username,
                     Email = users.Email,
                     UserRoleId = users.UserRoleId,
-                    AddedBy = users.AddedBy
+                    Added_By = users.AddedBy
                 };
 
                 return Result.Success(result);

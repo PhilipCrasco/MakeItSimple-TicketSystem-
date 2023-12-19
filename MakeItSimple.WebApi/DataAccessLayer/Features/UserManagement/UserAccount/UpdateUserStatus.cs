@@ -45,7 +45,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return Result.Success(users);
+                var results = new UpdateUserStatusResult
+                {
+                    Id = users.Id,
+                    Status = users.IsActive
+
+                };
+
+                return Result.Success(results);
 
 
             }

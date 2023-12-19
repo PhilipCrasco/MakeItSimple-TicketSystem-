@@ -10,7 +10,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
         {
             builder.HasData(new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
                 Fullname = "Admin",
                 Username = "admin",
                 Email = "admin@gmail.com",

@@ -9,20 +9,21 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures.GetUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateUserStatus;
 
 
 namespace MakeItSimple.WebApi.Controllers.UserController
 {
     [Route("api/User")]
     [ApiController]
-    public class UserControllers : ControllerBase
+    public class UserController : ControllerBase
     {
 
         private readonly IMediator _mediator;
         private readonly ValidatorHandler _validatorHandler;
 
 
-        public UserControllers(IMediator mediator , ValidatorHandler validatorHandler)
+        public UserController(IMediator mediator , ValidatorHandler validatorHandler)
         {
             _mediator = mediator;
             _validatorHandler = validatorHandler;
@@ -85,7 +86,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
 
                 if(User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
-                    command.AddedBy = userId;
+                    command.Added_By = userId;
                 }
 
                 var result = await _mediator.Send(command);
@@ -116,7 +117,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
-                    command.ModifiedBy = userId;
+                    command.Modified_By = userId;
                 }
 
                 var result = await _mediator.Send(command);
@@ -135,7 +136,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
 
 
         [HttpPatch("UpdateUserStatus")]
-        public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserCommand command)
+        public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserStatusCommand command)
         {
             try
             {

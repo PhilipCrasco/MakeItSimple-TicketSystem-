@@ -14,23 +14,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
         public class UpdateUserResult
         {
             public Guid Id {  get; set; }
-            public string Username { get; set; }
-            public string Fullname { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
-            public Guid ? ModifiedBy { get; set; }
-            public DateTime Updated_At { get; set; }
+            public Guid ? Modified_By { get; set; }
+            public DateTime ? Updated_At { get; set; }
 
         }
 
         public class UpdateUserCommand : IRequest<Result>
         {
             public Guid Id { get; set; }
-            public string Username { get; set; }
-            public string Fullname { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }       
-            public Guid? ModifiedBy { get; set; }
+            public Guid? Modified_By { get; set; }
         }
 
         public class Handler : IRequestHandler<UpdateUserCommand, Result>
@@ -52,19 +48,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
                 }
 
-                var UserAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Fullname == command.Fullname , cancellationToken);
-
-                if (UserAlreadyExist != null && UserAlreadyExist.Fullname != User.Fullname)
-                {
-                    return Result.Failure(UserError.UserAlreadyExist(command.Fullname));
-                }
-
-                var UsernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.Username, cancellationToken);
-                if (UsernameAlreadyExist != null)
-                {
-                    return Result.Failure(UserError.UsernameAlreadyExist(command.Username));
-                }
-
                 var UserRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
 
                 if (UserRoleNotExist == null)
@@ -72,24 +55,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserRoleNotExist());
                 }
 
-                User.Fullname = command.Fullname;
-                User.Username = command.Username;
                 User.Email = command.Email;
                 User.UserRoleId = command.UserRoleId;
                 User.UpdatedAt = DateTime.Now;
-                User.ModifiedBy = command.ModifiedBy;
+                User.ModifiedBy = command.Modified_By;
 
                 await _context.SaveChangesAsync(cancellationToken);
 
                 var result = new UpdateUserResult
                 {
                     Id = command.Id,    
-                    Fullname = User.Fullname,
-                    Username = User.Username,
                     Email = User.Email,
                     UserRoleId = User.UserRoleId,
                     Updated_At = User.UpdatedAt,
-                    ModifiedBy = User.ModifiedBy,
+                    Modified_By = User.ModifiedBy,
                 };
 
                 return Result.Success(result);

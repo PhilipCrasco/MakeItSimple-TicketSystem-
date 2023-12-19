@@ -1,6 +1,6 @@
 ﻿using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
 using MakeItSimple.WebApi.Models;
-using MakeItSimple.WebApi.Models.UserManagement.UserRoleModel;
+using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;

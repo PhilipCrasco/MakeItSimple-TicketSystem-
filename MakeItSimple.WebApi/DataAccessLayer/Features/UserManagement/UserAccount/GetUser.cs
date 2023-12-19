@@ -17,11 +17,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string Fullname { get; set; }
             public string Username { get; set; }
             public string Email { get; set; }
-            public string AddedBy { get; set; }
+            public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public bool Is_Active { get; set; }
-            public string ModifiedBy { get; set; }
-            public DateTime Update_At { get; set;}
+            public string Modified_By { get; set; }
+            public DateTime ? Update_At { get; set;}
             public string User_Role_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
 
@@ -75,10 +75,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Fullname = x.Fullname,
                     Username = x.Username,
                     Email = x.Email,
-                    AddedBy = x.AddedByUser.Fullname,
+                    Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Is_Active = x.IsActive,
-                    ModifiedBy = x.ModifiedByUser.Fullname,
+                    Modified_By = x.ModifiedByUser.Fullname,
                     Update_At = x.UpdatedAt,
                     User_Role_Name = x.UserRole.UserRoleName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions

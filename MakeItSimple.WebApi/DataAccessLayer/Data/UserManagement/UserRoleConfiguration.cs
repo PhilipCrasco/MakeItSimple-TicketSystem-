@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Models.UserManagement.UserRoleModel;
+﻿
+using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -26,7 +26,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public bool ? IsPasswordChanged { get; set; }
 
 
-
             public AuthenticateUserResult(User user , string token)
             {
                 Id = user.Id;

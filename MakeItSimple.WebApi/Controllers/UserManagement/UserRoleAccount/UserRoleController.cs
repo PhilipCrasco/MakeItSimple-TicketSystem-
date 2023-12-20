@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.AddNewUserRole;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.GetUserRole;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.UntagAndTagUserRolePermission;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.UpdateUserRole;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.UpdateUserRoleStatus;
 
@@ -146,6 +147,37 @@ namespace MakeItSimple.WebApi.Controllers.UserManagement.UserRoleAccount
             catch( Exception ex ) 
             {
              return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UntagAndTagUserRolePermission")]
+        public async Task<IActionResult> UntagAndTagUserRolePermission([FromBody] UntagAndTagUserRolePermissionCommand command)
+        {
+            try
+            {
+                var validationResult = await _validatorHandler.TagAndUntagUserRoleValidator.ValidateAsync(command);
+
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);
+                }
+
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                }
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 

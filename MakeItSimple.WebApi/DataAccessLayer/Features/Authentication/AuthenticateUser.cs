@@ -60,12 +60,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
         {
 
             private readonly MisDbContext _context;
-            private readonly IConfiguration _configuration;
+            private readonly TokenGenerator _tokenGenerator;
 
-            public Handler(MisDbContext context , IConfiguration configuration)
+            public Handler(MisDbContext context , TokenGenerator tokenGenerator)
             {
                 _context = context;
-                _configuration = configuration;
+                _tokenGenerator = tokenGenerator;
             }
 
             public async Task<Result> Handle(AuthenticateUserQuery command, CancellationToken cancellationToken)
@@ -85,44 +85,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var token = GenerateJwtToken(user);
+                var token = _tokenGenerator.GenerateJwtToken(user);
 
                 var results = user.ToGetAuthenticatedUserResult(token);
 
                 return Result.Success(results);
 
             }
-
-
-            private string GenerateJwtToken(User user)
-            {
-                var key = _configuration.GetValue<string>("JwtConfig:Key");
-                var audience = _configuration.GetValue<string>("JwtConfig:Audience");
-                var issuer = _configuration.GetValue<string>("JwtConfig:Issuer");
-                var KeyBytes = Encoding.ASCII.GetBytes(key);
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                        new Claim("id", user.Id.ToString()),
-                        new Claim(ClaimTypes.Name , user.Fullname),
-                        new Claim(ClaimTypes.Email , user.Email),
-                        new Claim(ClaimTypes.Role , user.UserRole.UserRoleName)
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(1),
-                    Issuer = issuer,
-                    Audience = audience,
-                    SigningCredentials = new SigningCredentials(
-                        new SymmetricSecurityKey(KeyBytes),
-                        SecurityAlgorithms.HmacSha256Signature)
-                };
-
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
-
-            }
-
 
         }
     }

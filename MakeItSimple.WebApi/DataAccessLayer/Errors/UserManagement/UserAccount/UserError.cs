@@ -21,5 +21,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors
       public static Error UserNotExist() =>
       new Error("User.UserNotExist", "User not exist!");
 
+      public static Error UserOldPasswordInCorrect() =>
+      new Error("User.UserNotExist", "User not exist!");
+
+      public static Error InvalidDefaultPassword() =>
+      new Error("User.InvalidDefaultPassword", "New password should not be equal to default password!");
+
     }
 }

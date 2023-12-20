@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
 
 
 namespace MakeItSimple.WebApi.Models
@@ -37,6 +38,18 @@ namespace MakeItSimple.WebApi.Models
 
         }
 
+
+        public class UserChangePasswordValidator : AbstractValidator<UserChangePasswordCommand>
+        {
+            public UserChangePasswordValidator()
+            {
+
+                RuleFor(p => p.New_Password).Equal(p => p.Confirm_Password)
+                    .WithMessage("New password not equal to confirm password!");
+
+            }
+
+        }
 
 
 

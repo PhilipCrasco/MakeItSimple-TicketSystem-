@@ -10,7 +10,7 @@ namespace MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount
         public int Id { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime ? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public Guid ? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }

@@ -62,7 +62,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("password");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
@@ -92,18 +92,17 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2023, 12, 19, 9, 3, 16, 806, DateTimeKind.Local).AddTicks(757),
+                            CreatedAt = new DateTime(2023, 12, 20, 9, 14, 33, 218, DateTimeKind.Local).AddTicks(281),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$MyPFNsaGkaMg1nJxjbDADOAPOHiNuz0zoZXA5PXCKQ5F2a8IfgAXC",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Password = "$2a$11$.dmG8WMZlvtmtjEJV4b5z.J96Y9L4cnZjiIu1K7ADaEF2KGkqaJOS",
                             UserRoleId = 1,
                             Username = "admin"
                         });
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleModel.UserRole", b =>
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +129,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("permissions");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
@@ -153,10 +152,9 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 19, 9, 3, 17, 93, DateTimeKind.Local).AddTicks(3206),
+                            CreatedAt = new DateTime(2023, 12, 20, 9, 14, 33, 486, DateTimeKind.Local).AddTicks(205),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserRoleName = "Admin"
                         });
                 });
@@ -175,7 +173,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_users_users_modified_by");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.UserManagement.UserRoleModel.UserRole", "UserRole")
+                    b.HasOne("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -189,7 +187,7 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleModel.UserRole", b =>
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
                         .WithMany()
@@ -208,7 +206,7 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleModel.UserRole", b =>
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>
                 {
                     b.Navigation("Users");
                 });

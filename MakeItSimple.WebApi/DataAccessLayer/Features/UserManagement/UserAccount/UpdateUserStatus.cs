@@ -49,10 +49,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
                 {
                     Id = users.Id,
                     Status = users.IsActive
-
                 };
 
                 return Result.Success(results);
+
 
 
             }

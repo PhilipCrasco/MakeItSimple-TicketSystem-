@@ -79,6 +79,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
                 var users = new User
                 {
+                      
                     Fullname = command.Fullname,
                     Username = command.Username,
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),

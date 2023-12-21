@@ -17,6 +17,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
         public class AuthenticateUserResult
         {
             public Guid Id { get; set; }
+
+            public string EmpId { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
             public string Email { get; set; }
@@ -29,6 +31,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public AuthenticateUserResult(User user , string token)
             {
                 Id = user.Id;
+                EmpId = user.EmpId;
                 Fullname = user.Fullname;
                 Username = user.Username;
                 Email = user.Email;

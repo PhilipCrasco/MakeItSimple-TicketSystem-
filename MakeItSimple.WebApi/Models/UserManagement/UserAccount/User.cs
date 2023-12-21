@@ -1,4 +1,5 @@
 ﻿
+using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,6 +31,8 @@ namespace MakeItSimple.WebApi.Models
         public int UserRoleId { get; set; }
         public virtual UserRole UserRole { get; set; }
 
+        public int ? DepartmentId { get; set; }
+        public virtual Department Department { get; set; }
 
     }
 }

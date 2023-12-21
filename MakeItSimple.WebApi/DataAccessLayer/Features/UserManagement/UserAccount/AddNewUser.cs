@@ -18,6 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Username { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
+            public int ? DepartmentId { get; set; }
             public Guid ? Added_By { get; set; }
 
         }
@@ -30,6 +31,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Username { get; set; }
             public string Email { get; set; }
             public int UserRoleId { get; set; }
+            public int ? DepartmentId { get; set; }
             public Guid ? Added_By { get; set; }
 
         }
@@ -75,16 +77,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserRoleNotExist());
                 }
 
+                var DepartmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId , cancellationToken);
+
+                if(DepartmentNotExist == null)
+                {
+                    return Result.Failure(UserError.DepartmentNotExist());
+                }
                
 
                 var users = new User
                 {
-                      
+
+                    EmpId = command.EmpId, 
                     Fullname = command.Fullname,
                     Username = command.Username,
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     Email = command.Email,
                     UserRoleId = command.UserRoleId,
+                    DepartmentId = command.DepartmentId,    
                     AddedBy = command.Added_By,
                     
                 };
@@ -95,10 +105,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 var result = new AddNewUserResult
                 {
                     Id = users.Id,
+                    EmpId = users.EmpId,
                     Fullname = users.Fullname,
                     Username = users.Username,
                     Email = users.Email,
                     UserRoleId = users.UserRoleId,
+                    DepartmentId = users.DepartmentId,
                     Added_By = users.AddedBy
                 };
 

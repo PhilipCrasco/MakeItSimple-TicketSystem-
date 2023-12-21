@@ -23,6 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string Modified_By { get; set; }
             public DateTime ? Update_At { get; set;}
             public string User_Role_Name { get; set; }
+            public string Department_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
 
 
@@ -81,6 +82,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Modified_By = x.ModifiedByUser.Fullname,
                     Update_At = x.UpdatedAt,
                     User_Role_Name = x.UserRole.UserRoleName,
+                    Department_Name = x.Department.DepartmentName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
 
                 });

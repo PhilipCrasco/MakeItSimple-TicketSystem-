@@ -1,8 +1,5 @@
-﻿using FluentValidation;
-using MakeItSimple.WebApi.Common;
+﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures;
-using MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

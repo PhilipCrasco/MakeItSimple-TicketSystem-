@@ -47,10 +47,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             var DepartmentCodeNullOrEmpty = new List<SyncDepartmentCommand.Department>();
             var DepartmentNameNullOrEmpty = new List<SyncDepartmentCommand.Department>();
 
-            foreach (SyncDepartmentCommand.Department department in command.Departments)
+            foreach (var department in command.Departments)
             {
 
-                if(string.IsNullOrEmpty(department.Department_Code))
+
+
+
+                if (string.IsNullOrEmpty(department.Department_Code))
                 {
                     DepartmentCodeNullOrEmpty.Add(department);
                     continue;
@@ -73,6 +76,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     if (ExistingDepartment != null)
                     {
                         bool hasChanged = false;
+
+                        if (ExistingDepartment.DepartmentCode != department.Department_Code)
+                        {
+                            ExistingDepartment.DepartmentCode = department.Department_Code;
+                            hasChanged = true;
+                        }
 
                         if (ExistingDepartment.DepartmentName != department.Department_Name)
                         {
@@ -101,7 +110,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     }
                     else
                     {
-                        var Addepartments = new Models.Setup.DepartmentSetup.Department
+                        var AddDepartments = new Models.Setup.DepartmentSetup.Department
                         {
 
                             DepartmentNo = department.Department_No,
@@ -114,7 +123,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                         };
 
                         AvailableSync.Add(department);         
-                        await _context.Departments.AddAsync(Addepartments);
+                        await _context.Departments.AddAsync(AddDepartments);
                     }
 
                 }

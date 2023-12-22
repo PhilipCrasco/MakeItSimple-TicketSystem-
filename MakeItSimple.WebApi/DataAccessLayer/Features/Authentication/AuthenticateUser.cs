@@ -74,12 +74,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public async Task<Result> Handle(AuthenticateUserQuery command, CancellationToken cancellationToken)
             {
                 var user = await _context.Users.Include(x => x.UserRole)
-                    .SingleOrDefaultAsync(x => x.Username == command.UsernameOrEmail && x.IsActive == true|| x.Email == command.UsernameOrEmail && x.IsActive == true);
+                    .SingleOrDefaultAsync(x => x.Username == command.UsernameOrEmail);
 
                 if(user == null || !BCrypt.Net.BCrypt.Verify(command.Password , user.Password))
                 {
                     return Result.Failure(AuthenticationError.UsernameAndPasswordIncorrect());
                 }
+
+                if(user.IsActive != true)
+                {
+                  return Result.Failure(AuthenticationError.UserNotActive()); 
+                }
+
 
                 if(user.UserRoleId == null)
                 {

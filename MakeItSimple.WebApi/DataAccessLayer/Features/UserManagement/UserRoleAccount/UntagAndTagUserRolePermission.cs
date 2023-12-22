@@ -54,7 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                 if(userRole.Permissions != null && command.Permissions != null)
                 {
                     changeMessage = userRole.Permissions.Count < command.Permissions.Count ? "User Role has been successfully tagged" 
-                        : "User Role has been successfully Untagged";
+                         : userRole.Permissions.Count == command.Permissions.Count ? "User Role is Unchange" : "User Role has been successfully Untagged";
                 }
 
                 userRole.Permissions = command.Permissions;

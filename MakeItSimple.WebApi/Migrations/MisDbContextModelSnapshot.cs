@@ -19,6 +19,65 @@ namespace MakeItSimple.WebApi.Migrations
                 .HasAnnotation("ProductVersion", "7.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.AccountTitleSetup.AccountTitle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AccountCode")
+                        .HasColumnType("longtext")
+                        .HasColumnName("account_code");
+
+                    b.Property<int>("AccountNo")
+                        .HasColumnType("int")
+                        .HasColumnName("account_no");
+
+                    b.Property<string>("AccountTitles")
+                        .HasColumnType("longtext")
+                        .HasColumnName("account_titles");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime>("SyncDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sync_date");
+
+                    b.Property<string>("SyncStatus")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sync_status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_account_titles");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_account_titles_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_account_titles_modified_by");
+
+                    b.ToTable("account_titles", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -137,6 +196,65 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("departments", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("LocationCode")
+                        .HasColumnType("longtext")
+                        .HasColumnName("location_code");
+
+                    b.Property<string>("LocationName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("location_name");
+
+                    b.Property<int>("LocationNo")
+                        .HasColumnType("int")
+                        .HasColumnName("location_no");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime>("SyncDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sync_date");
+
+                    b.Property<string>("SyncStatus")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sync_status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_locations");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_locations_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_locations_modified_by");
+
+                    b.ToTable("locations", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -217,11 +335,11 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2023, 12, 21, 14, 9, 49, 665, DateTimeKind.Local).AddTicks(4374),
+                            CreatedAt = new DateTime(2023, 12, 22, 14, 58, 6, 726, DateTimeKind.Local).AddTicks(7562),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$ptzhAz286F7WXiQc/txSYOc8hMLIKIoYrimFFt5gWnCxlrRoC4ZGC",
+                            Password = "$2a$11$43DeuVy1uKJsUNUoEI6y6eAl0qCjfq6Oz/ei16/eaM0d1V3ahMg.q",
                             UserRoleId = 1,
                             Username = "admin"
                         });
@@ -277,11 +395,30 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 21, 14, 9, 49, 937, DateTimeKind.Local).AddTicks(8016),
+                            CreatedAt = new DateTime(2023, 12, 22, 14, 58, 7, 2, DateTimeKind.Local).AddTicks(4703),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UserRoleName = "Admin"
                         });
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.AccountTitleSetup.AccountTitle", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_account_titles_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_account_titles_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", b =>
@@ -316,6 +453,25 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_departments_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_locations_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_locations_users_modified_by_user_id");
 
                     b.Navigation("AddedByUser");
 

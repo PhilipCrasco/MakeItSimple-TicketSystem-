@@ -73,13 +73,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                         {
                             bool hasChanged = false;
 
-                            if(ExistingCompany.CompanyCode == companies.Company_Code)
+                            if(ExistingCompany.CompanyCode != companies.Company_Code)
                             {
                                 ExistingCompany.CompanyCode = companies.Company_Code;
                                 hasChanged = true;
                             }
 
-                            if (ExistingCompany.CompanyName == companies.Company_Code)
+                            if (ExistingCompany.CompanyName != companies.Company_Code)
                             {
                                 ExistingCompany.CompanyCode = companies.Company_Name;
                                 hasChanged = true;

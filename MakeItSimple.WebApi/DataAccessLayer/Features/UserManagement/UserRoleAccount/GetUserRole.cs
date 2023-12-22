@@ -1,8 +1,10 @@
 ﻿using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount
 {
@@ -23,7 +25,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
 
             public bool Is_Tagged { get; set; }
 
-            public string Users { get; set; }
+            public List<Users> users {  get; set; } 
+
+            public class Users
+            {
+                public Guid UserId { get; set; }
+                public string Fullname { get; set; }
+            }
 
         }
 
@@ -61,9 +69,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
 
                 if(request.Is_Tagged != null)
                 {
+
                     userRole = request.Is_Tagged == true ? userRole.Where(x => x.Users.FirstOrDefault().Fullname != null)
                         : userRole.Where(x => x.Users.FirstOrDefault().Fullname == null);
-
 
                 }
 
@@ -78,7 +86,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                     Modified_By = x.ModifiedBy,
                     Updated_At = x.UpdatedAt, 
                     Is_Tagged = x.Users.FirstOrDefault().Fullname != null ? true : false,
-                    Users = x.Users.FirstOrDefault().Fullname
+                    users = x.Users.Select(x => new GetUserRoleResult.Users
+                    {
+
+                        UserId = x.Id,
+                        Fullname = x.Fullname
+
+                    }).ToList(),
+
                 });
 
 

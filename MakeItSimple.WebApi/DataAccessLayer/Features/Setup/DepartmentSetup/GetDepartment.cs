@@ -26,6 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
 
             public class Users
             {
+                public Guid UserId { get; set; }
                 public string Fullname { get; set; }
             }
     
@@ -38,8 +39,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
         public class GetDepartmentQuery : UserParams, IRequest<PagedList<GetDepartmentResult>>
         {
             public string Search { get; set; }
-
-            public bool ? Status { get; set; }
 
         }
 
@@ -64,11 +63,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     || x.DepartmentName.Contains(request.Search));
                 }
 
-                if(request.Status != null )
-                {
-                    departmentsQuery = departmentsQuery.Where(x => x.IsActive == request.Status);
-                }
-
                 var results = departmentsQuery.Select(x => new GetDepartmentResult
                 {
                     Id = x.Id,
@@ -83,6 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     SyncDate = x.SyncDate,
                      users = x.Users.Select(x => new GetDepartmentResult.Users
                     {
+                         UserId = x.Id,
                         Fullname = x.Fullname,
 
                     }).ToList(),

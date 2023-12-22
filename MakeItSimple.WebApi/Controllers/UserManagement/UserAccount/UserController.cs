@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUse
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateUserStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserResetPassword;
 
 
 namespace MakeItSimple.WebApi.Controllers.UserController
@@ -182,6 +184,25 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         }
 
 
+        [HttpPut("UserResetPassword")]
+        public async Task<IActionResult> UserResetPassword([FromBody] UserResetPasswordCommand command)
+        {
+            try
+            {
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
 
 
 

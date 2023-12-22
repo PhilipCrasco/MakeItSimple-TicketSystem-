@@ -26,8 +26,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
         public class GetCompanyQuery : UserParams , IRequest<PagedList<GetCompanyResult>>
         {
             public string Search {  get; set; }
-
-            public bool ? Status {  get; set; }
         }
 
         public class Handler : IRequestHandler<GetCompanyQuery, PagedList<GetCompanyResult>>
@@ -49,11 +47,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
                 }
 
-                if(request.Status != null)
-                {
-                    companiesQuery = companiesQuery.Where(x => x.IsActive == request.Status);
-                }
-
                 var results = companiesQuery.Select(x => new GetCompanyResult
                 {
                     Id = x.Id,
@@ -67,9 +60,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
 
-
                 });
-
 
                 return await PagedList<GetCompanyResult>.CreateAsync(results, request.PageNumber, request.PageSize);
 

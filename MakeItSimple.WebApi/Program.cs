@@ -130,6 +130,9 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+
+app.UseCors("ClientPermission");
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

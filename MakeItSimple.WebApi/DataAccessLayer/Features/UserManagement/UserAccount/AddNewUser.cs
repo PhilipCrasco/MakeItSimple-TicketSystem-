@@ -25,10 +25,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
         public class AddNewUserCommand : IRequest<Result>
         {
-            public Guid Id { get; set; }
+
             public string EmpId { get; set; }
             public string Fullname { set; get; }
             public string Username { get; set; }
+
             public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
@@ -69,6 +70,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.EmailAlreadyExist(command.Email));
                 }
+
+                
                 
                 var UserRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
 

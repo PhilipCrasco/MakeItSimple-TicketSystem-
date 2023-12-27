@@ -131,7 +131,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCors("ClientPermission");
+app.UseCors("_clientPermission");
 
 app.UseSwagger();
 app.UseSwaggerUI();

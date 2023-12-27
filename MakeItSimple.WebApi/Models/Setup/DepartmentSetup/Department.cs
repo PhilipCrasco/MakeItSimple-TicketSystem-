@@ -17,9 +17,10 @@ namespace MakeItSimple.WebApi.Models.Setup.DepartmentSetup
         public string DepartmentName { get; set ; }
         public DateTime SyncDate { get; set ; }
         public string SyncStatus { get; set ; }
-
         public ICollection<User> Users { get; set ; }
-
+        
+       
+        
 
     }
 }

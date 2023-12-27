@@ -57,9 +57,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                          : userRole.Permissions.Count == command.Permissions.Count ? "User Role is Unchange" : "User Role has been successfully Untagged";
                 }
 
-                userRole.Permissions = command.Permissions;
-                userRole.UpdatedAt = DateTime.Now;
-                userRole.ModifiedBy = command.Modified_By;
+                if(changeMessage != "User Role is Unchange")
+                {
+                    userRole.Permissions = command.Permissions;
+                    userRole.UpdatedAt = DateTime.Now;
+                    userRole.ModifiedBy = command.Modified_By;
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

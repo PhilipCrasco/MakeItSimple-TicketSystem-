@@ -78,6 +78,63 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("account_titles", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("channel_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int")
+                        .HasColumnName("team_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_channels");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_channels_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_channels_modified_by");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("ix_channels_team_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_channels_user_id");
+
+                    b.ToTable("channels", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -255,6 +312,53 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("locations", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("TeamCode")
+                        .HasColumnType("longtext")
+                        .HasColumnName("team_code");
+
+                    b.Property<string>("TeamName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("team_name");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_teams");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_teams_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_teams_modified_by");
+
+                    b.ToTable("teams", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -265,6 +369,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<Guid?>("AddedBy")
                         .HasColumnType("char(36)")
                         .HasColumnName("added_by");
+
+                    b.Property<int?>("ChannelId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
@@ -320,6 +428,9 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_users_added_by");
 
+                    b.HasIndex("ChannelId")
+                        .HasDatabaseName("ix_users_channel_id");
+
                     b.HasIndex("DepartmentId")
                         .HasDatabaseName("ix_users_department_id");
 
@@ -335,11 +446,11 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2023, 12, 22, 14, 58, 6, 726, DateTimeKind.Local).AddTicks(7562),
+                            CreatedAt = new DateTime(2023, 12, 27, 16, 35, 1, 311, DateTimeKind.Local).AddTicks(4199),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
-                            Password = "$2a$11$43DeuVy1uKJsUNUoEI6y6eAl0qCjfq6Oz/ei16/eaM0d1V3ahMg.q",
+                            Password = "$2a$12$ihvpKbpvdRfZLXz.tZKFEulxnTg1tiS11T/MbpufId3rzXoCMW2OK",
                             UserRoleId = 1,
                             Username = "admin"
                         });
@@ -395,7 +506,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 22, 14, 58, 7, 2, DateTimeKind.Local).AddTicks(4703),
+                            CreatedAt = new DateTime(2023, 12, 27, 16, 35, 1, 311, DateTimeKind.Local).AddTicks(9552),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UserRoleName = "Admin"
@@ -419,6 +530,41 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_channels_users_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_channels_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", "Team")
+                        .WithMany("Channels")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_channels_teams_team_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_channels_users_user_id1");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", b =>
@@ -478,6 +624,25 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_teams_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_teams_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -485,6 +650,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("AddedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_users_users_added_by");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", null)
+                        .WithMany("Users")
+                        .HasForeignKey("ChannelId")
+                        .HasConstraintName("fk_users_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", "Department")
                         .WithMany("Users")
@@ -532,9 +702,19 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
+                {
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
+                {
+                    b.Navigation("Channels");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>

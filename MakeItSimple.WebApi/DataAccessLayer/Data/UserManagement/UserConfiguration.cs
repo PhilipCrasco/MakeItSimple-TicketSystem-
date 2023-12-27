@@ -14,7 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
                 Fullname = "Admin",
                 Username = "admin",
                 Email = "admin@gmail.com",
-                Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Password = "$2a$12$ihvpKbpvdRfZLXz.tZKFEulxnTg1tiS11T/MbpufId3rzXoCMW2OK",
                 UserRoleId = 1
             });
 

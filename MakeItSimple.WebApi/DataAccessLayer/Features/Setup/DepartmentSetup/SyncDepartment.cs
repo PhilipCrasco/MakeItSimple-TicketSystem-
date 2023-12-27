@@ -47,7 +47,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             var DepartmentCodeNullOrEmpty = new List<SyncDepartmentCommand.Department>();
             var DepartmentNameNullOrEmpty = new List<SyncDepartmentCommand.Department>();
 
-            foreach (var department in command.Departments)
+            foreach (SyncDepartmentCommand.Department department in command.Departments)
             {
 
 

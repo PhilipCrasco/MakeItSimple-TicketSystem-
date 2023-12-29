@@ -22,13 +22,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
 
-            public  List<Users> users {get ; set;}
+            public List<SubUnit> subUnits { get; set; }
 
-            public class Users
+            public class SubUnit
             {
-                public Guid UserId { get; set; }
-                public string Fullname { get; set; }
+                public int SubUnitId { get; set; }
+                public string SubUnit_Name { get; set; }
             }
+
     
 
 
@@ -53,8 +54,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
 
             public async Task<PagedList<GetDepartmentResult>> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.Users)
-                .Include(x => x.ModifiedByUser).Include(x => x.AddedByUser);
+                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.SubUnits)
+                    .Include(x => x.Users).Include(x => x.ModifiedByUser).Include(x => x.AddedByUser);
                 
 
                 if(!string.IsNullOrEmpty(request.Search))
@@ -75,13 +76,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
-                     users = x.Users.Select(x => new GetDepartmentResult.Users
+                    subUnits = x.SubUnits.Select(x => new GetDepartmentResult.SubUnit
                     {
-                         UserId = x.Id,
-                        Fullname = x.Fullname,
+                        SubUnitId = x.Id,
+                        SubUnit_Name = x.SubUnitName,
 
-                    }).ToList(),
-
+                    }).ToList()
                     
                 });
                 

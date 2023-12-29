@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
+
+            public int ? SubUnitId {  get; set; }
             public Guid ? Added_By { get; set; }
 
         }
@@ -33,7 +35,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
+
+            public int ? SubUnitId { get; set; }
+
             public Guid ? Added_By { get; set; }
+
 
         }
 
@@ -86,7 +92,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.DepartmentNotExist());
                 }
-               
+
+                var SubUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+
+                if (SubUnitNotExist == null)
+                {
+                    return Result.Failure(UserError.SubUnitNotExist());
+                }
+
 
                 var users = new User
                 {
@@ -97,6 +110,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     Email = command.Email,
                     UserRoleId = command.UserRoleId,
+                    SubUnitId = command.SubUnitId,
                     DepartmentId = command.DepartmentId,    
                     AddedBy = command.Added_By,
                     
@@ -114,6 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Email = users.Email,
                     UserRoleId = users.UserRoleId,
                     DepartmentId = users.DepartmentId,
+                    SubUnitId= users.SubUnitId,
                     Added_By = users.AddedBy
                 };
 

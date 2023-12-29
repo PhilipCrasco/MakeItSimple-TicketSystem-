@@ -1,5 +1,5 @@
-﻿
-using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
+﻿using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
+using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,6 +33,9 @@ namespace MakeItSimple.WebApi.Models
 
         public int ? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
+
+        public int ? SubUnitId { get; set; }
+        public virtual SubUnit SubUnit { get; set; }
 
     }
 }

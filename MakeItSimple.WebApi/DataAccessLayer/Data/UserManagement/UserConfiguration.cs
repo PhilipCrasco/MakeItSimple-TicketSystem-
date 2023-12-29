@@ -15,7 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
                 Username = "admin",
                 Email = "admin@gmail.com",
                 Password = "$2a$12$ihvpKbpvdRfZLXz.tZKFEulxnTg1tiS11T/MbpufId3rzXoCMW2OK",
-                UserRoleId = 1
+                UserRoleId = 1,
+                IsPasswordChange = true,
             });
 
 

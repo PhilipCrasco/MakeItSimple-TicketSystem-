@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models;
+using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup.AddNewTeam;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.AddNewSubUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
@@ -30,8 +31,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         public IValidator<UntagAndTagUserRolePermissionCommand> TagAndUntagUserRoleValidator {  get; set; }
 
 
-        // Team Setup
-        public IValidator<AddNewTeamCommand> AddNewTeamValidator { get; set; }
+        // SubUnit Setup
+        public IValidator<AddNewSubUnitCommand> AddNewSubUnitValidator { get; set; }
+
+
+        // Channel Setup 
+        public IValidator<AddNewChannelCommand> AddNewChannelValidator {  get; set; }
 
 
 
@@ -51,9 +56,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
             TagAndUntagUserRoleValidator = new UserRole.TagAndUntagUserRoleValidator();
 
 
-            //Team Setup
+            //SubUNit Setup
 
-            AddNewTeamValidator = new Team.TeamValidator();
+            AddNewSubUnitValidator = new SubUnit.SubUnitValidator();
+
+            //Channel Setup
+
+            AddNewChannelValidator = new Channel.ChannelValidator();
         }
         
     }

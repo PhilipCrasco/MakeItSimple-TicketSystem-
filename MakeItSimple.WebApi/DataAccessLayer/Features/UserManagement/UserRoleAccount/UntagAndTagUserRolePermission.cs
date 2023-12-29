@@ -50,14 +50,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                     return Result.Failure(UserRoleError.UserRoleNotExist());
                 }
 
-                string changeMessage = "User Role is Unchange";
+                string changeMessage = "Permission is Unchange";
                 if(userRole.Permissions != null && command.Permissions != null)
                 {
-                    changeMessage = userRole.Permissions.Count < command.Permissions.Count ? "User Role has been successfully tagged" 
-                         : userRole.Permissions.Count == command.Permissions.Count ? "User Role is Unchange" : "User Role has been successfully Untagged";
+                    changeMessage = userRole.Permissions.Count < command.Permissions.Count ? "Permission has been successfully tagged" 
+                         : userRole.Permissions.Count == command.Permissions.Count ? "Permission is Unchange" : "Permission has been successfully Untagged";
                 }
 
-                if(changeMessage != "User Role is Unchange")
+                if(changeMessage != "Permission is Unchange")
                 {
                     userRole.Permissions = command.Permissions;
                     userRole.UpdatedAt = DateTime.Now;
@@ -77,8 +77,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                 };
 
                 return Result.Success(result);
-
-
 
 
             }

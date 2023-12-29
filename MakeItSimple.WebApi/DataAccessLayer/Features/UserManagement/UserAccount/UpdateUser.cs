@@ -18,6 +18,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int UserRoleId { get; set; }
 
             public int ? DepartmentId { get; set; }
+
+            public int ? SubUnitId {  get; set; }
+
             public Guid ? Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
 
@@ -29,6 +32,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int? DepartmentId { get; set; }
+
+            public int ? SubUnitId { get; set; }
+
             public Guid? Modified_By { get; set; }
         }
 
@@ -65,9 +71,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.DepartmentNotExist());
                 }
 
+                var SubUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+
+                if (SubUnitNotExist == null)
+                {
+                    return Result.Failure(UserError.SubUnitNotExist());
+                }
+
+
                 User.Email = command.Email;
                 User.UserRoleId = command.UserRoleId;
                 User.DepartmentId = command.DepartmentId;
+                User.SubUnitId = command.SubUnitId;
                 User.UpdatedAt = DateTime.Now;
                 User.ModifiedBy = command.Modified_By;
 
@@ -79,6 +94,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Email = User.Email,
                     UserRoleId = User.UserRoleId,
                     DepartmentId = User.DepartmentId,
+                    SubUnitId = User.SubUnitId,
                     Updated_At = User.UpdatedAt,
                     Modified_By = User.ModifiedBy,
                 };

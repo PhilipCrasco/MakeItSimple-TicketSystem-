@@ -65,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                 }
 
 
-                if (command.Departments.Count(d => d.Department_No == department.Department_No && d.Department_Name == department.Department_Name) > 1)
+                if (command.Departments.Count(d => d.Department_Code == department.Department_Code && d.Department_Name == department.Department_Name) > 1)
                 {
                     DuplicateSync.Add(department);
 

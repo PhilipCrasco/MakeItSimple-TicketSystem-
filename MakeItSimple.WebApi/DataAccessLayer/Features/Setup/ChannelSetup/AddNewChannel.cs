@@ -6,6 +6,7 @@ using System.Security.Policy;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using Microsoft.EntityFrameworkCore;
+using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 {
@@ -15,10 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int Id {  get; set; }
             public string Channel_Name { get; set; }
-            public string Team { get; set; }
-           
-            public string User { get; set; }
-            public string Added_By { get; set; }
+            public int SubUnitId { get; set; }
+            public Guid ? Added_By { get; set; }
             public DateTime Created_At { get; set; }
 
         }
@@ -27,8 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         public class AddNewChannelCommand : IRequest<Result>
         {
             public string Channel_Name { get; set; }
-            public int TeamId { get; set; }
-
+            public int SubUnitId { get; set; }
             public Guid ? UserId { get; set; }
             public Guid ? Added_By { get; set; }
            
@@ -44,14 +42,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 _context = context;
             }
 
+
+
             public async Task<Result> Handle(AddNewChannelCommand command, CancellationToken cancellationToken)
             {
+
+                var ChannelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
+
+                if (ChannelNameAlreadyExist != null)
+                {
+                    return Result.Failure(ChannelError.ChannelNameAlreadyExist(command.Channel_Name));
+                }
+
+                var SubUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+
+                if (SubUnitNotExist == null)
+                {
+                    return Result.Failure(ChannelError.SubUnitNotExist());
+                }
 
                 var channels = new Channel
                 {
                     ChannelName = command.Channel_Name,
-                    TeamId = command.TeamId, 
-                    UserId = command.UserId,
+                    SubUnitId = command.SubUnitId, 
                     AddedBy = command.Added_By,
 
                 };
@@ -59,20 +72,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 await _context.Channels.AddAsync(channels , cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var addedby = await _context.Users.FirstOrDefaultAsync(x => x.Id == channels.AddedBy, cancellationToken);
-                var teamName = await _context.Teams.FirstOrDefaultAsync(x => x.Id == channels.TeamId , cancellationToken);
-                var fullname = await _context.Users.FirstOrDefaultAsync(x => x.Id == channels.UserId, cancellationToken);
-
                 var results = new AddNewChannelResult
                 {
                     Id = channels.Id,
-                    Channel_Name = channels.ChannelName,    
-                    Team = channels.Team.TeamName,
-                    User = channels.User.Fullname,
-                    Added_By = addedby.Fullname,
+                    Channel_Name = channels.ChannelName,
+                    SubUnitId = channels.SubUnitId,
+                    Added_By = channels.AddedBy,
                    Created_At = channels.CreatedAt
-
-
                 };
 
                 return Result.Success(results);

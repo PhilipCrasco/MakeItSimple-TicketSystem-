@@ -1,0 +1,17 @@
+﻿using MakeItSimple.WebApi.Common;
+
+namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
+{
+    public class SubUnitError
+    {
+      public static Error SubUnitCodeAlreadyExist(string SubUnitCode) =>
+      new Error("SubUnit.SubUnitCodeAlreadyExist", $"Sub unit code {SubUnitCode} already exist!");
+
+      public static Error SubUnitNameAlreadyExist(string SubUnitName) =>
+      new Error("SubUnit.SubUnitCodeAlreadyExist", $"Sub unit name {SubUnitName} already exist!");
+
+      public static Error DepartmentNotExist() =>
+      new Error("SubUnit.DepartmentNotExist", "Department doesn't exist!");
+
+    }
+}

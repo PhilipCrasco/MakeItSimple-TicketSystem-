@@ -13,7 +13,6 @@ namespace MakeItSimple.WebApi.Models
             public UserValidator()
             {
 
-                
                 RuleFor(f => f.Fullname).NotEmpty().WithMessage("Fullname is required!")
                 .MinimumLength(3).WithMessage("Fullname must be at least 3 character long!");
                 RuleFor(u => u.Username).NotEmpty().WithMessage("Username is required!")

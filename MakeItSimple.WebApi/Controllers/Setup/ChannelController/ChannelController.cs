@@ -11,6 +11,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.Add
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.RemoveChannelUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannelStatus;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 {
@@ -96,6 +98,60 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("UpdateChannel")]
+        public async Task<IActionResult> UpdateChannel([FromBody] UpdateChannelCommand command)
+        {
+            try
+            {
+                var validationResult = await _validatorHandler.UpdateChannelValidator.ValidateAsync(command);
+
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);
+                }
+
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                }
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+        [HttpPost("UpdateChannelStatus")]
+        public async Task<IActionResult> UpdateChannelStatus([FromBody] UpdateChannelStatusCommand command)
+        {
+
+            try
+            {
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+
 
         [HttpPost("AddMember")]
         public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)

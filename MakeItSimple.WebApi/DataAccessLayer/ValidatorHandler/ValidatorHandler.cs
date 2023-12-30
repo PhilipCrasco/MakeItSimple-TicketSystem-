@@ -4,13 +4,16 @@ using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.AddNewSubUnit;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpdateSubUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.AddNewUserRole;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.UntagAndTagUserRolePermission;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAccount.UpdateUserRole;
+using static MakeItSimple.WebApi.Models.Setup.TeamSetup.SubUnit;
 using static MakeItSimple.WebApi.Models.User;
 
 
@@ -33,10 +36,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
 
         // SubUnit Setup
         public IValidator<AddNewSubUnitCommand> AddNewSubUnitValidator { get; set; }
-
+        public IValidator<UpdateSubUnitCommand> UpdateSubUnitValidator { get; set; }
 
         // Channel Setup 
         public IValidator<AddNewChannelCommand> AddNewChannelValidator {  get; set; }
+        public IValidator<UpdateChannelCommand> UpdateChannelValidator {  get; set; }
 
 
 
@@ -59,10 +63,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
             //SubUNit Setup
 
             AddNewSubUnitValidator = new SubUnit.SubUnitValidator();
+            UpdateSubUnitValidator = new SubUnit.UpdateSubUnitValidator();
 
             //Channel Setup
 
             AddNewChannelValidator = new Channel.ChannelValidator();
+            UpdateChannelValidator = new Channel.UpdateChannelValidator();
         }
         
     }

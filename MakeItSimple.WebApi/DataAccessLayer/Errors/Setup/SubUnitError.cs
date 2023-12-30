@@ -13,5 +13,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
       public static Error DepartmentNotExist() =>
       new Error("SubUnit.DepartmentNotExist", "Department doesn't exist!");
 
+      public static Error SubUnitNotExist() =>
+      new Error("SubUnit.SubUnitNotExist", "Sub unit doesn't exist!");
+
     }
 }

@@ -24,6 +24,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public class ChannelUser
         {
+                public int ChannelUserId {  get; set; }
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
                 public string UserRole { get; set; }
@@ -73,6 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     No_Of_Members = x.ChannelUsers.Count(),
                     channelUsers = x.ChannelUsers.Select(x => new GetChannelResult.ChannelUser
                     {
+                        ChannelUserId = x.Id,
                         UserId = x.UserId,
                         Fullname = x.User.Fullname,
                         UserRole = x.User.UserRole.UserRoleName

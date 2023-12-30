@@ -1,11 +1,14 @@
 ﻿
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.AddNewSubUnit;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpdateSubUnit;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpdateSubUnitStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup.GetSubUnit;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
@@ -92,5 +95,58 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
                 return Conflict(ex.Message);
             }
         }
+
+        [HttpPost("UpdateSubUnit")]
+        public async Task<IActionResult> UpdateSubUnit([FromBody] UpdateSubUnitCommand command)
+        {
+            try
+            {
+                var validationResult = await _validatorHandler.UpdateSubUnitValidator.ValidateAsync(command);
+
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);
+                }
+
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                }
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpPost("UpdateSubUnitStatus")]
+        public async Task<IActionResult> UpdateSubUnitStatus([FromBody] UpdateSubUnitStatusCommand command)
+        {
+            try
+            {
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+
     }
 }

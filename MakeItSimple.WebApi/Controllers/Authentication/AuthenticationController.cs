@@ -32,7 +32,7 @@ namespace MakeItSimple.WebApi.Controllers.AuthenticationController
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Conflict(ex.Message);
             }
         }
 

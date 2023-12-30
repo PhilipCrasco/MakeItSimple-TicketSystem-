@@ -20,7 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public class ChannelUser
             {
-                public Guid UserId { get; set; }
+                public int ChannelUserId { get; set; }
             }
 
         }
@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public class ChannelUser
             {
-                public Guid UserId { get; set; }
+                public int ChannelUserId { get; set; }
             }
         }
 
@@ -68,7 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         
                 foreach (var channelUser in command.ChannelUsers)
                 {
-                    var cu = channelUsers.FirstOrDefault(x => x.UserId == channelUser.UserId);
+                    var cu = channelUsers.FirstOrDefault(x => x.Id == channelUser.ChannelUserId);
 
                     if (cu == null) 
                     {
@@ -85,7 +85,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         Modified_By = command.Modified_By,
                         ChannelUsers = command.ChannelUsers.Select(x => new RemoveChannelUserResult.ChannelUser
                         {
-                            UserId = x.UserId
+                            ChannelUserId = x.ChannelUserId
 
                         }).ToList()
                     });

@@ -23,5 +23,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
       public static Error UserAlreadyAdd() =>
       new Error("Channel.UserAlreadyAdd", "Member already been add!");
 
+      public static Error ChannelInUse(string channel) =>
+      new Error("Channel.ChannelInUse", $"Channel {channel} is use!");
+
+      public static Error ChannelNoChanges() =>
+      new Error("Channel.ChannelNoChanges", "No changes has made!");
+     
+      
+
     }
 }

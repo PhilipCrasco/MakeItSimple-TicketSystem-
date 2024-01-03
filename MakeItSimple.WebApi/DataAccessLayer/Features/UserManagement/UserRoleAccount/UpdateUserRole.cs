@@ -1,6 +1,8 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.UserManagement.UserAccount;
+using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -41,19 +43,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
             public async Task<Result> Handle(UpdateUserRoleCommand command, CancellationToken cancellationToken)
             {
 
+                var userRole = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+
+                if (userRole == null)
+                {
+                    return Result.Failure(UserRoleError.UserRoleNotExist());
+                }
+                else if (userRole.UserRoleName == command.User_Role_Name)
+                {
+                    return Result.Failure(UserRoleError.UserRoleNoChanges());
+                }
+
                 var UserRoleAlreadyExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.UserRoleName == command.User_Role_Name, cancellationToken);
 
-                if (UserRoleAlreadyExist != null)
+                if (UserRoleAlreadyExist != null && userRole.UserRoleName != command.User_Role_Name)
                 {
                     return Result.Failure(UserRoleError.UserRoleAlreadyExist(command.User_Role_Name));
                 }
 
-                var userRole = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.Id , cancellationToken);
-
-                if (userRole == null) 
-                {
-                    return Result.Failure(UserRoleError.UserRoleNotExist());
-                }
 
                 var UserRoleIsUse = await _context.Users.AnyAsync(x => x.UserRoleId == command.Id && x.IsActive == true, cancellationToken);
 

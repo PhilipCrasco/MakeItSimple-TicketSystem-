@@ -44,26 +44,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
             public async Task<Result> Handle(UpdateSubUnitCommand command, CancellationToken cancellationToken)
             {
-                var SubUnitCodeAlreadyExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitCode == command.SubUnit_Code, cancellationToken);
-
-                if (SubUnitCodeAlreadyExist != null)
-                {
-                    return Result.Failure(SubUnitError.SubUnitCodeAlreadyExist(command.SubUnit_Code));
-                }
-
-                var SubUnitNameAlreadyExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitName == command.SubUnit_Name, cancellationToken);
-
-                if (SubUnitNameAlreadyExist != null)
-                {
-                    return Result.Failure(SubUnitError.SubUnitNameAlreadyExist(command.SubUnit_Name));
-                }
-
-                var DepartmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId, cancellationToken);
-
-                if (DepartmentNotExist == null)
-                {
-                    return Result.Failure(SubUnitError.DepartmentNotExist());
-                }
 
                 var subUnit = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
 
@@ -71,12 +51,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 {
                     return Result.Failure(SubUnitError.SubUnitNotExist());
                 }
+                else if (subUnit.SubUnitCode == command.SubUnit_Code && subUnit.SubUnitName == command.SubUnit_Name && subUnit.DepartmentId == command.DepartmentId)
+                {
+                    return Result.Failure(SubUnitError.SubUnitNochanges());
+                }
+
+                var subUnitCodeAlreadyExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitCode == command.SubUnit_Code, cancellationToken);
+
+                if (subUnitCodeAlreadyExist != null && subUnit.SubUnitCode != command.SubUnit_Code)
+                {
+                    return Result.Failure(SubUnitError.SubUnitCodeAlreadyExist(command.SubUnit_Code));
+                }
+
+                var subUnitNameAlreadyExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitName == command.SubUnit_Name, cancellationToken);
+
+                if (subUnitNameAlreadyExist != null && subUnit.SubUnitName != command.SubUnit_Name)
+                {
+                    return Result.Failure(SubUnitError.SubUnitNameAlreadyExist(command.SubUnit_Name));
+                }
+
+                var departmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId, cancellationToken);
+
+                if (departmentNotExist == null)
+                {
+                    return Result.Failure(SubUnitError.DepartmentNotExist());
+                }
+
+                var subUnitIsUse = await _context.Channels.AnyAsync(x => x.SubUnitId == command.Id && x.IsActive == true, cancellationToken);
+
+                if (subUnitIsUse == true)
+                {
+                    return Result.Failure(SubUnitError.SubUnitIsUse(subUnit.SubUnitName));
+                }
 
                 subUnit.SubUnitCode = command.SubUnit_Code;
                 subUnit.SubUnitName = command.SubUnit_Name;
                 subUnit.DepartmentId = command.DepartmentId;
                 subUnit.ModifiedBy = command.Modified_By;
                 subUnit.UpdatedAt = DateTime.Now;
+
+                await _context.SaveChangesAsync(cancellationToken);
 
                 var results = new UpdateSubUnitResult
                 {

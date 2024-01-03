@@ -94,7 +94,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var token = _tokenGenerator.GenerateJwtToken(user);
+                var token = _tokenGenerator.GenerateJwtToken(user );
 
                 var results = user.ToGetAuthenticatedUserResult(token);
 

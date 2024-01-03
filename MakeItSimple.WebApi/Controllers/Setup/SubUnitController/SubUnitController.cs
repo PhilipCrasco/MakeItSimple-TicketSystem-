@@ -96,7 +96,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
             }
         }
 
-        [HttpPost("UpdateSubUnit")]
+        [HttpPut("UpdateSubUnit")]
         public async Task<IActionResult> UpdateSubUnit([FromBody] UpdateSubUnitCommand command)
         {
             try
@@ -127,7 +127,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
         }
 
 
-        [HttpPost("UpdateSubUnitStatus")]
+        [HttpPatch("UpdateSubUnitStatus")]
         public async Task<IActionResult> UpdateSubUnitStatus([FromBody] UpdateSubUnitStatusCommand command)
         {
             try

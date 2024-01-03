@@ -99,7 +99,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             }
         }
 
-        [HttpPost("UpdateChannel")]
+        [HttpPut("UpdateChannel")]
         public async Task<IActionResult> UpdateChannel([FromBody] UpdateChannelCommand command)
         {
             try
@@ -130,7 +130,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpPost("UpdateChannelStatus")]
+        [HttpPatch("UpdateChannelStatus")]
         public async Task<IActionResult> UpdateChannelStatus([FromBody] UpdateChannelStatusCommand command)
         {
 

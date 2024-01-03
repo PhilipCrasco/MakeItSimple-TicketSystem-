@@ -43,7 +43,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNotExist());
                 }
 
+                var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
+
+                if (channelInUse == true)
+                {
+                    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
+                }
+
                 channels.IsActive = !channels.IsActive;
+
+                await _context.SaveChangesAsync();
 
                 var results = new UpdateChannelStatusResult
                 {
@@ -51,7 +60,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                    Status = channels.IsActive
                 };
 
-                return Result.Success(channels);
+                return Result.Success(results);
 
             }
         }

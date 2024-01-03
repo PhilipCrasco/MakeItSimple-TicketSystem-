@@ -10,13 +10,15 @@ namespace MakeItSimple.WebApi.Common
     {
         private readonly IConfiguration _configuration;
 
+
         public TokenGenerator(IConfiguration configuration)
         {
             _configuration = configuration;
 
+
         }
 
-        public string GenerateJwtToken(User user)
+        public string GenerateJwtToken(User user )
         {
             var key = _configuration.GetValue<string>("JwtConfig:Key");
             var audience = _configuration.GetValue<string>("JwtConfig:Audience");
@@ -28,11 +30,12 @@ namespace MakeItSimple.WebApi.Common
                 Subject = new ClaimsIdentity(new[]
                 {
                         new Claim("id", user.Id.ToString()),
-                        new Claim(ClaimTypes.Name , user.Fullname),
+                        new Claim(ClaimTypes.Name , user.Fullname),                  
                         new Claim(ClaimTypes.Email , user.Email),
                         new Claim(ClaimTypes.Role , user.UserRole.UserRoleName)
                     }),
                 Expires = DateTime.UtcNow.AddDays(1),
+
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(
@@ -44,6 +47,9 @@ namespace MakeItSimple.WebApi.Common
             return tokenHandler.WriteToken(token);
 
         }
+
+     
+
 
     }
 }

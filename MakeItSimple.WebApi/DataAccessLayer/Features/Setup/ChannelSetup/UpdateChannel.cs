@@ -40,9 +40,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public async Task<Result> Handle(UpdateChannelCommand command, CancellationToken cancellationToken)
             {
 
+                var channels = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+
+                if (channels == null)
+                {
+                    return Result.Failure(ChannelError.ChannelNotExist());
+                }
+                else if (channels.ChannelName == command.Channel_Name && channels.SubUnitId == command.SubUnitId)
+                {
+                    return Result.Failure(ChannelError.ChannelNoChanges());
+                }
+
+
                 var ChannelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
 
-                if (ChannelNameAlreadyExist != null)
+                if (ChannelNameAlreadyExist != null && channels.ChannelName != command.Channel_Name)
                 {
                     return Result.Failure(ChannelError.ChannelNameAlreadyExist(command.Channel_Name));
                 }
@@ -53,12 +65,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     return Result.Failure(ChannelError.SubUnitNotExist());
                 }
+                
+                var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
 
-                var channels = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
-
-                if (channels == null)
+                if(channelInUse == true)
                 {
-                    return Result.Failure(ChannelError.ChannelNotExist());
+                    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
                 }
 
                 channels.ChannelName = command.Channel_Name;
@@ -66,6 +78,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 channels.ModifiedBy = command.Modified_By;
                 channels.UpdatedAt = DateTime.Now;
 
+                await _context.SaveChangesAsync(cancellationToken);  
 
                 var results = new UpdateChannelResult
                 {

@@ -15,6 +15,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
 
       public static Error SubUnitNotExist() =>
       new Error("SubUnit.SubUnitNotExist", "Sub unit doesn't exist!");
+      public static Error SubUnitIsUse(string subUnit) =>
+      new Error("SubUnit.SubUnitIsUse", $"Sub unit {subUnit} is use!");
+
+      public static Error SubUnitNochanges() =>
+      new Error("SubUnit.SubUnitNochanges", "No changes has made!");
 
     }
 }

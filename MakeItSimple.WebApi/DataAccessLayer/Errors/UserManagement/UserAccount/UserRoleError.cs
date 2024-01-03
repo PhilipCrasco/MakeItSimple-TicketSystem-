@@ -14,5 +14,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.UserManagement.UserAccount
       public static Error UserRoleIsUse(string UserRoleName) =>
       new Error("UserRole.UserRoleIsUse", $"User Role {UserRoleName} was use!");
 
+      public static Error UserRoleNoChanges() =>
+      new Error("UserRole.UserRoleNoChanges", "No changes has made!");
+
     }
 }

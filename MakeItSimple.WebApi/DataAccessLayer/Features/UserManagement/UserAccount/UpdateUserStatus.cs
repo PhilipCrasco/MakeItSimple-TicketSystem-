@@ -34,21 +34,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
             public async Task<Result> Handle(UpdateUserStatusCommand command, CancellationToken cancellationToken)
             {
                 
-                var users = await _context.Users.FirstOrDefaultAsync(x => x.Id  == command.Id , cancellationToken );
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id  == command.Id , cancellationToken );
 
-                if (users == null)
+                if (user == null)
                 {
                     return Result.Failure(UserError.UserNotExist());
                 }
+                var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
+                if (userIsUse == true)
+                {
+                    return Result.Failure(UserError.UserIsUse(user.Fullname));
+                }
 
-                users.IsActive = !users.IsActive;
+                user.IsActive = !user.IsActive;
 
                 await _context.SaveChangesAsync(cancellationToken);
 
                 var results = new UpdateUserStatusResult
                 {
-                    Id = users.Id,
-                    Status = users.IsActive
+                    Id = user.Id,
+                    Status = user.IsActive
                 };
 
                 return Result.Success(results);

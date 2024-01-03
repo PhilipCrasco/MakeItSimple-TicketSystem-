@@ -78,6 +78,49 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("account_titles", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("CategoryDescription")
+                        .HasColumnType("longtext")
+                        .HasColumnName("category_description");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_categories");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_categories_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_categories_modified_by");
+
+                    b.ToTable("categories", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
                 {
                     b.Property<int>("Id")
@@ -343,6 +386,56 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("locations", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("SubCategoryDescription")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sub_category_description");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sub_categories");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_sub_categories_added_by");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_sub_categories_category_id");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_sub_categories_modified_by");
+
+                    b.ToTable("sub_categories", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", b =>
                 {
                     b.Property<int>("Id")
@@ -484,7 +577,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2023, 12, 29, 9, 42, 36, 287, DateTimeKind.Local).AddTicks(5818),
+                            CreatedAt = new DateTime(2024, 1, 1, 20, 14, 19, 653, DateTimeKind.Local).AddTicks(3423),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
@@ -545,7 +638,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2023, 12, 29, 9, 42, 36, 288, DateTimeKind.Local).AddTicks(1575),
+                            CreatedAt = new DateTime(2024, 1, 1, 20, 14, 19, 653, DateTimeKind.Local).AddTicks(8924),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UserRoleName = "Admin"
@@ -565,6 +658,25 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_account_titles_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_categories_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_categories_users_modified_by_user_id");
 
                     b.Navigation("AddedByUser");
 
@@ -609,7 +721,7 @@ namespace MakeItSimple.WebApi.Migrations
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelUserSetup.ChannelUser", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany()
+                        .WithMany("ChannelUsers")
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -678,6 +790,34 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_locations_users_modified_by_user_id");
 
                     b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_sub_categories_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sub_categories_categories_category_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_sub_categories_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("Category");
 
                     b.Navigation("ModifiedByUser");
                 });
@@ -767,6 +907,16 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>
+                {
+                    b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
+                {
+                    b.Navigation("ChannelUsers");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", b =>

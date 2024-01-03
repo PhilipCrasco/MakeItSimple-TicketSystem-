@@ -1,10 +1,16 @@
 ﻿using FluentValidation;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models;
+using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
+using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup.UpsertCategory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup.UpsertSubCategory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.AddNewSubUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpdateSubUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
@@ -42,6 +48,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         public IValidator<AddNewChannelCommand> AddNewChannelValidator {  get; set; }
         public IValidator<UpdateChannelCommand> UpdateChannelValidator {  get; set; }
 
+        //Category Setup
+        public IValidator<UpsertCategoryCommand> UpsertCategoryValidator { get; set; }
+
+        //Sub Category Setup 
+
+        public IValidator<UpsertSubCategoryCommand> UpsertSubCategoryValidator { get; set; }
+
 
 
         public ValidatorHandler()
@@ -69,6 +82,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
 
             AddNewChannelValidator = new Channel.ChannelValidator();
             UpdateChannelValidator = new Channel.UpdateChannelValidator();
+
+            //Category Setup
+            UpsertCategoryValidator = new Category.CategoryValidator();
+
+            //Sub Category Setup
+
+            UpsertSubCategoryValidator = new SubCategory.SubCategoryValidator();
+
         }
         
     }

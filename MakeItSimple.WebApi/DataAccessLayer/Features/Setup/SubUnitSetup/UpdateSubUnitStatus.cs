@@ -38,13 +38,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 {
                     return Result.Failure(SubUnitError.SubUnitNotExist());
                 }
-                
+
+                var subUnitIsUse = await _context.Channels.AnyAsync(x => x.SubUnitId == command.Id && x.IsActive == true, cancellationToken);
+
+                if (subUnitIsUse == true)
+                {
+                    return Result.Failure(SubUnitError.SubUnitIsUse(subUnit.SubUnitName));
+                }
+
                 subUnit.IsActive = !subUnit.IsActive;
+
+                await _context.SaveChangesAsync(cancellationToken); 
 
                 var results = new UpdateSubUnitStatusResult
                 {
-                    Id = command.Id,
-                    Status = command.Status
+                    Id = subUnit.Id,
+                    Status = subUnit.IsActive
                 };
 
 

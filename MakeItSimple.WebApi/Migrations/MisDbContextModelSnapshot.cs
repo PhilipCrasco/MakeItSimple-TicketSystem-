@@ -78,6 +78,63 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("account_titles", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ApproverSetup.Approver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<int?>("ApproverLevel")
+                        .HasColumnType("int")
+                        .HasColumnName("approver_level");
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_approvers");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_approvers_added_by");
+
+                    b.HasIndex("ChannelId")
+                        .HasDatabaseName("ix_approvers_channel_id");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_approvers_modified_by");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_approvers_user_id");
+
+                    b.ToTable("approvers", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -577,7 +634,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2024, 1, 1, 20, 14, 19, 653, DateTimeKind.Local).AddTicks(3423),
+                            CreatedAt = new DateTime(2024, 1, 4, 8, 34, 31, 549, DateTimeKind.Local).AddTicks(3253),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
@@ -638,7 +695,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 20, 14, 19, 653, DateTimeKind.Local).AddTicks(8924),
+                            CreatedAt = new DateTime(2024, 1, 4, 8, 34, 31, 549, DateTimeKind.Local).AddTicks(8973),
                             IsActive = true,
                             Permissions = "[\"User Management\"]",
                             UserRoleName = "Admin"
@@ -662,6 +719,41 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ApproverSetup.Approver", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_approvers_users_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_approvers_channels_channel_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_approvers_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_approvers_users_user_id1");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>

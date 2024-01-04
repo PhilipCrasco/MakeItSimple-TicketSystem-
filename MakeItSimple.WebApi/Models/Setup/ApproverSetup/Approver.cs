@@ -11,18 +11,15 @@ namespace MakeItSimple.WebApi.Models.Setup.ApproverSetup
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public Guid? AddedBy { get; set; }
-        public User AddedByUser { get; set; }
+        public virtual User AddedByUser { get; set; }
         public Guid? ModifiedBy { get; set; }
-        public User ModifiedByUser { get; set; }
-
+        public virtual User ModifiedByUser { get; set; }
         public int ChannelId { get; set; }    
         public virtual Channel Channel { get; set; }
-
-        public int UserId { get; set; }
+        public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
-
         public int ? ApproverLevel { get; set; }
-        
+
 
     }
 }

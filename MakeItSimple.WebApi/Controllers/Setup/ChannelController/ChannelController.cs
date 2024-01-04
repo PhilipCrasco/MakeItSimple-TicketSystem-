@@ -152,7 +152,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
         }
 
 
-
         [HttpPost("AddMember")]
         public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
         {

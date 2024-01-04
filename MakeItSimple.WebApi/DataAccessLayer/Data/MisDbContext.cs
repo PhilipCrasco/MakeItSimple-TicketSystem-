@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.AccountTitleSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ApproverSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CompanySetup;
@@ -9,6 +10,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
+using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
@@ -37,10 +39,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<SubUnit> SubUnits { get; set; }
         public virtual DbSet<Channel> Channels {  get; set; }
         public virtual DbSet<ChannelUser> ChannelUsers { get; set; }
-
         public virtual DbSet<Category> Categories {  get; set; }
-
         public virtual DbSet<SubCategory> SubCategories { get; set; }
+        public virtual DbSet<Approver> Approvers { get; set; }
+
 
 
 
@@ -56,6 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ChannelConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubCategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ApproverConfiguration());
 
 
         }

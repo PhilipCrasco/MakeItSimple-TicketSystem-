@@ -100,11 +100,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         CreatedAt = DateTime.Now
 
                     };
-
+                    approverList.Add(addApprover);
                     await _context.Approvers.AddAsync(addApprover, cancellationToken);
 
-
-                    approverList.Add(addApprover);
 
                 }
 
@@ -119,10 +117,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     UserId = x.UserId,
                     ApproverLevel = x.ApproverLevel,
 
-
                 }).ToList();
 
-
+                
+               
                 return Result.Success(result);
             }
         }

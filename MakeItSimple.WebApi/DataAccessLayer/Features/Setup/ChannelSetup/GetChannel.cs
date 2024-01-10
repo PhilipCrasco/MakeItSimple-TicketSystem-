@@ -72,7 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     Updated_At = x.UpdatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     No_Of_Members = x.ChannelUsers.Count(),
-                    channelUsers = x.ChannelUsers.Select(x => new GetChannelResult.ChannelUser
+                    channelUsers = x.ChannelUsers.Where(x => x.IsActive == true).Select(x => new GetChannelResult.ChannelUser
                     {
                         ChannelUserId = x.Id,
                         UserId = x.UserId,

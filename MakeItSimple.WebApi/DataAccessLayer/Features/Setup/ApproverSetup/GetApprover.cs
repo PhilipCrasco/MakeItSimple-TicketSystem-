@@ -75,8 +75,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                                     }).ToList(),
                                     
-
-
                                 });
 
                 return await PagedList<GetApproverResult>.CreateAsync(result , request.PageNumber, request.PageSize);

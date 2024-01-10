@@ -84,14 +84,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
                     No_Of_Channels = x.Channels.Count(),
-                    users = x.Users.Select(x => new GetSubUnitResult.User
+                    users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
                         UserId = x.Id,
                         Fullname = x.Fullname,
 
                     }).ToList(),
 
-                    channels = x.Channels.Select(x => new GetSubUnitResult.Channel
+                    channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
                     {
                         ChannelId = x.Id,
                         Channel_Name = x.ChannelName

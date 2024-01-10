@@ -44,6 +44,10 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "CloudinaryDotNet": {
+              "target": "Package",
+              "version": "[1.25.0, )"
+            },
             "EFCore.NamingConventions": {
               "target": "Package",
               "version": "[7.0.2, )"

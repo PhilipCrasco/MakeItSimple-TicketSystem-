@@ -547,6 +547,279 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("sub_units", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.ClosingTAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("ClosingAttachment")
+                        .HasColumnType("longtext")
+                        .HasColumnName("closing_attachment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_closing_t_attachments");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_closing_t_attachments_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_closing_t_attachments_modified_by");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_closing_t_attachments_ticket_concern_id");
+
+                    b.ToTable("closing_t_attachments", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("Attachment")
+                        .HasColumnType("longtext")
+                        .HasColumnName("attachment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int?>("TicketTransactionId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_transaction_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_attachments");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_attachments_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_attachments_modified_by");
+
+                    b.HasIndex("TicketTransactionId")
+                        .HasDatabaseName("ix_ticket_attachments_ticket_transaction_id");
+
+                    b.ToTable("ticket_attachments", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketConcern", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_id");
+
+                    b.Property<int>("ChannelUserId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_user_id");
+
+                    b.Property<Guid?>("ClosedApproveBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("closed_approve_by");
+
+                    b.Property<string>("ConcernDetails")
+                        .HasColumnType("longtext")
+                        .HasColumnName("concern_details");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsClosedApprove")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_closed_approve");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("longtext")
+                        .HasColumnName("remarks");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_category_id");
+
+                    b.Property<int>("SubUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_id");
+
+                    b.Property<DateTime>("TargetDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("target_date");
+
+                    b.Property<int?>("TicketTransactionId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_transaction_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_concerns");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_concerns_added_by");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_ticket_concerns_category_id");
+
+                    b.HasIndex("ChannelId")
+                        .HasDatabaseName("ix_ticket_concerns_channel_id");
+
+                    b.HasIndex("ChannelUserId")
+                        .HasDatabaseName("ix_ticket_concerns_channel_user_id");
+
+                    b.HasIndex("ClosedApproveBy")
+                        .HasDatabaseName("ix_ticket_concerns_closed_approve_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_concerns_modified_by");
+
+                    b.HasIndex("SubCategoryId")
+                        .HasDatabaseName("ix_ticket_concerns_sub_category_id");
+
+                    b.HasIndex("SubUnitId")
+                        .HasDatabaseName("ix_ticket_concerns_sub_unit_id");
+
+                    b.HasIndex("TicketTransactionId")
+                        .HasDatabaseName("ix_ticket_concerns_ticket_transaction_id");
+
+                    b.ToTable("ticket_concerns", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("approved_at");
+
+                    b.Property<Guid?>("ApprovedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("approved_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("department_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsApprove")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_approve");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("longtext")
+                        .HasColumnName("remarks");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_transactions");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_transactions_added_by");
+
+                    b.HasIndex("ApprovedBy")
+                        .HasDatabaseName("ix_ticket_transactions_approved_by");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("ix_ticket_transactions_department_id");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_transactions_modified_by");
+
+                    b.ToTable("ticket_transactions", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -634,7 +907,7 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = new Guid("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
-                            CreatedAt = new DateTime(2024, 1, 4, 8, 34, 31, 549, DateTimeKind.Local).AddTicks(3253),
+                            CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             Fullname = "Admin",
                             IsActive = true,
@@ -695,9 +968,9 @@ namespace MakeItSimple.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 1, 4, 8, 34, 31, 549, DateTimeKind.Local).AddTicks(8973),
+                            CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
-                            Permissions = "[\"User Management\"]",
+                            Permissions = "[\"User Management\",\"User Role\"]",
                             UserRoleName = "Admin"
                         });
                 });
@@ -940,6 +1213,175 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.ClosingTAttachment", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_closing_t_attachments_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_closing_t_attachments_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketConcern", "TicketConcern")
+                        .WithMany("ClosingTAttachments")
+                        .HasForeignKey("TicketConcernId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_closing_t_attachments_ticket_concerns_ticket_concern_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("TicketConcern");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketAttachment", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_attachments_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_attachments_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketTransaction", "TicketTransaction")
+                        .WithMany("TicketAttachments")
+                        .HasForeignKey("TicketTransactionId")
+                        .HasConstraintName("fk_ticket_attachments_ticket_transactions_ticket_transaction_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("TicketTransaction");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketConcern", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_concerns_categories_category_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_concerns_channels_channel_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelUserSetup.ChannelUser", "ChannelUser")
+                        .WithMany()
+                        .HasForeignKey("ChannelUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_concerns_channel_users_channel_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ClosedApproveByUser")
+                        .WithMany()
+                        .HasForeignKey("ClosedApproveBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_closed_approve_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_concerns_sub_categories_sub_category_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_concerns_sub_units_sub_unit_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketTransaction", "TicketTransaction")
+                        .WithMany("TicketConcerns")
+                        .HasForeignKey("TicketTransactionId")
+                        .HasConstraintName("fk_ticket_concerns_ticket_transactions_ticket_transaction_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("ChannelUser");
+
+                    b.Navigation("ClosedApproveByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("SubCategory");
+
+                    b.Navigation("SubUnit");
+
+                    b.Navigation("TicketTransaction");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketTransaction", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_transactions_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_transactions_users_approved_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_transactions_departments_department_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_transactions_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -1023,6 +1465,18 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Channels");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketConcern", b =>
+                {
+                    b.Navigation("ClosingTAttachments");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketRequest.TicketTransaction", b =>
+                {
+                    b.Navigation("TicketAttachments");
+
+                    b.Navigation("TicketConcerns");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>

@@ -59,7 +59,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
                     return Result.Failure(SubCategoryError.SubCategoryAlreadyExist(command.SubCategory_Description));
                 }
 
-                var categoryNotExist = await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId , cancellationToken);
+                var categoryNotExist = await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId && x.IsActive == true, cancellationToken);
                 if(categoryNotExist == null)
                 {
                     return Result.Failure(SubCategoryError.CategoryNotExist());

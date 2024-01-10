@@ -51,8 +51,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
         [HttpGet("GetApprover")]
         public async Task<IActionResult> GetApprover([FromQuery] GetApproverQuery query)
         {
-            try
-            {
+
                 var approver = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
@@ -80,11 +79,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
                 var successResult = Result.Success(result);
                 return Ok(successResult);
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPatch("UpdateApproverStatus")]
@@ -105,6 +99,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
             }
         }
         
-
+        
     }
 }

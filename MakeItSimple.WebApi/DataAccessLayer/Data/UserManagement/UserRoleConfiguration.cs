@@ -15,7 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
             {
                 Id = 1,
                 UserRoleName = "Admin",
-                Permissions = new List<string> { "User Management" },
+                Permissions = new List<string> { "User Management","User Role" },
+                CreatedAt = DateTime.Parse("2024-01-08"),
             });
 
              builder.Property(e => e.Permissions).HasConversion(

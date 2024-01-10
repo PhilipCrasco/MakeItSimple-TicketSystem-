@@ -7,6 +7,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing;
 using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
@@ -19,6 +20,7 @@ using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -43,6 +45,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<Approver> Approvers { get; set; }
 
+        public virtual DbSet<TicketTransaction> TicketTransactions { get; set; }
+        public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
+        public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
+        public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
+
+
+
 
 
 
@@ -59,7 +68,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ApproverConfiguration());
-
+            modelBuilder.ApplyConfiguration(new TicketTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
+            modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());
 
         }
 

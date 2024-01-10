@@ -76,7 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
-                    subUnits = x.SubUnits.Select(x => new GetDepartmentResult.SubUnit
+                    subUnits = x.SubUnits.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.SubUnit
                     {
                         SubUnitId = x.Id,
                         SubUnit_Name = x.SubUnitName,

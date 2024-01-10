@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
                 Password = "$2a$12$ihvpKbpvdRfZLXz.tZKFEulxnTg1tiS11T/MbpufId3rzXoCMW2OK",
                 UserRoleId = 1,
                 IsPasswordChange = true,
+                CreatedAt = DateTime.Parse("2024-01-08"),
             });
 
 

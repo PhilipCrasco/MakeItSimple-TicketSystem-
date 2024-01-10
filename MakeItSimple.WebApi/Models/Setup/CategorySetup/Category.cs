@@ -9,7 +9,7 @@ namespace MakeItSimple.WebApi.Models.Setup.CategorySetup
     {
         public int Id {  get; set; }
         public bool IsActive { get; set; } = true;
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
         public Guid? AddedBy { get; set; }
         public User AddedByUser { get; set; }

@@ -86,7 +86,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                     Modified_By = x.ModifiedBy,
                     Updated_At = x.UpdatedAt, 
                     Is_Tagged = x.Users.FirstOrDefault().Fullname != null ? true : false,
-                    users = x.Users.Select(x => new GetUserRoleResult.Users
+                    users = x.Users.Where(x => x.IsActive == true).Select(x => new GetUserRoleResult.Users
                     {
 
                         UserId = x.Id,

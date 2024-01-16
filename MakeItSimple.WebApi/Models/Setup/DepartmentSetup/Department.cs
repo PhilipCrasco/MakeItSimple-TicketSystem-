@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using System.ComponentModel.DataAnnotations;
 
 namespace MakeItSimple.WebApi.Models.Setup.DepartmentSetup
 {

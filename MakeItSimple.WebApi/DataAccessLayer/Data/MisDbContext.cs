@@ -45,13 +45,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<Approver> Approvers { get; set; }
 
-        public virtual DbSet<TicketTransaction> TicketTransactions { get; set; }
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
+
+        public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
         public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
-
-
-
 
 
 
@@ -68,7 +66,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubCategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ApproverConfiguration());
-            modelBuilder.ApplyConfiguration(new TicketTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());

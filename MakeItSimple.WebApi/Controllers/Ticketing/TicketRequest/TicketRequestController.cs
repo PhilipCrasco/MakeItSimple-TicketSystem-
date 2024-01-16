@@ -1,10 +1,15 @@
-﻿using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing;
+﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.AddNewTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.AddNewTicketAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicketAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetRequestAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetTicketRequest;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.UpdateTicketRequest;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
 {
@@ -46,7 +51,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
         }
 
         [HttpPost("AddNewTicketAttachment/{id}")]
-        public async Task<IActionResult> AddNewTicketAttachment([FromForm] AddNewTicketAttachmentCommand command , [FromRoute] int id)
+        public async Task<IActionResult> AddNewTicketAttachment([FromForm] AddNewTicketAttachmentCommand command , [FromRoute] int id )
         {
             try
             {
@@ -55,10 +60,93 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
                     command.Added_By = userId;
                 }
 
-                command.TicketTransactionId = id;
+                command.RequestGeneratorId = id;
+
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpGet("GetTicketRequest")]
+        public async Task<IActionResult> GetTicketRequest([FromQuery] GetTicketRequestQuery query)
+        {
+            try
+            {
+                var ticketRequest = await _mediator.Send(query);
+
+                Response.AddPaginationHeader(
+
+                ticketRequest.CurrentPage,
+                ticketRequest.PageSize,
+                ticketRequest.TotalCount,
+                ticketRequest.TotalPages,
+                ticketRequest.HasPreviousPage,
+                ticketRequest.HasNextPage
+
+                );
+
+                var result = new
+                {
+                    ticketRequest,
+                    ticketRequest.CurrentPage,
+                    ticketRequest.PageSize,
+                    ticketRequest.TotalCount,
+                    ticketRequest.TotalPages,
+                    ticketRequest.HasPreviousPage,
+                    ticketRequest.HasNextPage
+                };
+
+                var successResult = Result.Success(result);
+                return Ok(successResult);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+        [HttpGet("GetRequestAttachment")]
+        public async Task<IActionResult> GetRequestAttachment ([FromQuery]GetRequestAttachmentQuery query)
+        {
+            try
+            {
+                var results = await _mediator.Send(query);
+                if(results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch(Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdateTicketRequest")]
+        public async Task<IActionResult> UpdateTicketRequest([FromBody] UpdateTicketRequestCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Added_By = userId;
+
+                }
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+
                     return BadRequest(results);
                 }
                 return Ok(results);

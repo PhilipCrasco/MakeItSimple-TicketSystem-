@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing.TicketRequest
 
         public string ClosingAttachment {  get; set; }
 
-        public int TicketConcernId { get; set; }
+        public int ? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
 
     }

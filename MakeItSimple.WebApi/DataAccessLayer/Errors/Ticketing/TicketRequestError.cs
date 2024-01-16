@@ -18,8 +18,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error ChannelNotExist() =>
       new Error("TicketRequest.ChannelNotExist", "Channel not exist!");
 
-      public static Error ChannelUserNotExist() =>
-      new Error("TicketRequest.ChannelUserNotExist", "Member not exist!");
+      public static Error UserNotExist() =>
+      new Error("TicketRequest.UserNotExist", "Member not exist!");
 
       public static Error CategoryNotExist() =>
       new Error("TicketRequest.CategoryNotExist", "Category not exist!");
@@ -30,8 +30,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error DateTimeInvalid() =>
       new Error("TicketRequest.DateTimeInvalid", "Invalid start/target date!");
 
+      public static Error DuplicateConcern() =>
+      new Error("TicketRequest.DateTimeInvalid", "Concern ticket duplicated!");
+
       public static Error AttachmentNotNull() =>
       new Error("TicketRequest.AttachmentNotNull", "Attachment must not be empty!");
+     
+      public static Error AttachmentAlreadyExist() =>
+      new Error("TicketRequest.AttachmentNotNull", "Attachment already exist!");
+
       public static Error InvalidAttachmentSize() =>
       new Error("TicketRequest.InvalidAttachmentSize", "Invalid Attachment Size!");
       

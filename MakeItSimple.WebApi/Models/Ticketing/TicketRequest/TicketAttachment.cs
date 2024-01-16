@@ -13,8 +13,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing.TicketRequest
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
         public string Attachment {  get; set; }
-        public int ? TicketTransactionId { get; set; }
-        public virtual TicketTransaction TicketTransaction { get; set; }
+
+        public int ? RequestGeneratorId { get; set; }
+        public virtual RequestGenerator RequestGenerator { get; set; }
 
     }
 }

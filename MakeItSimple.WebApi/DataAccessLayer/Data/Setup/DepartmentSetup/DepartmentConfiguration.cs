@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
+﻿
+using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

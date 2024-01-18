@@ -1,6 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
@@ -59,7 +59,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 }
 
 
-                var results = requestGeneratorQuery.Select(x => new GetRequestAttachmentResult
+                var results = await requestGeneratorQuery.Select(x => new GetRequestAttachmentResult
                 {
                     RequestGeneratorId = x.Id,
                     Attachments = x.TicketAttachments.Select(x => new GetRequestAttachmentResult.TicketAttachment
@@ -74,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     }).ToList(),
 
 
-                });
+                }).ToListAsync();
 
                 return Result.Success(results);
 

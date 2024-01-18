@@ -3,7 +3,7 @@ using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

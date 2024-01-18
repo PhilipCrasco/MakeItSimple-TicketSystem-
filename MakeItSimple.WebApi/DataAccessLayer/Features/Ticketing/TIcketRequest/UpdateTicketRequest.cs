@@ -2,7 +2,7 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
             public Guid ? Added_By { get; set; }
-            public Guid Modified_By { get; set; }
+            public Guid ? Modified_By { get; set; }
+            public string Remarks { get; set; }
 
             public ICollection<Concern> ticketConcerns { get; set; }
 
@@ -100,18 +101,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         case null:
                             return Result.Failure(TicketRequestError.SubCategoryNotExist());
                     }
-                    switch (requestTicketConcern.FirstOrDefault(x => x.ConcernDetails == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
-                    && x.SubCategoryId == concerns.SubCategoryId))
-                    {
-                        case not null:
-                            return Result.Failure(TicketRequestError.DuplicateConcern());
-                    }
 
                     if (string.IsNullOrEmpty(concerns.Concern_Details))
                     {
                         return Result.Failure(TicketRequestError.ConcernDetailsNotNull());
                     }
-                    if (concerns.Start_Date > concerns.Target_Date || concerns.Target_Date > DateToday)
+                    if (concerns.Start_Date > concerns.Target_Date || DateToday > concerns.Target_Date)
                     {
                         return Result.Failure(TicketRequestError.DateTimeInvalid());
                     }
@@ -124,10 +119,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                     var upsertConcern = requestTicketConcern.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
 
-                    if(upsertConcern != null)
+                    if (upsertConcern != null)
                     {
-                        bool hasChanged = false;
 
+                        var duplicateConcern = requestTicketConcern.FirstOrDefault(x => x.ConcernDetails == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
+                           && x.SubCategoryId == concerns.SubCategoryId && (upsertConcern.ConcernDetails != concerns.Concern_Details
+                           && upsertConcern.CategoryId != concerns.CategoryId && upsertConcern.SubCategoryId != concerns.SubCategoryId));
+
+                        if (duplicateConcern != null)
+                        {
+                            return Result.Failure(TicketRequestError.DuplicateConcern());
+                        }
+
+                        bool hasChanged = false;
 
                         if (upsertConcern.ConcernDetails != concerns.Concern_Details)
                         {
@@ -163,6 +167,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         {
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
+                            upsertConcern.IsReject = false;
+                            upsertConcern.RejectRemarks = null;
+                            upsertConcern.Remarks = command.Remarks;
                             ticketConcernList.Add(upsertConcern);
                         }
                         if (!hasChanged)
@@ -173,8 +180,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     }
                     else
                     {
+                        var duplicateConcern = requestTicketConcern.FirstOrDefault(x => x.ConcernDetails == concerns.Concern_Details 
+                        && concerns.CategoryId == concerns.CategoryId && x.SubCategoryId == concerns.SubCategoryId );
+
+                        if (duplicateConcern != null)
+                        {
+                            return Result.Failure(TicketRequestError.DuplicateConcern());
+                        }
                         var addTicketConcern = new TicketConcern
                         {
+                            
                             RequestGeneratorId = requestGenerator.Id,
                             DepartmentId = command.DepartmentId,
                             SubUnitId = command.SubUnitId,
@@ -185,6 +200,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                             SubCategoryId = concerns.SubCategoryId,
                             AddedBy = command.Added_By,
                             CreatedAt = DateTime.Now,
+                            IsReject = false,
+                            RejectRemarks = null,
+                            Remarks = command.Remarks
 
                         };
 

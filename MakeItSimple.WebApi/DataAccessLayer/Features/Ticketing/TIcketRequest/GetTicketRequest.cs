@@ -1,6 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -141,7 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
 
 
-                var result = ticketQuery.Include(x => x.RequestGenerator).ThenInclude(x => x.TicketAttachments)
+                var result =  ticketQuery.Include(x => x.RequestGenerator).ThenInclude(x => x.TicketAttachments)
                     .GroupBy(x => x.RequestGeneratorId).Select(x => new GetTicketRequestResult
                     {
                         RequestGeneratedId = x.Key,

@@ -1,6 +1,6 @@
-﻿using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using MakeItSimple.WebApi.Models.Ticketing;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing
 {

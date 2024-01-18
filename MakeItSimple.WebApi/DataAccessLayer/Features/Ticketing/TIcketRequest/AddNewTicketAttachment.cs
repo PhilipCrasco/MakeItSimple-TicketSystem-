@@ -3,13 +3,13 @@ using CloudinaryDotNet.Actions;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Http.HttpResults;
+using MakeItSimple.WebApi.Models.Ticketing;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 {

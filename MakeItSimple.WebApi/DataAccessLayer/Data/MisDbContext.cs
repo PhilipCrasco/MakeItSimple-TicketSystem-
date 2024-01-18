@@ -20,7 +20,7 @@ using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MakeItSimple.WebApi.Models.Ticketing.TicketRequest;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -51,6 +51,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
         public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
 
+        public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,6 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());
+            modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
 
         }
 

@@ -7,8 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicketAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.ApproveRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.CancelTicketRequest;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetTicketRequest;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.UpdateTicketRequest;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
@@ -152,6 +155,70 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
                 return Ok(results);
             }
             catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("ApproveRequestTicket")]
+        public async Task<IActionResult> ApproveRequestTicket([FromBody] ApproveRequestTicketCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Approved_By = userId;
+
+                }
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("RejectRequestTicket")]
+        public async Task<IActionResult> RejectRequestTicket([FromBody] RejectRequestTicketCommand command)
+        {
+            try
+            {
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+        [HttpPut("CancelTicketRequest")]
+        public async Task<IActionResult> CancelTicketRequest(CancelTicketRequestCommand command)
+        {
+            try
+            {
+                var results = await _mediator.Send(command);
+                if(results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch(Exception ex)
             {
                 return Conflict(ex.Message);
             }

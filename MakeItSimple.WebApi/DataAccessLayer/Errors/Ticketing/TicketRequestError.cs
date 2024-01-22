@@ -33,13 +33,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.DateTimeInvalid", "Invalid start/target date!");
 
       public static Error DuplicateConcern() =>
-      new Error("TicketRequest.DateTimeInvalid", "Concern ticket duplicated!");
+      new Error("TicketRequest.DuplicateConcern", "Concern ticket duplicated!");
 
       public static Error AttachmentNotNull() =>
       new Error("TicketRequest.AttachmentNotNull", "Attachment must not be empty!");
      
       public static Error AttachmentAlreadyExist() =>
-      new Error("TicketRequest.AttachmentNotNull", "Attachment already exist!");
+      new Error("TicketRequest.AttachmentAlreadyExist", "Attachment already exist!");
 
       public static Error InvalidAttachmentSize() =>
       new Error("TicketRequest.InvalidAttachmentSize", "Invalid Attachment Size!");

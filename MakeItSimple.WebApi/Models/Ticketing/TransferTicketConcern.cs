@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
+using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 
@@ -21,7 +22,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
 
-        public int SubUnitId { get; set; }
+        public int? DepartmentId { get; set; }
+        public virtual Department Department { get; set; }
+
+        public int SubUnitId { get; set; }      
         public virtual SubUnit SubUnit { get; set; }
 
         public int ChannelId { get; set; }

@@ -1,8 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicket;
@@ -223,6 +221,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing.TicketRequest
                 return Conflict(ex.Message);
             }
         }
+
+
 
 
     }

@@ -119,8 +119,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         var attachmentsParams = new ImageUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.Department.DepartmentName}/{getTicketConcern.User.Fullname}" +
-                            $"/Request/{getTicketConcern.RequestGeneratorId}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/{getTicketConcern.Department.DepartmentName}/{getTicketConcern.User.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);

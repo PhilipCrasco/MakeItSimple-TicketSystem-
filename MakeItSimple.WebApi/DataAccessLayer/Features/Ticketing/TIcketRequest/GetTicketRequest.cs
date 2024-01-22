@@ -15,8 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
         {
             public int? RequestGeneratedId { get; set; }
             public int DepartmentId { get; set; }
-            public string DepartmentCode { get; set; }
-            public string DepartmentName { get; set; }
+            public string Department_Code { get; set; }
+            public string Department_Name { get; set; }
             public int SubUnitId { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
@@ -44,10 +44,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 public string Concern_Description { get; set; }
 
                 public int CategoryId { get; set; }
-                public string Category_Description { get; set; }
 
+                public string Category_Description { get; set; }
                 public int SubCategoryId { get; set; }
-                public string SubCategoryDescription { get; set; }
+               public string SubCategoryDescription { get; set; }
 
                 public DateTime Start_Date { get; set; }
 
@@ -56,7 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 public string Added_By { get; set; }
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
-                public DateTime? Updated_At { get; set; }
+                public DateTime? Updated_At { get; set; } 
 
                 public bool IsActive { get; set; }
 
@@ -146,8 +146,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     {
                         RequestGeneratedId = x.Key,
                         DepartmentId = x.First().DepartmentId,
-                        DepartmentCode = x.First().Department.DepartmentCode,
-                        DepartmentName = x.First().Department.DepartmentName,
+                        Department_Code = x.First().Department.DepartmentCode,
+                        Department_Name = x.First().Department.DepartmentName,
                         SubUnitId = x.First().SubUnitId,
                         SubUnit_Code = x.First().SubUnit.SubUnitCode,
                         SubUnit_Name = x.First().SubUnit.SubUnitName,

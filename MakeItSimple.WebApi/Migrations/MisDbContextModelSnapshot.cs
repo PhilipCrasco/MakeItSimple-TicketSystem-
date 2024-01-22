@@ -715,7 +715,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
 
-                    b.Property<bool>("IsApprove")
+                    b.Property<bool?>("IsApprove")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_approve");
 
@@ -856,6 +856,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("department_id");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
@@ -919,6 +923,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ChannelId")
                         .HasDatabaseName("ix_transfer_ticket_concerns_channel_id");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("ix_transfer_ticket_concerns_department_id");
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_modified_by");
@@ -1510,6 +1517,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_transfer_ticket_concerns_channels_channel_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .HasConstraintName("fk_transfer_ticket_concerns_departments_department_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
@@ -1553,6 +1565,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Channel");
+
+                    b.Navigation("Department");
 
                     b.Navigation("ModifiedByUser");
 

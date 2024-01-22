@@ -49,7 +49,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string TransferRemarks { get; set; }
         public virtual User TransferByUser { get; set; }
 
-        public bool IsApprove { get; set; } = false;
+        public bool ? IsApprove { get; set; } = false;
         public DateTime? ApprovedAt { get; set; }
         public Guid? ApprovedBy { get; set; }
         public virtual User ApprovedByUser { get; set; }

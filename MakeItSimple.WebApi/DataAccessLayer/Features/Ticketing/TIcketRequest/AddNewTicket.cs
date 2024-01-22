@@ -137,7 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         return Result.Failure(TicketRequestError.ConcernDetailsNotNull());
                     }
 
-                    if (concern.Start_Date > concern.Target_Date || concern.Target_Date > DateToday)
+                    if (concern.Start_Date > concern.Target_Date || concern.Target_Date < DateToday)
                     {
                         return Result.Failure(TicketRequestError.DateTimeInvalid());
                     }

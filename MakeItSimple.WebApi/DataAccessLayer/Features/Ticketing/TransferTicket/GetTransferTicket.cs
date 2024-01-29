@@ -123,7 +123,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     Updated_At = x.First().UpdatedAt,
                     Transfer_By = x.First().TransferByUser.Fullname,
                     Transfer_At = x.First().TransferAt,
-                    TransferStatus = x.First().IsTransfer == true ? "Transfer Approve" : x.First().IsTransfer != true && x.First().IsActive == false ? "Transfer Ticket Rejected" : "Tranfer Ticket for Approval",
+                    TransferStatus = x.First().IsTransfer == true && x.First().TicketConcern.IsApprove == null ? "Transfer Approve" 
+                    : x.First().IsTransfer != true && x.First().IsActive == false ? "Transfer Ticket Rejected" : "Tranfer Ticket for Approval",  
                     TransferRemarks = x.First().TransferRemarks,
                     GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
                     {

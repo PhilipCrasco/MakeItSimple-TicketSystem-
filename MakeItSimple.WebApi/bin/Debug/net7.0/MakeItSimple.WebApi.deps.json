@@ -29,7 +29,8 @@
           "Pomelo.EntityFrameworkCore.MySql": "7.0.0",
           "Pomelo.EntityFrameworkCore.MySql.Design": "1.1.2",
           "Swashbuckle.AspNetCore": "6.5.0",
-          "System.IdentityModel.Tokens.Jwt": "7.0.3"
+          "System.IdentityModel.Tokens.Jwt": "7.0.3",
+          "morelinq": "4.1.0"
         },
         "runtime": {
           "MakeItSimple.WebApi.dll": {}
@@ -1630,6 +1631,14 @@
           "lib/netstandard2.0/Mono.TextTemplating.dll": {
             "assemblyVersion": "2.2.0.0",
             "fileVersion": "2.2.1.1"
+          }
+        }
+      },
+      "morelinq/4.1.0": {
+        "runtime": {
+          "lib/net6.0/MoreLinq.dll": {
+            "assemblyVersion": "4.1.0.0",
+            "fileVersion": "4.1.0.0"
           }
         }
       },
@@ -3591,6 +3600,13 @@
       "sha512": "sha512-KZYeKBET/2Z0gY1WlTAK7+RHTl7GSbtvTLDXEZZojUdAPqpQNDL6tHv7VUpqfX5VEOh+uRGKaZXkuD253nEOBQ==",
       "path": "mono.texttemplating/2.2.1",
       "hashPath": "mono.texttemplating.2.2.1.nupkg.sha512"
+    },
+    "morelinq/4.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tkUeXp5dWNVP47MIhVEsIQk4DaN2oM/owIAnHblNOiwDQ5RB7oKreqZ7a+z+AEdyNgzLSkj6Pv0D0rY6Gh1/Ng==",
+      "path": "morelinq/4.1.0",
+      "hashPath": "morelinq.4.1.0.nupkg.sha512"
     },
     "MySql.Data/8.0.11": {
       "type": "package",

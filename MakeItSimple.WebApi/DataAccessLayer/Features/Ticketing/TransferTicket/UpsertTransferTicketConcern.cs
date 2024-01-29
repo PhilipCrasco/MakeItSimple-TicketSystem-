@@ -39,8 +39,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(UpsertTransferTicketConcernCommand command, CancellationToken cancellationToken)
             {
+
+                var requestGeneratedId = new RequestGenerator { };
+
+                await  _context.RequestGenerators.AddAsync(requestGeneratedId, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+
                 foreach(var transferConcern in command.AddTransferTickets)
                 {
+
                     switch(await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == transferConcern.SubUnitId, cancellationToken))
                     {
                         case null:
@@ -79,8 +86,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         var addTransferTicket = new TransferTicketConcern
                         {
+                            RequestGeneratorId = requestGeneratedId.Id,
                             TicketConcernId = ticketConcern.Id,
-                           
                             SubUnitId = transferConcern.SubUnitId,
                             ChannelId = transferConcern.ChannelId,
                             UserId = transferConcern.UserId,
@@ -98,6 +105,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         };
 
                         await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
+
+                        ticketConcern.IsTransfer = false;
                         await _context.SaveChangesAsync(cancellationToken);
 
                     }
@@ -132,6 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             transferTicketConcern.ModifiedBy = ticketConcern.ModifiedBy;
                             transferTicketConcern.UpdatedAt = DateTime.Now;
                             transferTicketConcern.IsActive = true;
+                            
                         }
                         
                     }
@@ -145,7 +155,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return Result.Success("Success");
+                return Result.Success();
             }
         }
 

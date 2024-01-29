@@ -67,7 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         concerns.ApprovedBy = command.Approved_By;
                         concerns.ApprovedAt = DateTime.Now;
                         concerns.IsReject = false;
-                        concerns.RejectRemarks = null; 
+                        concerns.Remarks = null; 
 
                         ticketApproveList.Add(concerns);
                     }

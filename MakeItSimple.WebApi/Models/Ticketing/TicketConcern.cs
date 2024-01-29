@@ -1,14 +1,9 @@
-﻿using FluentValidation;
-using MakeItSimple.WebApi.Common;
+﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
-using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicket;
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
@@ -46,7 +41,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public bool? IsTransfer { get; set; }
         public DateTime? TransferAt { get; set; }
         public Guid? TransferBy { get; set; }
-        public string TransferRemarks { get; set; }
+        //public string TransferRemarks { get; set; }
         public virtual User TransferByUser { get; set; }
 
         public bool ? IsApprove { get; set; } = false;
@@ -54,15 +49,19 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? ApprovedBy { get; set; }
         public virtual User ApprovedByUser { get; set; }
 
-        public bool IsClosedApprove { get; set; } = false;
+        public bool ? IsClosedApprove { get; set; }
+        public DateTime? Closed_At { get; set; } = DateTime.Today;
         public Guid? ClosedApproveBy { get; set; }
         public virtual User ClosedApproveByUser { get; set; }
 
         public bool IsClosedReject { get; set; }
-        public string CloseRejectRemarks { get; set; }
+        //public string CloseRejectRemarks { get; set; }
 
         public bool IsReject { get; set; } = false;
-        public string RejectRemarks { get; set; }
+        //public string RejectRemarks { get; set; }
+
+        public bool IsReTicket { get; set; } = false;
+        public DateTime ? ReticketAt { get; set; }
 
         public string Remarks { get; set; }
 
@@ -73,7 +72,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
 
-        public ICollection<ClosingTAttachment> ClosingTAttachments { get; set; }
+        public int ? ClosingGeneratorId { get; set; }
+        public virtual ClosingGenerator ClosingGenerator { get; set; }
 
 
 

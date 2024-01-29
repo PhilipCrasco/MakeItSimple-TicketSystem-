@@ -23,7 +23,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             public Guid? UserId { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public string Remarks { get; set; }
 
             public ICollection<Concern> ticketConcerns { get; set; }
 
@@ -55,7 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             {
 
                 var ticketConcernList = new List<TicketConcern>();
-                var DateToday = DateTime.Now;
+                var DateToday = DateTime.Today;
 
                 var requestGenerator = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
 
@@ -67,22 +66,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                 var requestTicketConcern = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
 
-                switch (requestTicketConcern.FirstOrDefault(x => x.DepartmentId == command.DepartmentId))
+                switch (await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId , cancellationToken))
                 {
                     case null:
                         return Result.Failure(TicketRequestError.DepartmentNotExist());
                 }
-                switch (requestTicketConcern.FirstOrDefault(x => x.SubUnitId == command.SubUnitId))
+                switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId , cancellationToken))
                 {
                     case null:
                         return Result.Failure(TicketRequestError.SubUnitNotExist());
                 }
-                switch (requestTicketConcern.FirstOrDefault(x => x.ChannelId == command.ChannelId))
+                switch (await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId , cancellationToken))
                 {
                     case null:
                         return Result.Failure(TicketRequestError.ChannelNotExist());
                 }
-                switch (requestTicketConcern.FirstOrDefault(x => x.UserId == command.UserId))
+                switch (await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId))
                 {
                     case null:
                         return Result.Failure(TicketRequestError.UserNotExist());
@@ -91,12 +90,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 foreach (var concerns in command.ticketConcerns)
                 {
 
-                    switch (requestTicketConcern.FirstOrDefault(x => x.CategoryId == concerns.CategoryId))
+                    switch (await  _context.Categories.FirstOrDefaultAsync(x => x.Id == concerns.CategoryId))
                     {
                         case null:
                             return Result.Failure(TicketRequestError.CategoryNotExist());
                     }
-                    switch (requestTicketConcern.FirstOrDefault(x => x.CategoryId == concerns.CategoryId))
+                    switch (await _context.SubCategories.FirstOrDefaultAsync(x => x.Id == concerns.SubCategoryId))
                     {
                         case null:
                             return Result.Failure(TicketRequestError.SubCategoryNotExist());
@@ -168,8 +167,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
                             upsertConcern.IsReject = false;
-                            upsertConcern.RejectRemarks = null;
-                            upsertConcern.Remarks = command.Remarks;
+                            //upsertConcern.Remarks = null;
                             ticketConcernList.Add(upsertConcern);
                         }
                         if (!hasChanged)
@@ -200,9 +198,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                             SubCategoryId = concerns.SubCategoryId,
                             AddedBy = command.Added_By,
                             CreatedAt = DateTime.Now,
+                            StartDate = concerns.Start_Date,
+                            TargetDate = concerns.Target_Date,
                             IsReject = false,
-                            RejectRemarks = null,
-                            Remarks = command.Remarks
+                            //Remarks = null
 
                         };
 
@@ -215,7 +214,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 await _context.SaveChangesAsync(cancellationToken);
 
 
-                return Result.Success("Transaction Success");
+                return Result.Success();
 
             }
         }

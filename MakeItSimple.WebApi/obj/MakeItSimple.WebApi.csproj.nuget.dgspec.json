@@ -131,6 +131,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[7.0.3, )"
+            },
+            "morelinq": {
+              "target": "Package",
+              "version": "[4.1.0, )"
             }
           },
           "imports": [

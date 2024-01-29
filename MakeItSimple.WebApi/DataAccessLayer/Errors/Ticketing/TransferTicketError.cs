@@ -4,6 +4,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 {
     public class TransferTicketError
     {
+
+      public static Error TicketIdNotExist() =>
+      new Error("TransferTicketError.TicketNotExist", "Ticket transaction not exist!");
+
       public static Error TicketConcernIdNotExist() =>
       new Error("TransferTicketError.TicketConcernIdNotExist", "Ticket concern not exist!");
 
@@ -22,6 +26,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error UserNotExist() =>
       new Error("TransferTicketError.UserNotExist", "Member not exist!");
       public static Error DuplicateTransferTicket() =>
-      new Error("DuplicateTransferTicket.DuplicateTransferTicket", "Concern ticket duplicated!");
+      new Error("TransferTicketError.DuplicateTransferTicket", "Concern ticket duplicated!");
+
+      public static Error DateTimeInvalid() =>
+      new Error("TransferTicketError.DateTimeInvalid", "Invalid start/target date!");
+
     }
 }

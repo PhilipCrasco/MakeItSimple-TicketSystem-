@@ -30,6 +30,8 @@ namespace MakeItSimple.WebApi.Controllers.Setup.AccountTitleController
                 {
                     command.Added_By = userId;
                     command.Modified_By = userId;
+
+                    
                 }
 
                 var result = await _mediator.Send(command);
@@ -46,7 +48,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.AccountTitleController
         }
 
         [HttpGet("GetAccountTitle")]
-        public async Task<IActionResult> GetAccountTitle([FromBody] GetAccountTitleQuery query)
+        public async Task<IActionResult> GetAccountTitle([FromQuery] GetAccountTitleQuery query)
         {
             try
             {

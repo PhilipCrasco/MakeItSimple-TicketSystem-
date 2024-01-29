@@ -57,13 +57,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         var ticketConcernById = ticketConcernExist.FirstOrDefault(x => x.Id == ticketConcern.TicketConcernId);
                         if(ticketConcernById != null)
                         {
-                             _context.Remove(ticketConcernById);
+                            ticketConcernById.IsActive = false;
                         }
                         else if(ticketConcern.TicketConcernId == null)
                         {
                             foreach(var cancelAll in ticketConcernExist)
                             {
-                                _context.Remove(cancelAll);
+                                cancelAll.IsActive = false;
                             }
                         }
                         else

@@ -25,7 +25,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
-        public int SubUnitId { get; set; }      
+        public int SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
         public int ChannelId { get; set; }
@@ -51,6 +51,15 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TransferBy { get; set; }
         public string TransferRemarks { get; set; }
         public virtual User TransferByUser { get; set; }
+
+        public bool IsRejectTransfer { get; set; }
+        public DateTime ? RejectTransferAt { get; set; }
+        public string ? RejectTransferBy { get; set; }
+        public virtual User RejectTransferByUser { get; set; }
+
+        public int? RequestGeneratorId { get; set; }
+        public virtual RequestGenerator RequestGenerator { get; set; }
+
 
 
     }

@@ -12,11 +12,11 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User AddedByUser { get; set; }
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
-
         public string ClosingAttachment { get; set; }
+        public int? ClosingGeneratorId { get; set; }
+        public virtual ClosingGenerator ClosingGenerator { get; set; }
 
-        public int? TicketConcernId { get; set; }
-        public virtual TicketConcern TicketConcern { get; set; }
+
 
     }
 }

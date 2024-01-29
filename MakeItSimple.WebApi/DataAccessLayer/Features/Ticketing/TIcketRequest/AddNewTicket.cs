@@ -84,7 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             {
 
                 var concernList = new List<TicketConcern>();
-                var DateToday = DateTime.Now;
+                var DateToday = DateTime.Today;
 
                 var addRequestGenerator = new RequestGenerator { };
 
@@ -137,7 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         return Result.Failure(TicketRequestError.ConcernDetailsNotNull());
                     }
 
-                    if (concern.Start_Date > concern.Target_Date || concern.Target_Date < DateToday)
+                    if (concern.Start_Date > concern.Target_Date || concern.Target_Date < DateToday )
                     {
                         return Result.Failure(TicketRequestError.DateTimeInvalid());
                     }
@@ -155,6 +155,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         StartDate = concern.Start_Date,
                         TargetDate = concern.Target_Date,
                         AddedBy = command.Added_By,
+                        IsClosedApprove = null,
                         CreatedAt = DateTime.Now,
 
                     };

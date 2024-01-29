@@ -2138,6 +2138,19 @@
           "lib/netstandard2.0/Mono.TextTemplating.dll": {}
         }
       },
+      "morelinq/4.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/MoreLinq.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/MoreLinq.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "MySql.Data/8.0.11": {
         "type": "package",
         "dependencies": {
@@ -7595,6 +7608,31 @@
         "mono.texttemplating.nuspec"
       ]
     },
+    "morelinq/4.1.0": {
+      "sha512": "tkUeXp5dWNVP47MIhVEsIQk4DaN2oM/owIAnHblNOiwDQ5RB7oKreqZ7a+z+AEdyNgzLSkj6Pv0D0rY6Gh1/Ng==",
+      "type": "package",
+      "path": "morelinq/4.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "COPYING.txt",
+        "README.md",
+        "lib/net6.0/MoreLinq.dll",
+        "lib/net6.0/MoreLinq.pdb",
+        "lib/net6.0/MoreLinq.xml",
+        "lib/net8.0/MoreLinq.dll",
+        "lib/net8.0/MoreLinq.pdb",
+        "lib/net8.0/MoreLinq.xml",
+        "lib/netstandard2.0/MoreLinq.dll",
+        "lib/netstandard2.0/MoreLinq.pdb",
+        "lib/netstandard2.0/MoreLinq.xml",
+        "lib/netstandard2.1/MoreLinq.dll",
+        "lib/netstandard2.1/MoreLinq.pdb",
+        "lib/netstandard2.1/MoreLinq.xml",
+        "morelinq.4.1.0.nupkg.sha512",
+        "morelinq.nuspec"
+      ]
+    },
     "MySql.Data/8.0.11": {
       "sha512": "P5zKcnM2SVtdHD6gfReymJguIYLhNL5Og8Qm5TC9MEsSupsAYrRu4AB4nsbalrjqqv8VHBqVREWsXg9lY+q03A==",
       "type": "package",
@@ -12011,7 +12049,8 @@
       "Pomelo.EntityFrameworkCore.MySql >= 7.0.0",
       "Pomelo.EntityFrameworkCore.MySql.Design >= 1.1.2",
       "Swashbuckle.AspNetCore >= 6.5.0",
-      "System.IdentityModel.Tokens.Jwt >= 7.0.3"
+      "System.IdentityModel.Tokens.Jwt >= 7.0.3",
+      "morelinq >= 4.1.0"
     ]
   },
   "packageFolders": {
@@ -12144,6 +12183,10 @@
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
             "version": "[7.0.3, )"
+          },
+          "morelinq": {
+            "target": "Package",
+            "version": "[4.1.0, )"
           }
         },
         "imports": [
@@ -12176,6 +12219,26 @@
       "warningLevel": 1,
       "message": "MySql.EntityFrameworkCore 7.0.10 depends on MySql.Data (>= 7.0.10) but MySql.Data 7.0.10 was not found. An approximate best match of MySql.Data 8.0.11 was resolved.",
       "libraryId": "MySql.Data",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-59j7-ghrg-fj52",
+      "libraryId": "System.IdentityModel.Tokens.Jwt",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.IdentityModel.Tokens.Jwt' 7.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8g9c-28fc-mcx2",
+      "libraryId": "System.IdentityModel.Tokens.Jwt",
       "targetGraphs": [
         "net7.0"
       ]

@@ -5,6 +5,9 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using MoreLinq;
+using MoreLinq.Extensions;
+using System.Net.Mail;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetTicketRequest.GetTicketRequestResult;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
@@ -13,40 +16,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
     {
         public class GetTicketRequestResult
         {
-            public int? RequestGeneratedId { get; set; }
-            public int DepartmentId { get; set; }
+            public int? RequestGeneratorId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
-            public int SubUnitId { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
-
-            public int ChannelId { get; set; }
             public string Channel_Name { get; set; }
-
-            public Guid? UserId { get; set; }
             public string EmpId { get; set; }
             public string Fullname { get; set; }
-
-
             public string TicketStatus { get; set; }
-
-            public string Approved_By { get; set; }
-            public DateTime? Approve_At { get; set; }
-
-            public string RejectRemarks { get; set; }
-
+            public string Remarks { get; set; }
             public List<TicketConcerns> TicketConcern { get; set; }
+
 
             public class TicketConcerns
             {
-                public int TicketConcernId { get; set; }
+                public int ? TicketConcernId { get; set; }
                 public string Concern_Description { get; set; }
 
-                public int CategoryId { get; set; }
-
                 public string Category_Description { get; set; }
-                public int SubCategoryId { get; set; }
                public string SubCategoryDescription { get; set; }
 
                 public DateTime Start_Date { get; set; }
@@ -62,7 +50,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
             }
 
-
+          
         }
 
         public class GetTicketRequestQuery : UserParams, IRequest<PagedList<GetTicketRequestResult>>
@@ -108,6 +96,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
 
 
+  
+
+
                 var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
                 if (channeluserExist != null)
@@ -141,47 +132,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
 
 
-                var result =  ticketQuery.Include(x => x.RequestGenerator).ThenInclude(x => x.TicketAttachments)
-                    .GroupBy(x => x.RequestGeneratorId).Select(x => new GetTicketRequestResult
+
+                var result = ticketQuery
+                    .GroupBy(x => x.RequestGeneratorId)
+                    .Select( x => new GetTicketRequestResult 
                     {
-                        RequestGeneratedId = x.Key,
-                        DepartmentId = x.First().DepartmentId,
+
+                        RequestGeneratorId = x.Key,
                         Department_Code = x.First().Department.DepartmentCode,
                         Department_Name = x.First().Department.DepartmentName,
-                        SubUnitId = x.First().SubUnitId,
                         SubUnit_Code = x.First().SubUnit.SubUnitCode,
                         SubUnit_Name = x.First().SubUnit.SubUnitName,
-                        ChannelId = x.First().ChannelId,
                         Channel_Name = x.First().Channel.ChannelName,
-                        UserId = x.First().UserId,
                         EmpId = x.First().User.EmpId,
                         Fullname = x.First().User.Fullname,
                         TicketStatus = x.First().IsApprove == true ? "Ticket Approve" : x.First().IsApprove == false
-                    && x.First().IsReject == false ? "For Approval" : x.First().IsReject == true ? "Rejected" : "Unknown",
+                        && x.First().IsReject == false ? "For Approval" : x.First().IsReject == true ? "Rejected" : "Unknown",
+                        Remarks = x.First().Remarks,
 
-                        Approved_By = x.First().ApprovedByUser.Fullname,
-                        Approve_At = x.First().ApprovedAt,
-                        RejectRemarks = x.First().RejectRemarks,
-                        TicketConcern = x.Select(x => new TicketConcerns
+                        TicketConcern =  x.Select(x => new TicketConcerns
                         {
                             TicketConcernId = x.Id,
                             Concern_Description = x.ConcernDetails,
-                            CategoryId = x.CategoryId,
                             Category_Description = x.Category.CategoryDescription,
-                            SubCategoryId = x.SubCategoryId,
-                            SubCategoryDescription = x.SubCategory.SubCategoryDescription,
-                            Start_Date = x.StartDate,
-                            Target_Date = x.TargetDate,
-                            Added_By = x.AddedByUser.Fullname,
-                            Created_At = x.CreatedAt,
-                            Modified_By = x.ModifiedByUser.Fullname,
-                            Updated_At = x.UpdatedAt,
-                            IsActive = x.IsActive,
+                            ////SubCategoryDescption = x.concern.SubCategory.SubCategoryDescription,
+                            ////Start_Date = x.ncern.StartDate,
+                            ////Target_Date = xoncern.TargetDate,
+                            ////Added_By = x.coern.AddedByUser.Fullname,
+                            ////Created_At = x.ncern.CreatedAt,
+                            ////Modified_By = xoncern.ModifiedByUser.Fullname,
+                            ////Updated_At = x.ncern.UpdatedAt,
+                            ////IsActive = x.coern.IsActive,
 
                         }).ToList(),
 
+                      
+
 
                     });
+
+                
 
                 return await PagedList<GetTicketRequestResult>.CreateAsync(result, request.PageNumber, request.PageSize);
             }

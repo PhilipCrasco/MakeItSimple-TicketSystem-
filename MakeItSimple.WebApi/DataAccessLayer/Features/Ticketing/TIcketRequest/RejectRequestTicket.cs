@@ -20,7 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             public class RejectConcern
             {
                 public int TicketConcernId { get; set; }
-                public string Reject_Remarks { get; set; }
+                public string Remarks { get; set; }
                 public bool Is_Reject { get; set; }
 
             }
@@ -68,7 +68,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     foreach (var concerns in ticketConcernExist)
                     {
                         concerns.IsReject = true;
-                        concerns.RejectRemarks = command.Reject_Remarks;
+                        concerns.IsApprove = false;
+                        concerns.Remarks = command.Reject_Remarks;
 
                         ticketApproveList.Add(concerns);
                     }
@@ -84,10 +85,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     RejectConcerns = ticketApproveList.Select(x => new RejectRequestTicketResult.RejectConcern
                     {
                         TicketConcernId = x.Id,
-                        Reject_Remarks = x.RejectRemarks,
-                        Is_Reject = x.IsReject,
+                        Remarks = x.Remarks,
+                        Is_Reject = true,
+                        
 
-                    }).ToList(),
+            }).ToList(),
 
                 });
 

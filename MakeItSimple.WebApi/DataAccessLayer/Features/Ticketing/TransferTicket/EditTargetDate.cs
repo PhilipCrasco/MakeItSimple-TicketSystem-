@@ -32,19 +32,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(EditTargetDateCommand command, CancellationToken cancellationToken)
             {
+                var dateToday = DateTime.Today;
+
                 foreach(var transferTicket in command.EditDates)
                 {
-
-                    
-
+                    if(transferTicket.Start_Date > transferTicket.Target_Date || transferTicket.Target_Date < dateToday)
+                    {
+                        return Result.Failure(TransferTicketError.DateTimeInvalid());
+                    }
+                   
                     var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == transferTicket.TicketConcernId, cancellationToken);
 
                     if (ticketConcern == null)
                     {
                         return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                     }
+
                     ticketConcern.StartDate = transferTicket.Start_Date;
                     ticketConcern.TargetDate = transferTicket.Target_Date;
+                    ticketConcern.IsApprove = false;
                     
                     
                 }

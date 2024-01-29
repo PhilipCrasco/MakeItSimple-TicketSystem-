@@ -79,6 +79,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
 
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+
 
                 var uploadTasks = new List<Task>();
 
@@ -123,13 +125,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-
-                      //var attachmentAlreadyExist = await _context.TicketAttachments.FirstOrDefaultAsync(x => x.Attachment == attachmentResult.SecureUrl.ToString()
-                      // && ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString(), cancellationToken);
-                      //  if (attachmentAlreadyExist != null)
-                      //  {
-                      //      errorList.Add(attachmentAlreadyExist);
-                      //  }
  
 
                         if(ticketAttachment != null )
@@ -172,6 +167,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         
                     }, cancellationToken));
 
+                }
+
+                foreach(var concern in ticketConcernList)
+                {
+                    concern.IsReject = false;
                 }
 
 

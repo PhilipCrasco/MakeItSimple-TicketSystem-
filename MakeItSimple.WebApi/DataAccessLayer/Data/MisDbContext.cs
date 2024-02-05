@@ -49,6 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
         public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
+        public virtual DbSet<ApproverTicketing> ApproverTicketings { get; set; }
         public virtual DbSet<ClosingGenerator> ClosingGenerators { get; set; }
 
 
@@ -70,7 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
-
+            modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());  
         }
 
 

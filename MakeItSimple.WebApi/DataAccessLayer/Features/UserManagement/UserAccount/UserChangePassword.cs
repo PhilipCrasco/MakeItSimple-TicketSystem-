@@ -48,7 +48,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
                 }
 
                 
-
                 if (!BCrypt.Net.BCrypt.Verify(command.Current_Password, user.Password))
                 {
                     return Result.Failure(UserError.UserOldPasswordInCorrect());

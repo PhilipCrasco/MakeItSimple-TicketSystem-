@@ -19,6 +19,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
        public static Error UserDuplicate() =>
        new Error("Approver.UserDuplicate", "Approver duplicated!");
 
+       public static Error ApproverLevelDuplicate() =>
+       new Error("Approver.ApproverLevelDuplicate", "Approver level duplicated!");
+
        public static Error UserNotAuthorize() =>
        new Error("Approver.UserDuplicate", "Approver not Authorized!");
        public static Error ApproverNotExist() =>

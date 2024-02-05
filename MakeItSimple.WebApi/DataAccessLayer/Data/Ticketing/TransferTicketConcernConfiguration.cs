@@ -30,6 +30,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing
            .OnDelete(DeleteBehavior.Restrict);
 
 
+            builder.HasOne(u => u.RejectTransferByUser)
+           .WithMany()
+           .HasForeignKey(u => u.RejectTransferBy)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 

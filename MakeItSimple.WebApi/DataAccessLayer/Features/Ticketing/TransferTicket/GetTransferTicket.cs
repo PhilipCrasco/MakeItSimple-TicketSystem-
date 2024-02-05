@@ -1,8 +1,14 @@
-﻿using MakeItSimple.WebApi.Common.Pagination;
+﻿using Google.Protobuf.WellKnownTypes;
+using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
+using MoreLinq;
+using System.Transactions;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket.GetTransferTicketResult;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
@@ -12,8 +18,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
         public class GetTransferTicketResult
         {
-            public int TicketConcernId { get; set; }
-            public int TransferTicketConcernId { get; set; }
+
+            public int ? RequestGeneratorId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
             public string SubUnit_Code { get; set; }
@@ -22,13 +28,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string EmpId { get; set; }
             public string Fullname { get; set; }
             public bool IsActive { get; set; }
-
-            public string Added_By {  get; set; }
-            public DateTime Created_At { get; set; }
-
-            public string Modified_By { get; set; }
-            public DateTime ? Updated_At { get; set; }
-
             public string  Transfer_By { get; set; }
             public DateTime ? Transfer_At { get; set; }
             public string TransferStatus { get; set; }
@@ -38,10 +37,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public class GetTransferTicketConcern
             {
+
                 public int TransferTicketConcernId { get; set; }
+                public int TicketConcernId { get; set; }
                 public string Concern_Description { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategoryDescription { get; set; }
+
+                public string Added_By { get; set; }
+                public DateTime Created_At { get; set; }
+
+                public string Modified_By { get; set; }
+                public DateTime? Updated_At { get; set; }
                 public DateTime ? Start_Date { get; set; }
                 public DateTime ? Target_Date { get; set; }
 
@@ -53,9 +60,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketQuery : UserParams, IRequest<PagedList<GetTransferTicketResult>>
         {
             public Guid ? UserId { get; set; }
+            public  Guid ? UserApproverId { get; set; }
+            public string Approval { get; set; }
             public bool ? IsTransfer { get; set; }
             public string Search { get; set; }
             public bool ? Status { get; set; }
+
+            
         }
 
         public class Handler : IRequestHandler<GetTransferTicketQuery, PagedList<GetTransferTicketResult>>
@@ -69,8 +80,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<PagedList<GetTransferTicketResult>> Handle(GetTransferTicketQuery request, CancellationToken cancellationToken)
             {
+
+
                 IQueryable<TransferTicketConcern> transferTicketQuery = _context.TransferTicketConcerns
                     .Include(x => x.TicketConcern)
+                    .Include(x => x.RequestGenerator)
+                    .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
                     .Include(x => x.User)
                     .Include(x => x.SubUnit)
@@ -79,8 +94,41 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .Include(x => x.SubCategory)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
+                    
 
                 var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserApproverId, cancellationToken);
+
+                if (request.UserApproverId != null)
+                {
+                    var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
+                    var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
+                    var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
+                    var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                    transferTicketQuery = transferTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
+
+                }
+
+                var fillterApproval = transferTicketQuery.Select(x => x.RequestGeneratorId);
+
+                if(request.Approval == TicketingConString.Approval)
+                {
+                    
+                    var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
+
+                    //var approverList = approverTransactList.Select(x => x.RequestGeneratorId);
+                    //var approvalLevelList = approverTransactList.Where(x => approverList.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToList();
+
+                    if(approverTransactList != null && approverTransactList.Any())
+                    {
+                        var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
+                        transferTicketQuery = transferTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
+                    }
+
+
+                }
+
+
 
                 if (channeluserExist != null)
                 {
@@ -94,6 +142,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     || x.Channel.ChannelName.Contains(request.Search));
                 }
 
+
+
                 if(request.Status != null)
                 {
                     transferTicketQuery = transferTicketQuery.Where(x => x.IsActive == request.Status);
@@ -105,10 +155,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 }
 
 
-                var results = transferTicketQuery.GroupBy(x => x.Id).Select(x => new GetTransferTicketResult
+                var results = transferTicketQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetTransferTicketResult
                 {
-                    TicketConcernId = x.First().TicketConcernId,
-                    TransferTicketConcernId = x.First().Id,
+                    RequestGeneratorId = x.Key,
                     Department_Code = x.First().Department.DepartmentCode,
                     Department_Name = x.First().Department.DepartmentName,
                     SubUnit_Code = x.First().SubUnit.SubUnitCode,
@@ -117,10 +166,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     EmpId = x.First().User.EmpId,
                     Fullname = x.First().User.Fullname,
                     IsActive = x.First().IsActive,
-                    Added_By = x.First().AddedByUser.Fullname,
-                    Created_At = x.First().CreatedAt,
-                    Modified_By = x.First().ModifiedByUser.Fullname,
-                    Updated_At = x.First().UpdatedAt,
                     Transfer_By = x.First().TransferByUser.Fullname,
                     Transfer_At = x.First().TransferAt,
                     TransferStatus = x.First().IsTransfer == true && x.First().TicketConcern.IsApprove == null ? "Transfer Approve" 
@@ -129,9 +174,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
                     {
                         TransferTicketConcernId = x.Id,
+                        TicketConcernId = x.TicketConcernId,
                         Concern_Description = x.ConcernDetails,
                         Category_Description = x.Category.CategoryDescription,
                         SubCategoryDescription = x.SubCategory.SubCategoryDescription,
+                        Added_By = x.AddedByUser.Fullname,
+                        Created_At = x.CreatedAt,
+                        Modified_By = x.ModifiedByUser.Fullname,
+                        Updated_At = x.UpdatedAt,
                         Start_Date = x.StartDate,
                         Target_Date = x.TargetDate
                     }).ToList()

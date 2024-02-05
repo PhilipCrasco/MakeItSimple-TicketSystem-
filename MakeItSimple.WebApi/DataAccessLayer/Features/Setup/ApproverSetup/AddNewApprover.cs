@@ -16,6 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public int ChannelId { get; set; }
             public Guid? Added_By { get; set; }
             public DateTime Created_At { get; set; }
+            public Guid ? Modified_By { get; set; }
+            public DateTime ? Updated_At { get; set; }
             public Guid? UserId { get; set; }
             public int? ApproverLevel { get; set; }
 
@@ -26,11 +28,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public int ChannelId { get; set; }
             public Guid? Added_By { get; set; }
             public DateTime CreatedAt { get; set; }
+            public Guid? Modified_By { get; set; }
+            public DateTime? Updated_At { get; set; }
 
             public IEnumerable<Approver> Approvers { get; set; }
 
             public class Approver
             {
+                public int ? ApproverId { get; set; }
                 public Guid? UserId { get; set; }
                 public int? ApproverLevel { get; set; }
             }
@@ -57,11 +62,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     return Result.Failure(ApproverError.ChannelNotExist());
                 }
 
-                var channelAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId, cancellationToken);
-                if (channelAlreadyExist != null)
-                {
-                    return Result.Failure(ApproverError.ChannelAlreadyExist());
-                }
 
                 foreach (var approver in command.Approvers)
                 {
@@ -78,31 +78,88 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         return Result.Failure(ApproverError.UserNotExist());
                     }
 
-                    var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.UserId == approver.UserId, cancellationToken);
-                    if (userAlreadyExist != null)
-                    {
-                        return Result.Failure(ApproverError.UserAlreadyExist());
-                    }
-
                     var invalidUser = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId, cancellationToken);
                     if (invalidUser == null)
                     {
                         return Result.Failure(ApproverError.UserNotAuthorize());
                     }
 
-
-                    var addApprover = new Approver
+                    var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.Id == approver.ApproverId, cancellationToken);
+                    if (approverExist != null)
                     {
-                        UserId = approver.UserId,
-                        ChannelId = command.ChannelId,
-                        ApproverLevel = approver.ApproverLevel,
-                        AddedBy = command.Added_By,
-                        CreatedAt = DateTime.Now
 
-                    };
-                    approverList.Add(addApprover);
-                    await _context.Approvers.AddAsync(addApprover, cancellationToken);
+                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId 
+                        && approverExist.UserId != approver.UserId, cancellationToken);
+                        if (userAlreadyExist != null)
+                        {
+                            return Result.Failure(ApproverError.UserAlreadyExist());
+                        }
 
+                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId 
+                        && x.ApproverLevel == approver.ApproverLevel && approverExist.ApproverLevel != approver.ApproverLevel, cancellationToken);
+                        if(approverLevelDuplicate != null)
+                        {
+                            return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                        }
+
+                        bool hasChange = false;
+
+                        if(approverExist.ChannelId != command.ChannelId)
+                        {
+                            approverExist.ChannelId = command.ChannelId;
+                            hasChange = true;
+                        }
+
+                        if(approverExist.UserId != approver.UserId)
+                        {
+                            approverExist.UserId = approver.UserId; 
+                            hasChange = true;
+                        }
+                        if(approverExist.ApproverLevel != approver.ApproverLevel)
+                        {
+                            approverExist.ApproverLevel = approver.ApproverLevel;
+                            hasChange = true;
+                        }
+                        
+                        if(hasChange is true)
+                        {
+                            approverExist.ModifiedBy = command.Modified_By;
+                            approverExist.UpdatedAt = DateTime.Now;
+                            approverList.Add(approverExist);
+                        }
+                        else
+                        {
+                            approverList.Add(approverExist);
+                        }
+
+
+                    }
+                    else
+                    {
+                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId, cancellationToken);
+                        if (userAlreadyExist != null)
+                        {
+                            return Result.Failure(ApproverError.UserAlreadyExist());
+                        }
+
+                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.ApproverLevel == approver.ApproverLevel, cancellationToken);
+                        if(approverLevelDuplicate != null)
+                        {
+                            return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                        }
+
+                        var addApprover = new Approver
+                        {
+                            UserId = approver.UserId,
+                            ChannelId = command.ChannelId,
+                            ApproverLevel = approver.ApproverLevel,
+                            AddedBy = command.Added_By,
+                            CreatedAt = DateTime.Now
+
+                        };
+                        approverList.Add(addApprover);
+                        await _context.Approvers.AddAsync(addApprover, cancellationToken);
+                    }
 
                 }
 
@@ -114,13 +171,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     ChannelId = x.ChannelId,
                     Added_By = x.AddedBy,
                     Created_At = x.CreatedAt,
+                    Modified_By = x.ModifiedBy,
+                    Updated_At = x.UpdatedAt,
                     UserId = x.UserId,
                     ApproverLevel = x.ApproverLevel,
 
                 }).ToList();
 
-                
-               
                 return Result.Success(result);
             }
         }

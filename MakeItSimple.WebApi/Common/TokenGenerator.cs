@@ -14,8 +14,6 @@ namespace MakeItSimple.WebApi.Common
         public TokenGenerator(IConfiguration configuration)
         {
             _configuration = configuration;
-
-
         }
 
         public string GenerateJwtToken(User user )

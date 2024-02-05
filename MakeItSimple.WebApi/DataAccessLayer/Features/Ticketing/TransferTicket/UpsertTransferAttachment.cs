@@ -55,9 +55,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
-                var getTicketConcern = await _context.TicketConcerns.Include(x => x.Department).Include(x => x.SubUnit)
-                    .Include(x => x.User).Include(x => x.RequestGenerator)
-                    .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                var getTicketConcern = await _context.TransferTicketConcerns.Include(x => x.AddedByUser)
+                    .ThenInclude(x => x.Department)
+                    .FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketIdNotExist.Id, cancellationToken);
 
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
 
@@ -95,7 +95,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         var attachmentsParams = new ImageUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.Department.DepartmentName}/{getTicketConcern.User.Fullname}/Transfer/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/{getTicketConcern.AddedByUser.Department.DepartmentName}/{getTicketConcern.AddedByUser.Fullname}/Transfer/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);

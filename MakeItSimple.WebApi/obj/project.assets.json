@@ -12059,11 +12059,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
+      "projectUniqueName": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
       "projectName": "MakeItSimple.WebApi",
-      "projectPath": "D:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
+      "projectPath": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
       "packagesPath": "C:\\Users\\philipcrasco\\.nuget\\packages\\",
-      "outputPath": "D:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\obj\\",
+      "outputPath": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\philipcrasco\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -60,8 +60,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public bool IsReject { get; set; } = false;
         //public string RejectRemarks { get; set; }
 
-        public bool IsReTicket { get; set; } = false;
+        public bool ? IsReTicket { get; set; }
         public DateTime ? ReticketAt { get; set; }
+        public Guid ? ReticketBy { get; set; }
+        public virtual User ReticketByUser { get; set; }
 
         public string Remarks { get; set; }
 

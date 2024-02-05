@@ -32,6 +32,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
+                    command.Modified_By = userId;
                 }
 
                 var result = await _mediator.Send(command);

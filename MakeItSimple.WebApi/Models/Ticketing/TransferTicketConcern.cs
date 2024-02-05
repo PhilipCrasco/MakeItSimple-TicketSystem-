@@ -5,6 +5,7 @@ using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
@@ -54,12 +55,13 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public bool IsRejectTransfer { get; set; }
         public DateTime ? RejectTransferAt { get; set; }
-        public string ? RejectTransferBy { get; set; }
+        public Guid ? RejectTransferBy { get; set; }
         public virtual User RejectTransferByUser { get; set; }
+
+        public Guid ? TicketApprover { get; set; }
 
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
-
 
 
     }

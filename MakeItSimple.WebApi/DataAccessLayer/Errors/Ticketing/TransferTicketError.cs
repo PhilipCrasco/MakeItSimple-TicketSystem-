@@ -14,11 +14,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
        public static Error TransferTicketConcernIdNotExist() =>
       new Error("TransferTicketError.TransferTicketConcernIdNotExist", "Transfer ticket concern not exist!");
 
+      public static Error TicketConcernIdAlreadyExist() =>
+      new Error("TransferTicketError.TicketConcernIdAlreadyExist", " ticket concern already exist!");
+
       public static Error SubUnitNotExist() =>
       new Error("TransferTicketError.SubUnitNotExist", "Sub unit not exist!");
 
       public static Error ChannelNotExist() =>
       new Error("TransferTicketError.ChannelNotExist", "Channel not exist!");
+
+      public static Error NoApproverExist() =>
+      new Error("TransferTicketError.NoApproverExist", "No approver has been setup!");
       
       public static Error TransferTicketAlreadyExist() =>
       new Error("TransferTicketError.TransferTicketAlreadyExist", "Transfer ticket already exist!");
@@ -26,9 +32,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error UserNotExist() =>
       new Error("TransferTicketError.UserNotExist", "Member not exist!");
       public static Error DuplicateTransferTicket() =>
-      new Error("TransferTicketError.DuplicateTransferTicket", "Concern ticket duplicated!");
+      new Error("TransferTicketError.DuplicateTransferTicket", "Transfer ticket duplicated!");
 
-      public static Error DateTimeInvalid() =>
+      public static Error DuplicateConcernTicket() =>
+      new Error("TransferTicketError.DuplicateConcernTicket", "Concern ticket duplicated!"); 
+
+        public static Error DateTimeInvalid() =>
       new Error("TransferTicketError.DateTimeInvalid", "Invalid start/target date!");
 
     }

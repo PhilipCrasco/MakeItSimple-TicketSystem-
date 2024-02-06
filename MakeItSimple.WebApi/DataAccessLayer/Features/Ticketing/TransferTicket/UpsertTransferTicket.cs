@@ -50,6 +50,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
+                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorExist.Id,cancellationToken);
+
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
                 {
                     case null:
@@ -157,13 +159,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             TransferBy = command.Transfer_By,
                             TransferAt = DateTime.Now,
                             IsTransfer = false,
+                            TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 
                         };
 
 
+
                         await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
                     }
-
+                    else
+                    {
+                        return Result.Failure(TransferTicketError.TicketIdNotExist());
+                    }
 
                     ticketConcern.IsTransfer = false;
                 }

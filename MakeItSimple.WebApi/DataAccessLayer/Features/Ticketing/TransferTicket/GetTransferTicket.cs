@@ -129,7 +129,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 }
 
 
-
                 if (channeluserExist != null)
                 {
                     transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
@@ -141,8 +140,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     || x.SubUnit.SubUnitName.Contains(request.Search)
                     || x.Channel.ChannelName.Contains(request.Search));
                 }
-
-
 
                 if(request.Status != null)
                 {
@@ -168,8 +165,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     IsActive = x.First().IsActive,
                     Transfer_By = x.First().TransferByUser.Fullname,
                     Transfer_At = x.First().TransferAt,
-                    TransferStatus = x.First().IsTransfer == true && x.First().TicketConcern.IsApprove == null ? "Transfer Approve" 
-                    : x.First().IsTransfer != true && x.First().IsActive == false ? "Transfer Ticket Rejected" : "Tranfer Ticket for Approval",  
+                    TransferStatus = x.First().IsTransfer == true && x.First().TicketConcern.IsApprove == null ? "Transfer Approve"  : "Tranfer Ticket for Approval",  
                     TransferRemarks = x.First().TransferRemarks,
                     GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
                     {

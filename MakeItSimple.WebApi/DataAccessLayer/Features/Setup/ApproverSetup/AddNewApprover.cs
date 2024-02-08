@@ -5,6 +5,8 @@ using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MoreLinq;
+using System.Linq;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 {
@@ -84,6 +86,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         return Result.Failure(ApproverError.UserNotAuthorize());
                     }
 
+                    if (command.Approvers.Count(x => x.ApproverLevel == approver.ApproverLevel) > 1)
+                    {
+                        return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                    }
+
                     var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.Id == approver.ApproverId, cancellationToken);
                     if (approverExist != null)
                     {
@@ -147,6 +154,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         {
                             return Result.Failure(ApproverError.ApproverLevelDuplicate());
                         }
+                        
 
                         var addApprover = new Approver
                         {
@@ -161,6 +169,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         await _context.Approvers.AddAsync(addApprover, cancellationToken);
                     }
 
+                }
+
+                var removeApproverList = await _context.Approvers.Where(x => x.ChannelId == channelNotExist.Id).ToListAsync();
+
+                var removeApproval = removeApproverList.Select(x => x.UserId);
+
+                var approvalListId = approverList.Select(x => x.UserId);
+
+                //var approverToList = _context.Approvers.Where(x => approvalListId.Contains(x.UserId)).ToList();
+
+                //var getapprover = approverToList.Select(x => x.UserId);
+                //var removeNotContainApproval = approverList.Where(x => !removeApproval.Contains(x.UserId)).ToList();
+
+                var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.UserId));
+
+                foreach (var approver in removeNotContainApproval)
+                {
+                    _context.Remove(approver);
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

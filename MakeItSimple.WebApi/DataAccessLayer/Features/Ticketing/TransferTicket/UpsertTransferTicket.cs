@@ -129,6 +129,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             transferTicket.UpdatedAt = DateTime.Now;
                             transferTicket.IsRejectTransfer = false;
                             transferTicket.IsTransfer = false;
+                            transferTicket.RejectTransferAt = null;
+                            transferTicket.RejectTransferBy = null;
 
                         }
 
@@ -156,9 +158,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,
                             TargetDate = ticketConcern.TargetDate,
-                            TransferBy = command.Transfer_By,
-                            TransferAt = DateTime.Now,
+                            //TransferBy = command.Transfer_By,
+                            //TransferAt = DateTime.Now,
                             IsTransfer = false,
+                            IsRejectTransfer = false,
+                            RejectTransferAt = null,
+                            RejectTransferBy = null,
                             TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 
                         };
@@ -173,6 +178,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
 
                     ticketConcern.IsTransfer = false;
+                   
                 }
 
 

@@ -83,7 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         }
 
 
-                        var getApproverUser = await _context.Approvers.Where(x => x.ChannelId == channelexist.Id).ToListAsync(); 
+                        var getApproverUser = await _context.Approvers.Where(x => x.ChannelId == ticketConcern.ChannelId).ToListAsync();
                         
                         var getApproverUserId = getApproverUser.First(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
@@ -102,8 +102,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,
                             TargetDate = ticketConcern.TargetDate,
-                            TransferBy = command.Transfer_By,
-                            TransferAt = DateTime.Now,
+                            //TransferBy = command.Transfer_By,
+                            //TransferAt = DateTime.Now,
                             IsTransfer = false,
                             TicketApprover = getApproverUserId.UserId
                             

@@ -49,6 +49,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; }
+
+                public string RejectTransfer_By { get; set; }
+                public DateTime? RejectTransfer_At { get; set; }
+
                 public DateTime ? Start_Date { get; set; }
                 public DateTime ? Target_Date { get; set; }
 
@@ -148,9 +152,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if(request.IsTransfer != null)
                 {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer);
+                    transferTicketQuery = request.IsTransfer == false ? transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer == false && x.TicketConcern.IsApprove == true) :  
+                        transferTicketQuery.Where(x => x.IsTransfer == true && x.TicketConcern.IsApprove == null);
                 }
-
 
                 var results = transferTicketQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetTransferTicketResult
                 {
@@ -165,7 +169,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     IsActive = x.First().IsActive,
                     Transfer_By = x.First().TransferByUser.Fullname,
                     Transfer_At = x.First().TransferAt,
-                    TransferStatus = x.First().IsTransfer == true && x.First().TicketConcern.IsApprove == null ? "Transfer Approve"  : "Tranfer Ticket for Approval",  
+                    TransferStatus = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
+                    && x.First().IsRejectTransfer == false ? "Transfer Aprrove" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
                     TransferRemarks = x.First().TransferRemarks,
                     GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
                     {
@@ -174,10 +179,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         Concern_Description = x.ConcernDetails,
                         Category_Description = x.Category.CategoryDescription,
                         SubCategoryDescription = x.SubCategory.SubCategoryDescription,
+                        
                         Added_By = x.AddedByUser.Fullname,
                         Created_At = x.CreatedAt,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
+                        RejectTransfer_By = x.RejectTransferByUser.Fullname,
+                        RejectTransfer_At = x.RejectTransferAt,
                         Start_Date = x.StartDate,
                         Target_Date = x.TargetDate
                     }).ToList()

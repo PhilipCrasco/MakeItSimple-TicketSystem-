@@ -11,11 +11,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
     {
 
         public class RejectTransferTicketCommand : IRequest<Result>
-        {
+        { 
+            public Guid ? RejectTransfer_By { get; set; }
             public ICollection<RejectTransferTicket> RejectTransferTickets { get; set; }
             public class RejectTransferTicket
             {
-                public int TicketConcernId { get; set; }
+                public int RequestGeneratorId { get; set; }
             }
         }
 
@@ -33,17 +34,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             {
                 foreach(var transferTicket in command.RejectTransferTickets)
                 {
-                    var transferConcern= await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transferTicket.TicketConcernId, cancellationToken);
+                    var requestGeneratorExist= await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == transferTicket.RequestGeneratorId, cancellationToken);
 
-                    if (transferConcern == null)
+                    if (requestGeneratorExist == null) 
                     {
-                        return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
+                        return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
-                    transferConcern.IsActive = false;
-                }
+                    var transferTicketList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id).ToListAsync();
 
-                return Result.Success("Reject Success");
+                    var approverUserList = await _context.ApproverTicketings.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id).ToListAsync();
+
+                    var approverLevelValidation =  approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
+
+
+                    foreach(var approverUserId in approverUserList)
+                    {
+                        approverUserId.IsApprove = null;
+                    }
+
+
+                    foreach (var perTicketId in transferTicketList)
+                    {
+                        perTicketId.RejectTransferAt = DateTime.Now;
+                        perTicketId.IsRejectTransfer = true;
+                        perTicketId.RejectTransferBy = command.RejectTransfer_By;
+                        perTicketId.TicketApprover = approverLevelValidation.UserId;
+                    }
+
+
+                }
+                await _context.SaveChangesAsync(cancellationToken);
+                return Result.Success();
             }
         }
     }

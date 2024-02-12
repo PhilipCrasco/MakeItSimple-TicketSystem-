@@ -14,9 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             public class CancelTicketGenerator
             {
                 public int RequestGeneratorId { get; set; }
-
                 public ICollection<CancelTicketConcern> CancelTicketConcerns { get; set; }
-
                 public class CancelTicketConcern
                 {
                     public int ? TicketConcernId { get; set; }
@@ -50,7 +48,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                     var ticketConcernExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId).ToListAsync();
 
-                   
+                   if(ticketGenerator.CancelTicketConcerns == null)
+                    {
+                        foreach (var cancelAll in ticketConcernExist)
+                        {
+                            cancelAll.IsActive = false;
+                        }
+                    }
 
                     foreach (var ticketConcern in ticketGenerator.CancelTicketConcerns)
                     {
@@ -59,19 +63,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         {
                             ticketConcernById.IsActive = false;
                         }
-                        else if(ticketConcern.TicketConcernId == null)
-                        {
-                            foreach(var cancelAll in ticketConcernExist)
-                            {
-                                cancelAll.IsActive = false;
-                            }
-                        }
                         else
                         {
                             return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
                         }
 
-                         
                     }
 
                 }

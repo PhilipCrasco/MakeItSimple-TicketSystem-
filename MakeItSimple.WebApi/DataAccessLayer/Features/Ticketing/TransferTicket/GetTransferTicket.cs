@@ -99,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .Include(x => x.SubCategory)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
-                    
+
 
                 var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserApproverId, cancellationToken);
@@ -113,7 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     transferTicketQuery = transferTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
 
                 }
-
+                
                 var fillterApproval = transferTicketQuery.Select(x => x.RequestGeneratorId);
 
                 if(request.Approval == TicketingConString.Approval)
@@ -121,19 +121,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     
                     var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
 
-                    //var approverList = approverTransactList.Select(x => x.RequestGeneratorId);
-                    //var approvalLevelList = approverTransactList.Where(x => approverList.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToList();
-
                     if(approverTransactList != null && approverTransactList.Any())
                     {
                         var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
                         transferTicketQuery = transferTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
                     }
 
-
                 }
-
-
+ 
                 if (channeluserExist != null)
                 {
                     transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
@@ -153,8 +148,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if(request.IsTransfer != null)
                 {
-                    //transferTicketQuery = request.IsTransfer == false ? transferTicketQuery.Where(x => x.IsTransfer == false) : request.IsTransfer == true ? 
-                    //    transferTicketQuery.Where(x => x.IsTransfer == true && x.IsActive == true) : transferTicketQuery;
 
                     transferTicketQuery = transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer);
                 }

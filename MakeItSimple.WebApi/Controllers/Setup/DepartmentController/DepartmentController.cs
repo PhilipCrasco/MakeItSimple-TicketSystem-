@@ -1,13 +1,10 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup;
-using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup.GetDepartment;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
 {

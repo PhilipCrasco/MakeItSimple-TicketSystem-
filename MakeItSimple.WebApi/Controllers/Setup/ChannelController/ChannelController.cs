@@ -130,12 +130,16 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpPatch("UpdateChannelStatus")]
-        public async Task<IActionResult> UpdateChannelStatus([FromBody] UpdateChannelStatusCommand command)
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateChannelStatus([FromRoute] int id)
         {
 
             try
             {
+                var command = new UpdateChannelStatusCommand
+                {
+                    Id = id
+                };
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

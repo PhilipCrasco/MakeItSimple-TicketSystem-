@@ -13,20 +13,20 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup.GetSub
 
 namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
 {
-    [Route("api/SubUnit")]
+    [Route("api/sub-unit")]
     [ApiController]
     public class SubUnitController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly ValidatorHandler _validatorHandler;
 
-        public SubUnitController(IMediator mediator , ValidatorHandler validatorHandler )
+        public SubUnitController(IMediator mediator, ValidatorHandler validatorHandler)
         {
             _mediator = mediator;
             _validatorHandler = validatorHandler;
         }
 
-        [HttpPost("AddNewSubUnit")]
+        [HttpPost]
         public async Task<IActionResult> AddNewTeam([FromBody] AddNewSubUnitCommand command)
         {
             try
@@ -57,7 +57,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
         }
 
 
-        [HttpGet("GetSubUnit")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetSubUnit([FromQuery] GetSubUnitQuery query)
         {
             try
@@ -96,11 +96,13 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
             }
         }
 
-        [HttpPut("UpdateSubUnit")]
-        public async Task<IActionResult> UpdateSubUnit([FromBody] UpdateSubUnitCommand command)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSubUnit([FromRoute] int id , [FromBody ]UpdateSubUnitCommand command)
         {
             try
             {
+                command.Id = id;
+
                 var validationResult = await _validatorHandler.UpdateSubUnitValidator.ValidateAsync(command);
 
                 if (!validationResult.IsValid)
@@ -127,11 +129,15 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
         }
 
 
-        [HttpPatch("UpdateSubUnitStatus")]
-        public async Task<IActionResult> UpdateSubUnitStatus([FromBody] UpdateSubUnitStatusCommand command)
+        [HttpPatch("status/{id}")]
+        public async Task<IActionResult> UpdateSubUnitStatus([FromRoute]int id)
         {
             try
             {
+                var command = new UpdateSubUnitCommand
+                { 
+                  Id = id
+                };   
 
                 var result = await _mediator.Send(command);
                 if (result.IsFailure)

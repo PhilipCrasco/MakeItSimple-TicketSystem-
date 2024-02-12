@@ -27,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public string Channel_Name { get; set; }
             public int SubUnitId { get; set; }
-            public Guid ? UserId { get; set; }
+            //public Guid ? UserId { get; set; }
             public Guid ? Added_By { get; set; }
            
         }

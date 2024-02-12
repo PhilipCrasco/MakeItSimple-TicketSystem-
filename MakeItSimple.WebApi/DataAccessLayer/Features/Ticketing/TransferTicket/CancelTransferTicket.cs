@@ -17,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             {
                 public int RequestGeneratorId { get; set; }
 
-                public List<CancelTransferTicketById> CancelTransferTicketByIds { get; set; }
+                public List<CancelTransferTicketById>  CancelTransferTicketByIds { get; set; }
                 public class CancelTransferTicketById
                 {
                     public int? TransferTicketConcernId { get; set; }
@@ -46,28 +46,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             return Result.Failure(TransferTicketError.TicketIdNotExist());
                         }
 
-                        foreach(var transferId in transferTicket.CancelTransferTicketByIds)
+
+                    if(transferTicket.CancelTransferTicketByIds.Count <= 0)
+                    {
+                        foreach (var transferList in transferTicketQuery)
                         {
-                           var transferconcernId = transferTicketQuery.FirstOrDefault(x => x.Id == transferId.TransferTicketConcernId);
+                            var transferConcernRequest = await _context.TicketConcerns.Where(x => x.Id == transferList.TicketConcernId).ToListAsync();
 
-                           if (transferconcernId != null)
-                           {
-                            _context.Remove(transferconcernId);
-                           }
-                           else
-                           {
-                             foreach(var transferList in transferTicketQuery)
-                             {
-                                _context.Remove(transferList);
-                             }
-                           }
+                            foreach (var transferConcern in transferConcernRequest)
+                            {
+                                transferConcern.IsTransfer = null;
+                            }
 
-
+                            _context.Remove(transferList);
                         }
+                    }
+                      
+                    foreach (var transferId in transferTicket.CancelTransferTicketByIds)
+                    {
+                        var transferconcernId = transferTicketQuery.FirstOrDefault(x => x.Id == transferId.TransferTicketConcernId);
+                        if (transferconcernId != null)
+                        {
+                            var transferConcernRequest = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == transferconcernId.TicketConcernId, cancellationToken);
+
+                            transferConcernRequest.IsTransfer = null;
+                            
+
+                            _context.Remove(transferconcernId);
+                        }
+                        else
+                        {
+                            return Result.Failure(TransferTicketError.TransferTicketConcernIdNotExist());
+                        }
+
+                    }
+
+                    
 
                         
 
-                    }
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

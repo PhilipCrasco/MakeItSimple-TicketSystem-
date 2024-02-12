@@ -33,12 +33,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         public IValidator<UpdateUserCommand> UpdateUserValidator { get; set; }
         public IValidator<UserChangePasswordCommand> UserChangePasswordValidator { get; set; }
 
-
         //UserRoles
         public IValidator<AddNewUserRoleCommand>  AddUserRoleValidator { get; set; }
         public IValidator<UpdateUserRoleCommand>  UpdateUserRoleValidator { get; set; }
         public IValidator<UntagAndTagUserRolePermissionCommand> TagAndUntagUserRoleValidator {  get; set; }
-
 
         // SubUnit Setup
         public IValidator<AddNewSubUnitCommand> AddNewSubUnitValidator { get; set; }
@@ -54,8 +52,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         //Sub Category Setup 
 
         public IValidator<UpsertSubCategoryCommand> UpsertSubCategoryValidator { get; set; }
-
-
 
         public ValidatorHandler()
         {

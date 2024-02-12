@@ -11,7 +11,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.Up
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 {
-    [Route("api/Approver")]
+    [Route("api/approver")]
     [ApiController]
     public class ApproverController : ControllerBase
     {
@@ -22,7 +22,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
             _mediator = mediator;
         }
 
-        [HttpPost("AddNewApprover")]
+        [HttpPost]
         public async Task<IActionResult>AddNewApprover([FromBody] AddNewApproverCommand command)
         {
 
@@ -49,7 +49,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 
         }
 
-        [HttpGet("GetApprover")]
+        [HttpGet]
         public async Task<IActionResult> GetApprover([FromQuery] GetApproverQuery query)
         {
 
@@ -82,7 +82,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 
         }
 
-        [HttpPatch("UpdateApproverStatus")]
+        [HttpPatch("status")]
         public async Task<IActionResult> UpdateApproverStatus([FromBody] UpdateApproverStatusCommand command)
         {
             try

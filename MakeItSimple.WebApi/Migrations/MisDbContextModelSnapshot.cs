@@ -972,6 +972,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
+                    b.Property<string>("RejectRemarks")
+                        .HasColumnType("longtext")
+                        .HasColumnName("reject_remarks");
+
                     b.Property<DateTime?>("RejectTransferAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("reject_transfer_at");

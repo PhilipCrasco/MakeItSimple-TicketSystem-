@@ -43,15 +43,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(UpsertTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
-                var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
+                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
 
-                if(requestGeneratorExist == null)
+                if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
-                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorExist.Id,cancellationToken);
-
+            
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
                 {
                     case null:
@@ -92,7 +91,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     if(ticketConcern != null && transferTicket != null)
                     {
 
-                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId && transferTicket.TicketConcernId != transfer.TicketConcernId, cancellationToken);
+                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId && transferTicket.TicketConcernId != transfer.TicketConcernId && x.IsTransfer == false, cancellationToken);
                         if (ticketConcernAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
@@ -137,7 +136,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
                     else if(ticketConcern != null && transferTicket is null)
                     {
-                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId, cancellationToken);
+                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId && x.IsTransfer == false, cancellationToken);
                         if (ticketConcernAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
@@ -145,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         var addTransferTicket = new TransferTicketConcern
                         {
-                            RequestGeneratorId = requestGeneratorExist.Id,
+                            RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
                             TicketConcernId = ticketConcern.Id,
                             DepartmentId = ticketConcern.DepartmentId,
                             SubUnitId = command.SubUnitId,

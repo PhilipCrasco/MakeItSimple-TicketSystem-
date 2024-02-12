@@ -57,9 +57,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public DateTime ? RejectTransferAt { get; set; }
         public Guid ? RejectTransferBy { get; set; }
         public virtual User RejectTransferByUser { get; set; }
-
+        public string RejectRemarks { get; set; }
         public Guid ? TicketApprover { get; set; }
-
+       
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
 

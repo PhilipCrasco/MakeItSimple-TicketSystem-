@@ -70,7 +70,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         concerns.IsReject = true;
                         concerns.IsApprove = false;
                         concerns.Remarks = command.Reject_Remarks;
-
                         ticketApproveList.Add(concerns);
                     }
 

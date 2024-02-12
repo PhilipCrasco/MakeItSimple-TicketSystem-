@@ -15,7 +15,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public class CancelTransferTicketConcern
             {
-                public int TransferTicketConcernId { get; set; }
+                public int RequestGeneratorId { get; set; }
+
+                public List<CancelTransferTicketById> CancelTransferTicketByIds { get; set; }
+                public class CancelTransferTicketById
+                {
+                    public int? TransferTicketConcernId { get; set; }
+                }
             }
         }
 
@@ -31,21 +37,40 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(CancelTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
-
                 foreach(var transferTicket in command.CancelTransferTicketConcerns)
                 {
-                    var transferTicketQuery = await _context.TransferTicketConcerns.Where(x => x.Id == transferTicket.TransferTicketConcernId).ToListAsync();
+                        var transferTicketQuery = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == transferTicket.RequestGeneratorId ).ToListAsync();
 
-                    if(transferTicketQuery == null)
-                    {
-                        return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
+                        if (transferTicketQuery == null)
+                        {
+                            return Result.Failure(TransferTicketError.TicketIdNotExist());
+                        }
+
+                        foreach(var transferId in transferTicket.CancelTransferTicketByIds)
+                        {
+                           var transferconcernId = transferTicketQuery.FirstOrDefault(x => x.Id == transferId.TransferTicketConcernId);
+
+                           if (transferconcernId != null)
+                           {
+                            _context.Remove(transferconcernId);
+                           }
+                           else
+                           {
+                             foreach(var transferList in transferTicketQuery)
+                             {
+                                _context.Remove(transferList);
+                             }
+                           }
+
+
+                        }
+
+                        
+
                     }
 
-                    _context.Remove(transferTicketQuery);
-
-                }
-
-                return Result.Success("Cancel Successful");
+                await _context.SaveChangesAsync(cancellationToken);
+                return Result.Success();
             }
         }
     }

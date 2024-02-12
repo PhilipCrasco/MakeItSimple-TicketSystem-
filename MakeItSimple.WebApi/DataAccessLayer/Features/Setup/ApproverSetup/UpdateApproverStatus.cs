@@ -9,14 +9,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 {
     public class UpdateApproverStatus
     {
-        public class UpdateApproverStatusResult
-        {
-            public int Id { get; set; }
-            public bool Status { get; set; }
-        }
+
         public class UpdateApproverStatusCommand : IRequest<Result>
         {
-            public int Id { get; set; }
+            public ICollection<UpdateApproverStatusId> UpdateApproverStatusIds { get; set; }
+            public class UpdateApproverStatusId
+            {
+                public int ? ChannelId { get; set; }
+            }
+
         }
 
         public class Handler : IRequestHandler<UpdateApproverStatusCommand, Result>
@@ -30,26 +31,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
             public async Task<Result> Handle(UpdateApproverStatusCommand command, CancellationToken cancellationToken)
             {
-                
-                var approver = await _context.Approvers.FirstOrDefaultAsync(x => x.Id == command.Id , cancellationToken);
 
-                if (approver == null)
+
+                foreach(var approver in command.UpdateApproverStatusIds)
                 {
-                    return Result.Failure(ApproverError.ApproverNotExist());
+
+                    var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == approver.ChannelId, cancellationToken);
+
+                    if (approverExist == null)
+                    {
+                        return Result.Failure(ApproverError.ChannelNotExist());
+                    }
+
+                    var approverChannelList = await _context.Approvers.Where(x => x.ChannelId == approver.ChannelId).ToListAsync();
+
+                    foreach(var approverId in approverChannelList)
+                    {
+                        
+                        approverId.IsActive = !approverId.IsActive;
+                    }
+
+
                 }
 
-                approver.IsActive = !approver.IsActive;
+                await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync(cancellationToken);
-
-                var results = new UpdateApproverStatusResult
-                {
-                    Id = approver.Id,
-                    Status = approver.IsActive
-
-                };
-
-                return Result.Success(results);
+                return Result.Success();
             }
         }
     }

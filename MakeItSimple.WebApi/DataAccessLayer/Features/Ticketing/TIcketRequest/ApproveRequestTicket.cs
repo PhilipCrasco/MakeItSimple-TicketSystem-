@@ -68,6 +68,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         concerns.ApprovedAt = DateTime.Now;
                         concerns.IsReject = false;
                         concerns.Remarks = null; 
+                        concerns.IsTransfer = null;
+                        concerns.TransferBy = null;
+                        concerns.TransferAt = null;
 
                         ticketApproveList.Add(concerns);
                     }

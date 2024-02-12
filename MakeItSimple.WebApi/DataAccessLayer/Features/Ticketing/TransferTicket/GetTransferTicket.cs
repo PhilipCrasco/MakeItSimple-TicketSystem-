@@ -30,8 +30,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public bool IsActive { get; set; }
             public string  Transfer_By { get; set; }
             public DateTime ? Transfer_At { get; set; }
-            public string TransferStatus { get; set; }
-            public string TransferRemarks { get; set; }
+            public string Transfer_Status { get; set; }
+            public string Transfer_Remarks { get; set; }
+            public string RejectTransfer_By { get; set; }
+            public DateTime? RejectTransfer_At { get; set; }
+            public string Reject_Remarks { get; set; }
 
             public List<GetTransferTicketConcern> GetTransferTicketConcerns { get; set; }
 
@@ -50,9 +53,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; }
 
-                public string RejectTransfer_By { get; set; }
-                public DateTime? RejectTransfer_At { get; set; }
-
                 public DateTime ? Start_Date { get; set; }
                 public DateTime ? Target_Date { get; set; }
 
@@ -67,6 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public  Guid ? UserApproverId { get; set; }
             public string Approval { get; set; }
             public bool ? IsTransfer { get; set; }
+            public bool ? IsReject { get; set; }
             public string Search { get; set; }
             public bool ? Status { get; set; }
 
@@ -152,8 +153,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if(request.IsTransfer != null)
                 {
-                    transferTicketQuery = request.IsTransfer == false ? transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer == false && x.TicketConcern.IsApprove == true) :  
-                        transferTicketQuery.Where(x => x.IsTransfer == true && x.TicketConcern.IsApprove == null);
+                    //transferTicketQuery = request.IsTransfer == false ? transferTicketQuery.Where(x => x.IsTransfer == false) : request.IsTransfer == true ? 
+                    //    transferTicketQuery.Where(x => x.IsTransfer == true && x.IsActive == true) : transferTicketQuery;
+
+                    transferTicketQuery = transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer);
+                }
+
+                if(request.IsReject != null)
+                {
+                    transferTicketQuery = transferTicketQuery.Where(x => x.IsRejectTransfer == request.IsReject);
                 }
 
                 var results = transferTicketQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetTransferTicketResult
@@ -169,25 +177,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     IsActive = x.First().IsActive,
                     Transfer_By = x.First().TransferByUser.Fullname,
                     Transfer_At = x.First().TransferAt,
-                    TransferStatus = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
-                    && x.First().IsRejectTransfer == false ? "Transfer Aprrove" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
-                    TransferRemarks = x.First().TransferRemarks,
+                    Transfer_Status = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
+                    && x.First().IsRejectTransfer == false ? "Transfer Approve" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
+                    Transfer_Remarks = x.First().TransferRemarks,
+                    RejectTransfer_By = x.First().RejectTransferByUser.Fullname,
+                    RejectTransfer_At = x.First().RejectTransferAt,
+                    Reject_Remarks = x.First().RejectRemarks,
+
                     GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
                     {
                         TransferTicketConcernId = x.Id,
                         TicketConcernId = x.TicketConcernId,
                         Concern_Description = x.ConcernDetails,
                         Category_Description = x.Category.CategoryDescription,
-                        SubCategoryDescription = x.SubCategory.SubCategoryDescription,
-                        
+                        SubCategoryDescription = x.SubCategory.SubCategoryDescription,       
                         Added_By = x.AddedByUser.Fullname,
                         Created_At = x.CreatedAt,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
-                        RejectTransfer_By = x.RejectTransferByUser.Fullname,
-                        RejectTransfer_At = x.RejectTransferAt,
                         Start_Date = x.StartDate,
                         Target_Date = x.TargetDate
+
                     }).ToList()
 
                 });

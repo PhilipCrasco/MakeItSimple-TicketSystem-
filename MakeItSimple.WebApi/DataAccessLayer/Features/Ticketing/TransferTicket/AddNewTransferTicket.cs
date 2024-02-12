@@ -75,7 +75,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
 
                         var transferTicketAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transferConcern.TicketConcernId
-                          && x.IsActive == true, cancellationToken);
+                          && x.IsActive == true && x.IsTransfer == false, cancellationToken);
 
                         if (transferTicketAlreadyExist != null)
                         {

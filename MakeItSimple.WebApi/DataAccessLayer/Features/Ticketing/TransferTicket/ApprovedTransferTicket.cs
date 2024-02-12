@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models;
@@ -89,7 +90,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             concernTicketById.ChannelId = concernTicket.ChannelId;
                             concernTicketById.UserId = concernTicket.UserId;
                             concernTicketById.RequestGeneratorId = concernTicket.RequestGeneratorId;
-                            concernTicketById.IsApprove = null;
+                            concernTicketById.IsApprove = false;
+                            concernTicketById.Remarks = TicketingConString.Transfer;
                         }
 
 

@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public class RejectTransferTicket
             {
                 public int RequestGeneratorId { get; set; }
+                public string Reject_Remarks { get; set; }
             }
         }
 
@@ -60,6 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         perTicketId.IsRejectTransfer = true;
                         perTicketId.RejectTransferBy = command.RejectTransfer_By;
                         perTicketId.TicketApprover = approverLevelValidation.UserId;
+                        perTicketId.RejectRemarks = transferTicket.Reject_Remarks;
                     }
 
 

@@ -44,14 +44,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 
             public async Task<Result> Handle(SyncLocationCommand command, CancellationToken cancellationToken)
             {
-
+                var AllInputSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var AvailableSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var UpdateSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var DuplicateSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationCodeNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationNameNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
 
-                foreach (SyncLocationCommand.LocationResultCommand location in command.locations)
+                foreach (var location in command.locations)
                 {
 
                     if (string.IsNullOrEmpty(location.Location_Code))
@@ -127,8 +127,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                         }
                     }
 
+                    AllInputSync.Add(location);
                 }
 
+                var allInputByNo = AllInputSync.Select(x => x.Location_No);
+
+                var allDataInput = await _context.Locations.Where(x => !allInputByNo.Contains(x.LocationNo)).ToListAsync();
+
+                foreach (var department in allDataInput)
+                {
+                    _context.Remove(department);
+                }
 
                 var resultList = new
                 {

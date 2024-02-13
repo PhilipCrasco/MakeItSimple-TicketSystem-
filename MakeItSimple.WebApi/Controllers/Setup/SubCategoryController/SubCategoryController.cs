@@ -13,7 +13,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
 
 namespace MakeItSimple.WebApi.Controllers.Setup.SubCategoryController
 {
-    [Route("api/SubCategory")]
+    [Route("api/sub-category")]
     [ApiController]
     public class SubCategoryController : ControllerBase
     {
@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.SubCategoryController
             _validatorHandler = validatorHandler ;
         }
 
-        [HttpPost("UpsertSubCategory")]
+        [HttpPost]
         public async Task<IActionResult> UpsertSubCategory([FromBody] UpsertSubCategoryCommand command)
         {
             try
@@ -57,7 +57,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.SubCategoryController
             }
         }
 
-        [HttpGet("GetSubCategory")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetSubCategory([FromQuery]GetSubCategoryQuery query)
         {
             try
@@ -96,11 +96,16 @@ namespace MakeItSimple.WebApi.Controllers.Setup.SubCategoryController
             }
         }
 
-        [HttpPatch("UpdateSubCategoryStatus")]
-        public async Task<IActionResult> UpdateSubCategoryStatus([FromBody] UpdateSubCategoryStatusCommand  command)
+        [HttpPatch("status/id")]
+        public async Task<IActionResult> UpdateSubCategoryStatus([FromRoute] int id)
         {
             try
             {
+                var command = new UpdateSubCategoryStatusCommand
+                {
+                    Id = id
+                };
+
                 var results = await _mediator.Send(command);
                 if(results.IsFailure)
                 {

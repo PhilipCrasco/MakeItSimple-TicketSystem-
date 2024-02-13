@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public Guid Id { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
-            public string Email { get; set; }
+
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public bool Is_Active { get; set; }
@@ -24,6 +24,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public DateTime ? Update_At { get; set;}
             public string User_Role_Name { get; set; }
             public string Department_Name { get; set; }
+
+            public string Company_Name { get; set; }
+            public string Location_Name { get; set; }
+            public string Business_Name { get; set; }
+            
+            
+
 
             public string SubUnit_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
@@ -54,11 +61,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.UserRole);
+                    //.Include(x => x.acc);
+                    
 
                 if(!string.IsNullOrEmpty(request.Search))
                 {
                     userQuery = userQuery.Where(x => x.Fullname.Contains(request.Search) 
-                    || x.Username.Contains(request.Search) || x.Email.Contains(request.Search) 
                     || x.UserRole.UserRoleName.Contains(request.Search));
                 }
 
@@ -77,7 +85,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Id = x.Id,
                     Fullname = x.Fullname,
                     Username = x.Username,
-                    Email = x.Email,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Is_Active = x.IsActive,
@@ -86,6 +93,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     User_Role_Name = x.UserRole.UserRoleName,
                     Department_Name = x.Department.DepartmentName,
                     SubUnit_Name = x.SubUnit.SubUnitName,
+                    Company_Name = x.Company.CompanyName,
+                    Location_Name = x.Location.LocationName,
+                    Business_Name = x.BusinessUnit.BusinessName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
 
                 });

@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
             public async Task<Result> Handle(SyncCompanyCommand command, CancellationToken cancellationToken)
             {
-               
+                var AllInputSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var AvailableSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var UpdateSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var DuplicateSync = new List<SyncCompanyCommand.CompanyResultCommand>();
@@ -122,6 +123,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
                     }
 
+                    AllInputSync.Add(companies);
+
+                }
+
+                var allInputByNo = AllInputSync.Select(x => x.Company_No);
+
+                var allDataInput = await _context.Companies.Where(x => !allInputByNo.Contains(x.CompanyNo)).ToListAsync();
+
+                foreach (var company in allDataInput)
+                {
+                    _context.Remove(company);
                 }
 
                 var resultList = new

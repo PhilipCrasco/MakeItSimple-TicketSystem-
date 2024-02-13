@@ -16,11 +16,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string EmpId { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
-            public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
-
             public int ? SubUnitId {  get; set; }
+            public int ? CompanyId { get; set; }
+            public int ? LocationId { get; set; }
+
+            public int ? BusinessUnitId { get; set; }
+
             public Guid ? Added_By { get; set; }
 
         }
@@ -31,12 +34,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string EmpId { get; set; }
             public string Fullname { set; get; }
             public string Username { get; set; }
-
-            public string Email { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
 
             public int ? SubUnitId { get; set; }
+
+            public int? CompanyId { get; set; }
+            public int? LocationId { get; set; }
+
+            public int? BusinessUnitId { get; set; }
 
             public Guid ? Added_By { get; set; }
 
@@ -69,16 +75,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.UsernameAlreadyExist(command.Username));
                 }
-
-                var EmailAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Email == command.Email, cancellationToken);
-
-                if(EmailAlreadyExist != null)
-                {
-                    return Result.Failure(UserError.EmailAlreadyExist(command.Email));
-                }
-
-                
-                
+             
                 var UserRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
 
                 if (UserRoleNotExist == null)
@@ -100,6 +97,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.SubUnitNotExist());
                 }
 
+                var CompanyNotExist = await _context.Companies.FirstOrDefaultAsync(x => x.Id == command.CompanyId, cancellationToken);
+
+                if (CompanyNotExist == null)
+                {
+                    return Result.Failure(UserError.CompanyNotExist());
+                }
+                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.Id == command.LocationId, cancellationToken);
+
+                if (LocationNotExist == null)
+                {
+                    return Result.Failure(UserError.LocationNotExist());
+                }
+                var BusinessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
+
+                if (BusinessUnitNotExist == null)
+                {
+                    return Result.Failure(UserError.BusinessUnitNotExist());
+                }
+
 
                 var users = new User
                 {
@@ -108,11 +124,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Fullname = command.Fullname,
                     Username = command.Username,
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
-                    Email = command.Email,
                     UserRoleId = command.UserRoleId,
                     SubUnitId = command.SubUnitId,
                     DepartmentId = command.DepartmentId,    
+                    CompanyId = command.CompanyId,  
+                    LocationId = command.LocationId,
+                    BusinessUnitId = command.BusinessUnitId,    
                     AddedBy = command.Added_By,
+
                     
                 };
                 
@@ -125,10 +144,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     EmpId = users.EmpId,
                     Fullname = users.Fullname,
                     Username = users.Username,
-                    Email = users.Email,
                     UserRoleId = users.UserRoleId,
                     DepartmentId = users.DepartmentId,
                     SubUnitId= users.SubUnitId,
+                    CompanyId = users.CompanyId,
+                    LocationId = users.LocationId,
+                    BusinessUnitId = users.BusinessUnitId,
                     Added_By = users.AddedBy
                 };
 

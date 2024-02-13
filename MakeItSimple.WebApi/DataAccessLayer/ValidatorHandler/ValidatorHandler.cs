@@ -30,7 +30,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
     {
         //User
         public  IValidator<AddNewUserCommand> AddNewUserValidator { get; set; }
-        public IValidator<UpdateUserCommand> UpdateUserValidator { get; set; }
         public IValidator<UserChangePasswordCommand> UserChangePasswordValidator { get; set; }
 
         //UserRoles
@@ -59,7 +58,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
             //User
 
             AddNewUserValidator = new User.UserValidator();
-            UpdateUserValidator = new User.UserUpdateValidator();
             UserChangePasswordValidator = new User.UserChangePasswordValidator();   
 
             //UserRole

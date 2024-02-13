@@ -10,7 +10,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetu
 
 namespace MakeItSimple.WebApi.Controllers.Setup.AccountTitleController
 {
-    [Route("api/AccountTitle")]
+    [Route("api/account-title")]
     [ApiController]
     public class AccountTitleController : ControllerBase
     {
@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.AccountTitleController
             _mediator = mediator;
         }
 
-        [HttpPost("SyncAccoutTitle")]
+        [HttpPost]
         public async Task<IActionResult> SyncAccoutTitle([FromBody] SyncAccountTitleCommand command)
         {
             try
@@ -47,7 +47,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.AccountTitleController
             }
         }
 
-        [HttpGet("GetAccountTitle")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetAccountTitle([FromQuery] GetAccountTitleQuery query)
         {
             try

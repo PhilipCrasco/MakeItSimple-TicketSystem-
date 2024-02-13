@@ -13,7 +13,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup.Up
 
 namespace MakeItSimple.WebApi.Controllers.Setup.CategoryController
 {
-    [Route("api/Category")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CategoryController
             _validatorHandler = validatorHandler;
         }
 
-        [HttpPost("UpsertCategory")]
+        [HttpPost]
         public async Task<IActionResult> UpsertCategory([FromBody] UpsertCategoryCommand command)
         {
 
@@ -58,7 +58,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CategoryController
             }
         }
 
-        [HttpGet("GetCategory")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetCategory([FromQuery] GetCategoryQuery  query )
         {
             try
@@ -98,12 +98,15 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CategoryController
         }
 
 
-        [HttpPatch("UpdateCategoryStatus")]
-        public async Task<IActionResult> UpdateCategoryStatus([FromBody] UpdateCategoryStatusCommand command)
+        [HttpPatch("status/{id}")]
+        public async Task<IActionResult> UpdateCategoryStatus([FromRoute] int id)
         {
             try
             {
-
+                var command = new UpdateCategoryStatusCommand
+                {
+                    Id = id
+                };
                 var result = await _mediator.Send(command);
                 if(result.IsFailure)
                 {

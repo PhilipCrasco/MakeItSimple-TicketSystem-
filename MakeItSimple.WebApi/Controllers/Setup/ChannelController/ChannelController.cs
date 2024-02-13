@@ -16,20 +16,20 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.Upd
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 {
-    [Route("api/Channel")]
+    [Route("api/channel")]
     [ApiController]
     public class ChannelController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly ValidatorHandler _validatorHandler;
-        
-        public ChannelController(IMediator mediator , ValidatorHandler validatorHandler)
+
+        public ChannelController(IMediator mediator, ValidatorHandler validatorHandler)
         {
             _mediator = mediator;
             _validatorHandler = validatorHandler;
         }
 
-        [HttpPost("AddNewChannel")]
+        [HttpPost]
         public async Task<IActionResult> AddNewChannel([FromBody] AddNewChannelCommand command)
         {
             try
@@ -60,7 +60,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpGet("GetChannel")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetChannel([FromQuery] GetChannelQuery query)
         {
             try
@@ -99,11 +99,12 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             }
         }
 
-        [HttpPut("UpdateChannel")]
-        public async Task<IActionResult> UpdateChannel([FromBody] UpdateChannelCommand command)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateChannel([FromBody] UpdateChannelCommand command, [FromRoute] int id)
         {
             try
             {
+                command.Id = id;    
                 var validationResult = await _validatorHandler.UpdateChannelValidator.ValidateAsync(command);
 
                 if (!validationResult.IsValid)
@@ -156,7 +157,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
         }
 
 
-        [HttpPost("AddMember")]
+        [HttpPost("member")]
         public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
         {
 
@@ -177,12 +178,12 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpDelete("RemoveChannelUser")]
-        public async Task<IActionResult> RemoveChannelUser([FromBody] RemoveChannelUserCommand command)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoveChannelUser([FromBody] RemoveChannelUserCommand command, [FromRoute] int id)
         {
             try
             {
-
+                command.ChannelId = id;
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Modified_By = userId;

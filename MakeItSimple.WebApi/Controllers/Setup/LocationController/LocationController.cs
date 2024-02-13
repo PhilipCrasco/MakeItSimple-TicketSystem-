@@ -10,7 +10,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup.Sy
 
 namespace MakeItSimple.WebApi.Controllers.Setup.LocationController
 {
-    [Route("api/Location")]
+    [Route("api/location")]
     [ApiController]
     public class LocationController : ControllerBase
     {
@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.LocationController
             _mediator = mediator;
         }
 
-        [HttpPost("SyncLocation")]
+        [HttpPost]
         public async Task<IActionResult> SyncLocation([FromBody] SyncLocationCommand command)
         {
             try
@@ -45,7 +45,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.LocationController
             }
         }
 
-        [HttpGet("GetLocation")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetLocation([FromQuery] GetLocationQuery query)
         {
             try

@@ -1,4 +1,8 @@
-﻿using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
+﻿using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.CompanySetup;
+using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
+using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,7 +15,6 @@ namespace MakeItSimple.WebApi.Models
         public bool IsActive { get ; set; } = true;
         public string EmpId {  get; set; } 
         public string Fullname { get; set; }
-        public string Email { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public bool ? IsPasswordChange { get; set; }
@@ -36,6 +39,16 @@ namespace MakeItSimple.WebApi.Models
 
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
+
+        public int ? CompanyId { get; set; }
+        public virtual Company Company { get; set; }
+
+        public int ? LocationId { get; set; }
+        public virtual Location Location { get; set; }
+
+        public int ? BusinessUnitId { get; set; }
+        public virtual BusinessUnit BusinessUnit { get; set; }
+
 
     }
 }

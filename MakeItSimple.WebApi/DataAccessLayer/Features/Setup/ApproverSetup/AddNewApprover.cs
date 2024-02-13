@@ -172,15 +172,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                 }
 
                 var removeApproverList = await _context.Approvers.Where(x => x.ChannelId == channelNotExist.Id).ToListAsync();
-
-                var removeApproval = removeApproverList.Select(x => x.UserId);
-
                 var approvalListId = approverList.Select(x => x.UserId);
-
-                //var approverToList = _context.Approvers.Where(x => approvalListId.Contains(x.UserId)).ToList();
-
-                //var getapprover = approverToList.Select(x => x.UserId);
-                //var removeNotContainApproval = approverList.Where(x => !removeApproval.Contains(x.UserId)).ToList();
 
                 var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.UserId));
 

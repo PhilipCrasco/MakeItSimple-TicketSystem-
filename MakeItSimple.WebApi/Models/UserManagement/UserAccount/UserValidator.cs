@@ -17,22 +17,7 @@ namespace MakeItSimple.WebApi.Models
                 .MinimumLength(3).WithMessage("Fullname must be at least 3 character long!");
                 RuleFor(u => u.Username).NotEmpty().WithMessage("Username is required!")
                 .MinimumLength(3).WithMessage("Username must be at least 3 character long!");
-                RuleFor(em => em.Email).NotEmpty().WithMessage("Email is required!")
-                .EmailAddress().WithMessage("A valid email address is required!");
                
-            }
-
-        }
-
-
-        public class UserUpdateValidator : AbstractValidator<UpdateUserCommand>
-        {
-            public UserUpdateValidator()
-            {
-
-                RuleFor(em => em.Email).NotEmpty().WithMessage("Email is required!")
-                .EmailAddress().WithMessage("A valid email address is required!");
-
             }
 
         }

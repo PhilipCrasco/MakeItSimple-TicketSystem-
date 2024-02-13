@@ -109,12 +109,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         {
             try
             {
-                var validationResult = await _validatorHandler.UpdateUserValidator.ValidateAsync(command);
-                if(!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);
-
-                }
 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {

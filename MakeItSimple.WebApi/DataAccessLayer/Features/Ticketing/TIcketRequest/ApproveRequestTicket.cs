@@ -48,7 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
             public async Task<Result> Handle(ApproveRequestTicketCommand command, CancellationToken cancellationToken)
             {
-
+                var dateToday = DateTime.Today;
                 var ticketApproveList = new List<TicketConcern>();
 
                 foreach (var ticketConcern in command.Concern)
@@ -63,6 +63,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                     foreach(var concerns in ticketConcernExist)
                     {
+                        if(concerns.TargetDate < dateToday)
+                        {
+                            return Result.Failure(TicketRequestError.DateTimeInvalid());
+                        }
+
                         concerns.IsApprove = true;
                         concerns.ApprovedBy = command.Approved_By;
                         concerns.ApprovedAt = DateTime.Now;

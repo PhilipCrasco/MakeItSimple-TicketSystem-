@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.AccountTitleSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ApproverSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CompanySetup;
@@ -12,6 +13,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
@@ -36,6 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Company> Companies { get; set; }
+        public virtual DbSet<BusinessUnit> BusinessUnits { get; set; }
         public virtual DbSet<AccountTitle> AccountTitles { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<SubUnit> SubUnits { get; set; }
@@ -60,6 +63,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+            modelBuilder.ApplyConfiguration(new BusinessUnitConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new AccountTitleConfiguration());
             modelBuilder.ApplyConfiguration(new SubUnitConfiguration());

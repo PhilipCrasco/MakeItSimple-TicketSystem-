@@ -12,7 +12,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup.Syn
 
 namespace MakeItSimple.WebApi.Controllers.Setup.CompanyController
 {
-    [Route("api/Company")]
+    [Route("api/company")]
     [ApiController]
     public class CompanyController : ControllerBase
     {
@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CompanyController
             _validatorHandler = validatorHandler;
         }
 
-        [HttpPost("SyncCompany")]
+        [HttpPost()]
         public async Task<IActionResult> SyncCompany([FromBody] SyncCompanyCommand command)
         {
             try
@@ -51,7 +51,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CompanyController
         }
 
 
-        [HttpGet("GetCompany")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetCompany([FromQuery] GetCompanyQuery query)
         {
             try

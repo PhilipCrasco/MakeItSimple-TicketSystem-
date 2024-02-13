@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MediatR;
@@ -42,6 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetup
 
             public async Task<Result> Handle(SyncAccountTitleCommand command, CancellationToken cancellationToken)
             {
+                var AllInputSync = new List<SyncAccountTitleCommand.AccountTitleResultCommand>();
                 var AvailableSync = new List<SyncAccountTitleCommand.AccountTitleResultCommand>();
                 var UpdateSync = new List<SyncAccountTitleCommand.AccountTitleResultCommand>();
                 var DuplicateSync = new List<SyncAccountTitleCommand.AccountTitleResultCommand>();
@@ -121,7 +123,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetup
                         }
 
                     }
+                    AllInputSync.Add(accountTitle);
+                }
 
+                var allInputByNo = AllInputSync.Select(x => x.Account_No);
+
+                var allDataInput = await _context.AccountTitles.Where(x => !allInputByNo.Contains(x.AccountNo)).ToListAsync();
+
+                foreach (var account in allDataInput)
+                {
+                    _context.Remove(account);
                 }
 
                 var resultList = new

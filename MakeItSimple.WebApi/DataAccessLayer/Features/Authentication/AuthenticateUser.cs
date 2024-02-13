@@ -34,7 +34,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
                 EmpId = user.EmpId;
                 Fullname = user.Fullname;
                 Username = user.Username;
-                Email = user.Email;
                 UserRoleName = user.UserRole.UserRoleName;
                 Permissions = user.UserRole?.Permissions;
                 IsPasswordChanged = user.IsPasswordChange;

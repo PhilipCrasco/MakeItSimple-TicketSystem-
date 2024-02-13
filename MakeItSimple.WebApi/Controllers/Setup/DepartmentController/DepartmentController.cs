@@ -8,7 +8,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup.
 
 namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
 {
-    [Route("api/Department")]
+    [Route("api/department")]
     [ApiController]
     public class DepartmentController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
             _mediator = mediator;
         }
 
-        [HttpPost("SyncDepartment")]
+        [HttpPost]
         public async Task<IActionResult> SyncDepartment([FromBody] SyncDepartmentCommand command )
         {
             try
@@ -44,7 +44,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
         }
 
 
-        [HttpGet("GetDepartment")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetDepartment([FromQuery] GetDepartmentQuery query)
         {
             try

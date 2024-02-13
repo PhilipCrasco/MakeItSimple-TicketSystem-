@@ -41,6 +41,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
 
         public async Task<Result> Handle(SyncDepartmentCommand command, CancellationToken cancellationToken)
         {
+            var AllInputSync = new List<SyncDepartmentCommand.Department>();
             var DuplicateSync = new List<SyncDepartmentCommand.Department>();
             var AvailableSync = new List<SyncDepartmentCommand.Department>();
             var UpdateSync = new List<SyncDepartmentCommand.Department>();
@@ -97,6 +98,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                             ExistingDepartment.SyncStatus = "New Update";
 
                              UpdateSync.Add(department);
+
                              _context.Departments.Update(ExistingDepartment);
                         }
                         if(!hasChanged)
@@ -122,12 +124,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                             SyncStatus = "New Added"
                         };
 
-                        AvailableSync.Add(department);         
+                        AvailableSync.Add(department);
                         await _context.Departments.AddAsync(AddDepartments);
                     }
 
                 }
+ 
+                AllInputSync.Add(department);
+            }
 
+            var allInputByNo = AllInputSync.Select(x => x.Department_No);
+
+            var allDataInput = await _context.Departments.Where(x => !allInputByNo.Contains(x.DepartmentNo)).ToListAsync();
+
+            foreach(var department in allDataInput)
+            {
+                _context.Remove(department);
             }
 
             var resultList = new

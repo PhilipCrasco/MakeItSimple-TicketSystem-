@@ -13,7 +13,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
                 Id = Guid.Parse("bca9f29a-ccfb-4cd5-aa51-f3f61ea635d2"),
                 Fullname = "Admin",
                 Username = "admin",
-                Email = "admin@gmail.com",
                 Password = "$2a$12$ihvpKbpvdRfZLXz.tZKFEulxnTg1tiS11T/MbpufId3rzXoCMW2OK",
                 UserRoleId = 1,
                 IsPasswordChange = true,

@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             
             public string Deparment_Name {  get; set; }
 
+            public bool Is_Active { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -79,6 +80,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     SubUnit_Code = x.SubUnitCode,
                     SubUnit_Name = x.SubUnitName,
                     Deparment_Name = x.Department.DepartmentName,
+                    Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,

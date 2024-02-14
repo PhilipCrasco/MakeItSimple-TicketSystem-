@@ -13,6 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
         {
             public int ChannelId { get; set; }
             public string Channel_Name { get; set; }
+            public bool Is_Active { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By {  get; set; }
@@ -63,6 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                                 {
                                     ChannelId = x.Key,
                                     Channel_Name = x.First().Channel.ChannelName,
+                                    Is_Active = x.First().IsActive,
                                     Added_By = x.First().AddedByUser.Fullname,
                                     Created_At = x.First().CreatedAt,
                                     Modified_By = x.First().ModifiedByUser.Fullname,

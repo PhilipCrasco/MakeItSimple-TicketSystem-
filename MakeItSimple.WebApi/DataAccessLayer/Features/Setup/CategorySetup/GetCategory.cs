@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
             public string Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
 
+            public bool Is_Active { get; set; }
+
             public List<Subcategory> subcategories { get; set; }
 
             public class Subcategory

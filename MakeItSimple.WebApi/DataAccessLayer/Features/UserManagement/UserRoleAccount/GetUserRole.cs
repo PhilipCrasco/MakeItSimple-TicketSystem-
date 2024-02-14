@@ -25,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
 
             public bool Is_Tagged { get; set; }
 
+            public bool Is_Active { get; set; }
+
             public List<Users> users {  get; set; } 
 
             public class Users
@@ -86,9 +88,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserRoleAc
                     Modified_By = x.ModifiedBy,
                     Updated_At = x.UpdatedAt, 
                     Is_Tagged = x.Users.FirstOrDefault().Fullname != null ? true : false,
+                    Is_Active = x.IsActive,
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetUserRoleResult.Users
                     {
-
                         UserId = x.Id,
                         Fullname = x.Fullname
 

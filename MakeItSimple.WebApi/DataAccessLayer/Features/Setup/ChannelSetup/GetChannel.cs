@@ -15,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public string Channel_Name { get; set; }
             public string SubUnit_Name {  get; set; }
             public int No_Of_Members { get; set; }
+            public bool  Is_Active { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -72,6 +73,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     Updated_At = x.UpdatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     No_Of_Members = x.ChannelUsers.Count(),
+                    Is_Active = x.IsActive,
                     channelUsers = x.ChannelUsers.Where(x => x.IsActive == true).Select(x => new GetChannelResult.ChannelUser
                     {
                         ChannelUserId = x.Id,

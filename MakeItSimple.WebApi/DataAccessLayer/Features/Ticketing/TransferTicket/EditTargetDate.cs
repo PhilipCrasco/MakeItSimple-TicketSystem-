@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(EditTargetDateCommand command, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
+
+                var newconcern = new TicketConcern();
+
+                await _context.TicketConcerns.AddAsync(newconcern);
 
                 foreach(var transferTicket in command.EditDates)
                 {

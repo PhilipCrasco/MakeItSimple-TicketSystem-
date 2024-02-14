@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +111,8 @@ builder.Services.AddAuthentication(authOptions =>
     });
 
 builder.Services.Configure<CloudinaryOption>(config.GetSection("Cloudinary"));
+
+
 
 const string clientPermission = "_clientPermission";
 

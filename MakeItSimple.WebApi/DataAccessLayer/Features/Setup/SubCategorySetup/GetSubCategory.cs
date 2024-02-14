@@ -14,6 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
             public int Id { get; set; }
             public string SubCategory_Description { get; set; }
             public string Category_Description { get; set; }
+            public bool Is_Active { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -57,6 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
                     Id = x.Id,
                     SubCategory_Description = x.SubCategoryDescription,
                     Category_Description = x.Category.CategoryDescription,
+                    Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,

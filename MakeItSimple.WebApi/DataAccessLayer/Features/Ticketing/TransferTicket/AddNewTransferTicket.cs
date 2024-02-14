@@ -102,8 +102,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,
                             TargetDate = ticketConcern.TargetDate,
-                            //TransferBy = command.Transfer_By,
-                            //TransferAt = DateTime.Now,
                             IsTransfer = false,
                             TicketApprover = getApproverUserId.UserId
                             

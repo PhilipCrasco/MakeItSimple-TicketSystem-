@@ -11,6 +11,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public ICollection<TicketAttachment> TicketAttachments { get; set; }
         public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
         public ICollection<ApproverTicketing> ApproverTicketings { get; set; }
-
+        public ICollection<ReTicketConcern> ReTicketConcerns { get; set; }
+             
     }
 }

@@ -745,6 +745,155 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("closing_t_attachments", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_id");
+
+                    b.Property<string>("ConcernDetails")
+                        .HasColumnType("longtext")
+                        .HasColumnName("concern_details");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("department_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsReTicket")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_re_ticket");
+
+                    b.Property<bool>("IsRejectReTicket")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_reject_re_ticket");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ReTicketAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("re_ticket_at");
+
+                    b.Property<Guid?>("ReTicketBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("re_ticket_by");
+
+                    b.Property<string>("ReTicketRemarks")
+                        .HasColumnType("longtext")
+                        .HasColumnName("re_ticket_remarks");
+
+                    b.Property<Guid?>("RejectReTicketBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("reject_re_ticket_by");
+
+                    b.Property<string>("RejectRemarks")
+                        .HasColumnType("longtext")
+                        .HasColumnName("reject_remarks");
+
+                    b.Property<DateTime?>("RejectTransferAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("reject_transfer_at");
+
+                    b.Property<int?>("RequestGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_generator_id");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_category_id");
+
+                    b.Property<int>("SubUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_id");
+
+                    b.Property<DateTime?>("TargetDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("target_date");
+
+                    b.Property<Guid?>("TicketApprover")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("ticket_approver");
+
+                    b.Property<int>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_re_ticket_concerns");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_re_ticket_concerns_added_by");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_re_ticket_concerns_category_id");
+
+                    b.HasIndex("ChannelId")
+                        .HasDatabaseName("ix_re_ticket_concerns_channel_id");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("ix_re_ticket_concerns_department_id");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_re_ticket_concerns_modified_by");
+
+                    b.HasIndex("ReTicketBy")
+                        .HasDatabaseName("ix_re_ticket_concerns_re_ticket_by");
+
+                    b.HasIndex("RejectReTicketBy")
+                        .HasDatabaseName("ix_re_ticket_concerns_reject_re_ticket_by");
+
+                    b.HasIndex("RequestGeneratorId")
+                        .HasDatabaseName("ix_re_ticket_concerns_request_generator_id");
+
+                    b.HasIndex("SubCategoryId")
+                        .HasDatabaseName("ix_re_ticket_concerns_sub_category_id");
+
+                    b.HasIndex("SubUnitId")
+                        .HasDatabaseName("ix_re_ticket_concerns_sub_unit_id");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_re_ticket_concerns_ticket_concern_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_re_ticket_concerns_user_id");
+
+                    b.ToTable("re_ticket_concerns", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", b =>
                 {
                     b.Property<int>("Id")
@@ -1633,6 +1782,107 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ClosingGenerator");
 
                     b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_re_ticket_concerns_users_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_re_ticket_concerns_categories_category_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_re_ticket_concerns_channels_channel_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .HasConstraintName("fk_re_ticket_concerns_departments_department_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_re_ticket_concerns_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReTicketByUser")
+                        .WithMany()
+                        .HasForeignKey("ReTicketBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_re_ticket_concerns_users_re_ticket_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "RejectReTicketByUser")
+                        .WithMany()
+                        .HasForeignKey("RejectReTicketBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_re_ticket_concerns_users_reject_re_ticket_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                        .WithMany()
+                        .HasForeignKey("RequestGeneratorId")
+                        .HasConstraintName("fk_re_ticket_concerns_request_generators_request_generator_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_re_ticket_concerns_sub_categories_sub_category_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_re_ticket_concerns_sub_units_sub_unit_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
+                        .WithMany()
+                        .HasForeignKey("TicketConcernId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_re_ticket_concerns_ticket_concerns_ticket_concern_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_re_ticket_concerns_users_user_id1");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("ReTicketByUser");
+
+                    b.Navigation("RejectReTicketByUser");
+
+                    b.Navigation("RequestGenerator");
+
+                    b.Navigation("SubCategory");
+
+                    b.Navigation("SubUnit");
+
+                    b.Navigation("TicketConcern");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketAttachment", b =>

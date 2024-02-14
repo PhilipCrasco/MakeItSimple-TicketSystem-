@@ -43,7 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 public int TransferTicketConcernId { get; set; }
                 public int TicketConcernId { get; set; }
-                public string Concern_Description { get; set; }
+                public string Concern_Details { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategoryDescription { get; set; }
 
@@ -136,9 +136,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if(!string.IsNullOrEmpty(request.Search))
                 {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Username.Contains(request.Search)
-                    || x.SubUnit.SubUnitName.Contains(request.Search)
-                    || x.Channel.ChannelName.Contains(request.Search));
+                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                    || x.User.EmpId.Contains(request.Search));
                 }
 
                 if(request.Status != null)
@@ -181,7 +180,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         TransferTicketConcernId = x.Id,
                         TicketConcernId = x.TicketConcernId,
-                        Concern_Description = x.ConcernDetails,
+                        Concern_Details = x.ConcernDetails,
                         Category_Description = x.Category.CategoryDescription,
                         SubCategoryDescription = x.SubCategory.SubCategoryDescription,       
                         Added_By = x.AddedByUser.Fullname,

@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension
             {
                 Id = 1,
                 UserRoleName = "Admin",
-                Permissions = new List<string> { "User Management","User Role" },
+                Permissions = new List<string> { "User Management","User Role","User Account", "Masterlist", "Company", "Department", "Request", "Channel", "Filing", "Generate" },
                 CreatedAt = DateTime.Parse("2024-01-08"),
             });
 

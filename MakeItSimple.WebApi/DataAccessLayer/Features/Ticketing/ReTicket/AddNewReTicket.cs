@@ -81,7 +81,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         StartDate = reTicket.Start_Date,
                         TargetDate = reTicket.Target_Date,
                         IsReTicket = false,
-                        TicketApprover = approverUser.UserId
+                        TicketApprover = approverUser.UserId,
+                        AddedBy = command.Added_By
+                        
                     };
 
                     await _context.ReTicketConcerns.AddAsync(addNewReTicketConcern);

@@ -12,7 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
     {
 
         public record UpsertTransferTicketCommand : IRequest<Result>
-        {
+        {  
             public Guid? Added_By { get; set; }
             public Guid? Transfer_By { get; set; }
             public Guid? Modified_By { get; set; }

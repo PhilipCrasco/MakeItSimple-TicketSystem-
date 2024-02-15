@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Common.Pagination;
+﻿using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -53,6 +54,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class GetReTicketQuery : UserParams, IRequest<PagedList<GetReTicketResult>>
         {
             public Guid ? UserId { get; set; }
+
+            public string Approval { get; set; }
+
             public string Search { get; set; }
             public bool ? IsReTicket { get; set; }
             public bool ? IsReject { get ; set; }
@@ -94,10 +98,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 }
 
+                var fillterApproval = reTicketQuery.Select(x => x.RequestGeneratorId);
+
+                if (request.Approval == TicketingConString.Approval)
+                {
+
+                    var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
+
+                    if (approverTransactList != null && approverTransactList.Any())
+                    {
+                        var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
+                        reTicketQuery = reTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
+                    }
+
+                }
 
                 if (channeluserExist != null)
                 {
-                    reTicketQuery = reTicketQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
+                    reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Fullname == channeluserExist.Fullname);
                 }
                 
                 if(!string.IsNullOrEmpty(request.Search))

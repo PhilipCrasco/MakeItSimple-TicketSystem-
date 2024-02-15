@@ -1455,7 +1455,7 @@ namespace MakeItSimple.WebApi.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
-                            Permissions = "[\"User Management\",\"User Role\"]",
+                            Permissions = "[\"User Management\",\"User Role\",\"User Account\",\"Masterlist\",\"Company\",\"Department\",\"Request\",\"Channel\",\"Filing\",\"Generate\"]",
                             UserRoleName = "Admin"
                         });
                 });
@@ -1830,7 +1830,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_re_ticket_concerns_users_reject_re_ticket_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany()
+                        .WithMany("ReTicketConcerns")
                         .HasForeignKey("RequestGeneratorId")
                         .HasConstraintName("fk_re_ticket_concerns_request_generators_request_generator_id");
 
@@ -2245,6 +2245,8 @@ namespace MakeItSimple.WebApi.Migrations
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", b =>
                 {
                     b.Navigation("ApproverTicketings");
+
+                    b.Navigation("ReTicketConcerns");
 
                     b.Navigation("TicketAttachments");
 

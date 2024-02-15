@@ -211,23 +211,23 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpPut("EditTargetDate")]
-        public async Task<IActionResult> EditTargetDate([FromBody] EditTargetDateCommand command)
-        {
-            try
-            {
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
+        //[HttpPut("EditTargetDate")]
+        //public async Task<IActionResult> EditTargetDate([FromBody] EditTargetDateCommand command)
+        //{
+        //    try
+        //    {
+        //        var results = await _mediator.Send(command);
+        //        if (results.IsFailure)
+        //        {
+        //            return BadRequest(results);
+        //        }
+        //        return Ok(results);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
 
 
 

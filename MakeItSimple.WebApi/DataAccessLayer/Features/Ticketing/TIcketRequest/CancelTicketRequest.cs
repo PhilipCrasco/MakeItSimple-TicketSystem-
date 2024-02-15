@@ -39,7 +39,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 foreach (var ticketGenerator in command.CancelTicketGenerators)
                 {
 
-
                     var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketGenerator.RequestGeneratorId, cancellationToken);
                     if (requestGeneratorExist == null)
                     {

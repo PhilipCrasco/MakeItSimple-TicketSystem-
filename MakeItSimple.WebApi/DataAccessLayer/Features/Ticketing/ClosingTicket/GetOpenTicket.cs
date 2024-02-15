@@ -79,9 +79,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosingTicket
                     ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                 }
 
-                
                 var results = ticketConcernQuery.Where(x => x.IsApprove == true 
-                && x.IsClosedApprove == null)
+                && x.IsClosedApprove == null).OrderBy(x => x.Id)
                     .Select(x => new GetOpenTicketResult
                     {
                         TicketConcernId = x.Id,
@@ -92,7 +91,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosingTicket
                         Channel_Name = x.Channel.ChannelName,
                         EmpId = x.User.EmpId,
                         Fullname = x.User.Fullname,
-                        TicketStatus = x.IsApprove == true ? "Open Ticket" : x.IsTransfer == false ? "For Approval Transfer" : "Unknown",
+                        TicketStatus = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false ? "Open Ticket" 
+                        : x.IsTransfer == false ? "For Approval Transfer" : x.IsReTicket == false ? "For ReTicket" : "Unknown",
                         Category_Description = x.Category.CategoryDescription,
                         SubCategory_Description = x.SubCategory.SubCategoryDescription,
                         Start_Date = x.StartDate,

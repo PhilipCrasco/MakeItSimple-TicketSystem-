@@ -131,7 +131,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
  
                 if (channeluserExist != null)
                 {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
+                    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Fullname == channeluserExist.Fullname);
                 }
 
                 if(!string.IsNullOrEmpty(request.Search))

@@ -81,7 +81,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             
                             var concernTicketById = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == concernTicket.TicketConcernId, cancellationToken);
 
-                            concernTicketById.Remarks = null;
                             concernTicketById.IsTransfer = true;
                             concernTicketById.TransferAt = DateTime.Now;
                             concernTicketById.TransferBy = command.Transfer_By;

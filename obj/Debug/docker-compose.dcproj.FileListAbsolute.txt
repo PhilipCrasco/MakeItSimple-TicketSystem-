@@ -10,7 +10,6 @@ E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Pomelo.EntityFram
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.EntityFrameworkCore.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\FluentValidation.dll
-E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.EntityFrameworkCore.Relational.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\MediatR.Contracts.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\CloudinaryDotNet.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.Extensions.Options.dll
@@ -35,3 +34,4 @@ E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\MakeItSimple.WebA
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.CopyComplete
+E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.EntityFrameworkCore.Relational.dll

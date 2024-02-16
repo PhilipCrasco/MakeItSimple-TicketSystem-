@@ -39,7 +39,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(AddNewTransferTicketCommand command, CancellationToken cancellationToken)
             {
                 var transferList = new List<TicketConcern>();
-                var requestGeneratedId = new RequestGenerator { };
+                var requestGeneratedId = new RequestGenerator { IsActive = true };
 
                 await  _context.RequestGenerators.AddAsync(requestGeneratedId, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -73,6 +73,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == transferConcern.TicketConcernId, cancellationToken);
                     if (ticketConcern != null )
                     {
+
+                        if(ticketConcern.UserId == command.UserId) 
+                        {
+                            return Result.Failure(TransferTicketError.InvalidTransferTicket());
+                        }
 
                         var transferTicketAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transferConcern.TicketConcernId
                           && x.IsActive == true && x.IsTransfer == false, cancellationToken);

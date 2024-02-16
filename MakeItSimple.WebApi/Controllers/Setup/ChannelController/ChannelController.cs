@@ -131,7 +131,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpPatch("{id}/status")]
+        [HttpPatch("status/{id}")]
         public async Task<IActionResult> UpdateChannelStatus([FromRoute] int id)
         {
 
@@ -157,12 +157,13 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
         }
 
 
-        [HttpPost("member")]
-        public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
+        [HttpPost("member/{id}")]
+        public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command, [FromRoute] int id)
         {
 
             try
             {
+                command.ChannelId = id;
                 var results = await _mediator.Send(command);
                 if(results.IsFailure)
                 {

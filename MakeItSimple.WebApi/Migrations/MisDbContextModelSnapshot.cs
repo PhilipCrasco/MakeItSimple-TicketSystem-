@@ -804,6 +804,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("re_ticket_remarks");
 
+                    b.Property<DateTime?>("RejectReTicketAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("reject_re_ticket_at");
+
                     b.Property<Guid?>("RejectReTicketBy")
                         .HasColumnType("char(36)")
                         .HasColumnName("reject_re_ticket_by");
@@ -811,10 +815,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<string>("RejectRemarks")
                         .HasColumnType("longtext")
                         .HasColumnName("reject_remarks");
-
-                    b.Property<DateTime?>("RejectTransferAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("reject_transfer_at");
 
                     b.Property<int?>("RequestGeneratorId")
                         .HasColumnType("int")

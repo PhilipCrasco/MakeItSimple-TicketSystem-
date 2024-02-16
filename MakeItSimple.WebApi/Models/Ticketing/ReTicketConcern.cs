@@ -47,7 +47,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User ReTicketByUser { get; set; }
 
         public bool IsRejectReTicket { get; set; }
-        public DateTime? RejectTransferAt { get; set; }
+
+        public DateTime? RejectReTicketAt { get; set; }
         public Guid? RejectReTicketBy { get; set; }
         public virtual User RejectReTicketByUser { get; set; }
         public string RejectRemarks { get; set; }

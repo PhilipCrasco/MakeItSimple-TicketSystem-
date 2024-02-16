@@ -9,7 +9,9 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.ApproveReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.RejectReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicketAttachment;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -132,6 +134,54 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
- 
+
+        [HttpPut("attachment/{id}")]
+        public async Task<IActionResult> UpsertReTicketAttachment([FromForm] UpsertReTicketAttachmentCommand command, [FromRoute] int id)
+        {
+            try
+            {
+                command.RequestGeneratorId = id;
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                    command.Added_By = userId;
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("reject")]
+        public async Task<IActionResult> RejectReTicket([FromBody] RejectReTicketCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.RejectReTicket_By = userId;
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
     }
 }

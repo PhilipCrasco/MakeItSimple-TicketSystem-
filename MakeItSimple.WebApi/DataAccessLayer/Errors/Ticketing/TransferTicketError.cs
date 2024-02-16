@@ -17,6 +17,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error TicketConcernIdAlreadyExist() =>
       new Error("TransferTicketError.TicketConcernIdAlreadyExist", "Ticket concern already exist!");
 
+      public static Error InvalidTransferTicket() =>
+      new Error("TransferTicketError.InvalidTransferTicket", "Invalid transfer to the same user!");
+
       public static Error SubUnitNotExist() =>
       new Error("TransferTicketError.SubUnitNotExist", "Sub unit not exist!");
 

@@ -83,8 +83,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                     
 
-                        
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

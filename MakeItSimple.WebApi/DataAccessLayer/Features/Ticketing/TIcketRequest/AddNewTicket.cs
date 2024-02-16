@@ -86,7 +86,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 var concernList = new List<TicketConcern>();
                 var DateToday = DateTime.Today;
 
-                var addRequestGenerator = new RequestGenerator { };
+                var addRequestGenerator = new RequestGenerator { IsActive = true };
 
 
                 await _context.RequestGenerators.AddAsync(addRequestGenerator, cancellationToken);

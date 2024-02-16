@@ -83,8 +83,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var ticketConcern  = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == transfer.TicketConcernId, cancellationToken);
                     if (ticketConcern == null)
                     {
-
                         return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
+                    }
+
+                    if (ticketConcern.UserId == command.UserId)
+                    {
+                        return Result.Failure(TransferTicketError.InvalidTransferTicket());
                     }
 
                     var transferTicket = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.Id == transfer.TransferTicketConcernId, cancellationToken);

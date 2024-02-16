@@ -60,7 +60,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketIdNotExist.Id, cancellationToken);
 
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
-                var getTicketConcernList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                var getTicketConcernList = await _context.TransferTicketConcerns.Include(x => x.AddedByUser).ThenInclude(x => x.Department).Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
 
                 foreach(var transferTicket in getTicketConcernList)
                 {
@@ -147,8 +147,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 }
 
                 
-
-
                 await Task.WhenAll(uploadTasks);
                 await _context.SaveChangesAsync(cancellationToken);
 

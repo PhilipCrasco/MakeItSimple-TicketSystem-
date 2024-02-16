@@ -22,13 +22,13 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<IActionResult>AddNewApprover([FromBody] AddNewApproverCommand command)
+        [HttpPost("{id}")]
+        public async Task<IActionResult>AddNewApprover([FromBody] AddNewApproverCommand command , [FromRoute] int id)
         {
 
             try
             {
-
+                command.ChannelId = id; 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
@@ -49,7 +49,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 
         }
 
-        [HttpGet]
+        [HttpGet("page")]
         public async Task<IActionResult> GetApprover([FromQuery] GetApproverQuery query)
         {
 
@@ -87,6 +87,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
         {
             try
             {
+
               var results = await _mediator.Send(command);
                 if(results.IsFailure)
                 {

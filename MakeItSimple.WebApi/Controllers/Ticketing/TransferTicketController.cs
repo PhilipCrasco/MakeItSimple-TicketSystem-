@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.ApprovedTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.CancelTransferTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.EditTargetDate;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
@@ -195,7 +194,10 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.RejectTransfer_By = userId;
+                }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
@@ -211,23 +213,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        //[HttpPut("EditTargetDate")]
-        //public async Task<IActionResult> EditTargetDate([FromBody] EditTargetDateCommand command)
-        //{
-        //    try
-        //    {
-        //        var results = await _mediator.Send(command);
-        //        if (results.IsFailure)
-        //        {
-        //            return BadRequest(results);
-        //        }
-        //        return Ok(results);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Conflict(ex.Message);
-        //    }
-        //}
+
 
 
 

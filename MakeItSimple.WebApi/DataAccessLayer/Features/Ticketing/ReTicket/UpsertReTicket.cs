@@ -144,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             TargetDate = reTicket.Target_Date,
                             IsReTicket = false,
                             IsRejectReTicket = false,
-                            RejectTransferAt = null,
+                            RejectReTicketAt = null,
                             RejectReTicketBy = null,
                             TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 

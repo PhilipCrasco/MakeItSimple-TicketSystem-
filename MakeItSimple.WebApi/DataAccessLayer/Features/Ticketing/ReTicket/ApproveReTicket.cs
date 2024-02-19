@@ -12,6 +12,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class ApproveReTicketCommand : IRequest<Result>
         {
             public Guid ? Re_Ticket_By { get; set; }
+            public string Role { get; set; }
+            public Guid? Users { get; set; }
             public List<ApproveReTicketRequest> ApproveReTicketRequests { get; set; }
             public class ApproveReTicketRequest
             {
@@ -28,7 +30,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 _context = context;
             }
 
-            public async  Task<Result> Handle(ApproveReTicketCommand command, CancellationToken cancellationToken)
+            public async Task<Result> Handle(ApproveReTicketCommand command, CancellationToken cancellationToken)
             {
 
                 var dateToday = DateTime.Today;
@@ -45,13 +47,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     var reTicketRequestId = await _context.ApproverTicketings
                         .Where(x => x.RequestGeneratorId == requestTicketExist.Id && x.IsApprove == null).ToListAsync();
 
-
-
                     var selectTransferRequestId = reTicketRequestId.FirstOrDefault(x => x.ApproverLevel == reTicketRequestId.Min(x => x.ApproverLevel));
 
                     if (selectTransferRequestId != null)
                     {
                         selectTransferRequestId.IsApprove = true;
+
+                        if (userReTicket.First().TicketApprover != command.Users)
+                        {
+                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                        }
 
                         var userApprovalId = await _context.ApproverTicketings.Where(x => x.RequestGeneratorId == selectTransferRequestId.RequestGeneratorId).ToListAsync();
 
@@ -81,6 +86,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     {
                         foreach(var concernTicket  in userReTicket)
                         {
+                            if (TicketingConString.ApproverTransfer != command.Role)
+                            {
+                                return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                            }
+
                             concernTicket.IsReTicket = true;
                             concernTicket.ReTicketAt = DateTime.Now;
                             concernTicket.ReTicketBy = command.Re_Ticket_By;

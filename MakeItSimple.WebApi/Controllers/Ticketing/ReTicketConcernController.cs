@@ -53,6 +53,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        query.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                        query.UserId = userId;
+                    }
+                }
                 var ticketRequest = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
@@ -92,9 +106,19 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                if (User.Identity is ClaimsIdentity identity)
                 {
-                    command.Re_Ticket_By = userId;
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Re_Ticket_By = userId;
+                        command.Users = userId;
+                    }
                 }
                 var results = await _mediator.Send(command);
                 if(results.IsFailure)

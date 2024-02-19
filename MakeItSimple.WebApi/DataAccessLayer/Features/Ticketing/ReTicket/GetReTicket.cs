@@ -54,8 +54,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class GetReTicketQuery : UserParams, IRequest<PagedList<GetReTicketResult>>
         {
             public Guid ? UserId { get; set; }
-
             public string Approval { get; set; }
+            public string Users { get; set; }
+            public string Role { get; set; }
 
             public string Search { get; set; }
             public bool ? IsReTicket { get; set; }
@@ -85,38 +86,59 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     .Include(x => x.RejectReTicketByUser)
                     .Include(x => x.ReTicketByUser);
 
-                var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                //var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+
 
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserApproverId, cancellationToken);
-                if (request.UserApproverId != null)
-                {
-                    var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                    var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                    var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
-                    var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                    reTicketQuery = reTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
-
-                }
-
                 var fillterApproval = reTicketQuery.Select(x => x.RequestGeneratorId);
 
-                if (request.Approval == TicketingConString.Approval)
+                if (TicketingConString.Approval == request.Approval)
                 {
 
-                    var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
-
-                    if (approverTransactList != null && approverTransactList.Any())
+                    if (request.UserId != null && TicketingConString.Approver == request.Role)
                     {
-                        var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
-                        reTicketQuery = reTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
+                        var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
+                        var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
+                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                        reTicketQuery = reTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
+
+                    }
+
+                    else if (TicketingConString.Admin == request.Role)
+                    {
+                        var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
+
+                        if (approverTransactList != null && approverTransactList.Any())
+                        {
+                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
+                            reTicketQuery = reTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
+                        }
+
+                    }
+                    else
+                    {
+                        reTicketQuery = reTicketQuery.Where(x => x.RequestGeneratorId == null);
                     }
 
                 }
 
-                if (channeluserExist != null)
+                if (TicketingConString.Users == request.Users)
                 {
-                    reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Fullname == channeluserExist.Fullname);
+                    var channelUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                    if (channelUser != null)
+                    {
+                        if (request.Role == TicketingConString.Requestor || (request.Role == TicketingConString.Approver && request.Approval == null))
+                        {
+                            reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
+                        }
+                        else
+                        {
+                            reTicketQuery = reTicketQuery.Where(x => x.RequestGeneratorId == null);
+                        }
+                    }
                 }
+
                 
                 if(!string.IsNullOrEmpty(request.Search))
                 {

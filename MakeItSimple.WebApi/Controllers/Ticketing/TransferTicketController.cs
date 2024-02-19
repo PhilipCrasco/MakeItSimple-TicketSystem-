@@ -114,9 +114,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-
-
-
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
@@ -148,6 +145,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
                         //query.Users = userId;
+                        query.UserId = userId;
                     }
                 }
 

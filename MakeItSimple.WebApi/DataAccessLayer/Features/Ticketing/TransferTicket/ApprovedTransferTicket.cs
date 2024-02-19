@@ -83,7 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         foreach (var concernTicket in userTranferTicket)
                         {
 
-                            if(TicketingConString.Reciever != command.Role)
+                            if(TicketingConString.ApproverTransfer != command.Role)
                             {
                                 return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                             }

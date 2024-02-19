@@ -13,6 +13,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
        public class ApprovedTransferTicketCommand : IRequest<Result>
         {
             public Guid ? Transfer_By {  get; set; }
+            public string Role { get; set; }
+            public Guid? Users { get; set; }
             public ICollection<ApproveTransferTicket> ApproveTransferTickets { get; set; }
             public class ApproveTransferTicket
             {
@@ -52,6 +54,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         selectTransferRequestId.IsApprove = true;
 
+                        if(userTranferTicket.First().TicketApprover != command.Users)
+                        {
+                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                        }
+
                         var userApprovalId = await _context.ApproverTicketings.Where(x => x.RequestGeneratorId == selectTransferRequestId.RequestGeneratorId).ToListAsync();
 
                         foreach(var concernTicket in userTranferTicket)
@@ -75,6 +82,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         foreach (var concernTicket in userTranferTicket)
                         {
+
+                            if(TicketingConString.Reciever != command.Role)
+                            {
+                                return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                            }
+
                             concernTicket.IsTransfer = true;
                             concernTicket.TransferAt = DateTime.Now;
                             concernTicket.TransferBy = command.Transfer_By;

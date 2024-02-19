@@ -16,6 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
             public int Location_No { get; set; }
             public string Location_Code { get; set; }
             public string Location_Name { get; set; }
+            public string SubUnit_Code { get; set; }
+            public string SubUnit_Name { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -54,6 +56,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     Location_No = x.LocationNo,
                     Location_Code = x.LocationCode,
                      Location_Name = x.LocationName,
+                    SubUnit_Code = x.SubUnit.SubUnitCode,
+                    SubUnit_Name = x.SubUnit.SubUnitName,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,

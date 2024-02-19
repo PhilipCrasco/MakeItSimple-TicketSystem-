@@ -20,6 +20,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error InvalidTransferTicket() =>
       new Error("TransferTicketError.InvalidTransferTicket", "Invalid transfer to the same user!");
 
+      public static Error ApproverUnAuthorized() =>
+      new Error("TransferTicketError.ApproverInvalid", "User not authorize to approve!");
+
       public static Error SubUnitNotExist() =>
       new Error("TransferTicketError.SubUnitNotExist", "Sub unit not exist!");
 

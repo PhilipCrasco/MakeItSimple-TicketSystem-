@@ -71,6 +71,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string Search { get; set; }
             public bool ? Status { get; set; }
 
+            public string Role { get ; set; }
+
             
         }
 

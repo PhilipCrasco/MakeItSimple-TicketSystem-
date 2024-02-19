@@ -110,7 +110,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPut("upsert/{id}")]
+        [HttpPost("upsert/{id}")]
         public async Task<IActionResult> UpsertReTicket([FromBody] UpsertReTicketCommand command ,[FromRoute] int id)
         {
             try
@@ -135,7 +135,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPut("attachment/{id}")]
+        [HttpPost("attachment/{id}")]
         public async Task<IActionResult> UpsertReTicketAttachment([FromForm] UpsertReTicketAttachmentCommand command, [FromRoute] int id)
         {
             try

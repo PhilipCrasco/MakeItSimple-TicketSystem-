@@ -29,8 +29,10 @@ namespace MakeItSimple.WebApi.Common
                 {
                         new Claim("id", user.Id.ToString()),
                         new Claim(ClaimTypes.Name , user.Fullname),                  
-                        new Claim(ClaimTypes.Role , user.UserRole.UserRoleName)                    
+                        new Claim(ClaimTypes.Role , user.UserRole.UserRoleName),
+                        //new Claim("permission" , user.UserRole.Permissions.ToList())
                     }),
+
                 Expires = DateTime.UtcNow.AddDays(1),
 
                 Issuer = issuer,

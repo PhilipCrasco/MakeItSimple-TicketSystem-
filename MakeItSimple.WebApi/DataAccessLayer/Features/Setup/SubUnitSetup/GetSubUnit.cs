@@ -12,6 +12,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
         public class GetSubUnitResult
         {
             public int Id { get; set; }
+
+            public int SubUnit_No { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
             
@@ -22,8 +24,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
             public DateTime? Updated_At { get; set; }
-
             public int No_Of_Channels { get; set; }
+
+            public DateTime SyncDate { get; set; }
+            public string SyncStatus { get; set; }
+
+
 
             public List<User> users { get; set; }
 
@@ -40,6 +46,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 public int ChannelId { get; set; }
                 public string Channel_Name { get; set; }
             } 
+
+
 
         }
 
@@ -77,6 +85,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 var result = subUnitQuery.Select(x => new GetSubUnitResult
                 {
                     Id = x.Id,
+                    SubUnit_No = x.SubUnitNo,
                     SubUnit_Code = x.SubUnitCode,
                     SubUnit_Name = x.SubUnitName,
                     Deparment_Name = x.Department.DepartmentName,
@@ -86,6 +95,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
                     No_Of_Channels = x.Channels.Count(),
+                    SyncDate = x.SyncDate,
+                    SyncStatus = x.SyncStatus,
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
                         UserId = x.Id,

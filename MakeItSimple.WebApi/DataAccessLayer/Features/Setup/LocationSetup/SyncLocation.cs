@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup.SyncCompany;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.SyncSubUnit;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 {
@@ -24,6 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                 public int Location_No { get; set; }
                 public string Location_Code { get; set; }
                 public string Location_Name { get; set; }
+                public string SubUnit_Name { get; set; }
                 public string Sync_Status { get; set; }
                 public DateTime Created_At { get; set; }
                 public DateTime? Update_dAt { get; set; }
@@ -50,9 +52,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                 var DuplicateSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationCodeNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationNameNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
+                var SubUnitNotExist = new List<SyncLocationCommand.LocationResultCommand>();
 
                 foreach (var location in command.locations)
                 {
+                    var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitName == location.SubUnit_Name, cancellationToken);
+                    if (subUnitNotExist == null)
+                    {
+                        SubUnitNotExist.Add(location);
+                        continue;
+                    }
 
                     if (string.IsNullOrEmpty(location.Location_Code))
                     {
@@ -91,6 +100,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                                 hasChanged = true;
                             }
 
+                            if (ExistingLocation.SubUnitId != subUnitNotExist.Id)
+                            {
+                                ExistingLocation.SubUnitId = subUnitNotExist.Id;
+                                hasChanged = true;
+                            }
+
                             if (hasChanged)
                             {
                                 ExistingLocation.UpdatedAt = DateTime.Now;
@@ -115,6 +130,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                                 LocationNo = location.Location_No,
                                 LocationCode = location.Location_Code,
                                 LocationName = location.Location_Name,
+                                SubUnitId = subUnitNotExist.Id,
                                 CreatedAt = DateTime.Now,
                                 AddedBy = command.Added_By,
                                 SyncDate = DateTime.Now,
@@ -146,12 +162,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     DuplicateSync,
                     LocationCodeNullOrEmpty,
                     LocationNameNullOrEmpty,
+                    SubUnitNotExist
 
 
                 };
 
 
-                if (DuplicateSync.Count == 0 && LocationCodeNullOrEmpty.Count == 0 && LocationNameNullOrEmpty.Count == 0)
+                if (DuplicateSync.Count == 0 && LocationCodeNullOrEmpty.Count == 0 && LocationNameNullOrEmpty.Count == 0 && SubUnitNotExist.Count == 0)
                 {
                     await _context.SaveChangesAsync(cancellationToken);
                     return Result.Success("Successfully sync data");

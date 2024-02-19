@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 
 namespace MakeItSimple.WebApi.Models.Setup.LocationSetup
 {
@@ -16,6 +17,9 @@ namespace MakeItSimple.WebApi.Models.Setup.LocationSetup
         public int LocationNo { get; set; }
         public string LocationCode { get; set; }
         public string LocationName { get; set; }
+
+        public int ? SubUnitId { get; set; }    
+        public virtual SubUnit SubUnit { get; set; }
 
         public DateTime SyncDate { get; set; }
 

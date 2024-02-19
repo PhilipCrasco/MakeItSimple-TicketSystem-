@@ -12,6 +12,9 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferAttachment;
+using MakeItSimple.WebApi.Models;
+using MoreLinq.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -112,6 +115,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             try
             {
 
+
+
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
@@ -132,6 +137,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        query.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                    }
+                }
+
                 var transferTicket = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
@@ -170,9 +189,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                
+                if (User.Identity is ClaimsIdentity identity  )
                 {
-                    command.Transfer_By = userId;
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+   
+                    if(Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Transfer_By = userId;
+                        command.Users = userId;
+                    }
                 }
 
                 var results = await _mediator.Send(command);
@@ -194,6 +224,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.RejectTransfer_By = userId;

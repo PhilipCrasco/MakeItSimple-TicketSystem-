@@ -485,6 +485,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
+                    b.Property<int?>("SubUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_id");
+
                     b.Property<DateTime>("SyncDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("sync_date");
@@ -505,6 +509,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_locations_modified_by");
+
+                    b.HasIndex("SubUnitId")
+                        .HasDatabaseName("ix_locations_sub_unit_id");
 
                     b.ToTable("locations", (string)null);
                 });
@@ -593,6 +600,18 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<string>("SubUnitName")
                         .HasColumnType("longtext")
                         .HasColumnName("sub_unit_name");
+
+                    b.Property<int>("SubUnitNo")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_no");
+
+                    b.Property<DateTime>("SyncDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sync_date");
+
+                    b.Property<string>("SyncStatus")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
@@ -1665,9 +1684,16 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_locations_users_modified_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .HasConstraintName("fk_locations_sub_units_sub_unit_id");
+
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+
+                    b.Navigation("SubUnit");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", b =>

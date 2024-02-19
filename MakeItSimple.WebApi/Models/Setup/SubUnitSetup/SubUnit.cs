@@ -18,14 +18,17 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public virtual User AddedByUser { get; set; }
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
+
+        public int SubUnitNo { get; set; }
         public string SubUnitCode { get; set; }
         public string SubUnitName { get; set; }
-
         public int ? DepartmentId { get; set; }
+
+        public DateTime SyncDate { get; set; }
+        public string SyncStatus { get; set; }
+
         public virtual Department Department { get; set; }
-
         public ICollection<Channel> Channels { get; set; }
-
         public ICollection<User> Users { get; set; }
 
     }

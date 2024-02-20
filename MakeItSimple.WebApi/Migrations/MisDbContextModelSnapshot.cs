@@ -1159,6 +1159,52 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_concerns", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("ApproverBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("approver_by");
+
+                    b.Property<string>("Request")
+                        .HasColumnType("longtext")
+                        .HasColumnName("request");
+
+                    b.Property<int?>("RequestGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_generator_id");
+
+                    b.Property<Guid?>("RequestorBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("requestor_by");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("longtext")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("TransactionDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("transaction_date");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_histories");
+
+                    b.HasIndex("ApproverBy")
+                        .HasDatabaseName("ix_ticket_histories_approver_by");
+
+                    b.HasIndex("RequestGeneratorId")
+                        .HasDatabaseName("ix_ticket_histories_request_generator_id");
+
+                    b.HasIndex("RequestorBy")
+                        .HasDatabaseName("ix_ticket_histories_requestor_by");
+
+                    b.ToTable("ticket_histories", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
                 {
                     b.Property<int>("Id")
@@ -2054,6 +2100,32 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ApproverByUser")
+                        .WithMany()
+                        .HasForeignKey("ApproverBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_histories_users_approver_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                        .WithMany("TicketHistories")
+                        .HasForeignKey("RequestGeneratorId")
+                        .HasConstraintName("fk_ticket_histories_request_generators_request_generator_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "RequestorByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestorBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_histories_users_requestor_by_user_id");
+
+                    b.Navigation("ApproverByUser");
+
+                    b.Navigation("RequestGenerator");
+
+                    b.Navigation("RequestorByUser");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -2277,6 +2349,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("TicketAttachments");
 
                     b.Navigation("TicketConcerns");
+
+                    b.Navigation("TicketHistories");
 
                     b.Navigation("TransferTicketConcerns");
                 });

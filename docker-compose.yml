@@ -1,5 +1,7 @@
 version: '3.4'
-
+networks: 
+  makeitsimple.webapi:
+    
 services:
   makeitsimple.webapi:
     image: ${DOCKER_REGISTRY-}makeitsimplewebapi
@@ -9,16 +11,21 @@ services:
     ports:
             - "5000:5000"
             - "5001:5001"
+    depends_on: 
+      - mis.database
+    networks: 
+      - makeitsimple.webapi
 
   mis.database: 
-     image: mcr.microsoft.com/mssql/server:2022-latest
+     image: mysql:8.3.0
      container_name: mis.database
      environment:
-         - ACCEPT_EULA=Y
-         - MSSQL_SA_PASSWORD=philip13
+         - MYSQL_ROOT_PASSWORD=test
+         - DB_HOST=mis
          - DB_NAME=misdb
-         - DB_SA_PASSWORD=philip13 
+     networks:
+       - makeitsimple.webapi
      volumes:
-        - ./.containers/rdf-arcana-db:/var/lib/sqlserver/data
+        - ./.containers/rdf-arcana-db:/var/lib/mysql/data
      ports:
-        - "4232:4232"
+        - "8003:3306"

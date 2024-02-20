@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -14,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public record UpsertTransferTicketCommand : IRequest<Result>
         {  
             public Guid? Added_By { get; set; }
+            public Guid? Requestor_By { get; set; }
             public Guid? Transfer_By { get; set; }
             public Guid? Modified_By { get; set; }
             public int SubUnitId { get; set; }
@@ -181,7 +183,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
 
                     ticketConcern.IsTransfer = false;
-                   
+
+                    if(transferTicket.IsRejectTransfer == true)
+                    {
+                        var addTicketHistory = new TicketHistory
+                        {
+                            RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                            RequestorBy = command.Requestor_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Transfer,
+                            Status = TicketingConString.RequestUpdate
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    }
+
+
                 }
 
 

@@ -2,6 +2,7 @@
 using CloudinaryDotNet.Actions;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -20,6 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
+            public Guid? Requestor_By { get; set; }
 
             public List<TransferFile> TransferFiles { get; set; }
 
@@ -70,6 +72,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     transferTicket.RejectTransferAt = null;
 
                 };
+
+                if(getTicketConcernList.First().IsRejectTransfer == true)
+                {
+
+                        var addTicketHistory = new TicketHistory
+                        {
+                            RequestGeneratorId = ticketIdNotExist.Id,
+                            RequestorBy = command.Requestor_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Transfer,
+                            Status = TicketingConString.RequestUpdate
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    
+                }
+                
+                
 
                 var uploadTasks = new List<Task>();
 

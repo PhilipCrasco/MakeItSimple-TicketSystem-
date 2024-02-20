@@ -22,7 +22,7 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-var connectionString = builder.Configuration.GetConnectionString("DevConnection");
+var connectionString = builder.Configuration.GetConnectionString("TestConnection");
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 builder.Services.AddDbContext<MisDbContext>(x =>
@@ -133,13 +133,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 
 app.UseCors("_clientPermission");
 
 app.UseSwagger();
-app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 

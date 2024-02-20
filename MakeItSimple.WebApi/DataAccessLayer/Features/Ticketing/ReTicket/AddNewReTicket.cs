@@ -37,7 +37,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             {
                 var dateToday = DateTime.Today;
                 var reTicketList = new List<ReTicketConcern>();
-                var requestGeneratorId = new RequestGenerator { };
+                var requestGeneratorId = new RequestGenerator { IsActive = true };
 
                 await _context.RequestGenerators.AddAsync(requestGeneratorId, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -51,10 +51,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             return Result.Failure(ReTicketConcernError.TicketConcernIdNotExist());
                     }
 
-                    switch(await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.Id == reTicket.TicketConcernId && x.IsReTicket != true))
+                    var ticketConcernAlreadyExist = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == reTicket.TicketConcernId 
+                    && x.IsReTicket != true, cancellationToken);
+
+                    if (ticketConcernAlreadyExist != null)
                     {
-                        case not null:
-                            return Result.Success(ReTicketConcernError.TicketConcernIdAlreadyExist);
+                        return Result.Failure(ReTicketConcernError.TicketConcernIdAlreadyExist());
                     }
 
                     if(reTicket.Start_Date > reTicket.Target_Date || dateToday > reTicket.Target_Date)

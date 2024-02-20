@@ -19,8 +19,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
       public static Error ReTicketIdAlreadyExist() =>
       new Error("TransferTicketError.ReTicketIdAlreadyExist", "Re-Ticket request already exist!");
-
-      public static Error DateTimeInvalid() =>
+       public static Error ReTicketIdNotExist() =>
+      new Error("TransferTicketError.ReTicketIdNotExist", "Re-Ticket request not exist!");
+        public static Error DateTimeInvalid() =>
       new Error("ReTicketConcern.DateTimeInvalid", "Invalid start/target date!");
 
       public static Error ApproverUnAuthorized() =>

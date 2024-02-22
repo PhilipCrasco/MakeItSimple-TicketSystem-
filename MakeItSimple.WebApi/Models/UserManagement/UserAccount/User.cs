@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -40,6 +41,9 @@ namespace MakeItSimple.WebApi.Models
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
+        public int? UnitId { get; set; }
+        public virtual Unit Units { get; set; }
+
         public int ? CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
@@ -48,6 +52,8 @@ namespace MakeItSimple.WebApi.Models
 
         public int ? BusinessUnitId { get; set; }
         public virtual BusinessUnit BusinessUnit { get; set; }
+
+
 
 
     }

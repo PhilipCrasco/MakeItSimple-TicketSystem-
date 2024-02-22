@@ -1,4 +1,4 @@
-﻿using MakeItSimple.WebApi.Models.Setup.TeamSetup;
+﻿
 using MakeItSimple.WebApi.Models;
 using MediatR;
 using MakeItSimple.WebApi.Common;

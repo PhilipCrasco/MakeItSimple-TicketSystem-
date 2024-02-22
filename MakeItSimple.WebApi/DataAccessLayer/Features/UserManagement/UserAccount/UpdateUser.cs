@@ -26,6 +26,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             public int? BusinessUnitId { get; set; }
 
+            public int ? UnitId { get; set; }
+
             public Guid ? Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
 
@@ -38,7 +40,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int? DepartmentId { get; set; }
 
             public int ? SubUnitId { get; set; }
-
+            public int? UnitId { get; set; }
             public int? CompanyId { get; set; }
             public int? LocationId { get; set; }
 
@@ -112,6 +114,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.BusinessUnitNotExist());
                 }
 
+                var UnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
+                if (UnitNotExist == null)
+                {
+                    return Result.Failure(UserError.UnitNotExist());
+                }
+
                 var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
                 if (userIsUse == true)
                 {
@@ -124,6 +132,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.CompanyId  = command.CompanyId;
                 user.LocationId = command.LocationId;
                 user.BusinessUnitId = command.BusinessUnitId;
+                user.UnitId = command.UnitId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;
 
@@ -137,7 +146,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     SubUnitId = user.SubUnitId,
                     CompanyId = user.CompanyId,
                     LocationId = user.LocationId,
-                    BusinessUnitId = user.BusinessUnitId    ,    
+                    BusinessUnitId = user.BusinessUnitId,    
+                    UnitId = command.UnitId,
                     Updated_At = user.UpdatedAt,
                     Modified_By = user.ModifiedBy,
                 };

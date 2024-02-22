@@ -15,6 +15,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using MakeItSimple.WebApi.Models;
 using MoreLinq.Extensions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTicketHistory;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -64,6 +65,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
                     command.Added_By = userId;
                     command.Modified_By = userId;
+                    command.Requestor_By= userId;
                 }
 
                 command.RequestGeneratorId = id;
@@ -87,12 +89,22 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+
+                if (User.Identity is ClaimsIdentity identity)
                 {
-                    command.Added_By = userId;
-                    command.Modified_By = userId;
-                    command.Transfer_By = userId;
-                    command.Requestor_By = userId; 
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Added_By = userId;
+                        command.Modified_By = userId;
+                        command.Transfer_By = userId;
+                        command.Requestor_By = userId;
+                    }
                 }
 
                 var results = await _mediator.Send(command);
@@ -202,6 +214,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Transfer_By = userId;
                         command.Users = userId;
+                        command.Approver_By = userId;
+                        command.Requestor_By = userId;
                     }
                 }
 
@@ -246,6 +260,29 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
+
+        [HttpGet("history/{id}")]
+        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
+        {
+            try
+            {
+                var query = new GetTicketHistoryQuery
+                {
+                    RequestGeneratorId = id
+                };
+
+                var results = await _mediator.Send(query);
+                if (results.IsFailure)
+                {
+                    return BadRequest(query);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
 
 
 

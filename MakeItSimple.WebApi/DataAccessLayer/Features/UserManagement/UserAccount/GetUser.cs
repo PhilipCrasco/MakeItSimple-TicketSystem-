@@ -29,6 +29,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string Location_Name { get; set; }
             public string Business_Name { get; set; }
             
+            public string Unit_Name {  get; set; }
             
 
 
@@ -96,6 +97,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Company_Name = x.Company.CompanyName,
                     Location_Name = x.Location.LocationName,
                     Business_Name = x.BusinessUnit.BusinessName,
+                    Unit_Name = x.Units.UnitName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
 
                 });

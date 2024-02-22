@@ -1,6 +1,8 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class RejectReTicketCommand : IRequest<Result>
         {
             public Guid? RejectReTicket_By { get; set; }
+            public Guid? Requestor_By { get; set; }
+            public Guid? Approver_By { get; set; }
             public ICollection<RejectReTicketConcern> RejectReTicketConcerns { get; set; }
             public class RejectReTicketConcern
             {
@@ -47,6 +51,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     var approverLevelValidation = approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
 
 
+
+
                     foreach (var approverUserId in approverUserList)
                     {
                         approverUserId.IsApprove = null;
@@ -61,6 +67,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         perTicketId.TicketApprover = approverLevelValidation.UserId;
                         perTicketId.RejectRemarks = reTicket.Reject_Remarks;
                     }
+
+                    var addTicketHistory = new TicketHistory
+                    {
+                        RequestGeneratorId = requestGeneratorExist.Id,
+                        RequestorBy = reTicketList.First().AddedBy,
+                        ApproverBy = command.Approver_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.ReTicket,
+                        Status = TicketingConString.RejectedBy
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
 
                 }

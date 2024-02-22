@@ -16,14 +16,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
             public int Location_No { get; set; }
             public string Location_Code { get; set; }
             public string Location_Name { get; set; }
-            public string SubUnit_Code { get; set; }
-            public string SubUnit_Name { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
             public DateTime? Updated_At { get; set; }
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
+
+            public ICollection<SubUnit> SubUnits { get; set; }
+
+            public class SubUnit
+            {
+                public int Id {get; set; }
+                public string SubUnit_Name { get; set; }
+            }
         }
 
         public class GetLocationQuery : UserParams , IRequest<PagedList<GetLocationResult>>
@@ -42,7 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 
             public async Task<PagedList<GetLocationResult>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Location> locationQuery = _context.Locations.Include(x => x.AddedByUser).Include(x => x.ModifiedByUser);
+                IQueryable<Location> locationQuery = _context.Locations.Include(x => x.AddedByUser).Include(x => x.ModifiedByUser).Include(x => x.SubUnits);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -56,14 +62,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     Location_No = x.LocationNo,
                     Location_Code = x.LocationCode,
                      Location_Name = x.LocationName,
-                    SubUnit_Code = x.SubUnit.SubUnitCode,
-                    SubUnit_Name = x.SubUnit.SubUnitName,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
+                    SubUnits = x.SubUnits.Select(x => new GetLocationResult.SubUnit
+                    {
+                        Id = x.Id,
+                        SubUnit_Name = x.SubUnitName
+
+                    }).ToList(),
 
                 });
 

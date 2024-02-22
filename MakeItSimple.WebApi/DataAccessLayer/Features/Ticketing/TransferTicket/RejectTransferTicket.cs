@@ -52,8 +52,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                     var approverLevelValidation =  approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
 
+                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.RequestGeneratorId == x.RequestGeneratorId).ToListAsync();
+                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
-                    foreach(var approverUserId in approverUserList)
+                    foreach (var approverUserId in approverUserList)
                     {
                         approverUserId.IsApprove = null;
                     }
@@ -67,6 +69,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         perTicketId.TicketApprover = approverLevelValidation.UserId;
                         perTicketId.RejectRemarks = transferTicket.Reject_Remarks;
                     }
+
 
                     var addTicketHistory = new TicketHistory
                     {

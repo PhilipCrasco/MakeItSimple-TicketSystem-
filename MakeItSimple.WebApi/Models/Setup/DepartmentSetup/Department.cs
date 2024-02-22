@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using System.ComponentModel.DataAnnotations;
 
 namespace MakeItSimple.WebApi.Models.Setup.DepartmentSetup
@@ -20,7 +21,7 @@ namespace MakeItSimple.WebApi.Models.Setup.DepartmentSetup
         public DateTime SyncDate { get; set ; }
         public string SyncStatus { get; set ; }
         
-        public ICollection<SubUnit> SubUnits { get; set ; }
+        public ICollection<Unit> Units { get; set ; }
         public ICollection<User> Users { get; set ; }
         
        

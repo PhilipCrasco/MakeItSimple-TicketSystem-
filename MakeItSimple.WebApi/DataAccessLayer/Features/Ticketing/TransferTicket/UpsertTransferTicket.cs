@@ -3,6 +3,7 @@ using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
+using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferTicket.UpsertTransferTicketCommand;
@@ -21,6 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
+            public string Role { get; set; }
             public string TransferRemarks { get; set; }
             public int ? RequestGeneratorId {  get; set; }
             public List<UpsertTransferTicketConcern> UpsertTransferTicketConcerns { get; set; }
@@ -45,8 +47,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(UpsertTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
-                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                var transferUpdateList = new List<bool>(); 
+                var transferNewList = new List<TransferTicketConcern>();
 
+                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                var requestTransferList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
                 if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
@@ -103,6 +108,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
                         }
 
+                        if(transferTicket.IsTransfer == true && command.Role != TicketingConString.Admin)
+                        {
+                            return Result.Failure(TransferTicketError.UpdateUnAuthorized());
+                        }
+
                         bool HasChange = false;
 
                         if(transferTicket.SubUnitId != command.SubUnitId)
@@ -132,12 +142,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         {
                             transferTicket.ModifiedBy = command.Modified_By;
                             transferTicket.UpdatedAt = DateTime.Now;
-                            transferTicket.IsRejectTransfer = false;
                             transferTicket.IsTransfer = false;
-                            transferTicket.RejectTransferAt = null;
-                            transferTicket.RejectTransferBy = null;
-
+   
                         }
+
+                        transferUpdateList.Add(HasChange);
+                        
 
                     }
                     else if(ticketConcern != null && transferTicket is null)
@@ -163,44 +173,48 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,
                             TargetDate = ticketConcern.TargetDate,
-                            //TransferBy = command.Transfer_By,
-                            //TransferAt = DateTime.Now,
                             IsTransfer = false,
-                            IsRejectTransfer = false,
-                            RejectTransferAt = null,
-                            RejectTransferBy = null,
                             TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 
                         };
 
-
-
+                        ticketConcern.IsTransfer = false;
                         await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
+                        transferNewList.Add(addTransferTicket);
                     }
                     else
                     {
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
-                    ticketConcern.IsTransfer = false;
+                }
 
-                    if(transferTicket.IsRejectTransfer == true)
+                if ((requestTransferList.First().IsRejectTransfer == true && transferUpdateList.First() == true) 
+                    || (transferNewList.Count > 0 && requestTransferList.First().IsRejectTransfer == true))
+                {
+
+                    var addTicketHistory = new TicketHistory
                     {
-                        var addTicketHistory = new TicketHistory
-                        {
-                            RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
-                            RequestorBy = command.Requestor_By,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Transfer,
-                            Status = TicketingConString.RequestUpdate
-                        };
+                        RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                        RequestorBy = command.Requestor_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Transfer,
+                        Status = TicketingConString.RequestUpdate,
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                    foreach (var ticketHistory in requestTransferList)
+                    {
+                        ticketHistory.IsRejectTransfer = false;
+                        ticketHistory.RejectTransferAt = null;
+
+                        ticketHistory.RejectTransferBy = null;
                     }
 
 
                 }
-
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

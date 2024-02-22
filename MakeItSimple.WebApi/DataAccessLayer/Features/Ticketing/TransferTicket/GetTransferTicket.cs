@@ -144,14 +144,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var channelUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     if (channelUser != null)
                     {
-                        if (request.Role == TicketingConString.Requestor || (request.Role == TicketingConString.Approver && request.Approval == null))
-                        {
-                            transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
-                        }
-                        else
-                        {
-                            transferTicketQuery = transferTicketQuery.Where(x => x.RequestGeneratorId == null);
-                        }
+                        transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
+
+                        //if (request.Role ==TicketingConString.Requestor || (request.Role == TicketingConString.Approver && request.Approval == null))
+                        //{
+                        //    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
+                        //}
+                        //else
+                        //{
+                        //    transferTicketQuery = transferTicketQuery.Where(x => x.RequestGeneratorId == null);
+                        //}
                     }
                 }
 

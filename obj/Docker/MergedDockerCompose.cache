@@ -4,12 +4,16 @@ services:
     build:
       context: E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)
       dockerfile: MakeItSimple.WebApi/Dockerfile
+    depends_on:
+      mis.database:
+        condition: service_started
+        required: true
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:5000;http://+:5001
     image: makeitsimplewebapi
     networks:
-      default: null
+      makeitsimple.webapi: null
     ports:
       - mode: ingress
         target: 5000
@@ -41,24 +45,23 @@ services:
   mis.database:
     container_name: mis.database
     environment:
-      ACCEPT_EULA: "Y"
+      DB_HOST: mis
       DB_NAME: misdb
-      DB_SA_PASSWORD: philip13
-      MSSQL_SA_PASSWORD: philip13
-    image: mcr.microsoft.com/mssql/server:2022-latest
+      MYSQL_ROOT_PASSWORD: test
+    image: mysql:8.3.0
     networks:
-      default: null
+      makeitsimple.webapi: null
     ports:
       - mode: ingress
-        target: 4232
-        published: "4232"
+        target: 3306
+        published: "8003"
         protocol: tcp
     volumes:
       - type: bind
         source: E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\.containers\rdf-arcana-db
-        target: /var/lib/sqlserver/data
+        target: /var/lib/mysql/data
         bind:
           create_host_path: true
 networks:
-  default:
-    name: dockercompose15825787739157144358_default
+  makeitsimple.webapi:
+    name: dockercompose15825787739157144358_makeitsimple.webapi

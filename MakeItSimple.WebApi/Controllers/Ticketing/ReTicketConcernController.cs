@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.ApproveReTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.CancelReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.RejectReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicket;
@@ -34,6 +35,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
+                    command.Requestor_By = userId;  
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -192,7 +194,27 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.RejectReTicket_By = userId;
+                    command.Approver_By = userId;
                 }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("cancel")]
+        public async Task<IActionResult> CancelReTicket([FromBody]CancelReTicketCommand command)
+        {
+            try
+            {
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

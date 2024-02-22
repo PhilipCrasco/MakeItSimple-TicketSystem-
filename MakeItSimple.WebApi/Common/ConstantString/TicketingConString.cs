@@ -5,10 +5,11 @@
 
         public const string Approval = "Approval";
         public const string Users = "Users";
+
         public const string Transfer = "Transfer Ticket";
         public const string ReTicket = "Re-Ticket";
 
-        public const string ApproverTransfer = "Admin"; 
+        public const string ApproverTransfer = "Admin";
 
         // Ticketing Role
 
@@ -22,6 +23,8 @@
         public const string RequestCreated = "Request was created";
         public const string RejectedBy = "Request was rejected";
         public const string RequestUpdate = "Request Updated";
-       
+        public const string ApproveBy = "Request approve by ";
+        public const string RecieverApproveBy = "Request has been approved by Admin";
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -14,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class AddNewReTicketCommand : IRequest<Result>
         {
             public string Re_Ticket_Remarks { get; set; }
+            public Guid? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public List<AddReTicketConcern> AddReTicketConcerns { get; set; }
             public class AddReTicketConcern
@@ -113,12 +115,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         ApproverLevel = approver.ApproverLevel,
                         AddedBy = command.Added_By,
                         CreatedAt = DateTime.Now,
-                        Status = "ReTicket",
+                        Status = TicketingConString.ReTicket,
 
                     };
 
                     await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                 }
+
+                var addTicketHistory = new TicketHistory
+                {
+                    RequestGeneratorId = requestGeneratorId.Id,
+                    RequestorBy = command.Requestor_By,
+                    TransactionDate = DateTime.Now,
+                    Request = TicketingConString.ReTicket,
+                    Status = TicketingConString.RequestCreated
+                };
+
+                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
 

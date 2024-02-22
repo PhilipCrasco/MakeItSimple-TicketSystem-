@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
@@ -23,6 +24,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public int SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
+
+        public int ? UnitId { get; set; }
+        public virtual Unit Unit { get; set; }
 
         public int ChannelId { get; set; }
         public virtual Channel Channel { get; set; }

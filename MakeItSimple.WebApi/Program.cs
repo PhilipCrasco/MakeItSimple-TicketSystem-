@@ -22,7 +22,7 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-var connectionString = builder.Configuration.GetConnectionString("TestConnection");
+var connectionString = builder.Configuration.GetConnectionString("DevConnection");
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 builder.Services.AddDbContext<MisDbContext>(x =>

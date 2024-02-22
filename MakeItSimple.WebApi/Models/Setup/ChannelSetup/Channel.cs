@@ -1,7 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.AddNewSubUnit;
 
 
 namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup

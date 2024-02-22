@@ -19,6 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
             public int ? SubUnitId {  get; set; }
+            public int? UnitId { get; set; }
             public int ? CompanyId { get; set; }
             public int ? LocationId { get; set; }
 
@@ -36,8 +37,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string Username { get; set; }
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
-
             public int ? SubUnitId { get; set; }
+
+            public int ? UnitId { get; set; }
 
             public int? CompanyId { get; set; }
             public int? LocationId { get; set; }
@@ -116,6 +118,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.BusinessUnitNotExist());
                 }
 
+                var UnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
+                if (UnitNotExist == null)
+                {
+                    return Result.Failure(UserError.UnitNotExist());
+                }
+
 
                 var users = new User
                 {
@@ -129,7 +137,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     DepartmentId = command.DepartmentId,    
                     CompanyId = command.CompanyId,  
                     LocationId = command.LocationId,
-                    BusinessUnitId = command.BusinessUnitId,    
+                    BusinessUnitId = command.BusinessUnitId,  
+                    UnitId = command.UnitId,
                     AddedBy = command.Added_By,
 
                     
@@ -150,6 +159,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     CompanyId = users.CompanyId,
                     LocationId = users.LocationId,
                     BusinessUnitId = users.BusinessUnitId,
+                    UnitId = users.UnitId,  
                     Added_By = users.AddedBy
                 };
 

@@ -26,7 +26,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 public int SubUnit_No { get; set; }
                 public string SubUnit_Code { get; set; }
                 public string SubUnit_Name { get; set; }
-                public string Department_Name { get; set; }
+                public string Unit_Name { get; set; }
+
+                public string Location_Name { get; set; }
                 public string Sync_Status { get; set; }
                 public DateTime Created_At { get; set; }
                 public DateTime? Update_dAt { get; set; }
@@ -52,14 +54,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 var DuplicateSync = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
                 var SubUnitCodeNullOrEmpty = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
                 var SubUnitNameNullOrEmpty = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
-                var DepartmentNotExist = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
+                var UnitNotExist = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
+                var LocationNotExist = new List<SyncSubUnitCommand.SyncSubUnitsResult>();
 
                 foreach (var subUnit in command.SyncSubUnitsResults)
                 {
-                    var departmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.DepartmentName == subUnit.Department_Name , cancellationToken);
-                    if (departmentNotExist == null)
+                    var unitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.UnitName == subUnit.Unit_Name , cancellationToken);
+                    if (unitNotExist == null)
                     {
-                        DepartmentNotExist.Add(subUnit);
+                        UnitNotExist.Add(subUnit);
+                        continue;
+                    }
+
+                    var locationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationName == subUnit.Location_Name, cancellationToken);
+                    if (locationNotExist == null)
+                    {
+                        LocationNotExist.Add(subUnit);
                         continue;
                     }
 
@@ -98,9 +108,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                                 hasChanged = true;
                             }
 
-                            if (ExistingSubUnit.DepartmentId != departmentNotExist.Id)
+                            if (ExistingSubUnit.UnitId != unitNotExist.Id)
                             {
-                                ExistingSubUnit.DepartmentId = departmentNotExist.Id;
+                                ExistingSubUnit.UnitId = unitNotExist.Id;
+                                hasChanged = true;
+                            }
+
+                            if (ExistingSubUnit.LocationId != locationNotExist.Id)
+                            {
+                                ExistingSubUnit.LocationId = locationNotExist.Id;
                                 hasChanged = true;
                             }
 
@@ -128,7 +144,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                                 SubUnitNo = subUnit.SubUnit_No,
                                 SubUnitCode = subUnit.SubUnit_Code,
                                 SubUnitName = subUnit.SubUnit_Name,
-                                DepartmentId = departmentNotExist.Id,
+                                UnitId = unitNotExist.Id,
+                                LocationId = locationNotExist.Id,
                                 CreatedAt = DateTime.Now,
                                 AddedBy = command.Added_By,
                                 SyncDate = DateTime.Now,
@@ -160,12 +177,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                     DuplicateSync,
                     SubUnitCodeNullOrEmpty,
                     SubUnitNameNullOrEmpty,
-                    DepartmentNotExist
+                    UnitNotExist,
+                    LocationNotExist
 
                 };
 
 
-                if (DuplicateSync.Count == 0 && DepartmentNotExist.Count == 0 && SubUnitCodeNullOrEmpty.Count == 0 && SubUnitNameNullOrEmpty.Count == 0)
+                if (DuplicateSync.Count == 0 && UnitNotExist.Count == 0 && SubUnitCodeNullOrEmpty.Count == 0 && SubUnitNameNullOrEmpty.Count == 0 && LocationNotExist.Count == 0)
                 {
                     await _context.SaveChangesAsync(cancellationToken);
                     return Result.Success("Successfully sync data");

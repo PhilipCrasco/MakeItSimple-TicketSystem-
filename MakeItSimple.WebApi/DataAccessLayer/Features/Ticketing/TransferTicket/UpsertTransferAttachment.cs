@@ -51,6 +51,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(UpserTransferAttachmentCommand command, CancellationToken cancellationToken)
             {
+
+                var transferUpdateList = new List<bool>();
+                var transferNewList = new List<TicketAttachment>();
+
                 var ticketIdNotExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
                 if (ticketIdNotExist == null)
                 {
@@ -64,38 +68,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
                 var getTicketConcernList = await _context.TransferTicketConcerns.Include(x => x.AddedByUser).ThenInclude(x => x.Department).Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
 
-                foreach(var transferTicket in getTicketConcernList)
-                {
-                    transferTicket.IsTransfer = false;
-                    transferTicket.IsRejectTransfer = false;
-                    transferTicket.RejectTransferBy = null;
-                    transferTicket.RejectTransferAt = null;
-
-                };
-
-                if(getTicketConcernList.First().IsRejectTransfer == true)
-                {
-
-                        var addTicketHistory = new TicketHistory
-                        {
-                            RequestGeneratorId = ticketIdNotExist.Id,
-                            RequestorBy = command.Requestor_By,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Transfer,
-                            Status = TicketingConString.RequestUpdate
-                        };
-
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-                    
-                }
-                
-                
+                var ticketHistoryList = await _context.TicketHistories.Where(x => x.RequestGeneratorId == x.RequestGeneratorId).ToListAsync();
+                var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id) );
 
                 var uploadTasks = new List<Task>();
 
                 foreach (var attachments in command.TransferFiles.Where(attachments => attachments.Attachment.Length > 0))
                 {
-
 
                     var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketAttachmentId);
 
@@ -147,7 +126,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                 ticketAttachment.UpdatedAt = DateTime.Now;
 
                             }
-
+                            transferUpdateList.Add(hasChanged);
                         }
                         else
                         {
@@ -159,15 +138,43 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             };
 
                             await _context.AddAsync(addAttachment, cancellationToken);
-
+                            transferNewList.Add(addAttachment);   
                         }
 
                     }, cancellationToken));
 
                 }
 
-                
                 await Task.WhenAll(uploadTasks);
+
+                if ((getTicketConcernList.First().IsRejectTransfer == true && transferUpdateList.Count > 0) 
+                    || (transferNewList.Count > 0 && getTicketConcernList.First().IsRejectTransfer == true))
+                {
+                    if (ticketHistoryId.Status != TicketingConString.ApproveBy)
+                    {
+                        var addTicketHistory = new TicketHistory
+                        {
+                            RequestGeneratorId = ticketIdNotExist.Id,
+                            RequestorBy = command.Requestor_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Transfer,
+                            Status = TicketingConString.RequestUpdate
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                        foreach (var transferTicket in getTicketConcernList)
+                        {
+                            transferTicket.IsTransfer = false;
+                            transferTicket.IsRejectTransfer = false;
+                            transferTicket.RejectTransferBy = null;
+                            transferTicket.RejectTransferAt = null;
+
+                        };
+                    }
+                }
+
+
                 await _context.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();

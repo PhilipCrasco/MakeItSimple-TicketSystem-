@@ -128,14 +128,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     var channelUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     if (channelUser != null)
                     {
-                        if (request.Role == TicketingConString.Requestor || (request.Role == TicketingConString.Approver && request.Approval == null))
-                        {
-                            reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
-                        }
-                        else
-                        {
-                            reTicketQuery = reTicketQuery.Where(x => x.RequestGeneratorId == null);
-                        }
+                        
+                       reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
+                        
                     }
                 }
 

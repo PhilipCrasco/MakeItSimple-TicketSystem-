@@ -22,12 +22,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
 
-            public List<SubUnit> subUnits { get; set; }
+            public List<Unit> Units { get; set; }
 
-            public class SubUnit
+            public class Unit
             {
-                public int SubUnitId { get; set; }
-                public string SubUnit_Name { get; set; }
+                public int UnitId { get; set; }
+                public string Unit_Name { get; set; }
             }
 
     
@@ -54,7 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
 
             public async Task<PagedList<GetDepartmentResult>> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.SubUnits)
+                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.Units)
                     .Include(x => x.Users).Include(x => x.ModifiedByUser).Include(x => x.AddedByUser);
                 
 
@@ -76,10 +76,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
-                    subUnits = x.SubUnits.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.SubUnit
+                    Units = x.Units.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.Unit
                     {
-                        SubUnitId = x.Id,
-                        SubUnit_Name = x.SubUnitName,
+                        UnitId = x.Id,
+                        Unit_Name = x.UnitName,
 
                     }).ToList()
                     

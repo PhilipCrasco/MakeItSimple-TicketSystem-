@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -16,6 +17,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public Guid? Modified_By { get; set; }
             public int ? RequestGeneratorId { get; set; }
             public string Re_Ticket_Remarks { get; set; }
+            public Guid? Requestor_By { get; set; }
+            public string Role { get; set; }
             public List<UpsertReTicketConsern> UpsertReTicketConserns {  get; set; }
 
             public class UpsertReTicketConsern
@@ -41,8 +44,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public async Task<Result> Handle(UpsertReTicketCommand command, CancellationToken cancellationToken)
             {
 
-                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                var transferUpdateList = new List<bool>();
+                var transferNewList = new List<ReTicketConcern>();
 
+                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                var requestReTicketList = await _context.ReTicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
                 if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(ReTicketConcernError.TicketIdNotExist());
@@ -55,10 +61,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 {
                     return Result.Failure(ReTicketConcernError.ReTicketConcernUnable());
                 }
-                //else if(command.UpsertReTicketConserns.Count == 0)
-                //{
-                //  return 
-                //}
+
+                if(requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin)
+                {
+                    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
+                }
 
                 foreach (var reTicket in command.UpsertReTicketConserns)
                 {
@@ -113,13 +120,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         {
                             reTicketConcern.ModifiedBy = command.Modified_By;
                             reTicketConcern.UpdatedAt = DateTime.Now;
-                            reTicketConcern.IsRejectReTicket = false;
                             reTicketConcern.IsReTicket = false;
                             reTicketConcern.ReTicketAt = null;
                             reTicketConcern.ReTicketBy = null;
 
+
                         }
 
+                        transferUpdateList.Add(HasChange);
                     }
                     else if (ticketConcern != null && reTicketConcern is null)
                     {
@@ -143,26 +151,52 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             StartDate = reTicket.Start_Date,
                             TargetDate = reTicket.Target_Date,
                             IsReTicket = false,
-                            IsRejectReTicket = false,
-                            RejectReTicketAt = null,
-                            RejectReTicketBy = null,
                             TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 
                         };
 
 
-
+                        ticketConcern.IsReTicket = false;
                         await _context.ReTicketConcerns.AddAsync(addReTicket, cancellationToken);
+                        transferNewList.Add(addReTicket);
+
+
                     }
                     else
                     {
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
-                    ticketConcern.IsReTicket = false;
+
                 }
 
-                await _context.SaveChangesAsync();
+                if ((requestReTicketList.First().IsRejectReTicket == true && transferUpdateList.First() == true)
+                     || (transferNewList.Count > 0 && requestReTicketList.First().IsRejectReTicket == true))
+                {
+
+                    var addTicketHistory = new TicketHistory
+                    {
+                        RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                        RequestorBy = command.Requestor_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.ReTicket,
+                        Status = TicketingConString.RequestUpdate,
+
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                    foreach (var ticketHistory in requestReTicketList)
+                    {
+                        ticketHistory.IsRejectReTicket = false;
+                        ticketHistory.RejectReTicketAt = null;
+                        ticketHistory.RejectReTicketBy = null;
+                    }
+
+
+                }
+
+                await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }
         }

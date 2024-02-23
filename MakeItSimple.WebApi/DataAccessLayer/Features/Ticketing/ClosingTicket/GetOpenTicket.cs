@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Common.Pagination;
+﻿using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -33,6 +34,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosingTicket
             public bool ? Status { get; set; }
             public string Search { get; set; }
 
+            public string Request { get; set; }
+
+            public string Users { get; set; }
+
             public Guid ? UserId { get; set; }
         }
 
@@ -60,11 +65,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosingTicket
 
 
 
-                var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                //var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
-                if (channeluserExist != null)
+                if (request.Users == TicketingConString.Users)
                 {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
+                    ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
                 }
 
                 if (!string.IsNullOrEmpty(request.Search))
@@ -74,13 +79,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosingTicket
 
                 }
 
-                if(request.Status != null)
+                if (request.Request == TicketingConString.ReTicket)
+                {
+                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReTicket == false && x.IsApprove == true);
+                }
+
+                else if (request.Request == TicketingConString.Transfer)
+                {
+                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer == false && x.IsApprove == true);
+                }
+
+                else if (request.Request == TicketingConString.Open)
+                {
+                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer != false && x.IsReTicket != false && x.IsApprove == true);
+                }
+
+                if (request.Status != null)
                 {
                     ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                 }
 
                 var results = ticketConcernQuery.Where(x => x.IsApprove == true 
-                && x.IsClosedApprove == null).OrderBy(x => x.Id)
+                && x.IsClosedApprove != true).OrderBy(x => x.Id)
                     .Select(x => new GetOpenTicketResult
                     {
                         TicketConcernId = x.Id,

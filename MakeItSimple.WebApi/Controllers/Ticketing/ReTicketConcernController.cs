@@ -120,6 +120,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Re_Ticket_By = userId;
                         command.Users = userId;
+                        command.Approver_By = userId;
+                        command.Requestor_By = userId;
                     }
                 }
                 var results = await _mediator.Send(command);
@@ -142,10 +144,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             try
             {
                 command.RequestGeneratorId = id;
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                if (User.Identity is ClaimsIdentity identity)
                 {
-                    command.Modified_By = userId;
-                    command.Added_By = userId;
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Modified_By = userId;
+                        command.Added_By = userId;
+                        command.Requestor_By = userId;
+                    }
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -171,7 +183,9 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
                     command.Modified_By = userId;
                     command.Added_By = userId;
+                    command.Requestor_By = userId;
                 }
+
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
@@ -191,10 +205,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+
+                if (User.Identity is ClaimsIdentity identity)
                 {
-                    command.RejectReTicket_By = userId;
-                    command.Approver_By = userId;
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.RejectReTicket_By = userId;
+                        command.Approver_By = userId;
+                    }
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)

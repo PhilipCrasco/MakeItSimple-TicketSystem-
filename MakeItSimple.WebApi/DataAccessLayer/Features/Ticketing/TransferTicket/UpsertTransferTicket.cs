@@ -57,7 +57,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
-            
+                if (requestTransferList.First().IsTransfer == true && command.Role != TicketingConString.Admin)
+                {
+                    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
+                }
+
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
                 {
                     case null:
@@ -106,11 +110,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         if (ticketConcernAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
-                        }
-
-                        if(transferTicket.IsTransfer == true && command.Role != TicketingConString.Admin)
-                        {
-                            return Result.Failure(TransferTicketError.UpdateUnAuthorized());
                         }
 
                         bool HasChange = false;

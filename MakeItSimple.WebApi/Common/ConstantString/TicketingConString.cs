@@ -8,6 +8,7 @@
 
         public const string Transfer = "Transfer Ticket";
         public const string ReTicket = "Re-Ticket";
+        public const string Open = "Open Ticket";
 
         public const string ApproverTransfer = "Admin";
 

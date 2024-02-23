@@ -2,6 +2,7 @@
 using CloudinaryDotNet.Actions;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -16,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class UpsertReTicketAttachmentCommand : IRequest<Result>
         {
             public int? RequestGeneratorId { get; set; }
-
+            public Guid? Requestor_By { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
 
@@ -47,6 +48,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
             public async Task<Result> Handle(UpsertReTicketAttachmentCommand command, CancellationToken cancellationToken)
             {
+
+
+                var transferUpdateList = new List<bool>();
+                var transferNewList = new List<TicketAttachment>();
+
                 var ticketIdNotExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
                 if (ticketIdNotExist == null)
                 {
@@ -58,16 +64,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 .FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketIdNotExist.Id, cancellationToken);
 
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+
                 var getTicketConcernList = await _context.ReTicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
 
-                foreach (var transferTicket in getTicketConcernList)
-                {
-                    transferTicket.IsReTicket = false;
-                    transferTicket.IsReTicket = false;
-                    transferTicket.RejectReTicketBy = null;
-                    transferTicket.RejectReTicketAt = null;
-
-                };
+                var ticketHistoryList = await _context.TicketHistories.Where(x => x.RequestGeneratorId == x.RequestGeneratorId).ToListAsync();
+                var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                 var uploadTasks = new List<Task>();
 
@@ -125,7 +126,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                                 ticketAttachment.UpdatedAt = DateTime.Now;
 
                             }
-
+                            transferUpdateList.Add(hasChanged);
                         }
                         else
                         {
@@ -137,7 +138,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             };
 
                             await _context.AddAsync(addAttachment, cancellationToken);
-
+                            transferNewList.Add(addAttachment);
                         }
 
                     }, cancellationToken));
@@ -145,6 +146,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 }
 
                 await Task.WhenAll(uploadTasks);
+
+                if ((getTicketConcernList.First().IsRejectReTicket == true && transferUpdateList.Count > 0)
+                   || (transferNewList.Count > 0 && getTicketConcernList.First().IsRejectReTicket == true))
+                {
+                    if (ticketHistoryId.Status != TicketingConString.ApproveBy || ticketHistoryId.Status != TicketingConString.RequestCreated)
+                    {
+                        var addTicketHistory = new TicketHistory
+                        {
+                            RequestGeneratorId = ticketIdNotExist.Id,
+                            RequestorBy = command.Requestor_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.ReTicket,
+                            Status = TicketingConString.RequestUpdate
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                        foreach (var transferTicket in getTicketConcernList)
+                        {
+
+                            transferTicket.IsReTicket = false;
+                            transferTicket.IsReTicket = false;
+                            transferTicket.RejectReTicketBy = null;
+                            transferTicket.RejectReTicketAt = null;
+
+                        };
+                    }
+                }
+
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

@@ -17,6 +17,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid ? RejectTransfer_By { get; set; }
             public Guid ? Requestor_By { get; set; }
             public Guid ? Approver_By { get; set; }
+
+            public string Role { get; set; }
+
             public ICollection<RejectTransferTicket> RejectTransferTickets { get; set; }
             public class RejectTransferTicket
             {
@@ -70,18 +73,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         perTicketId.RejectRemarks = transferTicket.Reject_Remarks;
                     }
 
-
-                    var addTicketHistory = new TicketHistory
+                    if (ticketHistoryId.Status != TicketingConString.RejectedBy)
                     {
-                        RequestGeneratorId = requestGeneratorExist.Id,
-                        RequestorBy = transferTicketList.First().AddedBy,
-                        ApproverBy = command.Approver_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Transfer,
-                        Status = TicketingConString.RejectedBy
-                    };
+                        var addTicketHistory = new TicketHistory
+                        {
+                            RequestGeneratorId = requestGeneratorExist.Id,
+                            RequestorBy = transferTicketList.First().AddedBy,
+                            ApproverBy = command.Approver_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Transfer,
+                            Status = TicketingConString.RejectedBy
+                        };
 
-                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);  
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    }
 
                 }
                 await _context.SaveChangesAsync(cancellationToken);

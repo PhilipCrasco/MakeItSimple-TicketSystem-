@@ -140,7 +140,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             await _context.AddAsync(addAttachment, cancellationToken);
                             transferNewList.Add(addAttachment);   
                         }
-
+                        
                     }, cancellationToken));
 
                 }
@@ -150,7 +150,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 if ((getTicketConcernList.First().IsRejectTransfer == true && transferUpdateList.Count > 0) 
                     || (transferNewList.Count > 0 && getTicketConcernList.First().IsRejectTransfer == true))
                 {
-                    if (ticketHistoryId.Status != TicketingConString.ApproveBy)
+                    if (ticketHistoryId.Status != TicketingConString.ApproveBy || ticketHistoryId.Status != TicketingConString.RequestCreated)
                     {
                         var addTicketHistory = new TicketHistory
                         {

@@ -61,7 +61,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public string Search { get; set; }
             public bool ? IsReTicket { get; set; }
             public bool ? IsReject { get ; set; }
-            public Guid? UserApproverId { get; set; }
 
         }
 
@@ -89,7 +88,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 //var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
 
-                var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserApproverId, cancellationToken);
+                var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var fillterApproval = reTicketQuery.Select(x => x.RequestGeneratorId);
 
                 if (TicketingConString.Approval == request.Approval)
@@ -143,7 +142,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 if(request.IsReject != null)
                 {
-                    reTicketQuery = reTicketQuery.Where(x => x.IsReTicket == request.IsReject);
+                    reTicketQuery = reTicketQuery.Where(x => x.IsRejectReTicket  == request.IsReject);
                 }
 
                 if (request.IsReTicket != null)

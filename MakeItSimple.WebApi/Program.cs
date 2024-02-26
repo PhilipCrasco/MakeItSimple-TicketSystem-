@@ -27,7 +27,9 @@ var connectionString = builder.Configuration.GetConnectionString("DevConnection"
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 builder.Services.AddDbContext<MisDbContext>(x =>
 {
-    if (connectionString != null) x.UseMySql(connectionString, serverVersion).UseSnakeCaseNamingConvention();
+    if (connectionString != null) x.UseMySql(connectionString, serverVersion)
+        .UseSnakeCaseNamingConvention()
+        .EnableSensitiveDataLogging();
 });
 
 builder.Services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly);

@@ -160,6 +160,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         //query.Users = userId;
                         query.UserId = userId;
+                        
                     }
                 }
 

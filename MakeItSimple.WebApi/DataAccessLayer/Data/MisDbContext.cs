@@ -57,12 +57,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
         
         public virtual DbSet<ReTicketConcern> ReTicketConcerns { get; set; }
+        public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
 
         public virtual DbSet<ApproverTicketing> ApproverTicketings { get; set; }
         public virtual DbSet<ClosingGenerator> ClosingGenerators { get; set; }
 
         public virtual DbSet<TicketHistory> TicketHistories { get; set; }
 
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
 
 
 
@@ -83,6 +89,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ApproverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
+            modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());  
             modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());  

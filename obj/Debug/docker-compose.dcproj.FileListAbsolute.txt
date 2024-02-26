@@ -18,8 +18,8 @@ E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\System.IdentityMo
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.IdentityModel.Tokens.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\FluentValidation.DependencyInjectionExtensions.dll
-E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Swashbuckle.AspNetCore.Swagger.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Swashbuckle.AspNetCore.SwaggerUI.dll
+E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Swashbuckle.AspNetCore.Swagger.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.EntityFrameworkCore.Abstractions.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.OpenApi.dll
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\EFCore.NamingConventions.dll

@@ -45,7 +45,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public bool? IsTransfer { get; set; }
         public DateTime? TransferAt { get; set; }
         public Guid? TransferBy { get; set; }
-        //public string TransferRemarks { get; set; }
         public virtual User TransferByUser { get; set; }
 
         public bool ? IsApprove { get; set; } = false;
@@ -54,15 +53,12 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User ApprovedByUser { get; set; }
 
         public bool ? IsClosedApprove { get; set; }
-        public DateTime? Closed_At { get; set; } = DateTime.Today;
+        public DateTime? Closed_At { get; set; }
         public Guid? ClosedApproveBy { get; set; }
         public virtual User ClosedApproveByUser { get; set; }
 
         public bool IsClosedReject { get; set; }
-        //public string CloseRejectRemarks { get; set; }
-
         public bool IsReject { get; set; } = false;
-        //public string RejectRemarks { get; set; }
 
         public bool ? IsReTicket { get; set; }
         public DateTime ? ReticketAt { get; set; }

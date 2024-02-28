@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
+using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 
 namespace MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup
 {
@@ -22,5 +23,7 @@ namespace MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup
 
         public int ? CompanyId { get; set; }
         public virtual Company Company { get; set; }
+
+        public ICollection<Department> Departments {  get; set; }
     }
 }

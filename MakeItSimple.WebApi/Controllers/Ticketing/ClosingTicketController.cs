@@ -8,10 +8,13 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicketAttachment;
+
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -91,6 +94,67 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
+
+        [HttpPost("upsert/{id}")]
+        public async Task<IActionResult> UpsertClosingTicket([FromBody] UpsertClosingTicketCommand command , [FromRoute] int id)
+        {
+            try
+            {
+                command.RequestGeneratorId = id;
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Modified_By = userId;
+                        command.Added_By = userId;
+                        command.Requestor_By = userId;
+                    }
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch(Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("attachment/{id}")]
+        public async Task<IActionResult> UpsertClosingTicketAttachment([FromForm] UpsertClosingTicketAttachmentCommand command , [FromRoute] int id)
+        {
+            try
+            {
+                command.RequestGeneratorId = id;
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                    command.Added_By = userId;
+                    command.Requestor_By = userId;
+                }
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch(Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
 
         [HttpGet("close-ticket")]
         public async Task<IActionResult> GetClosingTicket([FromQuery] GetClosingTicketQuery query)
@@ -200,6 +264,25 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         command.Approver_By = userId;
                     }
                 }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpDelete("cancel")]
+        public async Task<IActionResult> CancelClosingTicket([FromBody] CancelClosingTicketCommand command)
+        {
+            try
+            {
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

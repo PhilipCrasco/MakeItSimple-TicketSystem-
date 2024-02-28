@@ -75,6 +75,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         RequestGeneratorId = requestGeneratorId.Id,
                         TicketConcernId = ticketConcernExist.Id,
                         DepartmentId = ticketConcernExist.DepartmentId,
+                        UnitId = ticketConcernExist.UnitId,
                         SubUnitId = ticketConcernExist.SubUnitId,
                         ChannelId = ticketConcernExist.ChannelId,
                         UserId = ticketConcernExist.UserId,

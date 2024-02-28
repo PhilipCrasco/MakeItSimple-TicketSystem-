@@ -22,6 +22,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
             public virtual string ModifiedBy { get; set; }
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
+            public ICollection<Department> Departments { get; set; }
+            public class Department
+            {
+                public int ? DepartmentId { get; set; }
+                public string Department_Code { get; set; }
+
+                public string Department_Name { get; set; }
+
+            }
 
         }
 
@@ -64,7 +73,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
                     ModifiedBy = x.ModifiedByUser.Fullname,
                     UpdatedAt = x.UpdatedAt,
                     SyncDate = x.SyncDate,
-                    SyncStatus = x.SyncStatus
+                    SyncStatus = x.SyncStatus,
+                    Departments = x.Departments.Select(x => new GetBussinessUnitResults.Department
+                    {
+                        DepartmentId = x.Id,
+                        Department_Code = x.DepartmentCode,
+                        Department_Name = x.DepartmentName
+
+                    }).ToList()
+                    
 
 
                 });

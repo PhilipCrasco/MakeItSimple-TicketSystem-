@@ -1,11 +1,13 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetup.GetAccountTitle;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup.GetBusinessUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup.SyncBusinessUnit;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.BusinessUnitController
@@ -46,7 +48,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.BusinessUnitController
         }
 
         [HttpGet("page")]
-        public async Task<IActionResult> GetAccountTitle([FromQuery] GetAccountTitleQuery query)
+        public async Task<IActionResult> GetBusinessUnit([FromQuery] GetBussinessUnitQuery query)
         {
             try
             {

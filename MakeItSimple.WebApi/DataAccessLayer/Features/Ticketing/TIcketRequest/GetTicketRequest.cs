@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             public int? RequestGeneratorId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+            public string Unit_Code { get; set; }
+            public string Unit_Name {  get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
             public string Channel_Name { get; set; }
@@ -88,6 +90,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     .Include(x => x.RequestGenerator)
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.Department)
+                    .Include(x => x.Unit)
                     .Include(x => x.SubUnit)
                     .Include(x => x.Channel)
                     .Include(x => x.User)
@@ -141,6 +144,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                         RequestGeneratorId = x.Key,
                         Department_Code = x.First().Department.DepartmentCode,
                         Department_Name = x.First().Department.DepartmentName,
+                        Unit_Code = x.First().Unit.UnitCode,
+                        Unit_Name = x.First().Unit.UnitName,    
                         SubUnit_Code = x.First().SubUnit.SubUnitCode,
                         SubUnit_Name = x.First().SubUnit.SubUnitName,
                         Channel_Name = x.First().Channel.ChannelName,

@@ -17,7 +17,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
         public class UpdateTicketRequestCommand : IRequest<Result>
         {
             public int ? RequestGeneratorId { get; set; }
+          
             public int DepartmentId { get; set; }
+
+            public int UnitId { get; set; }
+
             public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
@@ -70,6 +74,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 {
                     case null:
                         return Result.Failure(TicketRequestError.DepartmentNotExist());
+                }
+                switch (await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken))
+                {
+                    case null:
+                        return Result.Failure(TicketRequestError.UnitNotExist());
                 }
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId , cancellationToken))
                 {
@@ -132,6 +141,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                         bool hasChanged = false;
 
+                        //if (upsertConcern.DepartmentId != command.DepartmentId)
+                        //{
+                        //    upsertConcern.DepartmentId = command.DepartmentId;
+                        //    hasChanged = true;
+                        //}
+
+                        //if (upsertConcern.UnitId != command.UnitId)
+                        //{
+                        //    upsertConcern.UnitId = command.UnitId;
+                        //    hasChanged = true;
+                        //}
+
+                        //if (upsertConcern.SubUnitId != command.SubUnitId)
+                        //{
+                        //    upsertConcern.SubUnitId = command.SubUnitId;
+                        //    hasChanged = true;
+                        //}
+
+                        //if (upsertConcern.ChannelId != command.ChannelId)
+                        //{
+                        //    upsertConcern.ChannelId = command.ChannelId;
+                        //    hasChanged = true;
+                        //}
+
+                        //if (upsertConcern.UserId != command.UserId)
+                        //{
+                        //    upsertConcern.UserId = command.UserId;
+                        //    hasChanged = true;
+                        //}
+
                         if (upsertConcern.ConcernDetails != concerns.Concern_Details)
                         {
                             upsertConcern.ConcernDetails = concerns.Concern_Details;
@@ -190,6 +229,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                             
                             RequestGeneratorId = requestGenerator.Id,
                             DepartmentId = command.DepartmentId,
+                            UnitId = command.UnitId,
                             SubUnitId = command.SubUnitId,
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,

@@ -23,9 +23,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error ApproverUnAuthorized() =>
       new Error("TransferTicketError.ApproverInvalid", "User not authorize to approve!");
 
+        public static Error TransferConcernUnable() =>
+   new Error("TransferTicketError.TransferConcernUnable", "Transfer Ticket request already in approval!");
 
-      public static Error UpdateUnAuthorized() =>
+        public static Error UpdateUnAuthorized() =>
       new Error("TransferTicketError.ApproverInvalid", "User not authorize to update!");
+
+        public static Error UnitNotExist() =>
+       new Error("TransferTicketError.UnitNotExist", "Unit not exist!");
 
         public static Error SubUnitNotExist() =>
       new Error("TransferTicketError.SubUnitNotExist", "Sub unit not exist!");

@@ -21,6 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public int Department_No { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+            public string BusinessUnit_Name {  get; set; }
             public string Sync_Status { get; set; }
             public DateTime Created_At { get; set; }
             public DateTime? Update_dAt { get; set; }
@@ -47,12 +48,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             var UpdateSync = new List<SyncDepartmentCommand.Department>();
             var DepartmentCodeNullOrEmpty = new List<SyncDepartmentCommand.Department>();
             var DepartmentNameNullOrEmpty = new List<SyncDepartmentCommand.Department>();
+            var BusinessUnitNotExist = new List<SyncDepartmentCommand.Department>();
 
             foreach (SyncDepartmentCommand.Department department in command.Departments)
             {
-
-
-
+                var businessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.BusinessName == department.BusinessUnit_Name, cancellationToken);
+                if (businessUnitNotExist == null)
+                {
+                    BusinessUnitNotExist.Add(department);
+                    continue;
+                }
 
                 if (string.IsNullOrEmpty(department.Department_Code))
                 {
@@ -90,6 +95,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                             hasChanged = true;
                         }
 
+
+                        if (ExistingDepartment.BusinessUnitId != businessUnitNotExist.Id)
+                        {
+                            ExistingDepartment.BusinessUnitId = businessUnitNotExist.Id;
+                            hasChanged = true;
+                        }
+
                         if (hasChanged)
                         {
                             ExistingDepartment.UpdatedAt = DateTime.Now;
@@ -118,6 +130,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                             DepartmentNo = department.Department_No,
                             DepartmentCode = department.Department_Code,
                             DepartmentName = department.Department_Name,
+                            BusinessUnitId  = businessUnitNotExist.Id,
                             CreatedAt = DateTime.Now,
                             AddedBy = command.Added_By,
                             SyncDate = DateTime.Now,
@@ -148,12 +161,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                 UpdateSync,
                 DuplicateSync,
                 DepartmentCodeNullOrEmpty,
-                DepartmentNameNullOrEmpty
+                DepartmentNameNullOrEmpty,
+                BusinessUnitNotExist
 
             };
 
 
-            if (DuplicateSync.Count == 0 && DepartmentCodeNullOrEmpty.Count == 0 && DepartmentNameNullOrEmpty.Count == 0)
+            if (DuplicateSync.Count == 0 && DepartmentCodeNullOrEmpty.Count == 0 && DepartmentNameNullOrEmpty.Count == 0 && BusinessUnitNotExist.Count() == 0)
             {
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success("Successfully sync data");

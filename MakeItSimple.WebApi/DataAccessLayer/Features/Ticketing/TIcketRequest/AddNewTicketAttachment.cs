@@ -118,7 +118,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
                         await using var stream = attachments.Attachment.OpenReadStream();
 
-                        var attachmentsParams = new ImageUploadParams
+                        var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
                             PublicId = $"MakeITSimple/{getTicketConcern.Department.DepartmentName}/{getTicketConcern.User.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"

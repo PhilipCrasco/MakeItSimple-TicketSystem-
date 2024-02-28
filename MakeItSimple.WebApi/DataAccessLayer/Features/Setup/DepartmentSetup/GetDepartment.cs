@@ -15,6 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public int Department_No { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+            public string BusinessUnit_Code {  get; set; }
+            public string BusinessUnit_Name {  get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -70,6 +72,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Department_No = x.DepartmentNo,
                     Department_Code = x.DepartmentCode,
                     Department_Name = x.DepartmentName,
+                    BusinessUnit_Code = x.BusinessUnit.BusinessCode,
+                    BusinessUnit_Name = x.BusinessUnit.BusinessName,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,

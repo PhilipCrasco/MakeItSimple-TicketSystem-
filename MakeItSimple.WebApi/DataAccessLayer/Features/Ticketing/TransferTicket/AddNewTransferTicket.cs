@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public Guid ? Requestor_By { get; set; }
             public Guid ? Transfer_By { get; set; }
+            public int UnitId { get; set; }
             public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
@@ -46,6 +47,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 await  _context.RequestGenerators.AddAsync(requestGeneratedId, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
+
+                switch (await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken))
+                {
+                    case null:
+                        return Result.Failure(TransferTicketError.UnitNotExist());
+                }
 
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
                 {
@@ -100,6 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             RequestGeneratorId = requestGeneratedId.Id,
                             TicketConcernId = ticketConcern.Id,
                             DepartmentId = ticketConcern.DepartmentId,
+                            UnitId = command.UnitId,
                             SubUnitId = command.SubUnitId,
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,

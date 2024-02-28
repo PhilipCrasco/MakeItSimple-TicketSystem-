@@ -15,6 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public int TicketConcernId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+            public string Unit_Code { get; set; }
+            public string Unit_Name { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
             public string Channel_Name { get; set; }
@@ -102,6 +104,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         TicketConcernId = x.Id,
                         Department_Code = x.Department.DepartmentName,
                         Department_Name = x.Department.DepartmentName,
+                        Unit_Code = x.Unit.UnitCode,
+                        Unit_Name = x.Unit.UnitName,
                         SubUnit_Code = x.SubUnit.SubUnitCode,
                         SubUnit_Name = x.SubUnit.SubUnitName,
                         Channel_Name = x.Channel.ChannelName,

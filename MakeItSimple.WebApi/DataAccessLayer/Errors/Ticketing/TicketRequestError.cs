@@ -14,6 +14,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error ConcernDetailsNotNull() =>
       new Error("TicketRequest.ConcernDetailsNotNull", "Concern details must not be empty!");
       
+       public static Error UnitNotExist() =>
+      new Error("TicketRequest.UnitNotExist", "Unit not exist!");
+
       public static Error SubUnitNotExist() =>
       new Error("TicketRequest.SubUnitNotExist", "Sub unit not exist!");
 

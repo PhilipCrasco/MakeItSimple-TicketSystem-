@@ -101,7 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         await using var stream = attachments.Attachment.OpenReadStream();
 
-                        var attachmentsParams = new ImageUploadParams
+                        var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
                             PublicId = $"MakeITSimple/{getTicketConcern.AddedByUser.Department.DepartmentName}/{getTicketConcern.AddedByUser.Fullname}/Transfer/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"

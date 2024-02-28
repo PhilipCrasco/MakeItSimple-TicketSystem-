@@ -19,6 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid? Requestor_By { get; set; }
             public Guid? Transfer_By { get; set; }
             public Guid? Modified_By { get; set; }
+            public int UnitId { get; set; }
             public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
@@ -57,9 +58,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
-                if (requestTransferList.First().IsTransfer == true && command.Role != TicketingConString.Admin)
+                var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
+                && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
+
+                if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsTransfer == true && command.Role != TicketingConString.Admin))
                 {
-                    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
+                    return Result.Failure(TransferTicketError.TransferConcernUnable());
+                }
+
+
+                switch (await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken))
+                {
+                    case null:
+                        return Result.Failure(TransferTicketError.UnitNotExist());
                 }
 
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
@@ -114,7 +125,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         bool HasChange = false;
 
-                        if(transferTicket.SubUnitId != command.SubUnitId)
+                        if (transferTicket.UnitId != command.UnitId)
+                        {
+                            transferTicket.UnitId = command.UnitId;
+                            HasChange = true;
+                        }
+
+                        if (transferTicket.SubUnitId != command.SubUnitId)
                         {
                             transferTicket.SubUnitId = command.SubUnitId;
                             HasChange = true;
@@ -162,6 +179,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
                             TicketConcernId = ticketConcern.Id,
                             DepartmentId = ticketConcern.DepartmentId,
+                            UnitId = ticketConcern.UnitId,
                             SubUnitId = command.SubUnitId,
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,
@@ -208,7 +226,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         ticketHistory.IsRejectTransfer = false;
                         ticketHistory.RejectTransferAt = null;
-
                         ticketHistory.RejectTransferBy = null;
                     }
 

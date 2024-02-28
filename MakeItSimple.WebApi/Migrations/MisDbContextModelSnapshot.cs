@@ -402,6 +402,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("added_by");
 
+                    b.Property<int?>("BusinessUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("business_unit_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
@@ -443,6 +447,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_departments_added_by");
+
+                    b.HasIndex("BusinessUnitId")
+                        .HasDatabaseName("ix_departments_business_unit_id");
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_departments_modified_by");
@@ -1962,6 +1969,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_departments_users_added_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup.BusinessUnit", null)
+                        .WithMany("Departments")
+                        .HasForeignKey("BusinessUnitId")
+                        .HasConstraintName("fk_departments_business_units_business_unit_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
@@ -2733,6 +2745,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup.BusinessUnit", b =>
+                {
+                    b.Navigation("Departments");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", b =>

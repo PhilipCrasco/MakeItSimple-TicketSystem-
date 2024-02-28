@@ -55,17 +55,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 }
 
                 var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
-                && x.IsApprove != null , cancellationToken);
+                && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
-                if(validateApprover is not null)
+                if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin))
                 {
                     return Result.Failure(ReTicketConcernError.ReTicketConcernUnable());
                 }
 
-                if(requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin)
-                {
-                    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
-                }
+                //if (requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin)
+                //{
+                //    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
+                //}
 
                 foreach (var reTicket in command.UpsertReTicketConserns)
                 {
@@ -123,8 +123,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             reTicketConcern.IsReTicket = false;
                             reTicketConcern.ReTicketAt = null;
                             reTicketConcern.ReTicketBy = null;
-
-
                         }
 
                         transferUpdateList.Add(HasChange);
@@ -142,7 +140,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         var addReTicket = new ReTicketConcern
                         {
                             RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
-
+                            DepartmentId = ticketConcern.DepartmentId,
+                            UnitId = ticketConcern.UnitId,
+                            SubUnitId = ticketConcern.SubUnitId,
+                            ChannelId = ticketConcern.ChannelId,
+                            UserId = ticketConcern.UserId,
                             ConcernDetails = ticketConcern.ConcernDetails,
                             CategoryId = ticketConcern.CategoryId,
                             SubCategoryId = ticketConcern.SubCategoryId,

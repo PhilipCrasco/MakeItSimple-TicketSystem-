@@ -16,5 +16,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error DateTimeInvalid() =>
       new Error("ClosingtTicketError.DateTimeInvalid", "Invalid start/target date!");
 
+      public static Error ReTicketConcernUnable() =>
+      new Error("ClosingtTicketError.ClosingConcernUnable", "Re-Ticket request already in approval!");
+
+      public static Error ClosingTicketConcernUnable() =>
+      new Error("ClosingtTicketError.ClosingTicketConcernUnable", "Closing Ticket request already in approval!");
+
+        public static Error TicketConcernIdAlreadyExist() =>
+         new Error("ClosingtTicketError.TicketConcernIdAlreadyExist", "Ticket concern already exist!");
+
+        public static Error ClosingTicketIdNotExist() =>
+       new Error("TransferTicketError.ReTicketIdNotExist", "Closing Ticket request not exist!");
+
     }
 }

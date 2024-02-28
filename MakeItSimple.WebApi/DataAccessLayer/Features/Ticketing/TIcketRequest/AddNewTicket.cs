@@ -25,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
             {
                 public int TicketConcernId { get; set; }
                 public int DepartmentId { get; set; }
+
+                public int ? UnitId { get; set; }
                 public int SubUnitId { get; set; }
 
                 public int ChannelId { get; set; }
@@ -52,6 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
         {
 
             public int DepartmentId { get; set; }
+            public int UnitId { get; set; }
             public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
@@ -97,6 +100,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 {
                     case null:
                         return Result.Failure(TicketRequestError.DepartmentNotExist());
+                }
+                switch (await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken))
+                {
+                    case null:
+                        return Result.Failure(TicketRequestError.UnitNotExist());
                 }
                 switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
                 {
@@ -146,6 +154,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     {
                         RequestGeneratorId = addRequestGenerator.Id,
                         DepartmentId = command.DepartmentId,
+                        UnitId = command.UnitId,
                         SubUnitId = command.SubUnitId,
                         ChannelId = command.ChannelId,
                         UserId = command.UserId,
@@ -176,6 +185,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     {
                         TicketConcernId = x.Id,
                         DepartmentId = x.DepartmentId,
+                        UnitId = x.UnitId,
                         SubUnitId = x.SubUnitId,
                         ChannelId = x.ChannelId,
                         UserId = x.UserId,

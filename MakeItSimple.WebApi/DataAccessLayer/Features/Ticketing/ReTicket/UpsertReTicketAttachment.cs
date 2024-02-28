@@ -101,10 +101,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         await using var stream = attachments.Attachment.OpenReadStream();
 
-                        var attachmentsParams = new ImageUploadParams
+                        var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.AddedByUser.Department.DepartmentName}/{getTicketConcern.AddedByUser.Fullname}/Transfer/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/{getTicketConcern.AddedByUser.Department.DepartmentName}/{getTicketConcern.AddedByUser.Fullname}/Re-Ticket/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -165,9 +165,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         foreach (var transferTicket in getTicketConcernList)
                         {
-
                             transferTicket.IsReTicket = false;
-                            transferTicket.IsReTicket = false;
+                            transferTicket.IsRejectReTicket = false;
                             transferTicket.RejectReTicketBy = null;
                             transferTicket.RejectReTicketAt = null;
 

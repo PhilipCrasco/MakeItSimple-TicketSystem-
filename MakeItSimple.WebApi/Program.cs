@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket;
+using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,8 +114,6 @@ builder.Services.AddAuthentication(authOptions =>
 
 builder.Services.Configure<CloudinaryOption>(config.GetSection("Cloudinary"));
 
-
-
 const string clientPermission = "_clientPermission";
 
 builder.Services.AddCors(options =>
@@ -129,7 +127,12 @@ builder.Services.AddCors(options =>
 });
 
 
+
+builder.Services.AddSignalR();
+
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -138,17 +141,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.ApplyMigrations();
 }
-
-
-app.UseCors("_clientPermission");
-
 app.UseSwagger();
-
-
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseCors(clientPermission);
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+//app.MapControllers();
+
+app.UseWebSockets();
+
+app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registration
+app.MapControllers(); 
 
 app.Run();

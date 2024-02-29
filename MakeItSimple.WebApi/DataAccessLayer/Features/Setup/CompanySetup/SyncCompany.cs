@@ -80,9 +80,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                                 hasChanged = true;
                             }
 
-                            if (ExistingCompany.CompanyName != companies.Company_Code)
+                            if (ExistingCompany.CompanyName != companies.Company_Name)
                             {
-                                ExistingCompany.CompanyCode = companies.Company_Name;
+                                ExistingCompany.CompanyName = companies.Company_Name;
                                 hasChanged = true;
                             }
 
@@ -133,7 +133,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
                 foreach (var company in allDataInput)
                 {
-                    _context.Remove(company);
+                    company.IsActive = false;
+
+                    var businessUnitsList = await _context.BusinessUnits.Where(x => x.CompanyId == company.Id).ToListAsync();
+
+                    foreach(var business in businessUnitsList)
+                    {
+                        business.IsActive = false;
+                        
+                        var departmentList = await _context.Departments.Where(x => x.BusinessUnitId == business.Id).ToListAsync();
+
+                        
+                    }
+
+                    
                 }
 
                 var resultList = new

@@ -35,3 +35,4 @@ E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\MakeItSimple.WebA
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\obj\Debug\docker-compose.dcproj.CopyComplete
+E:\PhilipLorenz\FullStack\MakeItSimple(TicketSystem)\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll

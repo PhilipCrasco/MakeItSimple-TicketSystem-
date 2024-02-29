@@ -19,7 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             
             public string Unit_Name {  get; set; }
 
-            public string Location_Name { get; set; }
+            //public string Location_Name { get; set; }
 
             public bool Is_Active { get; set; }
             public string Added_By { get; set; }
@@ -91,7 +91,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     SubUnit_Code = x.SubUnitCode,
                     SubUnit_Name = x.SubUnitName,
                     Unit_Name = x.Unit.UnitName,
-                    Location_Name = x.Location.LocationName,
+                    //Location_Name = x.Location.LocationName,
                     Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,

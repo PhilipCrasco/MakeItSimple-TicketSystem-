@@ -168,12 +168,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
                                 subUnit.IsActive = false;
 
                                 var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
-                                var locationList = await _context.Locations.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
-
-                                foreach (var location in locationList)
-                                {
-                                    location.IsActive = false;
-                                }
 
                                 foreach (var channels in channelList)
                                 {

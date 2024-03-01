@@ -32,7 +32,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
 
-            public List<Location> Locations {  get; set; }  
+            //public List<Location> Locations {  get; set; }  
 
             public class Location
             {
@@ -109,12 +109,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     No_Of_Channels = x.Channels.Count(),
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
-                    Locations = x.Locations.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Location
-                    {
-                        LocationId = x.Id,
-                        Location_Code = x.LocationCode,
-                        Location_Name = x.LocationName,
-                    }).ToList(),
+                    //Locations = x.Locations.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Location
+                    //{
+                    //    LocationId = x.Id,
+                    //    Location_Code = x.LocationCode,
+                    //    Location_Name = x.LocationName,
+                    //}).ToList(),
 
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {

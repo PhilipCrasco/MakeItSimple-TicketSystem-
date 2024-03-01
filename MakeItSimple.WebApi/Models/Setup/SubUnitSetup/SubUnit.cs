@@ -41,7 +41,7 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public ICollection<Channel> Channels { get; set; }
         public ICollection<User> Users { get; set; }
 
-        public ICollection<Location> Locations { get; set; }
+        //public ICollection<Location> Locations { get; set; }
 
     }
 

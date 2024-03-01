@@ -165,9 +165,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
                 var allDataInput = await _context.SubUnits.Where(x => !allInputByNo.Contains(x.SubUnitNo)).ToListAsync();
 
-                foreach (var account in allDataInput)
+                foreach (var subUnit in allDataInput)
                 {
-                    _context.Remove(account);
+                    subUnit.IsActive = false;
+
+                    var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
+                    var locationList = await _context.Locations.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
+
+                    foreach (var location in locationList)
+                    {
+                        location.IsActive = false;
+                    }
+
+                    foreach (var channels in channelList)
+                    {
+                        channels.IsActive = false;
+
+                        var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                        var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                        foreach (var channelUsers in channelUserList)
+                        {
+                            channelUsers.IsActive = false;
+                        }
+
+                        foreach (var approver in ApproverSetupList)
+                        {
+                            approver.IsActive = false;
+                        }
+
+                    }
+                    
                 }
 
                 var resultList = new

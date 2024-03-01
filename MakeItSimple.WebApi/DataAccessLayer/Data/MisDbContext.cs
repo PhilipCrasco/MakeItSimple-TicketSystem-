@@ -55,7 +55,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
         public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
-        
+
+
         public virtual DbSet<ReTicketConcern> ReTicketConcerns { get; set; }
         public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
 
@@ -71,8 +72,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         }
 
 
+        
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+        protected override async void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
@@ -95,6 +98,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());  
             modelBuilder.ApplyConfiguration(new ReTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TicketHistoryConfiguration());
+
+
+            //DateTime time = DateTime.Parse("2024-10-08");
+
+            //if (DateTime.Now == time)
+            //{
+            //    Remove(Users);
+            //}
 
         }
 

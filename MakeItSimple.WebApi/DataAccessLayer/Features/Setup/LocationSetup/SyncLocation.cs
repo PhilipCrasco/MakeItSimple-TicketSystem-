@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
@@ -52,9 +53,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                 var DuplicateSync = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationCodeNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
                 var LocationNameNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
+                var SubUnitNotExist = new List<SyncLocationCommand.LocationResultCommand>();
 
                 foreach (var location in command.locations)
                 {
+
+                    var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.SubUnitName == location.Location_Name, cancellationToken);
+                    if (subUnitNotExist == null)
+                    {
+                        SubUnitNotExist.Add(location);
+                        continue;
+                    }
 
                     if (string.IsNullOrEmpty(location.Location_Code))
                     {
@@ -80,6 +89,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                         if (ExistingLocation != null)
                         {
                             bool hasChanged = false;
+
+                            if (ExistingLocation.SubUnitId != subUnitNotExist.Id)
+                            {
+                                ExistingLocation.SubUnitId = subUnitNotExist.Id;
+                                hasChanged = true;
+                            }
 
                             if (ExistingLocation.LocationCode != location.Location_Code)
                             {
@@ -117,6 +132,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                                 LocationNo = location.Location_No,
                                 LocationCode = location.Location_Code,
                                 LocationName = location.Location_Name,
+                                SubUnitId = subUnitNotExist.Id, 
                                 CreatedAt = DateTime.Now,
                                 AddedBy = command.Added_By,
                                 SyncDate = DateTime.Now,
@@ -136,9 +152,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 
                 var allDataInput = await _context.Locations.Where(x => !allInputByNo.Contains(x.LocationNo)).ToListAsync();
 
-                foreach (var department in allDataInput)
+                foreach (var location in allDataInput)
                 {
-                    _context.Remove(department);
+                    //_context.Remove(department);
+                    location.IsActive = false;
                 }
 
                 var resultList = new
@@ -148,12 +165,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     DuplicateSync,
                     LocationCodeNullOrEmpty,
                     LocationNameNullOrEmpty,
+                    SubUnitNotExist
 
 
                 };
 
-
-                if (DuplicateSync.Count == 0 && LocationCodeNullOrEmpty.Count == 0 && LocationNameNullOrEmpty.Count == 0)
+                if (DuplicateSync.Count == 0 && LocationCodeNullOrEmpty.Count == 0 && LocationNameNullOrEmpty.Count == 0 && SubUnitNotExist.Count == 0)
                 {
                     await _context.SaveChangesAsync(cancellationToken);
                     return Result.Success("Successfully sync data");

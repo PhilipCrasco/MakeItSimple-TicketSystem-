@@ -43,14 +43,34 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNotExist());
                 }
 
-                var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
+                //var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
 
-                if (channelInUse == true)
-                {
-                    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
-                }
+                //if (channelInUse == true)
+                //{
+                //    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
+                //}
+
 
                 channels.IsActive = !channels.IsActive;
+
+                if(channels.IsActive == false)
+                {
+
+                    var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                    var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                    foreach (var channelUsers in channelUserList)
+                    {
+                        channelUsers.IsActive = false;
+                    }
+
+                    foreach (var approver in ApproverSetupList)
+                    {
+                        approver.IsActive = false;
+                    }
+
+                }
 
                 await _context.SaveChangesAsync();
 

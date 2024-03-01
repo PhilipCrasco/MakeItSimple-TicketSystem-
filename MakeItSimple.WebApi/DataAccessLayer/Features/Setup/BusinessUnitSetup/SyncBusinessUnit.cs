@@ -146,9 +146,58 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
 
                 var allDataInput = await _context.BusinessUnits.Where(x => !allInputByNo.Contains(x.Business_No)).ToListAsync();
 
-                foreach (var account in allDataInput)
+                foreach (var business in allDataInput)
                 {
-                    _context.Remove(account);
+                    business.IsActive = false;
+                    var departmentList = await _context.Departments.Where(x => x.BusinessUnitId == business.Id).ToListAsync();
+
+                    foreach (var department in departmentList)
+                    {
+                        department.IsActive = false;
+
+                        var UnitList = await _context.Units.Where(x => x.DepartmentId == department.Id).ToListAsync();
+
+                        foreach (var units in UnitList)
+                        {
+                            units.IsActive = false;
+
+                            var subUnitsList = await _context.SubUnits.Where(x => x.UnitId == units.Id).ToListAsync();
+
+                            foreach (var subUnit in subUnitsList)
+                            {
+                                subUnit.IsActive = false;
+
+                                var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
+                                var locationList = await _context.Locations.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
+
+                                foreach (var location in locationList)
+                                {
+                                    location.IsActive = false;
+                                }
+
+                                foreach (var channels in channelList)
+                                {
+                                    channels.IsActive = false;
+
+                                    var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                                    var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                                    foreach (var channelUsers in channelUserList)
+                                    {
+                                        channelUsers.IsActive = false;
+                                    }
+
+                                    foreach (var approver in ApproverSetupList)
+                                    {
+                                        approver.IsActive = false;
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
                 }
 
                 var resultList = new

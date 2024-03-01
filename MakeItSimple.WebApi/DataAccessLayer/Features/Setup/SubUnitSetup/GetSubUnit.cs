@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -31,9 +32,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
 
+            public List<Location> Locations {  get; set; }  
 
+            public class Location
+            {
+                public int LocationId { get; set; }
+                public string Location_Code {  get; set; }
+                public string Location_Name { get; set; }
+            }
 
             public List<User> users { get; set; }
+
 
             public class User
             {
@@ -100,6 +109,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     No_Of_Channels = x.Channels.Count(),
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
+                    Locations = x.Locations.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Location
+                    {
+                        LocationId = x.Id,
+                        Location_Code = x.LocationCode,
+                        Location_Name = x.LocationName,
+                    }).ToList(),
+
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
                         UserId = x.Id,
@@ -110,6 +126,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
                     {
                         ChannelId = x.Id,
+         
                         Channel_Name = x.ChannelName
 
                     }).ToList(),

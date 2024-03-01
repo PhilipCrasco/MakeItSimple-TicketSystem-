@@ -49,7 +49,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
             }
         }
 
-
         [HttpGet("page")]
         public async Task<IActionResult> GetSubUnit([FromQuery] GetSubUnitQuery query)
         {

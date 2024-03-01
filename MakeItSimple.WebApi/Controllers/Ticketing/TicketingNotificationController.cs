@@ -50,7 +50,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpGet("ticket-request")]
+        [HttpGet("transfer-ticket")]
         public async Task<IActionResult> TransferTicketNotification([FromQuery] TransferTicketNotificationResultQuery command)
         {
             try

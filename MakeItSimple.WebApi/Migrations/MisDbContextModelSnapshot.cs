@@ -492,6 +492,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
+                    b.Property<int?>("SubUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_id");
+
                     b.Property<DateTime>("SyncDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("sync_date");
@@ -512,6 +516,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_locations_modified_by");
+
+                    b.HasIndex("SubUnitId")
+                        .HasDatabaseName("ix_locations_sub_unit_id");
 
                     b.ToTable("locations", (string)null);
                 });
@@ -589,10 +596,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
 
-                    b.Property<int?>("LocationId")
-                        .HasColumnType("int")
-                        .HasColumnName("location_id");
-
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
@@ -633,9 +636,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("DepartmentId")
                         .HasDatabaseName("ix_sub_units_department_id");
-
-                    b.HasIndex("LocationId")
-                        .HasDatabaseName("ix_sub_units_location_id");
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_sub_units_modified_by");
@@ -1969,7 +1969,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_departments_users_added_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup.BusinessUnit", null)
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup.BusinessUnit", "BusinessUnit")
                         .WithMany("Departments")
                         .HasForeignKey("BusinessUnitId")
                         .HasConstraintName("fk_departments_business_units_business_unit_id");
@@ -1981,6 +1981,8 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_departments_users_modified_by_user_id");
 
                     b.Navigation("AddedByUser");
+
+                    b.Navigation("BusinessUnit");
 
                     b.Navigation("ModifiedByUser");
                 });
@@ -1999,9 +2001,16 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_locations_users_modified_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .HasConstraintName("fk_locations_sub_units_sub_unit_id");
+
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
+
+                    b.Navigation("SubUnit");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", b =>
@@ -2045,11 +2054,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("DepartmentId")
                         .HasConstraintName("fk_sub_units_departments_department_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", "Location")
-                        .WithMany("SubUnits")
-                        .HasForeignKey("LocationId")
-                        .HasConstraintName("fk_sub_units_locations_location_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
@@ -2064,8 +2068,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("Department");
-
-                    b.Navigation("Location");
 
                     b.Navigation("ModifiedByUser");
 
@@ -2767,11 +2769,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Units");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", b =>
-                {
-                    b.Navigation("SubUnits");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", b =>

@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
-
+                    command.UserId = userId;    
                 }
 
                 var results = await _mediator.Send(command);

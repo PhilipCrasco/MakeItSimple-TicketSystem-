@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Common.Pagination;
+﻿using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -60,6 +61,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
 
             public Guid? UserId { get; set; }
 
+            public string Users { get; set; }
+
             public string Search { get; set; }
 
             public bool? Status { get; set; }
@@ -97,16 +100,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     .Include(x => x.Category)
                     .Include(x => x.SubCategory);
 
+                //var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
-
-  
-
-
-                var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-
-                if (channeluserExist != null)
+                if (request.Users == TicketingConString.Users)
                 {
-                    ticketQuery = ticketQuery.Where(x => x.User.Fullname == channeluserExist.Fullname);
+                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
                 }
 
 

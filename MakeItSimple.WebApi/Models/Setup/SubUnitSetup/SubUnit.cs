@@ -28,8 +28,8 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public int? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
-        public int ? LocationId { get; set; }
-        public virtual Location Location { get; set; }
+        //public int ? LocationId { get; set; }
+        //public virtual Location Location { get; set; }
 
         public int? UnitId { get; set; }
         public virtual Unit Unit {get; set;}
@@ -40,6 +40,8 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
 
         public ICollection<Channel> Channels { get; set; }
         public ICollection<User> Users { get; set; }
+
+        public ICollection<Location> Locations { get; set; }
 
     }
 

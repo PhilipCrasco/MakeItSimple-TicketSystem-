@@ -155,6 +155,7 @@ app.UseAuthorization();
 
 app.UseWebSockets();
 
+
 app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registration
 app.MapControllers(); 
 

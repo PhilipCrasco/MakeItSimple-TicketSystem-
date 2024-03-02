@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.BusinessUnitController
                     command.Modified_By = userId;
                 }
                 var results = await _mediator.Send(command);
-                if(results.IsFailure)
+                if(results.IsWarning)
                 {
                     return BadRequest(results);
                 }

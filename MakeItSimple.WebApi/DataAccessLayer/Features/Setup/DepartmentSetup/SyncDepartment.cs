@@ -209,7 +209,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                 return Result.Success("Successfully sync data");
             }
 
-            return Result.Success(resultList);
+            return Result.Warning(resultList);
 
         }
 

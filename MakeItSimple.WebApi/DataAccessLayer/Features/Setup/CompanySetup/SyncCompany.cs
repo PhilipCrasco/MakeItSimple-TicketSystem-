@@ -198,7 +198,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                     CompanyCodeNullOrEmpty,
                     CompanyNameNullOrEmpty,
 
-
                 };
 
 
@@ -208,7 +207,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                     return Result.Success("Successfully sync data");
                 }
 
-                return Result.Success(resultList);
+                return Result.Warning(resultList);
 
 
 

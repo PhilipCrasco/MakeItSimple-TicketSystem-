@@ -201,7 +201,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
                     return Result.Success("Successfully sync data");
                 }
 
-                return Result.Success(resultList);
+                return Result.Warning(resultList);
             }
         }
     }

@@ -31,7 +31,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
                 }
 
                 var result = await _mediator.Send(command);
-                if (result.IsFailure)
+                if (result.IsWarning)
                 {
                     return BadRequest(result);
                 }

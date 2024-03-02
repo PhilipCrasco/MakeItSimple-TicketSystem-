@@ -153,7 +153,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.AccountTitleSetup
                     return Result.Success("Successfully sync data");
                 }
 
-                return Result.Success(resultList);
+                return Result.Warning(resultList);
             }
         }
 

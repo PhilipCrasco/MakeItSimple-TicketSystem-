@@ -7,6 +7,7 @@ using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup.SyncCompany;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup.SyncLocation.SyncLocationCommand;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.SyncSubUnit;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
@@ -54,13 +55,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 
             public async Task<Result> Handle(SyncLocationCommand command, CancellationToken cancellationToken)
             {
-                var AllInputSync = new List<SyncLocationCommand.LocationResultCommand>();
-                var AvailableSync = new List<SyncLocationCommand.LocationResultCommand>();
-                var UpdateSync = new List<SyncLocationCommand.LocationResultCommand>();
-                var DuplicateSync = new List<SyncLocationCommand.LocationResultCommand>();
-                var LocationCodeNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
-                var LocationNameNullOrEmpty = new List<SyncLocationCommand.LocationResultCommand>();
-                var SubUnitNotExist = new List<SyncLocationCommand.LocationResultCommand>();
+                var AllInputSync = new List<LocationResultCommand>();
+                var AvailableSync = new List<LocationResultCommand>();
+                var UpdateSync = new List<LocationResultCommand>();
+                var DuplicateSync = new List<LocationResultCommand>();
+                var LocationCodeNullOrEmpty = new List<LocationResultCommand>();
+                var LocationNameNullOrEmpty = new List<LocationResultCommand>();
+                var SubUnitNotExist = new List<LocationResultCommand>();
+
 
                 foreach (var location in command.locations)
                 {
@@ -216,7 +218,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     return Result.Success("Successfully sync data");
                 }
 
-                return Result.Success(resultList);
+                return Result.Warning(resultList);
 
             }
         }

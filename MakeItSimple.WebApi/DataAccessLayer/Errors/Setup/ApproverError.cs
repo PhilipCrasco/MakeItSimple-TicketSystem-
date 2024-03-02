@@ -1,4 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup.SyncLocation;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup.SyncLocation.SyncLocationCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
 {
@@ -26,6 +29,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
        new Error("Approver.UserDuplicate", "Approver not Authorized!");
        public static Error ApproverNotExist() =>
        new Error("Approver.ApproverNotExist", "Approver not Exist!");
+
+       // public static Error ListError(List<SyncLocationCommand> AvailableSync ) =>
+       //new Error("Approver.ApproverNotExist", $"{AvailableSync}");
 
     }
 }

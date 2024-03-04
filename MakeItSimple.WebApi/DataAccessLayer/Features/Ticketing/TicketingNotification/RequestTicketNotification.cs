@@ -19,8 +19,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
         public class RequestTicketNotificationQuery
         {
             public int ? RequestGeneratorId { get; set; }
-            public int ChannelId { get; set; }
-            public Guid ? UserId { get; set; }
 
         }
 
@@ -51,7 +49,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             {
 
                 var query = await _context.TicketConcerns.GroupBy(x => x.RequestGeneratorId).ToListAsync();
-
 
                 if (request.Users == TicketingConString.Users)
                 {

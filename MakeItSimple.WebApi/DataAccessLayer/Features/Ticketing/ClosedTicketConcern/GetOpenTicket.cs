@@ -12,22 +12,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
         public class GetOpenTicketResult
         {
-            public int TicketConcernId { get; set; }
-            public string Department_Code { get; set; }
-            public string Department_Name { get; set; }
-            public string Unit_Code { get; set; }
-            public string Unit_Name { get; set; }
-            public string SubUnit_Code { get; set; }
-            public string SubUnit_Name { get; set; }
-            public string Channel_Name { get; set; }
-            public string EmpId { get; set; }
-            public string Fullname { get; set; }
-            public string TicketStatus { get; set; }
-            public string Category_Description { get; set; }
-            public string SubCategory_Description { get; set; }
-            public DateTime Start_Date { get; set; }
-            public DateTime Target_Date { get; set; }
-
+            public int OpenTicketCount { get; set; }
+            public List<OpenTicket> OpenTickets { get; set; }
+            public class OpenTicket
+            {
+                public int TicketConcernId { get; set; }
+                public string Department_Code { get; set; }
+                public string Department_Name { get; set; }
+                public string Unit_Code { get; set; }
+                public string Unit_Name { get; set; }
+                public string SubUnit_Code { get; set; }
+                public string SubUnit_Name { get; set; }
+                public string Channel_Name { get; set; }
+                public string EmpId { get; set; }
+                public string Fullname { get; set; }
+                public string TicketStatus { get; set; }
+                public string Category_Description { get; set; }
+                public string SubCategory_Description { get; set; }
+                public DateTime Start_Date { get; set; }
+                public DateTime Target_Date { get; set; }
+            }
+             
         }
 
 
@@ -98,27 +103,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 }
 
                 var results = ticketConcernQuery.Where(x => x.IsApprove == true
-                && x.IsClosedApprove != true).OrderBy(x => x.Id)
-                    .Select(x => new GetOpenTicketResult
-                    {
-                        TicketConcernId = x.Id,
-                        Department_Code = x.Department.DepartmentName,
-                        Department_Name = x.Department.DepartmentName,
-                        Unit_Code = x.Unit.UnitCode,
-                        Unit_Name = x.Unit.UnitName,
-                        SubUnit_Code = x.SubUnit.SubUnitCode,
-                        SubUnit_Name = x.SubUnit.SubUnitName,
-                        Channel_Name = x.Channel.ChannelName,
-                        EmpId = x.User.EmpId,
-                        Fullname = x.User.Fullname,
-                        TicketStatus = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? "Open Ticket"
-                        : x.IsTransfer == false ? "For Approval Transfer" : x.IsReTicket == false ? "For ReTicket" : x.IsClosedApprove == false ? "For Closing Ticket" : "Unknown", 
-                        Category_Description = x.Category.CategoryDescription,
-                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate
+                && x.IsClosedApprove != true).OrderBy(x => x.Id).Select(x => new GetOpenTicketResult
+                {
+                    OpenTicketCount = ticketConcernQuery.Count(),
+                    //OpenTickets  = 
 
-                    });
+
+                });
+                    //.Select(x => new GetOpenTicketResult.OpenTicket
+                    //{
+                    //    TicketConcernId = x.Id,
+                    //    Department_Code = x.Department.DepartmentName,
+                    //    Department_Name = x.Department.DepartmentName,
+                    //    Unit_Code = x.Unit.UnitCode,
+                    //    Unit_Name = x.Unit.UnitName,
+                    //    SubUnit_Code = x.SubUnit.SubUnitCode,
+                    //    SubUnit_Name = x.SubUnit.SubUnitName,
+                    //    Channel_Name = x.Channel.ChannelName,
+                    //    EmpId = x.User.EmpId,
+                    //    Fullname = x.User.Fullname,
+                    //    TicketStatus = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? "Open Ticket"
+                    //    : x.IsTransfer == false ? "For Approval Transfer" : x.IsReTicket == false ? "For ReTicket" : x.IsClosedApprove == false ? "For Closing Ticket" : "Unknown", 
+                    //    Category_Description = x.Category.CategoryDescription,
+                    //    SubCategory_Description = x.SubCategory.SubCategoryDescription,
+                    //    Start_Date = x.StartDate,
+                    //    Target_Date = x.TargetDate
+
+                    //});
 
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);

@@ -77,9 +77,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
                         continue;
                     }
 
-                    if (command.SyncUnitsResults.Count(x => x.Unit_Code == unit.Unit_Name && x.Unit_Name == unit.Unit_Name) > 1)
+                    if (command.SyncUnitsResults.Count(x => x.Unit_Code == unit.Unit_Code && x.Unit_Name == unit.Unit_Name) > 1)
                     {
                         DuplicateSync.Add(unit);
+                        continue;
                     }
                     else
                     {

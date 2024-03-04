@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
     public class MisDbContext : DbContext
     {
         public MisDbContext(DbContextOptions<MisDbContext> options) : base(options) { }
-
+       
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
@@ -105,6 +105,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             //if (DateTime.Now == time)
             //{
             //    Remove(Users);
+            //    SaveChanges();
             //}
 
         }

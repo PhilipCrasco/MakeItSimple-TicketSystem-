@@ -17,9 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class TransferTicketNotificationQuery
         {
-            public int ? RequestGeneratorId { get; set; }
-            //public int ChannelId { get; set; }
-            //public Guid? UserId { get; set; }
+            public int ? RequestGeneratorId { get; set; }   
         }
 
         public class TransferTicketNotificationResultQuery : IRequest<Result>
@@ -28,7 +26,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public string Role {  get; set; }
             public string Approval {  get; set; }
             public string Users { get; set; }
-            public bool? Status { get; set; }
             public bool? IsReject { get; set; }
             public bool? IsTransfer { get; set; }
         }
@@ -78,8 +75,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 {
                     query = query.Where(x => x.First().UserId == request.UserId).ToList();
                 }
-                
-                if(request.IsReject != null)
+
+                if (request.IsTransfer != null)
+                {
+                    query = query.Where(x => x.First().IsTransfer == request.IsTransfer).ToList();
+                }
+
+                if (request.IsReject != null)
                 {
                     query = query.Where(x => x.First().IsRejectTransfer == request.IsReject).ToList();
                 }

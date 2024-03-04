@@ -4,38 +4,38 @@
     {
         protected internal Result(bool isSuccess, bool isWarning, Error error)
         {
-            if (isSuccess && error != Error.None)
+            if (isSuccess && !isWarning && error != Error.None)
             {
                 throw new InvalidOperationException();
             }
 
-            if (!isSuccess && error == Error.None)
+            if (!isSuccess && !isWarning && error == Error.None)
             {
                 throw new InvalidOperationException();
             }
 
-            if (!isWarning && error == Error.None)
+            if (isSuccess && isWarning)
             {
                 throw new InvalidOperationException();
             }
 
             IsSuccess = isSuccess;
             Error = error;
-            IsWarning = isSuccess;
+            IsWarning = isWarning;
         }
 
         public bool IsSuccess { get; }
 
-        public bool IsFailure => !IsSuccess || !IsWarning;
-        public bool IsWarning { get; }
+        public bool IsFailure => !IsSuccess;
+        public bool IsWarning {get; }
 
         public Error Error { get; }
 
         public static Result Success() => new(true , true, Error.None);
         public static Result Warning() => new(true, true, Error.None);
 
-        public static Result<TValue> Success<TValue>(TValue value) => new(value,true , true, Error.None);
-        public static Result<TValue> Warning<TValue>(TValue value) => new(value,true, true, Error.None);
+        public static Result<TValue> Success<TValue>(TValue value) => new(value,true , false, Error.None);
+        public static Result<TValue> Warning<TValue>(TValue values) => new(values,false, true, Error.None);
 
         public static Result Failure(Error error) => new(false ,false, error);
 
@@ -43,11 +43,11 @@
 
         public static Result Create(bool condition) => condition ? Success(): Failure(Error.ConditionNotMet);
 
-        public static Result CreateWarning(bool condition) => condition ? Warning() : Failure(Error.ConditionNotMet);
+        public static Result CreateWarning(bool condition) => condition ? Warning() : Success();
 
         public static Result<TValue> Create<TValue>(TValue? value) => value is not null ? Success(value) : Failure<TValue>(Error.NullValue);
 
-        public static Result<TValue> CreateWarning<TValue>(TValue? value) => value is not null ? Warning(value) : Failure<TValue>(Error.NullValue);
+        public static Result<TValue> CreateWarning<TValue>(TValue? value) => value is null ? Warning(value) : Success(value);
     }
 
     public class Result<TValue> : Result
@@ -58,14 +58,12 @@
             : base(isSuccess ,IsWarning,error) =>
             _value = value;
 
-        public TValue Value => IsSuccess
-            ? _value!
+    
+        public TValue Value => IsSuccess 
+            ? _value! : IsWarning ? _value
             : throw new InvalidOperationException("The value of a failure result can not be accessed.");
-
-        public static implicit operator Result<TValue>(TValue? value) => Create(value);
+  
     }
-
-
 
 
     public record Error(string Code, string Message )

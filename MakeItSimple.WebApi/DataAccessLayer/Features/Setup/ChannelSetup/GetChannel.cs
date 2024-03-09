@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int Id { get; set; }
             public string Channel_Name { get; set; }
-            public string SubUnit_Name {  get; set; }
+            public string Department_Name {  get; set; }
             public int No_Of_Members { get; set; }
             public bool  Is_Active { get; set; }
             public string Added_By { get; set; }
@@ -67,7 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     Id = x.Id,
                     Channel_Name = x.ChannelName,
-                    SubUnit_Name = x.SubUnit.SubUnitName,
+                    Department_Name = x.Department.DepartmentName,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Updated_At = x.UpdatedAt,

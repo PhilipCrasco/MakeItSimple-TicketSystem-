@@ -23,8 +23,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public DateTime? Updated_At { get; set; }
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
+            public int No_Of_Channels { get; set; }
 
             public List<Unit> Units { get; set; }
+
+            public List<User> Users { get; set; }
+            public List<Channel>Channels { get; set; }
 
             public class Unit
             {
@@ -32,6 +36,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                 public string Unit_Name { get; set; }
             }
 
+            public class User
+            {
+                public Guid? UserId { get; set; }
+                public string EmpId { get; set; }
+                public string FullName { get; set; }
+            }
+
+            public class Channel
+            {
+                public int ChannelId { get; set;}
+                public string Channel_Name { get; set; } 
+
+            }
     
 
 
@@ -56,7 +73,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
 
             public async Task<PagedList<GetDepartmentResult>> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.Units)
+                IQueryable<Department> departmentsQuery = _context.Departments.Include(x => x.Units).Include(x => x.Channels)
                     .Include(x => x.Users).Include(x => x.ModifiedByUser).Include(x => x.AddedByUser);
                 
 
@@ -75,6 +92,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     BusinessUnit_Code = x.BusinessUnit.BusinessCode,
                     BusinessUnit_Name = x.BusinessUnit.BusinessName,
                     Added_By = x.AddedByUser.Fullname,
+                    No_Of_Channels = x.Channels.Count(),
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
@@ -84,6 +102,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     {
                         UnitId = x.Id,
                         Unit_Name = x.UnitName,
+
+                    }).ToList(),
+                    Users = x.Users.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.User
+                    {
+                        UserId = x.Id,
+                        EmpId = x.EmpId,
+                        FullName = x.Fullname
+                    
+                    }).ToList(),
+                    Channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.Channel
+                    {
+                        ChannelId = x.Id,
+                        Channel_Name = x.ChannelName
 
                     }).ToList()
                     

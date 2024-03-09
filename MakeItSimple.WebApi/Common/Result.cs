@@ -14,10 +14,10 @@
                 throw new InvalidOperationException();
             }
 
-            if (isSuccess && isWarning)
-            {
-                throw new InvalidOperationException();
-            }
+            //if (!isSuccess && !isWarning)
+            //{
+            //    throw new InvalidOperationException();
+            //}
 
             IsSuccess = isSuccess;
             Error = error;

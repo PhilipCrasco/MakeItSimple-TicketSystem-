@@ -6,12 +6,14 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CompanySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ReceiverSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.UnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing;
 using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
 using MakeItSimple.WebApi.Models;
+using MakeItSimple.WebApi.Models.Setup;
 using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
@@ -53,7 +55,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
         public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
-        public virtual DbSet<ClosingTAttachment> ClosingTAttachments { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
 
 
@@ -61,14 +62,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
 
         public virtual DbSet<ApproverTicketing> ApproverTicketings { get; set; }
-        public virtual DbSet<ClosingGenerator> ClosingGenerators { get; set; }
 
         public virtual DbSet<TicketHistory> TicketHistories { get; set; }
+        public virtual DbSet<Receiver> Receivers { get; set; }
+
+        public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.EnableSensitiveDataLogging(); 
         }
 
 
@@ -92,12 +95,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ApproverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
-            modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());  
-            modelBuilder.ApplyConfiguration(new ClosingTAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());  
             modelBuilder.ApplyConfiguration(new ReTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TicketHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());
+            modelBuilder.ApplyConfiguration(new RequestConcernConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
 
 
             //DateTime time = DateTime.Parse("2024-10-08");

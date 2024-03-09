@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using System.ComponentModel.DataAnnotations;
@@ -26,6 +27,8 @@ namespace MakeItSimple.WebApi.Models.Setup.DepartmentSetup
         
         public ICollection<Unit> Units { get; set ; }
         public ICollection<User> Users { get; set ; }
+
+        public ICollection<Channel> Channels { get; set ; }
         
        
         

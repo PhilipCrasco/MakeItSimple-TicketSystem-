@@ -19,6 +19,7 @@
         public const string Approver = "Approver";
         public const string Requestor = "Requestor";
         public const string Receiver = "Receiver";
+        public const string IssueHandler = "Issue Handler";
 
         //TicketHistory
 
@@ -28,5 +29,12 @@
         public const string ApproveBy = "Request approve by ";
         public const string RecieverApproveBy = "Request has been approved by Admin";
 
+
+        // Concern Status 
+
+        public const string ForApprovalTicket = "For Concern Approval";
+
+        public const string Concern = "Concern";
+        public const string Developing = "Developing";
     }
 }

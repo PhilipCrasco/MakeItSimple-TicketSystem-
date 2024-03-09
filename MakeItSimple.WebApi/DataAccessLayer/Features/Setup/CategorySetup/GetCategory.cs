@@ -72,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
+                    Is_Active = x.IsActive,
                     subcategories = x.SubCategories.Where(x => x.IsActive == true).Where(x => x.IsActive == true).Select(x => new GetCategoryResult.Subcategory
                     {
                         SubCategoryId = x.Id,

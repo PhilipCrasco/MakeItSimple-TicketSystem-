@@ -23,6 +23,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public string Username { get; set; }
             public string Email { get; set; }
             public string UserRoleName { get; set; }
+            //public string CompanyName {  get; set; }  
+            //public string BusinessName { get; set; }
+            //public string DepartmentName { get; set; }
+            //public string UnitName {  get; set; }
+            //public string SubUnitName { get; set; }
+            //public string LocationName { get; set; }
             public ICollection<string> Permissions { get; set; }
             public string Token { get; set; }
             public bool ? IsPasswordChanged { get; set; }
@@ -34,6 +40,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
                 EmpId = user.EmpId;
                 Fullname = user.Fullname;
                 Username = user.Username;
+                //CompanyName = user.Company.CompanyName;
+                //BusinessName = user.BusinessUnit.BusinessName;
+                //DepartmentName = user.Department.DepartmentName;
+                //UnitName = user.Units.UnitName;
+                //SubUnitName = user.SubUnit.SubUnitName;
+                //LocationName = user.Location.LocationName;
                 UserRoleName = user.UserRole.UserRoleName;
                 Permissions = user.UserRole?.Permissions;
                 IsPasswordChanged = user.IsPasswordChange;
@@ -73,6 +85,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public async Task<Result> Handle(AuthenticateUserQuery command, CancellationToken cancellationToken)
             {
                 var user = await _context.Users.Include(x => x.UserRole)
+                    .Include(x => x.Company)
+                    .Include(x => x.BusinessUnit)
+                    .Include(x => x.Department)
+                    .Include(x => x.Units)
+                    .Include(x => x.SubUnit)
+                    .Include(x => x.Location)
                     .SingleOrDefaultAsync(x => x.Username == command.UsernameOrEmail);
 
                 if(user == null || !BCrypt.Net.BCrypt.Verify(command.Password , user.Password))
@@ -85,7 +103,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
                   return Result.Failure(AuthenticationError.UserNotActive()); 
                 }
 
-
+                 
                 if(user.UserRoleId == null)
                 {
                    return Result.Failure(AuthenticationError.NoRole());

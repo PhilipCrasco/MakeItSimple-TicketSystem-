@@ -48,7 +48,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; } 
-
                 public bool IsActive { get; set; }
 
             }
@@ -159,8 +158,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                             Concern_Description = x.ConcernDetails,
                             Category_Description = x.Category.CategoryDescription,
                             SubCategoryDescription = x.SubCategory.SubCategoryDescription,
-                            Start_Date = x.StartDate,
-                            Target_Date = x.TargetDate,
+                            //Start_Date = x.StartDate,
+                            //Target_Date = x.TargetDate,
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
                             Modified_By = x.ModifiedByUser.Fullname,

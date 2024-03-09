@@ -12,8 +12,6 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelUserSetup
         public int ChannelId { get; set; }  
         public virtual Channel Channel { get; set; }
 
-        
-
 
     }
 }

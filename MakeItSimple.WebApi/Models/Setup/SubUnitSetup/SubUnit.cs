@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public string SyncStatus { get; set; }
 
 
-        public ICollection<Channel> Channels { get; set; }
+        //public ICollection<Channel> Channels { get; set; }
         public ICollection<User> Users { get; set; }
 
         //public ICollection<Location> Locations { get; set; }

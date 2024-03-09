@@ -96,7 +96,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.SubCategoryController
             }
         }
 
-        [HttpPatch("status/id")]
+        [HttpPatch("status/{id}")]
         public async Task<IActionResult> UpdateSubCategoryStatus([FromRoute] int id)
         {
             try

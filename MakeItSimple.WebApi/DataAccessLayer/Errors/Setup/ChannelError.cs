@@ -8,8 +8,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
       public static Error ChannelNameAlreadyExist(string ChannelName) =>
       new Error("Channel.ChannelNameAlreadyExist", $"Channel name {ChannelName} already exist!");
 
-      public static Error SubUnitNotExist() =>
-      new Error("Channel.SubUnitNotExist", "Sub unit doesn't exist!");
+      public static Error DepartmentNotExist() =>
+      new Error("Channel.SubUnitNotExist", "Department doesn't exist!");
 
       public static Error UserNotExist() =>
       new Error("Channel.UserNotExist", "User doesn't exist!");

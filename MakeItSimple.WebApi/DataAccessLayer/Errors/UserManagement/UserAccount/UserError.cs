@@ -30,6 +30,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors
       new Error("User.LocationNotExist", "Location not exist!");
       public static Error BusinessUnitNotExist() =>
       new Error("User.BusinessUnitNotExist", "Business unit not exist!");
+
+      public static Error ReceiverNotExist() =>
+      new Error("User.ReceiverNotExist", "Receiver must be set!");
       public static Error UnitNotExist() =>
       new Error("User.UnitNotExist", "Unit not exist!");
       public static Error UserNotExist() =>

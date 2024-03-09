@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
+﻿using MakeItSimple.WebApi.Models.Setup;
+using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
@@ -35,23 +36,31 @@ namespace MakeItSimple.WebApi.Models
         public int UserRoleId { get; set; }
         public virtual UserRole UserRole { get; set; }
 
+        public int? CompanyId { get; set; }
+        public virtual Company Company { get; set; }
+
+        public int? BusinessUnitId { get; set; }
+        public virtual BusinessUnit BusinessUnit { get; set; }
+
+        //public int ? ReceiverId { get; set; }
+        //public virtual Receiver Receiver { get; set; }
+
+
         public int ? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
-        public int ? SubUnitId { get; set; }
-        public virtual SubUnit SubUnit { get; set; }
- 
         public int? UnitId { get; set; }
         public virtual Unit Units { get; set; }
 
-        public int ? CompanyId { get; set; }
-        public virtual Company Company { get; set; }
+        public int ? SubUnitId { get; set; }
+        public virtual SubUnit SubUnit { get; set; }
 
-        public int ? LocationId { get; set; }
+        public int? LocationId { get; set; }
         public virtual Location Location { get; set; }
 
-        public int ? BusinessUnitId { get; set; }
-        public virtual BusinessUnit BusinessUnit { get; set; }
+
+
+
 
 
 

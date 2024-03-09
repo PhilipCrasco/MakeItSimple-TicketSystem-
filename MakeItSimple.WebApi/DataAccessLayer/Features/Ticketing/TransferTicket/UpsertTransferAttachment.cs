@@ -88,7 +88,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TicketRequestError.InvalidAttachmentSize());
                     }
 
-                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png" };
+                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png" , ".docx" };
                     var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
 
                     if (extension == null || !allowedFileTypes.Contains(extension))

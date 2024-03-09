@@ -1,6 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +13,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
         public class SyncCompanyCommand : IRequest<Result>
         {
 
-            public ICollection<CompanyResultCommand> Companies { get; set; }
-
             public Guid Modified_By { get; set; }
             public Guid? Added_By { get; set; }
             public DateTime? SyncDate { get; set; }
-
+            public ICollection<CompanyResultCommand> Companies { get; set; }
             public class CompanyResultCommand
             {
                 public int Company_No { get; set; }
@@ -42,14 +39,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
             public async Task<Result> Handle(SyncCompanyCommand command, CancellationToken cancellationToken)
             {
-                var AllInputSync = new List<SyncCompanyCommand.CompanyResultCommand>();
+                var AllInputSync = new List<CompanyResultCommand>();
                 var AvailableSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var UpdateSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var DuplicateSync = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var CompanyCodeNullOrEmpty = new List<SyncCompanyCommand.CompanyResultCommand>();
                 var CompanyNameNullOrEmpty = new List<SyncCompanyCommand.CompanyResultCommand>();
 
-                foreach (SyncCompanyCommand.CompanyResultCommand companies in command.Companies)
+                foreach (var companies in command.Companies)
                 {
                     if(string.IsNullOrEmpty(companies.Company_Code))
                     {
@@ -105,7 +102,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                         }
                         else
                         {
-                            var AddCompanies = new Company
+                            var addCompanies = new Company
                             {
                                 CompanyNo = companies.Company_No,
                                 CompanyCode = companies.Company_Code,
@@ -118,7 +115,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                             };
 
                             AvailableSync.Add(companies);
-                            await _context.Companies.AddAsync(AddCompanies);
+                            await _context.Companies.AddAsync(addCompanies);
                         }
 
                     }
@@ -137,58 +134,62 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
                     var businessUnitsList = await _context.BusinessUnits.Where(x => x.CompanyId == company.Id).ToListAsync();
 
-                    foreach(var business in businessUnitsList)
+                    foreach (var business in businessUnitsList)
                     {
                         business.IsActive = false;
-                        
+
                         var departmentList = await _context.Departments.Where(x => x.BusinessUnitId == business.Id).ToListAsync();
 
-                        foreach(var department in departmentList)
+                        foreach (var department in departmentList)
                         {
                             department.IsActive = false;
 
-                            var UnitList = await _context.Units.Where(x => x.DepartmentId == department.Id).ToListAsync();
 
-                            foreach(var units  in UnitList)
+                            var channelList = await _context.Channels.Where(x => x.DepartmentId == department.Id).ToListAsync();
+
+                            foreach (var channels in channelList)
                             {
-                                units.IsActive = false;
+                                channels.IsActive = false;
 
-                               var subUnitsList = await _context.SubUnits.Where(x => x.UnitId == units.Id).ToListAsync();   
+                                var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
 
-                                foreach( var subUnit in subUnitsList)
+                                var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                                foreach (var channelUsers in channelUserList)
                                 {
-                                    subUnit.IsActive = false;
+                                    channelUsers.IsActive = false;
+                                }
 
-                                    var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
+                                foreach (var approver in ApproverSetupList)
+                                {
+                                    approver.IsActive = false;
+                                }
 
-                                    foreach (var channels in channelList)
+
+
+
+                                var UnitList = await _context.Units.Where(x => x.DepartmentId == department.Id).ToListAsync();
+
+                                foreach (var units in UnitList)
+                                {
+                                    units.IsActive = false;
+
+                                    var subUnitsList = await _context.SubUnits.Where(x => x.UnitId == units.Id).ToListAsync();
+
+                                    foreach (var subUnit in subUnitsList)
                                     {
-                                        channels.IsActive = false;
-
-                                        var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                                        var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                                        foreach(var channelUsers in channelUserList)
-                                        {
-                                            channelUsers.IsActive = false;
-                                        }
-
-                                        foreach(var approver in ApproverSetupList)
-                                        {
-                                            approver.IsActive = false;  
-                                        }
+                                        subUnit.IsActive = false;
 
                                     }
                                 }
+
                             }
 
                         }
 
-                    }
 
-                    
-                } 
+                    }
+                }
 
                 var resultList = new
                 {

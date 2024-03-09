@@ -27,8 +27,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 public string SubUnit_Code { get; set; }
                 public string SubUnit_Name { get; set; }
                 public string Unit_Name { get; set; }
-
-                public string Location_Name { get; set; }
                 public string Sync_Status { get; set; }
                 public DateTime Created_At { get; set; }
                 public DateTime? Update_dAt { get; set; }
@@ -168,28 +166,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 foreach (var subUnit in allDataInput)
                 {
                     subUnit.IsActive = false;
-
-                    var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
-
-                    foreach (var channels in channelList)
-                    {
-                        channels.IsActive = false;
-
-                        var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                        var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                        foreach (var channelUsers in channelUserList)
-                        {
-                            channelUsers.IsActive = false;
-                        }
-
-                        foreach (var approver in ApproverSetupList)
-                        {
-                            approver.IsActive = false;
-                        }
-
-                    }
                     
                 }
 

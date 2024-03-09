@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.AddNewTicketAttachment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.ApproveRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.CancelTicketRequest;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetTicketRequest;

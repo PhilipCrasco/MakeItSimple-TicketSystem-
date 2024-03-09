@@ -114,6 +114,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.BusinessUnitNotExist());
                 }
 
+                //var receiverExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == BusinessUnitNotExist.Id, cancellationToken);
+                //if (receiverExist == null)
+                //{
+                //    return Result.Failure(UserError.ReceiverNotExist());
+                //}
+
                 var UnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
                 if (UnitNotExist == null)
                 {
@@ -135,6 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.UnitId = command.UnitId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;
+                //user.ReceiverId = receiverExist.Id;
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -154,6 +154,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             {
                 department.IsActive = false;
 
+                var channelList = await _context.Channels.Where(x => x.DepartmentId == department.Id).ToListAsync();
+
+                foreach (var channels in channelList)
+                {
+                    channels.IsActive = false;
+
+                    var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                    var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+
+                    foreach (var channelUsers in channelUserList)
+                    {
+                        channelUsers.IsActive = false;
+                    }
+
+                    foreach (var approver in ApproverSetupList)
+                    {
+                        approver.IsActive = false;
+                    }
+
+                }
+
                 var UnitList = await _context.Units.Where(x => x.DepartmentId == department.Id).ToListAsync();
 
                 foreach (var units in UnitList)
@@ -166,27 +188,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     {
                         subUnit.IsActive = false;
 
-                        var channelList = await _context.Channels.Where(x => x.SubUnitId == subUnit.Id).ToListAsync();
 
-                        foreach (var channels in channelList)
-                        {
-                            channels.IsActive = false;
-
-                            var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                            var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
-
-                            foreach (var channelUsers in channelUserList)
-                            {
-                                channelUsers.IsActive = false;
-                            }
-
-                            foreach (var approver in ApproverSetupList)
-                            {
-                                approver.IsActive = false;
-                            }
-
-                        }
                     }
                 }
             }

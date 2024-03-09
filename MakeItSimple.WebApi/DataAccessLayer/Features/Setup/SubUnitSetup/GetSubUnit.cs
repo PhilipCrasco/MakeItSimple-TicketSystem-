@@ -27,8 +27,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
             public DateTime? Updated_At { get; set; }
-            public int No_Of_Channels { get; set; }
-
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
 
@@ -50,13 +48,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 public string Fullname { get; set; }
             }
 
-            public List<Channel> channels{ get; set; }
+            //public List<Channel> channels{ get; set; }
 
-            public class Channel
-            {
-                public int ChannelId { get; set; }
-                public string Channel_Name { get; set; }
-            } 
+            //public class Channel
+            //{
+            //    public int ChannelId { get; set; }
+            //    public string Channel_Name { get; set; }
+            //} 
 
 
 
@@ -80,7 +78,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
 
             public async Task<PagedList<GetSubUnitResult>> Handle(GetSubUnitQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<SubUnit> subUnitQuery = _context.SubUnits.Include(x => x.Channels).Include(x => x.AddedByUser).Include(x => x.ModifiedByUser);
+                IQueryable<SubUnit> subUnitQuery = _context.SubUnits.Include(x => x.AddedByUser).Include(x => x.ModifiedByUser);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -100,21 +98,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     SubUnit_Code = x.SubUnitCode,
                     SubUnit_Name = x.SubUnitName,
                     Unit_Name = x.Unit.UnitName,
-                    //Location_Name = x.Location.LocationName,
                     Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
-                    No_Of_Channels = x.Channels.Count(),
+
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
-                    //Locations = x.Locations.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Location
-                    //{
-                    //    LocationId = x.Id,
-                    //    Location_Code = x.LocationCode,
-                    //    Location_Name = x.LocationName,
-                    //}).ToList(),
 
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
@@ -123,13 +114,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
 
                     }).ToList(),
 
-                    channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
-                    {
-                        ChannelId = x.Id,
+                    //channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
+                    //{
+                    //    ChannelId = x.Id,
          
-                        Channel_Name = x.ChannelName
+                    //    Channel_Name = x.ChannelName
 
-                    }).ToList(),
+                    //}).ToList(),
 
                 });
 

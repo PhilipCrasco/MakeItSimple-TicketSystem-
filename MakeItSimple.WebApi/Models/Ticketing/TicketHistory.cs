@@ -13,7 +13,6 @@
         public string Status { get; set; }
         public DateTime ? TransactionDate { get; set; }
 
-
     }
 
 }

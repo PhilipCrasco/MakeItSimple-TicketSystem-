@@ -184,16 +184,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest
                     Concerns = concernList.Select(x => new AddNewTicketResult.TicketConcerns
                     {
                         TicketConcernId = x.Id,
-                        DepartmentId = x.DepartmentId,
+                        //DepartmentId = x.DepartmentId,
                         UnitId = x.UnitId,
-                        SubUnitId = x.SubUnitId,
-                        ChannelId = x.ChannelId,
+                        //SubUnitId = x.SubUnitId,
+                        //ChannelId = x.ChannelId,
                         UserId = x.UserId,
                         Concern_Details = x.ConcernDetails,
-                        CategoryId = x.CategoryId,
-                        SubCategoryId = x.SubCategoryId,
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate,
+                        //CategoryId = x.CategoryId,
+                        //SubCategoryId = x.SubCategoryId,
+                        //Start_Date = x.StartDate,
+                        //Target_Date = x.TargetDate,
                         Added_By = x.AddedBy,
                         Created_At = x.CreatedAt,
 

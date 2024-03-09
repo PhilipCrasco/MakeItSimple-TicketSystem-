@@ -66,9 +66,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public bool? Status { get; set; }
             public string Search { get; set; }
-            public string Request { get; set; }
+            public string Receiver { get; set; }
             public string Users { get; set; }
             public Guid? UserId { get; set; }
+
+            public string Role { get; set; }
         }
 
         public class Handler : IRequestHandler<GetOpenTicketQuery, PagedList<GetOpenTicketResult>>
@@ -89,6 +91,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.RequestorByUser)
                     .Include(x => x.User);
 
+                var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
+                var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+                var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
+
                 if (request.Users == TicketingConString.Users)
                 {
                     ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
@@ -101,32 +107,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 }
 
-                if (request.Request == TicketingConString.ReTicket)
-                {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReTicket == false && x.IsApprove == true);
-                }
-
-                else if (request.Request == TicketingConString.Transfer)
-                {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer == false && x.IsApprove == true);
-                }
-
-                else if (request.Request == TicketingConString.Open)
-                {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer != false && x.IsReTicket != false && x.IsApprove == true);
-                }
-
                 if (request.Status != null)
                 {
                     ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                 }
 
+                if(request.Receiver == TicketingConString.Receiver)
+                {
+                    if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
+                    {
+
+                        var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                        var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                        ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
+
+                    }
+                    else
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                    }
+
+
+                }
+
+
+
                 var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false)
                     .GroupBy(x => x.RequestGeneratorId).Select(x => new GetOpenTicketResult
-                {
+                    {
 
-                    OpenTicketCount = ticketConcernQuery.Count(x => x.Id == ticketConcernQuery.First().Id),
-                    
+                        OpenTicketCount = ticketConcernQuery.Count(),
                         RequestGeneratorId = x.Key,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,
@@ -160,22 +170,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             IsActive = x.IsActive,
 
                         }).ToList()
-                });
 
 
-
-                //OpenTicketByIds = group.Select(x => new OpenTicketById
-                //{
-
-                //}).ToList()
+                    });
 
 
-                //{
-
-
-
-
-                //}).ToList(),
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

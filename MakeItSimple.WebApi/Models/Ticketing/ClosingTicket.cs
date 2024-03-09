@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
-        public int ChannelId { get; set; }
+        public int ? ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
 
         public string ConcernDetails { get; set; }

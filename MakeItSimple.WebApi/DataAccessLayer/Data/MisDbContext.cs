@@ -67,6 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<Receiver> Receivers { get; set; }
 
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
+        public virtual DbSet<TicketGenerator> TicketGenerators { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

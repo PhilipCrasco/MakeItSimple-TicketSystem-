@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public int ? RequestGeneratorId { get; set; }   
+        public int ? TicketGeneratorId { get; set; }
+        public virtual TicketGenerator TicketGenerator { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
         public Guid ? RequestorBy { get; set; }
         public virtual User RequestorByUser { get; set; }

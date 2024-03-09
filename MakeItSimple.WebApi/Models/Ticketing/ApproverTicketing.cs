@@ -22,5 +22,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int ? RequestGeneratorId { get; set; }
         public string Status { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
+
+
+        public int ? TicketGeneratorId { get; set; }
+        public virtual TicketGenerator TicketGenerator { get; set; }
     }
 }

@@ -816,6 +816,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("status");
 
+                    b.Property<int?>("TicketGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_generator_id");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("char(36)")
                         .HasColumnName("user_id");
@@ -831,6 +835,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("RequestGeneratorId")
                         .HasDatabaseName("ix_approver_ticketings_request_generator_id");
+
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_approver_ticketings_ticket_generator_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_approver_ticketings_user_id");
@@ -857,7 +864,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
@@ -1038,7 +1045,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
@@ -1568,9 +1575,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("is_active");
 
                     b.HasKey("Id")
-                        .HasName("pk_ticket_generator");
+                        .HasName("pk_ticket_generators");
 
-                    b.ToTable("ticket_generator", (string)null);
+                    b.ToTable("ticket_generators", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
@@ -1600,6 +1607,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("status");
 
+                    b.Property<int?>("TicketGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_generator_id");
+
                     b.Property<DateTime?>("TransactionDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("transaction_date");
@@ -1615,6 +1626,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("RequestorBy")
                         .HasDatabaseName("ix_ticket_histories_requestor_by");
+
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_ticket_histories_ticket_generator_id");
 
                     b.ToTable("ticket_histories", (string)null);
                 });
@@ -1638,7 +1652,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
@@ -2333,6 +2347,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("RequestGeneratorId")
                         .HasConstraintName("fk_approver_ticketings_request_generators_request_generator_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
+                        .WithMany("ApproverTicketings")
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_approver_ticketings_ticket_generators_ticket_generator_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -2343,6 +2362,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Channel");
 
                     b.Navigation("RequestGenerator");
+
+                    b.Navigation("TicketGenerator");
 
                     b.Navigation("User");
                 });
@@ -2370,8 +2391,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_closing_tickets_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ClosedByUser")
@@ -2431,7 +2450,7 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("ClosingTickets")
                         .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_closing_tickets_ticket_generator_ticket_generator_id");
+                        .HasConstraintName("fk_closing_tickets_ticket_generators_ticket_generator_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", "Unit")
                         .WithMany()
@@ -2499,8 +2518,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_re_ticket_concerns_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", "Company")
@@ -2813,11 +2830,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_histories_users_requestor_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
+                        .WithMany("TicketHistories")
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_ticket_histories_ticket_generators_ticket_generator_id");
+
                     b.Navigation("ApproverByUser");
 
                     b.Navigation("RequestGenerator");
 
                     b.Navigation("RequestorByUser");
+
+                    b.Navigation("TicketGenerator");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
@@ -2843,8 +2867,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_transfer_ticket_concerns_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", "Company")
@@ -3089,7 +3111,11 @@ namespace MakeItSimple.WebApi.Migrations
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", b =>
                 {
+                    b.Navigation("ApproverTicketings");
+
                     b.Navigation("ClosingTickets");
+
+                    b.Navigation("TicketHistories");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>

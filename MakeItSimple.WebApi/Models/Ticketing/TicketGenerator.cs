@@ -6,5 +6,8 @@
         public bool IsActive {get; set; }
 
         public ICollection<ClosingTicket> ClosingTickets { get; set; }
+        public ICollection<ApproverTicketing> ApproverTicketings { get; set; }
+
+        public ICollection<TicketHistory> TicketHistories { get; set; }
     }
 }

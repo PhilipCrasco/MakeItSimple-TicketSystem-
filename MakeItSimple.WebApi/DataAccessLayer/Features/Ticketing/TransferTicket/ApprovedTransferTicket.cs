@@ -132,7 +132,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             concernTicketById.Remarks = TicketingConString.Transfer;
                         }
 
-                        if(ticketHistoryId.Status != TicketingConString.RecieverApproveBy)
+                        if(ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
                         {
                             var addTicketHistory = new TicketHistory
                             {
@@ -141,7 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                 RequestorBy = userTranferTicket.First().AddedBy,
                                 TransactionDate = DateTime.Now,
                                 Request = TicketingConString.Transfer,
-                                Status = TicketingConString.RecieverApproveBy
+                                Status = TicketingConString.ReceiverApproveBy
                             };
 
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

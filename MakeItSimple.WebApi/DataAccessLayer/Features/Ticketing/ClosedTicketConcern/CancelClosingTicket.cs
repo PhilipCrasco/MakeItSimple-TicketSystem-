@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public List<CancelClosingGenerator> CancelClosingGenerators { get; set; }
             public class CancelClosingGenerator
             {
-                public int RequestGeneratorId { get; set; }
+                public int TicketGeneratorId { get; set; }
 
                 public List<CancelClosingConcern> CancelClosingConcerns { get; set; }
 
@@ -40,28 +40,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 foreach (var close in command.CancelClosingGenerators)
                 {
-                    var closingTicketQuery = await _context.ClosingTickets.Where(x => x.RequestGeneratorId == close.RequestGeneratorId).ToListAsync();
+                    var closingTicketQuery = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == close.TicketGeneratorId).ToListAsync();
 
                     if (closingTicketQuery == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    if (close.CancelClosingConcerns.Count <= 0)
-                    {
-                        foreach (var closingList in closingTicketQuery)
-                        {
-                            var closingTicketConcernRequest = await _context.TicketConcerns.Where(x => x.Id == closingList.TicketConcernId).ToListAsync();
 
-                            foreach (var reTicketConcern in closingTicketConcernRequest)
-                            {
-                                reTicketConcern.IsReTicket = null;
-                            }
-
-                            _context.Remove(closingList);
-                        }
-                    }
-
+                  
+                   
                     foreach (var closingId in close.CancelClosingConcerns)
                     {
                         var closingConcernId = closingTicketQuery.FirstOrDefault(x => x.Id == closingId.ClosingTicketId);
@@ -69,13 +57,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             var reTicketConcernRequest = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == closingConcernId.TicketConcernId, cancellationToken);
 
-                            reTicketConcernRequest.IsReTicket = null;
+                            reTicketConcernRequest.IsClosedApprove = null;
 
                             _context.Remove(closingConcernId);
                         }
                         else
                         {
-                            return Result.Failure(ClosingTicketError.ClosingTicketIdNotExist());
+                            foreach (var closingList in closingTicketQuery)
+                            {
+                                var closingTicketConcernRequest = await _context.TicketConcerns.Where(x => x.Id == closingList.TicketConcernId).ToListAsync();
+
+                                foreach (var reTicketConcern in closingTicketConcernRequest)
+                                {
+                                    reTicketConcern.IsClosedApprove = null;
+                                }
+
+                                _context.Remove(closingList);
+                            }
                         }
 
                     }

@@ -1,6 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using MakeItSimple.WebApi.Models;
 using MoreLinq.Extensions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTicketHistory;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -270,32 +269,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
-
-
-        [HttpGet("history/{id}")]
-        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
-        {
-            try
-            {
-                var query = new GetTicketHistoryQuery
-                {
-                    RequestGeneratorId = id
-                };
-
-                var results = await _mediator.Send(query);
-                if (results.IsFailure)
-                {
-                    return BadRequest(query);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
 
 
 

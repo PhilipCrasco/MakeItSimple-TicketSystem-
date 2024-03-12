@@ -129,7 +129,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             concernTicketById.Remarks = TicketingConString.ReTicket;
                         }
 
-                        if (ticketHistoryId.Status != TicketingConString.RecieverApproveBy)
+                        if (ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
                         {
                             var addTicketHistory = new TicketHistory
                             {
@@ -138,7 +138,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                                 RequestorBy = userReTicket.First().AddedBy,
                                 TransactionDate = DateTime.Now,
                                 Request = TicketingConString.ReTicket,
-                                Status = TicketingConString.RecieverApproveBy
+                                Status = TicketingConString.ReceiverApproveBy
                             };
 
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

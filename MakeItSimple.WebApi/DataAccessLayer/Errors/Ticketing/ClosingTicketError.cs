@@ -28,5 +28,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
         public static Error ClosingTicketIdNotExist() =>
        new Error("TransferTicketError.ReTicketIdNotExist", "Closing Ticket request not exist!");
 
+        public static Error ClosingTicketIdAlreadyExist() =>
+       new Error("TransferTicketError.ClosingTicketIdAlreadyExist", "Closing Ticket request already exist!");
+
     }
 }

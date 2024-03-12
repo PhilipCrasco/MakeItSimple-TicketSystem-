@@ -124,7 +124,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 //    return Result.Failure(UserError.ReceiverNotExist());
                 //}
 
-                var UnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
+                var UnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
                 if (UnitNotExist == null)
                 {
                     return Result.Failure(UserError.UnitNotExist());

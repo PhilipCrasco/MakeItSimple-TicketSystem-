@@ -66,10 +66,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var addNewClosingConcern = new ClosingTicket
                         {
                             TicketConcernId = ticketConcernExist.Id,
+                            TicketGeneratorId = ticketGeneratorId.Id,
                             ChannelId = ticketConcernExist.ChannelId,
                             UserId = ticketConcernExist.UserId,
                             ConcernDetails = ticketConcernExist.ConcernDetails,
-                            ClosingRemarks = command.Closed_Remarks,
+                            CategoryId = ticketConcernExist.CategoryId,
+                            SubCategoryId = ticketConcernExist.SubCategoryId,
+                            
+                            //ClosingRemarks = command.Closed_Remarks,
                             StartDate = ticketConcernExist.StartDate,
                             TargetDate = ticketConcernExist.TargetDate,
                             IsClosing = false,
@@ -83,7 +87,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         closedList.Add(addNewClosingConcern);
                          
-
                     }
 
                     var getApprover = await _context.Approvers

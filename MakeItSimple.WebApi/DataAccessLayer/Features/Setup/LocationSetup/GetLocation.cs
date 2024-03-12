@@ -12,7 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
     {
         public class GetLocationResult
         {
-            //public int Id { get; set; }
+
             public int Location_No { get; set; }
             public string Location_Code { get; set; }
             public string Location_Name { get; set; }
@@ -29,6 +29,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
 
             public class SubUnit
             {
+                public int LocationId { get; set; }
                 public int ? SubUnitId {get; set; }
                 public string SubUnit_Code { get; set; }
                 public string SubUnit_Name { get; set; }
@@ -63,6 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                 {
                     //Id = x.Id,
                     Location_No = x.Key,
+
                     Location_Code = x.First().LocationCode,
                      Location_Name = x.First().LocationName,
                     Added_By = x.First().AddedByUser.Fullname,
@@ -75,6 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     SyncDate = x.First().SyncDate,
                     SubUnits = x.Select(x => new GetLocationResult.SubUnit
                     {
+                        LocationId = x.Id,
                         SubUnitId = x.SubUnitId,
                         SubUnit_Code = x.SubUnit.SubUnitCode,
                         SubUnit_Name = x.SubUnit.SubUnitName,

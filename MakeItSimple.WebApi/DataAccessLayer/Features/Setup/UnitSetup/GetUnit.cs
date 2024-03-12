@@ -11,12 +11,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
     {
         public class GetUnitResult
         {
-            public int Id { get; set; }
+            public int Id { get; set; } 
 
             public int Unit_No { get; set; }
             public string Unit_Code { get; set; }
             public string Unit_Name { get; set; }
 
+            public int ? DepartmentId {  get; set; }
             public string Department_Name { get; set; }
 
             public bool Is_Active { get; set; }
@@ -86,6 +87,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
                     Unit_No = x.UnitNo,
                     Unit_Code = x.UnitCode,
                     Unit_Name = x.UnitName,
+                    DepartmentId = x.DepartmentId,
                     Department_Name = x.Department.DepartmentName,
                     Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,

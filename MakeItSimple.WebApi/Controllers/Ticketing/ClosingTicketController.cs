@@ -12,8 +12,9 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnedClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicketAttachment;
+
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
@@ -109,7 +110,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                command.RequestGeneratorId = id;
+                command.TicketGeneratorId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
                     var userRole = identity.FindFirst(ClaimTypes.Role);
@@ -125,32 +126,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         command.Requestor_By = userId;
                     }
                 }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch(Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpPost("attachment/{id}")]
-        public async Task<IActionResult> UpsertClosingTicketAttachment([FromForm] UpsertClosingTicketAttachmentCommand command , [FromRoute] int id)
-        {
-            try
-            {
-                command.RequestGeneratorId = id;
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Modified_By = userId;
-                    command.Added_By = userId;
-                    command.Requestor_By = userId;
-                }
-
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
@@ -271,6 +246,34 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.RejectClosed_By = userId;
                         command.Approver_By = userId;
+                    }
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("returned")]
+        public async Task<IActionResult> ReturnedClosingTicket([FromBody] ReturnedClosingTicketCommand command)
+        {
+            try
+            {
+
+                if (User.Identity is ClaimsIdentity identity)
+                {
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.UserId = userId;
                     }
                 }
                 var results = await _mediator.Send(command);

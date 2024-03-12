@@ -15,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
             public int? Business_No { get; set; }
             public string Business_Code { get; set; }
             public string Business_Name { get; set; }
+            public  int ? CompanyId { get; set; }
             public string Company_Name { get; set; }
             public string AddedBy { get; set; }
             public DateTime CreatedAt { get; set; } 
@@ -22,6 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
             public virtual string ModifiedBy { get; set; }
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
+            public bool IsActive { get; set; }
             public ICollection<Department> Departments { get; set; }
             public class Department
             {
@@ -37,6 +39,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
          public class GetBussinessUnitQuery : UserParams, IRequest<PagedList<GetBussinessUnitResults>>
          {
             public string Search { get; set; }
+            public bool ? Status { get; set; }
          }
 
         public class Handler : IRequestHandler<GetBussinessUnitQuery, PagedList<GetBussinessUnitResults>>
@@ -67,6 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
                     Business_No = x.Business_No,    
                     Business_Code = x.BusinessCode,
                     Business_Name = x.BusinessName,
+                    CompanyId = x.CompanyId,
                     Company_Name = x.Company.CompanyName,
                     AddedBy = x.AddedByUser.Fullname,
                     CreatedAt = x.CreatedAt,
@@ -74,6 +78,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
                     UpdatedAt = x.UpdatedAt,
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
+                    IsActive = x.IsActive,
                     Departments = x.Departments.Select(x => new GetBussinessUnitResults.Department
                     {
                         DepartmentId = x.Id,

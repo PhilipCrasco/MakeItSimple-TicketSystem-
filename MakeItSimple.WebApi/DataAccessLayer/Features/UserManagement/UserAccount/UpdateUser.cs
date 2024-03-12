@@ -107,7 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.LocationNotExist());
                 }
-                var BusinessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
+                var BusinessUnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
 
                 if (BusinessUnitNotExist == null)
                 {

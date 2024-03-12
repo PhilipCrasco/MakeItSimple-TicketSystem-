@@ -15,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public int Department_No { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+            public int ? BusinessUnitId { get; set; }
             public string BusinessUnit_Code {  get; set; }
             public string BusinessUnit_Name {  get; set; }
             public string Added_By { get; set; }
@@ -24,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
             public int No_Of_Channels { get; set; }
+
+            public bool Is_Active { get; set; }
 
             public List<Unit> Units { get; set; }
 
@@ -59,6 +62,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
         public class GetDepartmentQuery : UserParams, IRequest<PagedList<GetDepartmentResult>>
         {
             public string Search { get; set; }
+            public string Status { get; set; }
 
         }
 
@@ -89,6 +93,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Department_No = x.DepartmentNo,
                     Department_Code = x.DepartmentCode,
                     Department_Name = x.DepartmentName,
+                    BusinessUnitId = x.BusinessUnitId,
                     BusinessUnit_Code = x.BusinessUnit.BusinessCode,
                     BusinessUnit_Name = x.BusinessUnit.BusinessName,
                     Added_By = x.AddedByUser.Fullname,
@@ -98,6 +103,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
+                    Is_Active = x.IsActive,
                     Units = x.Units.Where(x => x.IsActive == true).Select(x => new GetDepartmentResult.Unit
                     {
                         UnitId = x.Id,

@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 
 namespace MakeItSimple.WebApi.Models.Setup.CompanySetup
 {
@@ -20,6 +21,9 @@ namespace MakeItSimple.WebApi.Models.Setup.CompanySetup
         public DateTime SyncDate { get; set; }
 
         public string SyncStatus { get; set; }
+
+         
+        public ICollection<BusinessUnit> BusinessUnits { get; set; }
 
 
 

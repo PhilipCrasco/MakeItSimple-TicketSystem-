@@ -21,11 +21,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
             public DateTime? Updated_At { get; set; }
             public DateTime? SyncDate { get; set; }
             public string Sync_Status { get; set; }
+
+            public bool IsActive { get; set; }
+
+            public List<BusinessUnit> BusinessUnits { get; set; }
+
+            public class BusinessUnit
+            {
+                public int? BusinessUnitId { get; set; } 
+                public string BusinessUnit_Name { get; set;}
+
+            }
         }
 
         public class GetCompanyQuery : UserParams , IRequest<PagedList<GetCompanyResult>>
         {
             public string Search {  get; set; }
+
+            public bool ? Status { get; set; }
         }
 
         public class Handler : IRequestHandler<GetCompanyQuery, PagedList<GetCompanyResult>>
@@ -47,6 +60,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
 
                 }
 
+                if(request.Status != null)
+                {
+                    companiesQuery = companiesQuery.Where(x => x.IsActive == request.Status);
+                }
+
                 var results = companiesQuery.Select(x => new GetCompanyResult
                 {
                     Id = x.Id,
@@ -59,6 +77,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup
                     Updated_At = x.UpdatedAt,
                     Sync_Status = x.SyncStatus,
                     SyncDate = x.SyncDate,
+                    IsActive = x.IsActive,
+                    BusinessUnits = x.BusinessUnits.Select(x => new GetCompanyResult.BusinessUnit
+                    {
+                        BusinessUnitId = x.Id,
+                        BusinessUnit_Name = x.BusinessName
+                    }).ToList()
 
                 });
 

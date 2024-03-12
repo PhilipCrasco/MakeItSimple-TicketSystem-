@@ -10,6 +10,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -166,6 +167,30 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
 
                     return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpGet("history/{id}")]
+        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
+        {
+            try
+            {
+                var query = new GetTicketHistoryQuery
+                {
+                    TicketGeneratorId = id
+                };
+
+                var results = await _mediator.Send(query);
+                if (results.IsFailure)
+                {
+                    return BadRequest(query);
                 }
                 return Ok(results);
             }

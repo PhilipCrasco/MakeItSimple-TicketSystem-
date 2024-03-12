@@ -15,15 +15,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            public int? RequestGeneratorId { get; set; }
-            public string Closing_Remarks { get; set; }
+            public int? TicketGeneratorId { get; set; }
             public Guid? Requestor_By { get; set; }
             public string Role { get; set; }
 
             public List<UpsertClosingTicketConcern> UpsertClosingTicketConcerns {  get; set; }
             public class UpsertClosingTicketConcern
             {
-                public int? TicketConcernId { get; set; }
+                public int TicketConcernId { get; set; }
                 public int? ClosingTicketId { get; set; }
             }
 
@@ -41,17 +40,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var closeUpdateList = new List<bool>();
                     var closeNewList = new List<ClosingTicket>();
 
-                    var requestGeneratorIdInTransfer = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
-                    var requestClosingList = await _context.ClosingTickets.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                    var requestGeneratorIdInTransfer = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
+                    var requestClosingList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
                     if (requestGeneratorIdInTransfer == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
+                    var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.TicketGeneratorId
                     && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
-                    if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsClosing == true && command.Role != TicketingConString.Admin))
+                    if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsClosing == true && command.Role != TicketingConString.Receiver))
                     {
                         return Result.Failure(ClosingTicketError.ClosingTicketConcernUnable());
                     }
@@ -81,14 +80,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             && close.TicketConcernId != close.TicketConcernId && x.IsClosing == false, cancellationToken);
                             if (ticketConcernAlreadyExist != null)
                             {
-                                return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
+                                return Result.Failure(ClosingTicketError.ClosingTicketIdAlreadyExist());
                             }
 
                             bool HasChange = false;
 
-                            if (closingTicketConcern.ClosingRemarks != command.Closing_Remarks)
+                            if(closingTicketConcern.TicketConcernId != close.TicketConcernId)
                             {
-                                closingTicketConcern.ClosingRemarks = command.Closing_Remarks;
+                                closingTicketConcern.TicketConcernId = close.TicketConcernId;
+
+                                var ticketConcernList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == closingTicketConcern.TicketConcernId, cancellationToken);
+
+                                closingTicketConcern.StartDate = ticketConcernList.StartDate;
+                                closingTicketConcern.TargetDate = ticketConcernList.TargetDate;
+                               
                                 HasChange = true;
                             }
                              
@@ -115,17 +120,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             var addClosingTicket = new ClosingTicket
                             {
-                                RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                                TicketGeneratorId = requestGeneratorIdInTransfer.TicketGeneratorId,
                                 TicketConcernId = ticketConcern.Id,
-                                DepartmentId = ticketConcern.DepartmentId,
-                                UnitId = ticketConcern.UnitId,
-                                //SubUnitId = ticketConcern.SubUnitId,
-                                //ChannelId = ticketConcern.ChannelId,
                                 UserId = ticketConcern.UserId,
                                 ConcernDetails = ticketConcern.ConcernDetails,
-                                //CategoryId = ticketConcern.CategoryId,
-                                //SubCategoryId = ticketConcern.SubCategoryId,
-                                ClosingRemarks = command.Closing_Remarks,
                                 AddedBy = command.Added_By,
                                 StartDate = ticketConcern.StartDate,
                                 TargetDate = ticketConcern.TargetDate,
@@ -136,7 +134,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             ticketConcern.IsClosedApprove = false;
                             await _context.ClosingTickets.AddAsync(addClosingTicket, cancellationToken);
-                            closeNewList.Add(addClosingTicket);
 
                         }
                         else

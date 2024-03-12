@@ -165,6 +165,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             Target_Date = x.TargetDate,
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
+                            Remarks = x.Remarks,
                             Modified_By = x.ModifiedByUser.Fullname,
                             Updated_At = x.UpdatedAt,
                             IsActive = x.IsActive,

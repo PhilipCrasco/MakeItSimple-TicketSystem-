@@ -16,23 +16,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public Guid Id { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
-
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public bool Is_Active { get; set; }
             public string Modified_By { get; set; }
             public DateTime ? Update_At { get; set;}
+
+            public int? UserRoleId { get; set; }
             public string User_Role_Name { get; set; }
+
+            public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
 
+            public int? CompanyId { get; set; }
             public string Company_Name { get; set; }
+
+            public int ? LocationId { get; set; }
             public string Location_Name { get; set; }
+
+            public int ? BusinessUnitId {  get; set; }
             public string Business_Name { get; set; }
             
+            public int ? UnitId { get; set; }
             public string Unit_Name {  get; set; }
             
 
-
+            public int ? SubUnitId { get; set; }
             public string SubUnit_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
 
@@ -62,6 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.UserRole);
+
                     //.Include(x => x.acc);
                     
 
@@ -91,12 +101,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Is_Active = x.IsActive,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Update_At = x.UpdatedAt,
+                    UserRoleId = x.UserRoleId,
                     User_Role_Name = x.UserRole.UserRoleName,
+                    DepartmentId = x.DepartmentId,
                     Department_Name = x.Department.DepartmentName,
+                    SubUnitId = x.SubUnitId,
                     SubUnit_Name = x.SubUnit.SubUnitName,
+                    CompanyId = x.CompanyId,
                     Company_Name = x.Company.CompanyName,
+                    LocationId = x.LocationId,
                     Location_Name = x.Location.LocationName,
+                    BusinessUnitId = x.BusinessUnitId,
                     Business_Name = x.BusinessUnit.BusinessName,
+                    UnitId = x.UnitId,
                     Unit_Name = x.Units.UnitName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
 

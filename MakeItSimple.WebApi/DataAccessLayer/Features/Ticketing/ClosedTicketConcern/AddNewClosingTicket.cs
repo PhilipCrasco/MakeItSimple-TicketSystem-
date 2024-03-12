@@ -72,8 +72,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             ConcernDetails = ticketConcernExist.ConcernDetails,
                             CategoryId = ticketConcernExist.CategoryId,
                             SubCategoryId = ticketConcernExist.SubCategoryId,
-                            
-                            //ClosingRemarks = command.Closed_Remarks,
                             StartDate = ticketConcernExist.StartDate,
                             TargetDate = ticketConcernExist.TargetDate,
                             IsClosing = false,

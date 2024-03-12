@@ -27,7 +27,7 @@
         public const string RejectedBy = "Request was rejected";
         public const string RequestUpdate = "Request Updated";
         public const string ApproveBy = "Request approve by ";
-        public const string ReceiverApproveBy = "Request has been approved by Admin";
+        public const string ReceiverApproveBy = "Request has been approved by Receiver";
         public const string Returned = "Request was returned";
 
 

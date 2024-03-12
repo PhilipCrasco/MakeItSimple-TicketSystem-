@@ -112,8 +112,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,
                             ConcernDetails = ticketConcern.ConcernDetails,
-                            //CategoryId = ticketConcern.CategoryId,
-                            //SubCategoryId = ticketConcern.SubCategoryId,
                             TransferRemarks = command.TransferRemarks,
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,

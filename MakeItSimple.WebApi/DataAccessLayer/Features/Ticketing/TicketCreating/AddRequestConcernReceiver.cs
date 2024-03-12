@@ -217,7 +217,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         if (command.Role == TicketingConString.IssueHandler)
                         {
                             upsertConcern.IsReject = false;
-                            upsertConcern.TicketType = TicketingConString.Developing;
+                            upsertConcern.TicketType = TicketingConString.Concern;
                             upsertConcern.TicketApprover = getApproverUserId.UserId;
                             ticketConcernList.Add(upsertConcern);
                         }

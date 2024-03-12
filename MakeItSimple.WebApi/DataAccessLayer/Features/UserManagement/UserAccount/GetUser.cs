@@ -14,6 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
         public class GetUserResult
         {
             public Guid Id { get; set; }
+            public string EmpId { get; set; }
             public string Fullname { get; set; }
             public string Username { get; set; }
             public string Added_By { get; set; }
@@ -94,6 +95,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                 {
 
                     Id = x.Id,
+                    EmpId = x.EmpId,
                     Fullname = x.Fullname,
                     Username = x.Username,
                     Added_By = x.AddedByUser.Fullname,

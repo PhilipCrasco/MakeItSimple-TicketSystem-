@@ -146,8 +146,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             return Result.Failure(ClosingTicketError.ApproverUnAuthorized());
                         }
-
-
+                         
                     }
                  
                 }

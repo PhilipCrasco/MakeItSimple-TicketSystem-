@@ -26,6 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             public int? BusinessUnitId { get; set; }
 
+            public string UserName { get; set; }
             public int ? UnitId { get; set; }
 
             public Guid ? Modified_By { get; set; }
@@ -38,7 +39,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public Guid Id { get; set; }
             public int UserRoleId { get; set; }
             public int? DepartmentId { get; set; }
-
+            public string UserName { get; set; }
             public int ? SubUnitId { get; set; }
             public int? UnitId { get; set; }
             public int? CompanyId { get; set; }
@@ -71,6 +72,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     && user.DepartmentId == command.DepartmentId && user.SubUnitId == command.SubUnitId)
                 {
                     return Result.Failure(UserError.UserNoChanges());
+                }
+
+                var usernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
+                if(usernameAlreadyExist != null && user.Username != command.UserName)
+                {
+                    return Result.Failure(UserError.UsernameAlreadyExist(command.UserName));
                 }
 
                 var userRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
@@ -141,6 +148,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.UnitId = command.UnitId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;
+                user.Username = command.UserName;
                 //user.ReceiverId = receiverExist.Id;
 
                 await _context.SaveChangesAsync(cancellationToken);
@@ -148,6 +156,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 var result = new UpdateUserResult
                 {
                     Id = command.Id,    
+                    UserName = command.UserName,
                     UserRoleId = user.UserRoleId,
                     DepartmentId = user.DepartmentId,
                     SubUnitId = user.SubUnitId,

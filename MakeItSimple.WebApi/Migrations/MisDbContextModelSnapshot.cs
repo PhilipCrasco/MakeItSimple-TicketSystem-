@@ -1949,7 +1949,7 @@ namespace MakeItSimple.WebApi.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
-                            Permissions = "[\"User Management\",\"User Role\",\"User Account\",\"Masterlist\",\"Company\",\"Department\",\"Request\",\"Channel\",\"Filing\",\"Generate\"]",
+                            Permissions = "[\"Overview\",\"User Management\",\"User Role\",\"User Account\",\"Request\",\"Channel\",\"Filing\",\"Generate\",\"Masterlist\",\"Company\",\"Business Unit\",\"Unit\",\"Location\",\"Sub Unit\",\"Department\",\"Category\",\"Sub Category\"]",
                             UserRoleName = "Admin"
                         });
                 });
@@ -2017,7 +2017,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_business_units_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", "Company")
-                        .WithMany()
+                        .WithMany("BusinessUnits")
                         .HasForeignKey("CompanyId")
                         .HasConstraintName("fk_business_units_companies_company_id");
 
@@ -2994,6 +2994,11 @@ namespace MakeItSimple.WebApi.Migrations
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
                 {
                     b.Navigation("ChannelUsers");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", b =>
+                {
+                    b.Navigation("BusinessUnits");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", b =>

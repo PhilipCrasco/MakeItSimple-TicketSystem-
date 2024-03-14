@@ -19,8 +19,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid? Requestor_By { get; set; }
             public Guid? Transfer_By { get; set; }
             public Guid? Modified_By { get; set; }
-            public int UnitId { get; set; }
-            public int SubUnitId { get; set; }
             public int ChannelId { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
@@ -67,17 +65,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 }
 
 
-                switch (await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken))
-                {
-                    case null:
-                        return Result.Failure(TransferTicketError.UnitNotExist());
-                }
-
-                switch (await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken))
-                {
-                    case null:
-                        return Result.Failure(TransferTicketError.SubUnitNotExist());
-                }
 
                 switch (await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken))
                 {
@@ -125,18 +112,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         bool HasChange = false;
 
-                        if (transferTicket.UnitId != command.UnitId)
-                        {
-                            transferTicket.UnitId = command.UnitId;
-                            HasChange = true;
-                        }
-
-                        if (transferTicket.SubUnitId != command.SubUnitId)
-                        {
-                            transferTicket.SubUnitId = command.SubUnitId;
-                            HasChange = true;
-                        }
-
                         if (transferTicket.ChannelId != command.ChannelId)
                         {
                             transferTicket.ChannelId = command.ChannelId;
@@ -178,9 +153,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         {
                             RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
                             TicketConcernId = ticketConcern.Id,
-                            DepartmentId = ticketConcern.DepartmentId,
-                            UnitId = ticketConcern.UnitId,
-                            SubUnitId = command.SubUnitId,
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,
                             ConcernDetails = ticketConcern.ConcernDetails,

@@ -22,7 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int ? SubUnitId {  get; set; }
 
             public int? CompanyId { get; set; }
-            public int? LocationId { get; set; }
+            public string LocationCode { get; set; }
 
             public int? BusinessUnitId { get; set; }
 
@@ -43,7 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int ? SubUnitId { get; set; }
             public int? UnitId { get; set; }
             public int? CompanyId { get; set; }
-            public int? LocationId { get; set; }
+            public string LocationCode { get; set; }
 
             public int? BusinessUnitId { get; set; }
 
@@ -108,13 +108,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.CompanyNotExist());
                 }
-                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.Id == command.LocationId, cancellationToken);
+                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode== command.LocationCode, cancellationToken);
 
                 if (LocationNotExist == null)
                 {
                     return Result.Failure(UserError.LocationNotExist());
                 }
-                var BusinessUnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
+                var BusinessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
 
                 if (BusinessUnitNotExist == null)
                 {
@@ -127,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 //    return Result.Failure(UserError.ReceiverNotExist());
                 //}
 
-                var UnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
+                var UnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
                 if (UnitNotExist == null)
                 {
                     return Result.Failure(UserError.UnitNotExist());
@@ -143,7 +143,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.DepartmentId = command.DepartmentId;
                 user.SubUnitId = command.SubUnitId;
                 user.CompanyId  = command.CompanyId;
-                user.LocationId = command.LocationId;
+                user.LocationId = LocationNotExist.Id;
                 user.BusinessUnitId = command.BusinessUnitId;
                 user.UnitId = command.UnitId;
                 user.UpdatedAt = DateTime.Now;
@@ -161,7 +161,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     DepartmentId = user.DepartmentId,
                     SubUnitId = user.SubUnitId,
                     CompanyId = user.CompanyId,
-                    LocationId = user.LocationId,
+                    LocationCode = command.LocationCode,
                     BusinessUnitId = user.BusinessUnitId,    
                     UnitId = command.UnitId,
                     Updated_At = user.UpdatedAt,

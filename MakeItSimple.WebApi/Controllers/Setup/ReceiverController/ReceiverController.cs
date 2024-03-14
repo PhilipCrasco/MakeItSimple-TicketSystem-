@@ -10,6 +10,11 @@ using MakeItSimple.WebApi.Common.Extension;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup.GetLocation;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup.GetReceiver;
 using MakeItSimple.WebApi.Common;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup.GetReceiverBusinessUnit;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.UpdateApproverStatus;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup.UpdateReceiverStatus;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannelStatus;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
 {
@@ -34,6 +39,41 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
                 return Ok(result);
             }
             catch(Exception ex) 
+            {
+
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpGet("receiver-business-unit")]
+        public async Task<IActionResult> GetReceiverBusinessUnit(GetReceiverBusinessUnitQuery query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("status/{id}")]
+        public async Task<IActionResult> UpdateApproverStatus([FromRoute] int id)
+        {
+            try
+            {
+
+                var command = new UpdateReceiverStatusCommand
+                {
+                    Id = id
+                };
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (Exception ex)
             {
 
                 return Conflict(ex.Message);

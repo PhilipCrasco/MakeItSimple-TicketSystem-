@@ -26,31 +26,15 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
 
-        public int? CompanyId { get; set; }
-        public virtual Company Company { get; set; }
-
-        public int? BusinessUnitId { get; set; }
-        public virtual BusinessUnit BusinessUnit { get; set; }
-
-
-        public int? DepartmentId { get; set; }
-        public virtual Department Department { get; set; }
-
-        public int? UnitId { get; set; }
-        public virtual Unit Unit { get; set; }
-
-        public int SubUnitId { get; set; }
-        public virtual SubUnit SubUnit { get; set; }
-
-        public int ? ChannelId { get; set; }
+        public int? ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
 
         public string ConcernDetails { get; set; }
 
-        public int CategoryId { get; set; }
+        public int ? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
-        public int SubCategoryId { get; set; }
+        public int ? SubCategoryId { get; set; }
         public virtual SubCategory SubCategory { get; set; }
 
         public DateTime? StartDate { get; set; }
@@ -67,17 +51,22 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User TransferByUser { get; set; }
 
         public bool IsRejectTransfer { get; set; }
-        public DateTime ? RejectTransferAt { get; set; }
-        public Guid ? RejectTransferBy { get; set; }
+        public DateTime? RejectTransferAt { get; set; }
+        public Guid? RejectTransferBy { get; set; }
         public virtual User RejectTransferByUser { get; set; }
         public string RejectRemarks { get; set; }
-        public Guid ? TicketApprover { get; set; }
+        public Guid? TicketApprover { get; set; }
 
 
         public int? ReceiverId { get; set; }
 
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
+
+        public int? TicketGeneratorId { get; set; }
+        public virtual TicketGenerator TicketGenerator {get; set; } 
+
+        public string Remarks { get; set; }
 
 
     }

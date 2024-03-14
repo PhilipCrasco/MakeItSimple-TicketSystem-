@@ -12,7 +12,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.Can
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.RejectReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicketAttachment;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -143,7 +142,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                command.RequestGeneratorId = id;
+                command.TicketGeneratorId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
                     var userRole = identity.FindFirst(ClaimTypes.Role);
@@ -173,32 +172,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPost("attachment/{id}")]
-        public async Task<IActionResult> UpsertReTicketAttachment([FromForm] UpsertReTicketAttachmentCommand command, [FromRoute] int id)
-        {
-            try
-            {
-                command.RequestGeneratorId = id;
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Modified_By = userId;
-                    command.Added_By = userId;
-                    command.Requestor_By = userId;
-                }
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
 
         [HttpPut("reject")]
         public async Task<IActionResult> RejectReTicket([FromBody] RejectReTicketCommand command)

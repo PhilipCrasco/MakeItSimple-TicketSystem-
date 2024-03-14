@@ -31,7 +31,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
             public async Task<Result> Handle(GetReceiverRoleQuery request, CancellationToken cancellationToken)
             {
-                var users = await _context.Users.Include(x => x.UserRole).Where(x => x.UserRole.UserRoleName == TicketingConString.Receiver)
+
+                var receiver = await _context.Receivers.ToListAsync();
+
+                var selectReceiver =  receiver.Select(x => x.UserId);
+
+                var users = await _context.Users.Include(x => x.UserRole)
+                    .Where(x => x.UserRole.UserRoleName == TicketingConString.Receiver)
+                    .Where(x => !selectReceiver.Contains(x.Id))
                     .Select(x => new GetReceiverRoleResult
                     {
                         UserId = x.Id,

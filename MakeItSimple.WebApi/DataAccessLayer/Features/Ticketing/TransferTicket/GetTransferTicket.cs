@@ -19,7 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketResult
         {
 
-            public int ? RequestGeneratorId { get; set; }
+            public int ? TicketGeneratorId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
             public string Unit_Code { get; set; }
@@ -97,100 +97,69 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
                     .Include(x => x.User)
-                    .Include(x => x.Unit)
-                    .Include(x => x.SubUnit)
-                    .Include(x => x.Channel)
-                    .Include(x => x.Category)
-                    .Include(x => x.SubCategory)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
 
 
-                //var channeluserExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var fillterApproval = transferTicketQuery.Select(x => x.RequestGeneratorId);
 
-             
-                if(TicketingConString.Approval == request.Approval)
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                    || x.User.EmpId.Contains(request.Search));
+                }
+
+                if (request.Status != null)
+                {
+                    transferTicketQuery = transferTicketQuery.Where(x => x.IsActive == request.Status);
+                }
+
+                if (request.IsTransfer != null)
+                {
+
+                    transferTicketQuery = transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer);
+                }
+
+                if (request.IsReject != null)
+                {
+                    transferTicketQuery = transferTicketQuery.Where(x => x.IsRejectTransfer == request.IsReject);
+                }
+
+                if (TicketingConString.Approval == request.Approval)
                 {
 
                     if (request.UserId != null && TicketingConString.Approver == request.Role)
                     {
                         var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
                         var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                        transferTicketQuery = transferTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
-
-                    }
-
-                    else if (TicketingConString.Admin == request.Role)
-                    {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
-
-                        if (approverTransactList != null && approverTransactList.Any())
-                        {
-                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
-                            transferTicketQuery = transferTicketQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
-                        }
+                        transferTicketQuery = transferTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
 
                     }
                     else
                     {
-                        transferTicketQuery = transferTicketQuery.Where(x => x.RequestGeneratorId == null);
+                        transferTicketQuery = transferTicketQuery.Where(x => x.TicketGeneratorId == null);
                     }
 
                 }
 
                 if(TicketingConString.Users == request.Users)
                 {
-                    var channelUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                    if (channelUser != null)
-                    {
-                        transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
-
-                        //if (request.Role ==TicketingConString.Requestor || (request.Role == TicketingConString.Approver && request.Approval == null))
-                        //{
-                        //    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
-                        //}
-                        //else
-                        //{
-                        //    transferTicketQuery = transferTicketQuery.Where(x => x.RequestGeneratorId == null);
-                        //}
-                    }
+                   transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId); 
                 }
 
-                if(!string.IsNullOrEmpty(request.Search))
+                var results = transferTicketQuery.GroupBy(x => x.TicketGeneratorId).Select(x => new GetTransferTicketResult
                 {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                    || x.User.EmpId.Contains(request.Search));
-                }
-
-                if(request.Status != null)
-                {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.IsActive == request.Status);
-                }
-
-                if(request.IsTransfer != null)
-                {
-
-                    transferTicketQuery = transferTicketQuery.Where(x => x.IsTransfer == request.IsTransfer);
-                }
-
-                if(request.IsReject != null)
-                {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.IsRejectTransfer == request.IsReject);
-                }
-
-                var results = transferTicketQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetTransferTicketResult
-                {
-                    RequestGeneratorId = x.Key,
-                    Department_Code = x.First().Department.DepartmentCode,
-                    Department_Name = x.First().Department.DepartmentName,
-                    Unit_Code = x.First().Unit.UnitCode,
-                    Unit_Name = x.First().Unit.UnitName,
-                    SubUnit_Code = x.First().SubUnit.SubUnitCode,
-                    SubUnit_Name = x.First().SubUnit.SubUnitName,
+                    TicketGeneratorId = x.Key,
+                    Department_Code = x.First().User.Department.DepartmentCode,
+                    Department_Name = x.First().User.Department.DepartmentName,
+                    Unit_Code = x.First().User.Units.UnitCode,
+                    Unit_Name = x.First().User.Units.UnitName,
+                    SubUnit_Code = x.First().User.SubUnit.SubUnitCode,
+                    SubUnit_Name = x.First().User.SubUnit.SubUnitName,
                     Channel_Name = x.First().Channel.ChannelName,
                     EmpId = x.First().User.EmpId,
                     Fullname = x.First().User.Fullname,

@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         {
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            public int ? RequestGeneratorId { get; set; }
+            public int ? TicketGeneratorId { get; set; }
             public string Re_Ticket_Remarks { get; set; }
             public Guid? Requestor_By { get; set; }
             public string Role { get; set; }
@@ -47,25 +47,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 var transferUpdateList = new List<bool>();
                 var transferNewList = new List<ReTicketConcern>();
 
-                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
-                var requestReTicketList = await _context.ReTicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
+                var requestReTicketList = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
                 if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                 }
 
-                var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
+                var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.TicketGeneratorId
                 && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
-                if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin))
+                if (validateApprover != null)
                 {
                     return Result.Failure(ReTicketConcernError.ReTicketConcernUnable());
                 }
-
-                //if (requestGeneratorIdInTransfer.IsReTicket == true && command.Role != TicketingConString.Admin)
-                //{
-                //    return Result.Failure(TransferTicketError.UpdateUnAuthorized());
-                //}
 
                 foreach (var reTicket in command.UpsertReTicketConserns)
                 {
@@ -139,15 +134,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         var addReTicket = new ReTicketConcern
                         {
-                            RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
-                            DepartmentId = ticketConcern.DepartmentId,
-                            UnitId = ticketConcern.UnitId,
-                            //SubUnitId = ticketConcern.SubUnitId,
-                            //ChannelId = ticketConcern.ChannelId,
+                            TicketGeneratorId = requestGeneratorIdInTransfer.TicketGeneratorId,
                             UserId = ticketConcern.UserId,
                             ConcernDetails = ticketConcern.ConcernDetails,
-                            //CategoryId = ticketConcern.CategoryId,
-                            //SubCategoryId = ticketConcern.SubCategoryId,
                             ReTicketRemarks = command.Re_Ticket_Remarks,
                             AddedBy = command.Added_By,
                             StartDate = reTicket.Start_Date,
@@ -157,11 +146,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         };
 
-
                         ticketConcern.IsReTicket = false;
                         await _context.ReTicketConcerns.AddAsync(addReTicket, cancellationToken);
                         transferNewList.Add(addReTicket);
-
 
                     }
                     else
@@ -194,7 +181,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         ticketHistory.RejectReTicketAt = null;
                         ticketHistory.RejectReTicketBy = null;
                     }
-
 
                 }
 

@@ -9,5 +9,8 @@
         public ICollection<ApproverTicketing> ApproverTicketings { get; set; }
 
         public ICollection<TicketHistory> TicketHistories { get; set; }
+        public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
+
+        public ICollection<ReTicketConcern> ReTicketConcerns { get;set; }
     }
 }

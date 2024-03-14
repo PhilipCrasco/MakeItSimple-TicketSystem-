@@ -27,22 +27,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string User_Role_Name { get; set; }
 
             public int? DepartmentId { get; set; }
+            public string Department_Code {  get; set; }
             public string Department_Name { get; set; }
 
             public int? CompanyId { get; set; }
+            public string Company_Code { get; set; }
             public string Company_Name { get; set; }
 
             public int ? LocationId { get; set; }
+            public string Location_Code { get; set; }
             public string Location_Name { get; set; }
 
             public int ? BusinessUnitId {  get; set; }
-            public string Business_Name { get; set; }
+            public string BusinessUnit_Code { get; set; }
+            public string BusinessUnit_Name { get; set; }
             
             public int ? UnitId { get; set; }
+            public string Unit_Code { get; set; }
             public string Unit_Name {  get; set; }
             
 
             public int ? SubUnitId { get; set; }
+            public string SubUnit_Code { get; set; }    
             public string SubUnit_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
 
@@ -106,16 +112,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     UserRoleId = x.UserRoleId,
                     User_Role_Name = x.UserRole.UserRoleName,
                     DepartmentId = x.DepartmentId,
+                    Department_Code = x.Department.DepartmentCode,
                     Department_Name = x.Department.DepartmentName,
                     SubUnitId = x.SubUnitId,
+                    SubUnit_Code = x.SubUnit.SubUnitCode,
                     SubUnit_Name = x.SubUnit.SubUnitName,
                     CompanyId = x.CompanyId,
+                    Company_Code = x.Company.CompanyCode,
                     Company_Name = x.Company.CompanyName,
                     LocationId = x.LocationId,
+                    Location_Code = x.Location.LocationCode,
                     Location_Name = x.Location.LocationName,
                     BusinessUnitId = x.BusinessUnitId,
-                    Business_Name = x.BusinessUnit.BusinessName,
+                    BusinessUnit_Code = x.BusinessUnit.BusinessCode,
+                    BusinessUnit_Name = x.BusinessUnit.BusinessName,
                     UnitId = x.UnitId,
+                    Unit_Code = x.Units.UnitCode,
                     Unit_Name = x.Units.UnitName,
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
 

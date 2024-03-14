@@ -16,8 +16,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
         public class GetOpenTicketResult
         {
-
+            
+            public int ? RequestedTicketCount { get; set; }
             public int ? OpenTicketCount { get; set; }
+            public int ? CloseTicketCount { get; set; }
+            public int ? DelayedTicketCount { get; set; }
             public int? RequestGeneratorId { get; set; }
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
@@ -35,6 +38,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public string Channel_Name { get; set; }
 
             public string Concern_Type { get; set; }
+
+            
 
             public List<OpenTicket> OpenTickets { get; set; }
             public class OpenTicket
@@ -85,6 +90,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public async Task<PagedList<GetOpenTicketResult>> Handle(GetOpenTicketQuery request, CancellationToken cancellationToken)
             {
+                var dateToday = DateTime.UtcNow;
+
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
@@ -127,16 +134,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
                     }
 
-
                 }
-
 
 
                 var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false)
                     .GroupBy(x => x.RequestGeneratorId).Select(x => new GetOpenTicketResult
                     {
-
-                        OpenTicketCount = ticketConcernQuery.Count(),
+                        CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
+                        RequestedTicketCount = ticketConcernQuery.Count(),
+                        OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
+                        DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
                         RequestGeneratorId = x.Key,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,

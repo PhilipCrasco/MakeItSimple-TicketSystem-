@@ -60,7 +60,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.UserAlreadyAdd());
                 }
 
-
                 var channelUser = new ChannelUser
                 { 
                     ChannelId = command.ChannelId,

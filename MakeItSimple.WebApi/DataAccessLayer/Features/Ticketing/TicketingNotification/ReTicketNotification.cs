@@ -17,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class ReTicketNotificationQuery
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? TicketGeneratorId { get; set; }
         }
 
         public class ReTicketNotificationResultQuery : IRequest<Result>
@@ -41,36 +41,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public async Task<Result> Handle(ReTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
-                var query = await _context.ReTicketConcerns.GroupBy(x => x.RequestGeneratorId).ToListAsync();
+                var query = await _context.ReTicketConcerns.GroupBy(x => x.TicketGeneratorId).ToListAsync();
 
-                var fillterApproval = query.Select(x => x.First().RequestGeneratorId);
-
-                if (TicketingConString.Approval == request.Approval)
-                {
-                    if (request.UserId != null && TicketingConString.Approver == request.Role)
-                    {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == request.UserId).ToListAsync();
-                        var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
-                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                        query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover) && userRequestIdApprovalList.Contains(x.First().RequestGeneratorId)).ToList();
-                    }
-                    else if (TicketingConString.Admin == request.Role)
-                    {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
-                        if (approverTransactList != null && approverTransactList.Any())
-                        {
-                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
-                            query = query.Where(x => !generatedIdInApprovalList.Contains(x.First().RequestGeneratorId)).ToList();
-                        }
-                    }
-                    else
-                    {
-                        query = query.Where(x => x.First().RequestGeneratorId == null).ToList();
-                    }
-
-                }
-
+                var fillterApproval = query.Select(x => x.First().TicketGeneratorId);
 
                 if (TicketingConString.Users == request.Users)
                 {
@@ -85,6 +58,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 if (request.IsReject != null)
                 {
                     query = query.Where(x => x.First().IsRejectReTicket == request.IsReject).ToList();
+                }
+
+
+                if (TicketingConString.Approval == request.Approval)
+                {
+                    if (request.UserId != null && TicketingConString.Approver == request.Role)
+                    {
+                        var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == request.UserId).ToListAsync();
+                        var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
+                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                        query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover) && userRequestIdApprovalList.Contains(x.First().TicketGeneratorId)).ToList();
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.First().TicketGeneratorId == null).ToList();
+                    }
+
                 }
 
                 var notification = query.Select(x => new ReTicketNotificationResult

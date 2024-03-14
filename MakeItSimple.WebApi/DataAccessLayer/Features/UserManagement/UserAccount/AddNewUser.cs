@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int ? SubUnitId {  get; set; }
             public int? UnitId { get; set; }
             public int ? CompanyId { get; set; }
-            public int ? LocationId { get; set; }
+            public string LocationCode { get; set; }
 
             public int ? BusinessUnitId { get; set; }
 
@@ -42,7 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int ? UnitId { get; set; }
 
             public int? CompanyId { get; set; }
-            public int? LocationId { get; set; }
+            public string LocationCode { get; set; }
 
             public int? BusinessUnitId { get; set; }
 
@@ -105,7 +105,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.CompanyNotExist());
                 }
-                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.Id == command.LocationId, cancellationToken);
+                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == command.LocationCode, cancellationToken);
 
                 if (LocationNotExist == null)
                 {
@@ -142,7 +142,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     SubUnitId = command.SubUnitId,
                     DepartmentId = command.DepartmentId,    
                     CompanyId = command.CompanyId,  
-                    LocationId = command.LocationId,
+                    LocationId = LocationNotExist.Id,
                     BusinessUnitId = command.BusinessUnitId,  
                     UnitId = command.UnitId,
                     AddedBy = command.Added_By,
@@ -163,7 +163,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     DepartmentId = users.DepartmentId,
                     SubUnitId= users.SubUnitId,
                     CompanyId = users.CompanyId,
-                    LocationId = users.LocationId,
+                    LocationCode = command.LocationCode,
                     BusinessUnitId = users.BusinessUnitId,
                     UnitId = users.UnitId,  
                     Added_By = users.AddedBy

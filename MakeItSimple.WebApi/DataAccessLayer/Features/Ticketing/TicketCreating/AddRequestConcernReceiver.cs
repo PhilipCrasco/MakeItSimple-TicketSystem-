@@ -219,7 +219,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.IsReject = false;
                             upsertConcern.TicketType = TicketingConString.Concern;
                             upsertConcern.TicketApprover = getApproverUserId.UserId;
-                            ticketConcernList.Add(upsertConcern);
+                            //ticketConcernList.Add(upsertConcern);
                         }
 
                     }
@@ -282,12 +282,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketType = TicketingConString.Concern;
 
-                            requestTicketConcernList.Add(addnewTicketConcern);
+                            ticketConcernList.Add(addnewTicketConcern);
                         }
 
                         if (command.Role == TicketingConString.IssueHandler)
                         {
-
                             addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }
@@ -297,11 +296,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
-
                 }
 
                  var getApprover = await _context.Approvers
-                .Where(x => x.ChannelId == requestTicketConcernList.First().ChannelId).ToListAsync();
+                .Where(x => x.ChannelId == ticketConcernList.First().ChannelId).ToListAsync();
 
                 if (getApprover == null)
                 {

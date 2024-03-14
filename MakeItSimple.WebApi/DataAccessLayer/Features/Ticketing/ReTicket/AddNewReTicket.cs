@@ -39,9 +39,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             {
                 var dateToday = DateTime.Today;
                 var reTicketList = new List<ReTicketConcern>();
-                var requestGeneratorId = new RequestGenerator { IsActive = true };
+                var ticketGeneratorId = new TicketGenerator { IsActive = true };
 
-                await _context.RequestGenerators.AddAsync(requestGeneratorId, cancellationToken);
+                await _context.TicketGenerators.AddAsync(ticketGeneratorId, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
 
                 foreach(var reTicket in command.AddReTicketConcerns)
@@ -72,17 +72,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                     var addNewReTicketConcern = new ReTicketConcern
                     {
-                        RequestGeneratorId = requestGeneratorId.Id,
+                        TicketGeneratorId = ticketGeneratorId.Id,
                         TicketConcernId = ticketConcernExist.Id,
-                        DepartmentId = ticketConcernExist.DepartmentId,
-                        UnitId = ticketConcernExist.UnitId,
-                        //SubUnitId = ticketConcernExist.SubUnitId,
-                        //ChannelId = ticketConcernExist.ChannelId,
                         UserId = ticketConcernExist.UserId,
                         ConcernDetails = ticketConcernExist.ConcernDetails,
-                        //CategoryId = ticketConcernExist.CategoryId,
-                        //SubCategoryId = ticketConcernExist.SubCategoryId,
-                        //ReTicketRemarks = command.Re_Ticket_Remarks,
                         StartDate = reTicket.Start_Date,
                         TargetDate = reTicket.Target_Date,
                         IsReTicket = false,
@@ -110,7 +103,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 {
                     var addNewApprover = new ApproverTicketing
                     {
-                        RequestGeneratorId = requestGeneratorId.Id,
+                        TicketGeneratorId = ticketGeneratorId.Id,
                         ChannelId = approver.ChannelId,
                         UserId = approver.UserId,
                         ApproverLevel = approver.ApproverLevel,
@@ -125,7 +118,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 var addTicketHistory = new TicketHistory
                 {
-                    RequestGeneratorId = requestGeneratorId.Id,
+                    TicketGeneratorId = ticketGeneratorId.Id,
                     RequestorBy = command.Requestor_By,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.ReTicket,

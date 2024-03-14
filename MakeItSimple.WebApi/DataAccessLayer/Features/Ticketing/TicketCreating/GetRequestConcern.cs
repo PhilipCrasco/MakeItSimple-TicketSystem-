@@ -59,8 +59,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public bool ? Approval { get; set; }
                 public string Search { get; set; }
                 public bool ? Status { get; set; }
+                public bool ? Reject { get; set; }
                 public string Approver { get; set; }
-
                 public string Requestor { get; set; }
 
             }
@@ -101,6 +101,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Status);
                     }
 
+                    if(request.Reject != null)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Reject);
+                    }
+
                     if (request.Approval != null)
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsApprove == request.Approval);
@@ -122,9 +127,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                             var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
                             ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
-
-
-
                        }
 
                         else if (request.Role == TicketingConString.Approver)

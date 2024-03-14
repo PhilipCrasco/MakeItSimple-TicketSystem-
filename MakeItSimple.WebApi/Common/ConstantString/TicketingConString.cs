@@ -19,7 +19,7 @@
         public const string Approver = "Approver";
         public const string Requestor = "Requestor";
         public const string Receiver = "Receiver";
-        public const string IssueHandler = "Issue Handler";
+        public const string IssueHandler = "IssueHandler";
 
         //TicketHistory
 
@@ -37,5 +37,6 @@
 
         public const string Concern = "Concern";
         public const string Developing = "Developing";
+        public const string RequestTicket = "Request Ticket";
     }
 }

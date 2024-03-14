@@ -11,8 +11,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
       new Error("Receiver.UserUnitNotExist", "User unit doesn't exist!");
 
 
-
-      public static Error DuplicateReceiver() =>
+        public static Error ReceiverNotExist() =>
+        new Error("Receiver.ReceiverNotExist", "Receiver doesn't exist!");
+        public static Error DuplicateReceiver() =>
       new Error("Receiver.UserUnitNotExist", "Business unit already exist!");
 
     }

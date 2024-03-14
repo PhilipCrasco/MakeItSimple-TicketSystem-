@@ -123,8 +123,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             concernTicketById.IsTransfer = true;
                             concernTicketById.TransferAt = DateTime.Now;
                             concernTicketById.TransferBy = command.Transfer_By;
-                            concernTicketById.SubUnitId = concernTicket.SubUnitId;
-                            concernTicketById.SubUnitId = concernTicket.SubUnitId;
                             concernTicketById.ChannelId = concernTicket.ChannelId;
                             concernTicketById.UserId = concernTicket.UserId;
                             concernTicketById.RequestGeneratorId = concernTicket.RequestGeneratorId;

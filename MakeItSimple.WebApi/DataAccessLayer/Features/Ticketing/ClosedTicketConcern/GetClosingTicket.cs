@@ -67,7 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public string Search { get; set; }
             public bool? IsClosed { get; set; }
             public bool? IsReject { get; set; }
-            public Guid? UserApproverId { get; set; }
+            //public Guid? UserApproverId { get; set; }
 
 
         }

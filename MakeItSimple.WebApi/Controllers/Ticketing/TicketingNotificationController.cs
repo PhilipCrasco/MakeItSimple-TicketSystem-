@@ -1,9 +1,12 @@
 ﻿using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.OpenTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.RequestTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ReTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
@@ -30,9 +33,20 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                if (User.Identity is ClaimsIdentity identity)
                 {
-                    command.UserId = userId;
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                        command.UserId = userId;
+
+                    }
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -91,6 +105,82 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
         [HttpGet("re-ticket")]
         public async Task<IActionResult> ReTicketNotification([FromQuery] ReTicketNotificationResultQuery command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                        command.UserId = userId;
+
+                    }
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+
+                // Notify clients using SignalR
+                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpGet("closing-ticket")]
+        public async Task<IActionResult> ClosingTicketNotification([FromQuery] ClosingTicketNotificationResultQuery command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                        command.UserId = userId;
+
+                    }
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+
+                // Notify clients using SignalR
+                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpGet("open-ticket")]
+        public async Task<IActionResult> OpenTicketNotification([FromQuery] OpenTicketNotificationResultQuery command)
         {
             try
             {

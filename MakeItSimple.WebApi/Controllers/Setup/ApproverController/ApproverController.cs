@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.AddNewApprover;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.GetApprover;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.GetApproverRole;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.UpdateApproverStatus;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 {
@@ -80,6 +82,30 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
                 var successResult = Result.Success(result);
                 return Ok(successResult);
 
+        }
+
+        [HttpGet("approver-user")]
+        public async Task<IActionResult> GetApproverRole([FromQuery] GetApproverRoleQuery query)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        query.Role = userRole.Value;
+                    }
+
+                }
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                return Conflict(ex.Message);
+            }
         }
 
         [HttpPatch("status")]

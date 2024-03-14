@@ -10,9 +10,11 @@ using System.Security.Cryptography.X509Certificates;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddMember;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.RemoveChannelUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannelStatus;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup.GetReceiverBusinessUnit;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 {
@@ -178,6 +180,22 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             }
 
         }
+
+        [HttpGet("member-list")]
+        public async Task<IActionResult> GetMember([FromQuery]GetMemberQuery query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                return Conflict(ex.Message);
+            }
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveChannelUser([FromBody] RemoveChannelUserCommand command, [FromRoute] int id)

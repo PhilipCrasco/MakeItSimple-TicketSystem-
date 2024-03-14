@@ -9,7 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.CancelTicketRequest;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.GetTicketRequest;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.RejectRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TIcketRequest.UpdateTicketRequest;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing

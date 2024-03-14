@@ -1,4 +1,4 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿                                       using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;

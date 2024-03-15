@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int Id {  get; set; }
             public string Channel_Name { get; set; }
-            public int ? DepartmentId { get; set; }
+            public int ? SubUnitId { get; set; }
             public Guid ? Added_By { get; set; }
             public DateTime Created_At { get; set; }
 
@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         public class AddNewChannelCommand : IRequest<Result>
         {
             public string Channel_Name { get; set; }
-            public int DepartmentId { get; set; }
+            public int SubUnitId { get; set; }
             //public Guid ? UserId { get; set; }
             public Guid ? Added_By { get; set; }
            
@@ -54,17 +54,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNameAlreadyExist(command.Channel_Name));
                 }
 
-                var departmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId, cancellationToken);
+                var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
 
-                if (departmentNotExist == null)
+                if (subUnitNotExist == null)
                 {
-                    return Result.Failure(ChannelError.DepartmentNotExist());
+                    return Result.Failure(ChannelError.SubUnitNotExist());
                 }
 
                 var channels = new Channel
                 {
                     ChannelName = command.Channel_Name,
-                    DepartmentId = command.DepartmentId, 
+                    SubUnitId = command.SubUnitId, 
                     AddedBy = command.Added_By,
 
                 };
@@ -76,7 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     Id = channels.Id,
                     Channel_Name = channels.ChannelName,
-                    DepartmentId = channels.DepartmentId,
+                    SubUnitId = channels.SubUnitId,
                     Added_By = channels.AddedBy,
                    Created_At = channels.CreatedAt
                 };

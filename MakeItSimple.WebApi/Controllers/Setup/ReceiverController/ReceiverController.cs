@@ -60,15 +60,15 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
             }
         }
 
-        [HttpPut("status/{id}")]
-        public async Task<IActionResult> UpdateApproverStatus([FromRoute] int id)
+        [HttpPut("status/{UserId}")]
+        public async Task<IActionResult> UpdateApproverStatus([FromRoute] Guid?  UserId)
         {
             try
             {
 
                 var command = new UpdateReceiverStatusCommand
                 {
-                    Id = id
+                    UserId = UserId
                 };
                 var result = await _mediator.Send(command);
                 return Ok(result);
@@ -109,28 +109,28 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
         {
             try
             {
-                var location = await _mediator.Send(query);
+                var receiver = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
 
-                location.CurrentPage,
-                location.PageSize,
-                location.TotalCount,
-                location.TotalPages,
-                location.HasPreviousPage,
-                location.HasNextPage
+                receiver.CurrentPage,
+                receiver.PageSize,
+                receiver.TotalCount,
+                receiver.TotalPages,
+                receiver.HasPreviousPage,
+                receiver.HasNextPage
 
                 );
 
                 var result = new
                 {
-                    location,
-                    location.CurrentPage,
-                    location.PageSize,
-                    location.TotalCount,
-                    location.TotalPages,
-                    location.HasPreviousPage,
-                    location.HasNextPage
+                    receiver,
+                    receiver.CurrentPage,
+                    receiver.PageSize,
+                    receiver.TotalCount,
+                    receiver.TotalPages,
+                    receiver.HasPreviousPage,
+                    receiver.HasNextPage
                 };
 
                 var successResult = Result.Success(result);

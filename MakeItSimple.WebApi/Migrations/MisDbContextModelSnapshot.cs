@@ -279,6 +279,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
+                    b.Property<int?>("SubUnitId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_unit_id");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -298,6 +302,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_channels_modified_by");
+
+                    b.HasIndex("SubUnitId")
+                        .HasDatabaseName("ix_channels_sub_unit_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_channels_user_id");
@@ -2024,6 +2031,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_channels_users_modified_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .HasConstraintName("fk_channels_sub_units_sub_unit_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -2034,6 +2046,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("ModifiedByUser");
+
+                    b.Navigation("SubUnit");
 
                     b.Navigation("User");
                 });

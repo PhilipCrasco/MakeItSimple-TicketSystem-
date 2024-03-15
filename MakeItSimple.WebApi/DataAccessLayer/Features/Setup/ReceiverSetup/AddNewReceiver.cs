@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
             public class AddNewReceiverId
             {
-                public int ? ReceiverId { get; set; }
+                public Guid ? Id { get; set; }
                 public int? BusinessUnitId { get; set; }
             }
 
@@ -63,45 +63,51 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         return Result.Failure(ReceiverError.DuplicateReceiver());
                     }
 
-                    var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.Id == receiverId.ReceiverId, cancellationToken);
+                    var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.UserId == receiverId.Id, cancellationToken);
                     var alreadyExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == receiverId.BusinessUnitId, cancellationToken);
-                    if (receiver != null)
+                    if (receiver == null)
                     {
 
-                        if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
-                        {
-                            return Result.Failure(ReceiverError.DuplicateReceiver());
-                        }
+                        //if (receiver != null)
+                        //{
 
-                        bool isChange = false;
+                        //    if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
+                        //    {
+                        //        return Result.Failure(ReceiverError.DuplicateReceiver());
+                        //    }
 
-                        if(receiver.UserId != command.UserId)
-                        {
-                            receiver.UserId = command.UserId;
-                            isChange = true;
-                        }
+                        //    bool isChange = false;
 
-                        if(receiver.BusinessUnitId != receiverId.BusinessUnitId)
-                        {
-                            receiver.BusinessUnitId = receiverId.BusinessUnitId;
-                            isChange = true;
+                        //    if(receiver.UserId != command.UserId)
+                        //    {
+                        //        receiver.UserId = command.UserId;
+                        //        isChange = true;
+                        //    }
 
-                        }
+                        //    if(receiver.BusinessUnitId != receiverId.BusinessUnitId)
+                        //    {
+                        //        receiver.BusinessUnitId = receiverId.BusinessUnitId;
+                        //        isChange = true;
 
-                        if (isChange)
-                        {
-                            receiver.ModifiedBy = command.Modified_By;
-                            receiver.UpdatedAt = DateTime.Now;
-                        }
-                        else
-                        {
-                            receiverList.Add(receiver);
-                        }
+                        //    }
+
+                        //    if (isChange)
+                        //    {
+                        //        receiver.ModifiedBy = command.Modified_By;
+                        //        receiver.UpdatedAt = DateTime.Now;
+                        //    }
+                        //    else
+                        //    {
+                        //        receiverList.Add(receiver);
+                        //    }
+
+                        //}
+
+
 
                     }
                     else
                     {
-
                         if (alreadyExist != null)
                         {
                             return Result.Failure(ReceiverError.DuplicateReceiver());
@@ -113,14 +119,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                             UserId = command.UserId,
                             BusinessUnitId = receiverId.BusinessUnitId,
                             AddedBy = command.Added_By,
-                             
+
                         };
 
                         receiverList.Add(addNewReceiver);
                         await _context.Receivers.AddAsync(addNewReceiver);
-
-
                     }
+
+
+
 
                 }
 

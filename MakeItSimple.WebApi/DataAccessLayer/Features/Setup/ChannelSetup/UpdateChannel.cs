@@ -14,7 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int Id { get; set; }
             public string Channel_Name { get; set; }
-            public int ? DepartmentId { get; set; }
+            public int ? SubUnitId { get; set; }
             public Guid? Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
         }
@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int Id { get; set; }
             public string Channel_Name { get; set; }
-            public int DepartmentId { get; set; }
+            public int SubUnitId { get; set; }
             public Guid? Modified_By { get; set; }
 
         }
@@ -46,7 +46,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     return Result.Failure(ChannelError.ChannelNotExist());
                 }
-                else if (channels.ChannelName == command.Channel_Name && channels.DepartmentId == command.DepartmentId)
+                else if (channels.ChannelName == command.Channel_Name && channels.SubUnitId == command.SubUnitId)
                 {
                     return Result.Failure(ChannelError.ChannelNoChanges());
                 }
@@ -59,11 +59,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNameAlreadyExist(command.Channel_Name));
                 }
 
-                var departmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId, cancellationToken);
+                var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
 
-                if (departmentNotExist == null)
+                if (subUnitNotExist == null)
                 {
-                    return Result.Failure(ChannelError.DepartmentNotExist());
+                    return Result.Failure(ChannelError.SubUnitNotExist());
                 }
                 
                 var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
@@ -74,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 }
 
                 channels.ChannelName = command.Channel_Name;
-                channels.DepartmentId = command.DepartmentId;
+                channels.SubUnitId = command.SubUnitId;
                 channels.ModifiedBy = command.Modified_By;
                 channels.UpdatedAt = DateTime.Now;
 
@@ -84,7 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     Id = channels.Id,
                     Channel_Name = channels.ChannelName,
-                    DepartmentId = channels.DepartmentId,
+                    SubUnitId = channels.SubUnitId,
                     Modified_By = channels.ModifiedBy,
                     Updated_At = channels.UpdatedAt
                 };

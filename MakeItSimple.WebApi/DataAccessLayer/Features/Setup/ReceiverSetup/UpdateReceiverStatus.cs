@@ -10,7 +10,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
     {
         public class UpdateReceiverStatusCommand : IRequest<Result>
         {
-            public int? Id { get; set; }
+            public Guid ? UserId { get; set; }
         }
 
         public class Handler : IRequestHandler<UpdateReceiverStatusCommand, Result>
@@ -24,14 +24,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
             public async Task<Result> Handle(UpdateReceiverStatusCommand command, CancellationToken cancellationToken)
             {
-                var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.Id == command.Id);
+                var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.UserId == command.UserId);
 
                 if (receiver == null)
                 {
                     return Result.Failure(ReceiverError.ReceiverNotExist());
                 }
 
-                receiver.IsActive  = !receiver.IsActive;
+                var receiverList = await _context.Receivers.Where(x => x.UserId == receiver.UserId).ToListAsync();
+
+                foreach(var receiverById in receiverList)
+                {
+                    receiverById.IsActive = !receiverById.IsActive;
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

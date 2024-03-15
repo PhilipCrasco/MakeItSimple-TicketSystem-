@@ -16,10 +16,10 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         public virtual User AddedByUser { get; set; }
         public  Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
-        public string ChannelName { get; set; } 
+        public string ChannelName { get; set; }
 
-        //public int ? SubUnitId { get; set; }
-        //public virtual SubUnit SubUnit { get; set; }
+        public int? SubUnitId { get; set; }
+        public virtual SubUnit SubUnit { get; set; }
 
         public int ? DepartmentId { get; set; }
         public virtual Department Department { get; set; }

@@ -16,12 +16,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
             public Guid? UserId { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
+
+            public string FullName { get; set; }
             public List<AddNewReceiverId> AddNewReceiverIds { get; set; }
 
 
             public class AddNewReceiverId
             {
-                public Guid ? Id { get; set; }
+                public int ? ReceiverId { get; set; }
                 public int? BusinessUnitId { get; set; }
             }
 
@@ -63,47 +65,66 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         return Result.Failure(ReceiverError.DuplicateReceiver());
                     }
 
-                    var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.UserId == receiverId.Id, cancellationToken);
+                    var receiverUser = await _context.Receivers.FirstOrDefaultAsync(x => x.User.Fullname == command.FullName, cancellationToken);
                     var alreadyExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == receiverId.BusinessUnitId, cancellationToken);
-                    if (receiver == null)
+                    if (receiverUser != null)
                     {
 
-                        //if (receiver != null)
-                        //{
+                        var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.Id == receiverId.ReceiverId, cancellationToken);
+                        if(receiver != null)
+                        {
 
-                        //    if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
-                        //    {
-                        //        return Result.Failure(ReceiverError.DuplicateReceiver());
-                        //    }
+                            if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
+                            {
+                                return Result.Failure(ReceiverError.DuplicateReceiver());
+                            }
 
-                        //    bool isChange = false;
+                            bool isChange = false;
 
-                        //    if(receiver.UserId != command.UserId)
-                        //    {
-                        //        receiver.UserId = command.UserId;
-                        //        isChange = true;
-                        //    }
+                            if (receiver.UserId != command.UserId)
+                            {
+                                receiver.UserId = command.UserId;
+                                isChange = true;
+                            }
 
-                        //    if(receiver.BusinessUnitId != receiverId.BusinessUnitId)
-                        //    {
-                        //        receiver.BusinessUnitId = receiverId.BusinessUnitId;
-                        //        isChange = true;
+                            if (receiver.BusinessUnitId != receiverId.BusinessUnitId)
+                            {
+                                receiver.BusinessUnitId = receiverId.BusinessUnitId;
+                                isChange = true;
+                            }
 
-                        //    }
+                            if (isChange)
+                            {
+                                receiver.ModifiedBy = command.Modified_By;
+                                receiver.UpdatedAt = DateTime.Now;
+                            }
+                            else
+                            {
+                                receiverList.Add(receiver);
 
-                        //    if (isChange)
-                        //    {
-                        //        receiver.ModifiedBy = command.Modified_By;
-                        //        receiver.UpdatedAt = DateTime.Now;
-                        //    }
-                        //    else
-                        //    {
-                        //        receiverList.Add(receiver);
-                        //    }
-
-                        //}
+                            }
+                            
+                        }
+                        else
+                        {
+                            if (alreadyExist != null)
+                            {
+                                return Result.Failure(ReceiverError.DuplicateReceiver());
+                            }
 
 
+                            var addNewReceiver = new Receiver
+                            {
+                                UserId = command.UserId,
+                                BusinessUnitId = receiverId.BusinessUnitId,
+                                AddedBy = command.Added_By,
+
+                            };
+
+                            receiverList.Add(addNewReceiver);
+                            await _context.Receivers.AddAsync(addNewReceiver);
+
+                        }
 
                     }
                     else
@@ -113,10 +134,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                             return Result.Failure(ReceiverError.DuplicateReceiver());
                         }
 
-
                         var addNewReceiver = new Receiver
                         {
-                            UserId = command.UserId,
+                            UserId = command.UserId, 
                             BusinessUnitId = receiverId.BusinessUnitId,
                             AddedBy = command.Added_By,
 
@@ -125,8 +145,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         receiverList.Add(addNewReceiver);
                         await _context.Receivers.AddAsync(addNewReceiver);
                     }
-
-
 
 
                 }
@@ -145,7 +163,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                 return Result.Success();
             }
         }
-
 
     }
 }

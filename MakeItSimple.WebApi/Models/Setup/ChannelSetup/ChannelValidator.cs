@@ -11,8 +11,8 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         {
             public ChannelValidator()
             {
-                RuleFor(x => x.Channel_Name).NotEmpty().WithMessage("Sub unit code is required")
-                    .MinimumLength(2).WithMessage(" code must be at least 2 character long!");
+                //RuleFor(x => x.Channel_Name).NotEmpty().WithMessage("Sub unit code is required")
+                //    .MinimumLength(2).WithMessage(" code must be at least 2 character long!");
             }
         }
 
@@ -21,8 +21,8 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         {
             public UpdateChannelValidator()
             {
-                RuleFor(x => x.Channel_Name).NotEmpty().WithMessage("Sub unit code is required")
-                    .MinimumLength(2).WithMessage(" code must be at least 2 character long!");
+                //RuleFor(x => x.Channel_Name).NotEmpty().WithMessage("Sub unit code is required")
+                //    .MinimumLength(2).WithMessage(" code must be at least 2 character long!");
             }
         }
     }

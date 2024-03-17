@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddDevelopingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddNewTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketRequest;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -126,7 +129,49 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
+        [HttpPost("attachment/{id}")]
+        public async Task<IActionResult> AddNewTicketAttachment([FromForm] AddNewTicketAttachmentCommand command, [FromRoute] int id)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Added_By = userId;
+                    command.Modified_By = userId;
+                }
 
+                command.RequestGeneratorId = id;
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("cancel")]
+        public async Task<IActionResult> CancelTicketRequest(CancelTicketRequestCommand command)
+        {
+            try
+            {
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
 
 
         [HttpGet("page")]
@@ -220,6 +265,28 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
         [HttpPut("reject")]
         public async Task<IActionResult> RejectRequestTicket([FromBody] RejectRequestTicketCommand command)
+        {
+            try
+            {
+
+
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+
+        [HttpPut("return")]
+        public async Task<IActionResult> ReturnRequestTicket([FromBody] ReturnRequestTicketCommand command)
         {
             try
             {

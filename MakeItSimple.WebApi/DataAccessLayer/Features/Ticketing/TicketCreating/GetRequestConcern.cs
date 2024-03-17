@@ -143,8 +143,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
                         }
 
-
-
                     }
 
 

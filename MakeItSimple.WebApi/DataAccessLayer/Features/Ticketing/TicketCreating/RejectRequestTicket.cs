@@ -87,7 +87,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Remarks = x.Remarks,
                         Is_Reject = true,
 
-
                     }).ToList(),
 
                 });

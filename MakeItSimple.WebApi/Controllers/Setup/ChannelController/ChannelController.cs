@@ -223,7 +223,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 
         }
 
-        [HttpPost]
+        [HttpPost("validation")]
         public async Task<IActionResult> GetChannelValidation(GetChannelValidationCommand command)
         {
             try

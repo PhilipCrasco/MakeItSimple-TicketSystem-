@@ -301,7 +301,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         await _context.SaveChangesAsync(cancellationToken);
 
                     }
+                    
 
+                    
                 }
 
                  var getApprover = await _context.Approvers
@@ -326,6 +328,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     };
 
                     await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+
                 }
 
 

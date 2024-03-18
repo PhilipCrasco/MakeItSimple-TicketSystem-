@@ -34,6 +34,7 @@
         // Concern Status 
 
         public const string ForApprovalTicket = "For Concern Approval";
+        public const string CurrentlyFixing = "Currently Fixing Issue";
 
         public const string Concern = "Concern";
         public const string Developing = "Developing";

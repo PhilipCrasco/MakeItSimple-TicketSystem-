@@ -10,16 +10,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 {
     public class AddMember
     {
-        public class AddMemberResult
-        {
-            public int ChannelId { get; set; }
-            public Guid ? UserId { get; set; }
-        }
 
        public class AddMemberCommand : IRequest<Result>
         {
             public int ChannelId { get; set; }
-            public Guid ? UserId { get; set; }
+            public List<Member> Members { get; set; }
+            public class Member
+            {
+               public Guid? UserId { get; set; }
+            }
+
 
         }
 
@@ -43,42 +43,37 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNotExist());
                 }
 
-
-                var UserNotExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId, cancellationToken);
-
-                if (ChannelNotExist == null)
+                foreach(var member in command.Members)
                 {
-                    return Result.Failure(ChannelError.UserNotExist());
+
+                    var UserNotExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == member.UserId, cancellationToken);
+
+                    if (ChannelNotExist == null)
+                    {
+                        return Result.Failure(ChannelError.UserNotExist());
+                    }
+
+
+                    var UserAlreadyAdd = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.UserId == member.UserId
+                    && x.ChannelId == command.ChannelId, cancellationToken);
+
+                    if (UserAlreadyAdd != null)
+                    {
+                        return Result.Failure(ChannelError.UserAlreadyAdd());
+                    }
+
+                    var channelUser = new ChannelUser
+                    {
+                        ChannelId = command.ChannelId,
+                        UserId = member.UserId,
+
+                    };
+
+                    await _context.ChannelUsers.AddAsync(channelUser, cancellationToken);
                 }
 
-
-                var UserAlreadyAdd = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.UserId == command.UserId
-                && x.ChannelId == command.ChannelId, cancellationToken);
-
-                if (UserAlreadyAdd != null )
-                {
-                    return Result.Failure(ChannelError.UserAlreadyAdd());
-                }
-
-                var channelUser = new ChannelUser
-                { 
-                    ChannelId = command.ChannelId,
-                    UserId = command.UserId 
-                
-                };
-
-                await _context.ChannelUsers.AddAsync(channelUser , cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
-
-                var results = new AddMemberResult
-                {
-                    ChannelId = channelUser.ChannelId,
-                    UserId = channelUser.UserId
-
-                };
-
-
-                return Result.Success(results);
+                return Result.Success();
 
             }
 

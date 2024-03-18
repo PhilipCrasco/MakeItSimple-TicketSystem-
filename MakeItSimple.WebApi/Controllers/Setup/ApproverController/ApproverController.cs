@@ -85,7 +85,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
         }
 
         [HttpGet("approver-user")]
-        public async Task<IActionResult> GetApproverRole([FromQuery] GetApproverRoleQuery query)
+        public async Task<IActionResult> GetApproverRole([FromQuery] GetApproverRoleQuery query)       
         {
             try
             {

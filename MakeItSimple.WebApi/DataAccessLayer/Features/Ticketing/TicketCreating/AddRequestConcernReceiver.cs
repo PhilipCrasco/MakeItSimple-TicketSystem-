@@ -5,9 +5,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Sockets;
-using System.Security.AccessControl;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket.AddNewReTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -219,7 +216,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.IsReject = false;
                             upsertConcern.TicketType = TicketingConString.Concern;
                             upsertConcern.TicketApprover = getApproverUserId.UserId;
-                            //ticketConcernList.Add(upsertConcern);
+
                         }
 
                     }
@@ -266,10 +263,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 AddedBy = command.Added_By,
                                 ConcernStatus = TicketingConString.ForApprovalTicket,
                                 IsDone = false,
+
                             };
 
                             await _context.RequestConcerns.AddAsync(addRequestConcern);
                             await _context.SaveChangesAsync(cancellationToken);
+
                             addnewTicketConcern.TicketType = TicketingConString.Concern;
                             addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
                         }
@@ -290,6 +289,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }
+
+                        var checkingList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
+                        && x.RequestConcernId != null, cancellationToken);
+                        if (checkingList != null)
+                        {
+                            addnewTicketConcern.RequestConcernId = checkingList.RequestConcernId;
+                        }                                                                                                                                                                                                                                                                                                                                                        
 
                         await _context.TicketConcerns.AddAsync(addnewTicketConcern);
                         await _context.SaveChangesAsync(cancellationToken);

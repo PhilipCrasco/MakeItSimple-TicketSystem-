@@ -1,9 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddDevelopingTicket;
@@ -12,6 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketRequest;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
@@ -153,6 +151,24 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 return Conflict(ex.Message);
             }
+        }
+
+        [HttpGet("request-attachment")]
+        public async Task<IActionResult> GetRequestAttachment([FromQuery] GetRequestAttachmentQuery query)
+        {
+            try
+            {
+                var results = await _mediator.Send(query);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }  
         }
 
         [HttpPut("cancel")]

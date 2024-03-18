@@ -20,7 +20,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public int? RequestGeneratorId { get; set; }
             }
 
-            
         }
 
         public class Handler : IRequestHandler<ReturnRequestTicketCommand, Result>

@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddMember;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannelValidation;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.RemoveChannelUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
@@ -216,6 +217,25 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
                 return Ok(result);
             }
             catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetChannelValidation(GetChannelValidationCommand command)
+        {
+            try
+            {
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch(Exception ex) 
             {
                 return Conflict(ex.Message);
             }

@@ -74,8 +74,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
 
-                var getTicketConcern = await _context.TicketConcerns.Include(x => x.Department).Include(x => x.SubUnit)
-                    .Include(x => x.User).ThenInclude(x => x.Department).Include(x => x.RequestGenerator)
+                var getTicketConcern = await _context.TicketConcerns
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.SubUnit)
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Department).Include(x => x.RequestGenerator)
                     .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
 
                 var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();

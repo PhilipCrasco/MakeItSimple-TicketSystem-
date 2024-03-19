@@ -96,7 +96,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
-                    .Include(x => x.User);
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.SubUnit);
+                    
 
                 var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                 var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
@@ -110,7 +112,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 if (!string.IsNullOrEmpty(request.Search))
                 {
                     ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                    || x.SubUnit.SubUnitName.Contains(request.Search));
+                    || x.User.SubUnit.SubUnitName.Contains(request.Search));
 
                 }
 

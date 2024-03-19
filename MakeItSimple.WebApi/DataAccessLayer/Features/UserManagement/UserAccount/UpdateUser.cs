@@ -68,19 +68,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserNotExist());
 
                 }
-                else if (user.UserRoleId == command.UserRoleId
-                    && user.DepartmentId == command.DepartmentId && user.SubUnitId == command.SubUnitId)
-                {
-                    return Result.Failure(UserError.UserNoChanges());
-                }
 
-                var usernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
-                if(usernameAlreadyExist != null && user.Username != command.UserName)
-                {
-                    return Result.Failure(UserError.UsernameAlreadyExist(command.UserName));
-                }
 
-                var userRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId , cancellationToken);
+
+                var userRoleNotExist = await _context.UserRoles.FirstOrDefaultAsync(x => x.Id == command.UserRoleId, cancellationToken);
 
                 if (userRoleNotExist == null)
                 {
@@ -108,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 {
                     return Result.Failure(UserError.CompanyNotExist());
                 }
-                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode== command.LocationCode, cancellationToken);
+                var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == command.LocationCode, cancellationToken);
 
                 if (LocationNotExist == null)
                 {
@@ -121,12 +112,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.BusinessUnitNotExist());
                 }
 
-                //var receiverExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == BusinessUnitNotExist.Id, cancellationToken);
-                //if (receiverExist == null)
-                //{
-                //    return Result.Failure(UserError.ReceiverNotExist());
-                //}
-
                 var UnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
                 if (UnitNotExist == null)
                 {
@@ -137,6 +122,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 if (userIsUse == true)
                 {
                     return Result.Failure(UserError.UserIsUse(user.Fullname));
+                }
+
+                var usernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
+                if (usernameAlreadyExist != null && user.Username != command.UserName)
+                {
+                    return Result.Failure(UserError.UsernameAlreadyExist(command.UserName));
+                }
+
+                if (user.Username == command.UserName && user.UserRoleId == command.UserRoleId
+                    && user.DepartmentId == command.DepartmentId && user.SubUnitId == command.SubUnitId)
+                {
+                    return Result.Failure(UserError.UserNoChanges());
                 }
 
                 user.UserRoleId = command.UserRoleId;

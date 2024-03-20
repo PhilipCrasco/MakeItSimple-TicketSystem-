@@ -799,10 +799,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
-                    b.Property<int?>("CurrentLevel")
-                        .HasColumnType("int")
-                        .HasColumnName("current_level");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
@@ -811,9 +807,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_approve");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int")
-                        .HasColumnName("receiver_id");
+                    b.Property<Guid?>("IssueHandler")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("issue_handler");
 
                     b.Property<int?>("RequestGeneratorId")
                         .HasColumnType("int")

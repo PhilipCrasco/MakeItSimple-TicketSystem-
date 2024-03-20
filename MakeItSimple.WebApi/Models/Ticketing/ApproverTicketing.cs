@@ -17,8 +17,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public bool ? IsApprove { get; set; }
         public int? ApproverLevel { get; set; }
 
-        public int? ReceiverId { get; set; }
-        public int? CurrentLevel { get; set; }
+        public Guid ? IssueHandler { get; set; }
+
         public int ? RequestGeneratorId { get; set; }
         public string Status { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }

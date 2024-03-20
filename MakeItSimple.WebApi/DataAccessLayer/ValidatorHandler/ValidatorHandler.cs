@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         //public IValidator<UpdateSubUnitCommand> UpdateSubUnitValidator { get; set; }
 
         // Channel Setup 
-        public IValidator<AddNewChannelCommand> AddNewChannelValidator {  get; set; }
+        //public IValidator<AddNewChannelCommand> AddNewChannelValidator {  get; set; }
         public IValidator<UpdateChannelCommand> UpdateChannelValidator {  get; set; }
 
         //Category Setup
@@ -65,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
 
             //Channel Setup
 
-            AddNewChannelValidator = new Channel.ChannelValidator();
+            //AddNewChannelValidator = new Channel.ChannelValidator();
             UpdateChannelValidator = new Channel.UpdateChannelValidator();
 
             //Category Setup

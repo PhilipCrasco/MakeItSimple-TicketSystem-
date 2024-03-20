@@ -108,9 +108,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 concerns.IsReject = false;
                                 concerns.Remarks = null;
                                 concerns.ConcernStatus = TicketingConString.CurrentlyFixing;
-                                //concerns.IsTransfer = null;
-                                //concerns.TransferBy = null;
-                                //concerns.TransferAt = null;
                                 ticketApproveList.Add(concerns);
                             }
 

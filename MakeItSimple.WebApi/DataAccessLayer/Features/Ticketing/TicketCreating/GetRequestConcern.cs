@@ -161,7 +161,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
-
                     var result = ticketConcernQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetRequestConcernResult
                     {
 

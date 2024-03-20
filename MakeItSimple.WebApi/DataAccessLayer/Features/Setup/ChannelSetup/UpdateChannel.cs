@@ -46,10 +46,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     return Result.Failure(ChannelError.ChannelNotExist());
                 }
-                else if (channels.ChannelName == command.Channel_Name && channels.SubUnitId == command.SubUnitId)
-                {
-                    return Result.Failure(ChannelError.ChannelNoChanges());
-                }
 
 
                 var ChannelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
@@ -66,12 +62,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.SubUnitNotExist());
                 }
                 
-                var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
+                //var channelInUse = await _context.ChannelUsers.AnyAsync(x => x.ChannelId == command.Id, cancellationToken);
 
-                if(channelInUse == true)
-                {
-                    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
-                }
+                //if(channelInUse == true)
+                //{
+                //    return Result.Failure(ChannelError.ChannelInUse(channels.ChannelName));
+                //}
 
                 channels.ChannelName = command.Channel_Name;
                 channels.SubUnitId = command.SubUnitId;

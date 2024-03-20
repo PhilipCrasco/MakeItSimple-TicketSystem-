@@ -74,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (!request.Search.IsNullOrEmpty())
                 {
-                    requestConcernsQuery = requestConcernsQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                    requestConcernsQuery = requestConcernsQuery.Where(x => x.User.Fullname.Contains(request. Search)
                     && x.Id.ToString().Contains(request.Search));
                 }
 

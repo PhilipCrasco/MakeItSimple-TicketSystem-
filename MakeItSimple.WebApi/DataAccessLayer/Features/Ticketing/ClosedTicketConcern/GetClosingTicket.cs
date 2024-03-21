@@ -89,12 +89,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.AddedByUser)
                     .Include(x => x.Channel)
                     .Include(x => x.User)
-                   
+                    .ThenInclude(x => x.BusinessUnit)
                     .Include(x => x.RejectClosedByUser)
                     .Include(x => x.ClosedByUser);
 
-                var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == closingTicketsQuery.First().User.BusinessUnitId);
-                var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+
+                ////var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == closingTicketsQuery.Firs);
+                var closingTicket = closingTicketsQuery.Include(x => x.User).ThenInclude(x => x.BusinessUnit).Select(x => x.User.BusinessUnitId);
+           
+                var receiverList = await _context.Receivers.Include(x => x.User).FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
 
@@ -128,18 +131,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
-                    else if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
+                    else if ( request.Role == TicketingConString.Receiver && receiverList != null)
                     {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.TicketGeneratorId) && x.IsApprove == null).ToListAsync();
-
-                        if (approverTransactList != null && approverTransactList.Any())
+                        if(request.UserId == receiverList.UserId)
                         {
-                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketGeneratorId);
-                            closingTicketsQuery = closingTicketsQuery.Where(x => !generatedIdInApprovalList.Contains(x.TicketGeneratorId));
+                            var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.TicketGeneratorId) && x.IsApprove == null).ToListAsync();
+
+                            if (approverTransactList != null && approverTransactList.Any())
+                            {
+                                var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketGeneratorId);
+                                closingTicketsQuery = closingTicketsQuery.Where(x => !generatedIdInApprovalList.Contains(x.TicketGeneratorId));
+                            }
+                            var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                            var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                            closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
                         }
-                        var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
-                        var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                        closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
+                        else
+                        {
+                            closingTicketsQuery = closingTicketsQuery.Where(x => x.TicketGeneratorId == null);
+                        }
 
                     }
                     else

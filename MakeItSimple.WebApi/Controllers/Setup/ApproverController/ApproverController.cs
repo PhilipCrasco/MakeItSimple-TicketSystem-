@@ -89,15 +89,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        query.Role = userRole.Value;
-                    }
-
-                }
                 var result = await _mediator.Send(query);
                 return Ok(result);
             }

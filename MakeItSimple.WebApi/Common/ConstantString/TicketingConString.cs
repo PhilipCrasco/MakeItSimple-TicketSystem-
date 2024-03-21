@@ -24,7 +24,7 @@
         public const string Approver = "Approver";
         public const string Requestor = "Requestor";
         public const string Receiver = "Receiver";
-        public const string IssueHandler = "IssueHandler";
+        public const string IssueHandler = "Issue Handler";
 
         //TicketHistory
 

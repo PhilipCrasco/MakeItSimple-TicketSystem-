@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Common;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel.AddNewChannelCommands;
+using MakeItSimple.WebApi.Models;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 {
@@ -16,21 +17,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public int SubUnitId { get; set; }
-            public Guid ? Added_By { get; set; }
-            public Guid ? Modified_By { get; set; }
+            public Guid? Added_By { get; set; }
+            public Guid? Modified_By { get; set; }
 
             public List<ChannelUserById> ChannelUserByIds { get; set; }
             public class ChannelUserById
             {
                 public int? ChannelUserId { get; set; }
-                public Guid ? UserId { get; set; }
-                
+                public Guid? UserId { get; set; }
+
             }
 
         }
 
 
-        public class Handler : IRequestHandler<AddNewChannelCommands,Result>
+        public class Handler : IRequestHandler<AddNewChannelCommands, Result>
         {
             private readonly MisDbContext _context;
 
@@ -43,8 +44,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public async Task<Result> Handle(AddNewChannelCommands command, CancellationToken cancellationToken)
             {
-             
-                var listDelete = new List<ChannelUserById>();
+
+                var listDelete = new List<ChannelUser>();
                 var listChannel = new List<Channel>();
 
                 var channelId = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -69,23 +70,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
                     bool hasChange = false;
 
-                    if(channelId.ChannelName != command.Channel_Name)
+                    if (channelId.ChannelName != command.Channel_Name)
                     {
                         channelId.ChannelName = channelId.ChannelName;
                         hasChange = true;
                     }
-                    if(channelId.SubUnitId != command.SubUnitId)
+                    if (channelId.SubUnitId != command.SubUnitId)
                     {
                         channelId.SubUnitId = command.SubUnitId;
                         hasChange = true;
                     }
 
-                    if(hasChange)
+                    if (hasChange)
                     {
                         channelId.ModifiedBy = command.Modified_By;
                         channelId.UpdatedAt = DateTime.Now;
 
                     }
+
 
                     listChannel.Add(channelId);
 
@@ -94,7 +96,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 else
                 {
 
-                   var channelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
+                    var channelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
 
                     if (channelNameAlreadyExist != null)
                     {
@@ -113,10 +115,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     await _context.SaveChangesAsync(cancellationToken);
 
                     listChannel.Add(channels);
-
                 }
 
-                foreach(var member in command.ChannelUserByIds)
+                foreach (var member in command.ChannelUserByIds)
                 {
 
                     var UserNotExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == member.UserId, cancellationToken);
@@ -126,69 +127,47 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         return Result.Failure(ChannelError.UserNotExist());
                     }
 
-                    var memberById = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.Id == member.ChannelUserId, cancellationToken);
-                    
-                    if(memberById != null)
+
+
+                    var channelName = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
+
+                    var channelUser = await _context.ChannelUsers.Include(x => x.User).FirstOrDefaultAsync(x => x.UserId == member.UserId && x.ChannelId == channelName.Id);
+
+                    if (channelUser == null)
                     {
-
-                        var UserAlreadyAdd = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.UserId == member.UserId, cancellationToken);
-
-                        if (UserAlreadyAdd != null && UserAlreadyAdd.UserId != member.UserId)
-                        {
-                            return Result.Failure(ChannelError.UserAlreadyAdd());
-                        }
-
-                        bool hasChange = false;
-
-                        if (memberById.UserId != member.UserId)
-                        {
-                            memberById.UserId = member.UserId;
-                            hasChange = true;
-                        }
-
-                        listDelete.Add(member);
-
-                    }
-                    else
-                    {
-                        var UserAlreadyAdd = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.UserId == member.UserId, cancellationToken);
-
-                        if (UserAlreadyAdd != null)
-                        {
-                            return Result.Failure(ChannelError.UserAlreadyAdd());
-                        }
-
-                        var channelName = await  _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
-
-                        var channelUser = new ChannelUser
+                        var addChannelUser = new ChannelUser
                         {
                             ChannelId = channelName.Id,
                             UserId = member.UserId,
 
                         };
 
-                        await _context.ChannelUsers.AddAsync(channelUser, cancellationToken);
-
-
+                        await _context.ChannelUsers.AddAsync(addChannelUser, cancellationToken);
+                        listDelete.Add(addChannelUser);
                     }
-
-
-                    var channelList = listChannel.Select(x => x.Id);
-                    var removeApproverList = await _context.ChannelUsers.Where(x => channelList.Contains(x.ChannelId)).ToListAsync();
-                    var approvalListId = listDelete.Select(x => x.UserId);
-
-                    var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.UserId));
-
-                    foreach (var approver in removeNotContainApproval)
+                    else
                     {
-                        _context.Remove(approver);
+                        listDelete.Add(channelUser);
                     }
+
+
+
+
 
 
 
                 }
 
+                var channelList = listChannel.Select(x => x.Id);
+                var removeApproverList = await _context.ChannelUsers.Where(x => channelList.Contains(x.ChannelId)).ToListAsync();
+                var approvalListId = listDelete.Select(x => x.UserId);
 
+                var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.UserId));
+
+                foreach (var approver in removeNotContainApproval)
+                {
+                    _context.Remove(approver);
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

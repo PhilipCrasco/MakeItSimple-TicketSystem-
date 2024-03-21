@@ -125,7 +125,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 concernTicketById.Closed_At = DateTime.Now;
                                 concernTicketById.ClosedApproveBy = command.Closed_By;
                                 concernTicketById.Remarks = TicketingConString.CloseTicket;
+                                concernTicketById.ConcernStatus = TicketingConString.Done;
+
+                                var requestConcernCloseList = await _context.TicketConcerns
+                                    .Where(x => x.RequestGeneratorId == concernTicketById.RequestGeneratorId 
+                                    && x.IsClosedApprove == true && x.RequestConcernId != null).ToListAsync();
+
+                                var requestConcernList = await _context.TicketConcerns
+                                    .Where(x => x.RequestGeneratorId == concernTicketById.RequestGeneratorId 
+                                    && x.RequestConcernId != null).ToListAsync();
+
+                                if (requestConcernCloseList.Count() == requestConcernList.Count())
+                                {
+
+                                    var requestConcernSelect = requestConcernCloseList.Select(x => x.RequestConcernId);
+                                    var requestConcern = await _context.RequestConcerns.Where(x => requestConcernSelect.Contains(x.Id)).ToListAsync();
+                                    
+                                    foreach ( var request in requestConcern)
+                                    {
+                                        request.ConcernStatus = TicketingConString.Done;
+                                    }
+
+
+                                }
+
                             }
+
+                            
 
                             if (ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
                             {

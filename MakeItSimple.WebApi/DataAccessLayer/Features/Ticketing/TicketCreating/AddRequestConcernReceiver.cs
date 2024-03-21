@@ -26,8 +26,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Role { get; set; }
 
             public List<AddRequestConcernbyConcern> AddRequestConcernbyConcerns { get; set; }
-
-
             public class AddRequestConcernbyConcern
             {
 
@@ -251,7 +249,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             StartDate = concerns.Start_Date,
                             TargetDate = concerns.Target_Date,
                             IsApprove = false,
-                            ConcernStatus = TicketingConString.CurrentlyFixing
+                            ConcernStatus = TicketingConString.ForApprovalTicket
                             
                             
                         };
@@ -314,7 +312,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         
                 }
 
-                if (ticketConcernList.Count() < 0)
+                if (ticketConcernList.Count() > 0)
                 {
                     var getApprover = await _context.Approvers
                   .Where(x => x.ChannelId == ticketConcernList.First().ChannelId).ToListAsync();
@@ -334,7 +332,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,
                             CreatedAt = DateTime.Now,
-                            Status = TicketingConString.ReTicket,
+                            Status = TicketingConString.RequestTicket,
 
                         };
 

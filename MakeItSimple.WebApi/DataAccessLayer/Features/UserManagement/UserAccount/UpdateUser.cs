@@ -134,7 +134,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 }
 
 
-
                 var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
                 if (userIsUse == true)
                 {

@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             
             public int ? UnitId { get; set; }
             public string Unit_Name {  get; set; }
+
+            public int Num_Of_Team { get; set; }
 
             //public string Location_Name { get; set; }
 
@@ -55,6 +58,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             {
                 public int ChannelId { get; set; }
                 public string Channel_Name { get; set; }
+            }
+            public List<Team> Teams { get; set; }
+            public class Team
+            {
+                public int ? TeamId { get; set;}
+                public string Team_Name { get; set;}
             }
 
         }
@@ -103,9 +112,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
-
+                    
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
+                    Num_Of_Team = x.Teams.Count(),
 
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
@@ -121,6 +131,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                         Channel_Name = x.ChannelName
 
                     }).ToList(),
+                    Teams = x.Teams.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Team
+                    {
+                        TeamId = x.Id,
+                        Team_Name = x.TeamName
+
+                    }).ToList()
+                    
+
+
 
                 });
 

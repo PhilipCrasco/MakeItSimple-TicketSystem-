@@ -1,4 +1,6 @@
 ﻿using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
+using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
@@ -12,6 +14,14 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User AddedByUser { get; set; }
         public int ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
+
+        public int ? SubUnitId { get; set; }
+        public virtual SubUnit SubUnit { get; set; }
+
+        public int? TeamId { get; set; }
+        public virtual Team Team { get; set; }
+
+
         public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
         public bool ? IsApprove { get; set; }

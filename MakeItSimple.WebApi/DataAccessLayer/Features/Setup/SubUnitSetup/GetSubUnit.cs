@@ -57,8 +57,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 public string Channel_Name { get; set; }
             }
 
-
-
         }
 
         public class GetSubUnitQuery : UserParams, IRequest<PagedList<GetSubUnitResult>>

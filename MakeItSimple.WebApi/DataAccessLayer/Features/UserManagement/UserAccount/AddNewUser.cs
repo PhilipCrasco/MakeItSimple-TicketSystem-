@@ -25,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             public int ? BusinessUnitId { get; set; }
 
+            public int ? TeamId { get; set; }
+
             public Guid ? Added_By { get; set; }
 
         }
@@ -38,6 +40,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int UserRoleId { get; set; }
             public int ? DepartmentId { get; set; }
             public int ? SubUnitId { get; set; }
+
+            public int ? TeamId { get; set; }
 
             public int ? UnitId { get; set; }
 
@@ -85,11 +89,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserRoleNotExist());
                 }
 
+
+                var CompanyNotExist = await _context.Companies.FirstOrDefaultAsync(x => x.Id == command.CompanyId, cancellationToken);
+
+                if (CompanyNotExist == null)
+                {
+                    return Result.Failure(UserError.CompanyNotExist());
+                }
+
+                var BusinessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
+
+                if (BusinessUnitNotExist == null)
+                {
+                    return Result.Failure(UserError.BusinessUnitNotExist());
+                }
+
                 var DepartmentNotExist = await _context.Departments.FirstOrDefaultAsync(x => x.Id == command.DepartmentId , cancellationToken);
 
                 if(DepartmentNotExist == null)
                 {
                     return Result.Failure(UserError.DepartmentNotExist());
+                }
+
+
+                var UnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
+                if (UnitNotExist == null)
+                {
+                    return Result.Failure(UserError.UnitNotExist());
                 }
 
                 var SubUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
@@ -99,37 +125,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.SubUnitNotExist());
                 }
 
-                var CompanyNotExist = await _context.Companies.FirstOrDefaultAsync(x => x.Id == command.CompanyId, cancellationToken);
-
-                if (CompanyNotExist == null)
-                {
-                    return Result.Failure(UserError.CompanyNotExist());
-                }
                 var LocationNotExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == command.LocationCode, cancellationToken);
 
                 if (LocationNotExist == null)
                 {
                     return Result.Failure(UserError.LocationNotExist());
                 }
-                var BusinessUnitNotExist = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == command.BusinessUnitId, cancellationToken);
 
-                if (BusinessUnitNotExist == null)
+
+                if(command.TeamId != null)
                 {
-                    return Result.Failure(UserError.BusinessUnitNotExist());
+                    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
+                    if (teamNotExist == null)
+                    {
+                        return Result.Failure(UserError.TeamNotExist());
+                    }
+
                 }
-
-                //var receiverExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == BusinessUnitNotExist.Id , cancellationToken);
-                //if (receiverExist == null)
-                //{
-                //    return Result.Failure(UserError.ReceiverNotExist());
-                //}
-
-                var UnitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
-                if (UnitNotExist == null)
-                {
-                    return Result.Failure(UserError.UnitNotExist());
-                }
-
 
                 var users = new User
                 {
@@ -140,6 +152,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     UserRoleId = command.UserRoleId,
                     SubUnitId = command.SubUnitId,
+                    TeamId = command.TeamId,
                     DepartmentId = command.DepartmentId,    
                     CompanyId = command.CompanyId,  
                     LocationId = LocationNotExist.Id,
@@ -162,6 +175,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     UserRoleId = users.UserRoleId,
                     DepartmentId = users.DepartmentId,
                     SubUnitId= users.SubUnitId,
+                    TeamId = users.TeamId,  
                     CompanyId = users.CompanyId,
                     LocationCode = command.LocationCode,
                     BusinessUnitId = users.BusinessUnitId,

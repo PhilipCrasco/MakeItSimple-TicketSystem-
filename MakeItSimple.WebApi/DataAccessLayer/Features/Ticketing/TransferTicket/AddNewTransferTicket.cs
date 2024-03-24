@@ -131,7 +131,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var addNewApprover = new ApproverTicketing
                     {
                         TicketGeneratorId = ticketGenerator.Id,
-                        ChannelId = approver.ChannelId,
+                        //ChannelId = approver.ChannelId,
                         UserId = approver.UserId,
                         ApproverLevel = approver.ApproverLevel,
                         AddedBy = command.Added_By,

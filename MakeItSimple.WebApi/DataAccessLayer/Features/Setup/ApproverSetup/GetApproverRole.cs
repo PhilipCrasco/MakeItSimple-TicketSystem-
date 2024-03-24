@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
         {
 
             //public string Role {  get; set; }
-            public int ChannelId { get; set; }
+            public int ? SubUnitId { get; set; }
         }
 
         public class Handler : IRequestHandler<GetApproverRoleQuery, Result>
@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public async Task<Result> Handle(GetApproverRoleQuery request, CancellationToken cancellationToken)
             {
 
-                var approver = await _context.Approvers.Where(x => x.ChannelId == request.ChannelId).ToListAsync();
+                var approver = await _context.Approvers.Where(x => x.SubUnitId == request.SubUnitId).ToListAsync();
 
                 var selectApprover = approver.Select(x => x.UserId);
 

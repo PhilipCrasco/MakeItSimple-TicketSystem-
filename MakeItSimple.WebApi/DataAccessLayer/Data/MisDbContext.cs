@@ -9,6 +9,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ReceiverSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.TeamSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.UnitSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing;
 using MakeItSimple.WebApi.DataAccessLayer.Data.UserConfigurationExtension;
@@ -25,6 +26,7 @@ using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
@@ -69,6 +71,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
         public virtual DbSet<TicketGenerator> TicketGenerators { get; set; }
 
+        public virtual DbSet<Team> Teams { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -89,6 +93,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new AccountTitleConfiguration());
             modelBuilder.ApplyConfiguration(new SubUnitConfiguration());
+            modelBuilder.ApplyConfiguration(new TeamConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
             modelBuilder.ApplyConfiguration(new ChannelConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());

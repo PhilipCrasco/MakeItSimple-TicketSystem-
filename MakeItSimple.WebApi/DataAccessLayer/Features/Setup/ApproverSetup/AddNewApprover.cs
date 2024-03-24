@@ -12,18 +12,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 {
     public class AddNewApprover
     {
-        public class AddNewApproverResult
-        {
-            public int Id { get; set; }
-            public int ChannelId { get; set; }
-            public Guid? Added_By { get; set; }
-            public DateTime Created_At { get; set; }
-            public Guid ? Modified_By { get; set; }
-            public DateTime ? Updated_At { get; set; }
-            public Guid? UserId { get; set; }
-            public int? ApproverLevel { get; set; }
-
-        }
 
         public class AddNewApproverCommand : IRequest<Result>
         {
@@ -78,12 +66,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     if (UserNotExist == null)
                     {
                         return Result.Failure(ApproverError.UserNotExist());
-                    }
-
-                    var invalidUser = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId, cancellationToken);
-                    if (invalidUser == null)
-                    {
-                        return Result.Failure(ApproverError.UserNotAuthorize());
                     }
 
                     if (command.Approvers.Count(x => x.ApproverLevel == approver.ApproverLevel) > 1)
@@ -183,20 +165,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var result = approverList.Select(x => new AddNewApproverResult
-                {
-                    Id = x.Id,
-                    ChannelId = x.ChannelId,
-                    Added_By = x.AddedBy,
-                    Created_At = x.CreatedAt,
-                    Modified_By = x.ModifiedBy,
-                    Updated_At = x.UpdatedAt,
-                    UserId = x.UserId,
-                    ApproverLevel = x.ApproverLevel,
 
-                }).ToList();
-
-                return Result.Success(result);
+                return Result.Success();
             }
         }
 

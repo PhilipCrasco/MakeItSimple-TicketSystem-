@@ -100,7 +100,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var addNewApprover = new ApproverTicketing
                         {
                             TicketGeneratorId = ticketGeneratorId.Id,
-                            ChannelId = approver.ChannelId,
+                            //ChannelId = approver.ChannelId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

@@ -251,7 +251,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var addNewApprover = new ApproverTicketing
                         {
                             RequestGeneratorId = requestGeneratorList.First().Id,
-                            ChannelId = approver.ChannelId,
+                            //ChannelId = approver.ChannelId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,
@@ -262,12 +262,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                     }
 
-
-
-
                 }
-
- 
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

@@ -327,7 +327,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var addNewApprover = new ApproverTicketing
                         {
                             RequestGeneratorId = requestTicketConcernList.First().RequestGeneratorId,
-                            ChannelId = approver.ChannelId,
+                            //ChannelId = approver.ChannelId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

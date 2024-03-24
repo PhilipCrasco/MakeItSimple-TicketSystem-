@@ -12,6 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public Guid? UserId { get; set; }
             public string EmpId { get; set; }
             public  string FullName { get; set; }
+            public string UserRole {  get; set; }
 
         }
 
@@ -45,7 +46,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                    UserId = x.Id,
                    EmpId = x.EmpId,
-                   FullName = x.Fullname
+                   FullName = x.Fullname,
+                   UserRole = x.UserRole.UserRoleName
 
                 }).ToListAsync();   
 

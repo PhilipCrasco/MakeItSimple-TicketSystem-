@@ -11,7 +11,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
     {
         public class GetApproverResult
         {
-            public int ChannelId { get; set; }
+            public int ? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public bool Is_Active { get; set; }
             public string Added_By { get; set; }

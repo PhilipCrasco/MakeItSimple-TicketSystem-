@@ -60,7 +60,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             return Result.Failure(ReTicketConcernError.TicketConcernIdAlreadyExist());
                         }
 
-                        var approverList = await _context.Approvers.Where(x => x.ChannelId == ticketConcernExist.ChannelId).ToListAsync();
+                        var approverByUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == ticketConcernExist.UserId, cancellationToken);
+                        var approverList = await _context.Approvers.Where(x => x.SubUnitId == approverByUser.SubUnitId).ToListAsync();
                         var approverUser = approverList.First(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
 
                         var addNewClosingConcern = new ClosingTicket
@@ -88,7 +89,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
 
                     var getApprover = await _context.Approvers
-                    .Where(x => x.ChannelId == closedList.First().ChannelId).ToListAsync();
+                    .Where(x => x.SubUnitId == closedList.First().User.SubUnitId).ToListAsync();
 
                     if (getApprover == null)
                     {
@@ -101,6 +102,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             TicketGeneratorId = ticketGeneratorId.Id,
                             //ChannelId = approver.ChannelId,
+                            SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

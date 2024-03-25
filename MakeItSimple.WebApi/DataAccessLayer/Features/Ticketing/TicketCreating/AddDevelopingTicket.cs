@@ -107,7 +107,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.DuplicateConcern());
                     }
 
-                    var getApproverUser = await _context.Approvers.Where(x => x.ChannelId == command.ChannelId).ToListAsync();
+                    var getApproverSubUnit = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId, cancellationToken);
+                    var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
                     var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
@@ -238,8 +239,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 if (ticketConcernList.Count() < 0)
                 {
 
-                    var getApprover = await _context.Approvers
-                    .Where(x => x.ChannelId == ticketConcernList.First().ChannelId).ToListAsync();
+                    var getApprover = await _context.Approvers.Include(x => x.User)
+                    .Where(x => x.SubUnitId == ticketConcernList.First().User.SubUnitId).ToListAsync();
 
                     if (getApprover == null)
                     {
@@ -252,6 +253,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             RequestGeneratorId = requestGeneratorList.First().Id,
                             //ChannelId = approver.ChannelId,
+                            SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

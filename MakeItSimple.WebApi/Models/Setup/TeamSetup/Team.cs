@@ -24,9 +24,9 @@ namespace MakeItSimple.WebApi.Models.Setup.TeamSetup
 
 
 
-        public ICollection<Channel> Channels { get; set; }
+        //public ICollection<Channel> Channels { get; set; }
 
-        public ICollection<Approver> Approvers { get; set; }
+        //public ICollection<Approver> Approvers { get; set; }
 
 
     }

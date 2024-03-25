@@ -23,8 +23,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
             public class Location
             {
-               public int ? LocationId { get; set; }
-               public int ? Location_Code { get; set; }
+
+               public string  Location_Code { get; set; }
                public string Location_Name { get; set; }
             }
 
@@ -128,7 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                     
                     foreach(var location in command.Locations)
                     {
-                        var locationExist = await _context.Locations.FirstOrDefaultAsync(x => x.Id == location.LocationId, cancellationToken);
+                        var locationExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == location.Location_Code, cancellationToken);
                         if (locationExist == null)
                         {
                             return Result.Failure(SubUnitError.LocationNotExist());

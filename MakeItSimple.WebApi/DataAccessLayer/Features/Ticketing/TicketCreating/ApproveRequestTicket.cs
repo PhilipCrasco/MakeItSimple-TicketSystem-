@@ -136,10 +136,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     }
                                 }
 
-
-
-
-
                             }
 
                         }
@@ -147,7 +143,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
-
 
                     }
 

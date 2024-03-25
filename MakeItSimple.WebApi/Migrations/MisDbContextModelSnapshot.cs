@@ -113,10 +113,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int")
-                        .HasColumnName("team_id");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -139,9 +135,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_approvers_sub_unit_id");
-
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("ix_approvers_team_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_approvers_user_id");
@@ -293,10 +286,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int")
-                        .HasColumnName("team_id");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -319,9 +308,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_channels_sub_unit_id");
-
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("ix_channels_team_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_channels_user_id");
@@ -1998,11 +1984,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_approvers_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", null)
-                        .WithMany("Approvers")
-                        .HasForeignKey("TeamId")
-                        .HasConstraintName("fk_approvers_teams_team_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -2084,14 +2065,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_channels_users_modified_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
-                        .WithMany("Channels")
+                        .WithMany()
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_channels_sub_units_sub_unit_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", null)
-                        .WithMany("Channels")
-                        .HasForeignKey("TeamId")
-                        .HasConstraintName("fk_channels_teams_team_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
@@ -2974,18 +2950,9 @@ namespace MakeItSimple.WebApi.Migrations
                 {
                     b.Navigation("Approvers");
 
-                    b.Navigation("Channels");
-
                     b.Navigation("Teams");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
-                {
-                    b.Navigation("Approvers");
-
-                    b.Navigation("Channels");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", b =>

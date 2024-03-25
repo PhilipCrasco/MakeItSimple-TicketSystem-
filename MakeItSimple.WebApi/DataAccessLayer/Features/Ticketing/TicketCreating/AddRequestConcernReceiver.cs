@@ -120,10 +120,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (command.AddRequestConcernbyConcerns.Count(x => x.Concern_Details == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
                     && x.SubCategoryId == concerns.SubCategoryId && x.UserId == concerns.UserId) > 1)
                     {
-                        return Result.Failure(TicketRequestError.DuplicateConcern());
+                        return Result.Failure(TicketRequestError.DuplicateConcern()); 
                     }
 
-                    var getApproverUser = await _context.Approvers.Where(x => x.ChannelId == command.ChannelId).ToListAsync();
+                    var getApproverSubUnit = await _context.Users.FirstOrDefaultAsync(x => x.Id == concerns.UserId, cancellationToken);
+                    var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
                     var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
@@ -191,7 +192,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                         if (upsertConcern.RequestorByUser.UserRole.UserRoleName == TicketingConString.Requestor 
-                            && upsertConcern.AddedByUser.UserRole.UserRoleName != TicketingConString.IssueHandler)
+                            &&   upsertConcern.AddedByUser.UserRole.UserRoleName != TicketingConString.IssueHandler)
                         {
                             var requestUpsertConcern = await _context.RequestConcerns.Where(x => x.Id == upsertConcern.RequestConcernId).ToListAsync();
 
@@ -250,8 +251,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             TargetDate = concerns.Target_Date,
                             IsApprove = false,
                             ConcernStatus = TicketingConString.ForApprovalTicket
-                            
-                            
+                          
                         };
 
                         var userList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
@@ -314,8 +314,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (ticketConcernList.Count() > 0)
                 {
-                    var getApprover = await _context.Approvers
-                  .Where(x => x.ChannelId == ticketConcernList.First().ChannelId).ToListAsync();
+                    var getApprover = await _context.Approvers.Include(x => x.User)
+                  .Where(x => x.SubUnitId == ticketConcernList.First().User.SubUnitId).ToListAsync();
 
                     if (getApprover == null)
                     {
@@ -328,6 +328,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             RequestGeneratorId = requestTicketConcernList.First().RequestGeneratorId,
                             //ChannelId = approver.ChannelId,
+                            SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

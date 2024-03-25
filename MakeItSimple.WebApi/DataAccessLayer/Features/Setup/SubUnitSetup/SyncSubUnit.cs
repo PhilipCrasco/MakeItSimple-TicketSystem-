@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
             public class SyncSubUnitsResult
             {
-                public int SubUnit_No { get; set; }
+                public int ? SubUnit_No { get; set; }
                 public string SubUnit_Code { get; set; }
                 public string SubUnit_Name { get; set; }
                 public string Unit_Name { get; set; }
@@ -161,7 +161,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
                 var allInputByNo = AllInputSync.Select(x => x.SubUnit_No);
 
-                var allDataInput = await _context.SubUnits.Where(x => !allInputByNo.Contains(x.SubUnitNo)).ToListAsync();
+                var allDataInput = await _context.SubUnits.Where(x => !allInputByNo.Contains(x.SubUnitNo) && x.SubUnitNo != null).ToListAsync();
 
                 foreach (var subUnit in allDataInput)
                 {

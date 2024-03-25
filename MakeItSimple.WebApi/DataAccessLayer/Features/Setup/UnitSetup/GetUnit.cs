@@ -42,6 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
             public class SubUnitList
             {
                 public int Id { get; set; }
+                public string SubUnit_Code {  get; set; }
                 public string SubUnit_Name { get; set; }
 
             }
@@ -106,6 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.UnitSetup
                     SubUnitLists = x.SubUnits.Where(x => x.IsActive == true).Select(x => new GetUnitResult.SubUnitList
                     {
                         Id = x.Id,
+                        SubUnit_Code = x.SubUnitCode,
                         SubUnit_Name = x.SubUnitName
 
                     }).ToList(),

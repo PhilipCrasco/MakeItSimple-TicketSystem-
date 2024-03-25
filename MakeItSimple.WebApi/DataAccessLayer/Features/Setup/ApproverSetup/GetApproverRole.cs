@@ -14,14 +14,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public string EmpId { get; set; }
 
             public string FullName { get; set; }
+
+            public string UserRole { get; set; }
         }
 
 
-        public class GetApproverRoleQuery : IRequest<Result> 
-        { 
-         
-            public string Role {  get; set; }
-            public int ChannelId { get; set; }
+        public class GetApproverRoleQuery : IRequest<Result>
+        {
+
+            //public string Role {  get; set; }
+            public int ? SubUnitId { get; set; }
         }
 
         public class Handler : IRequestHandler<GetApproverRoleQuery, Result>
@@ -36,19 +38,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public async Task<Result> Handle(GetApproverRoleQuery request, CancellationToken cancellationToken)
             {
 
-                var approver = await _context.Approvers.Where(x => x.ChannelId == request.ChannelId).ToListAsync();
+                var approver = await _context.Approvers.Where(x => x.SubUnitId == request.SubUnitId).ToListAsync();
 
                 var selectApprover = approver.Select(x => x.UserId);
 
 
-                var results = await _context.ChannelUsers
-                    .Include(x => x.User)
-                    .Where(x => x.ChannelId == request.ChannelId && !selectApprover.Contains(x.UserId) && request.Role == TicketingConString.Approver)
+                var results = await _context.Users
+                    .Include(x => x.UserRole)
+                    .Where(x => !selectApprover.Contains(x.Id) && x.UserRole.UserRoleName == TicketingConString.Approver
+                    )
                     .Select(x => new GetApproverRoleResult
                     {
-                        UserId = x.UserId,
-                        EmpId = x.User.EmpId,
-                        FullName = x.User.Fullname
+                        UserId = x.Id,
+                        EmpId = x.EmpId,
+                        FullName = x.Fullname,
+                        UserRole = x.UserRole.UserRoleName
+
 
                     }).ToListAsync();
 

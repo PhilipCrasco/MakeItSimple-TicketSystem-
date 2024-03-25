@@ -16,12 +16,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
             public Guid? UserId { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
+
+            public string FullName { get; set; }
             public List<AddNewReceiverId> AddNewReceiverIds { get; set; }
 
 
             public class AddNewReceiverId
             {
-                public int ? ReceiverId { get; set; }
+                public int? ReceiverId { get; set; }
                 public int? BusinessUnitId { get; set; }
             }
 
@@ -58,54 +60,70 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         return Result.Failure(ReceiverError.BusinessUnitNotExist());
                     }
 
-                    if (command.AddNewReceiverIds.Count(x => x.BusinessUnitId == receiverId.BusinessUnitId) > 1)
-                    {
-                        return Result.Failure(ReceiverError.DuplicateReceiver());
-                    }
 
-                    var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.Id == receiverId.ReceiverId, cancellationToken);
+                    var receiverUser = await _context.Receivers.FirstOrDefaultAsync(x => x.User.Fullname == command.FullName, cancellationToken);
                     var alreadyExist = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == receiverId.BusinessUnitId, cancellationToken);
-                    if (receiver != null)
+                    if (receiverUser != null)
                     {
 
-                        if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
+                        var receiver = await _context.Receivers.FirstOrDefaultAsync(x => x.Id == receiverId.ReceiverId, cancellationToken);
+                        if (receiver != null)
                         {
-                            return Result.Failure(ReceiverError.DuplicateReceiver());
-                        }
 
-                        bool isChange = false;
+                            if (alreadyExist != null && alreadyExist.BusinessUnitId != receiver.BusinessUnitId)
+                            {
+                                return Result.Failure(ReceiverError.DuplicateReceiver());
+                            }
 
-                        if(receiver.UserId != command.UserId)
-                        {
-                            receiver.UserId = command.UserId;
-                            isChange = true;
-                        }
+                            bool isChange = false;
 
-                        if(receiver.BusinessUnitId != receiverId.BusinessUnitId)
-                        {
-                            receiver.BusinessUnitId = receiverId.BusinessUnitId;
-                            isChange = true;
+                            if (receiver.UserId != command.UserId)
+                            {
+                                receiver.UserId = command.UserId;
+                                isChange = true;
+                            }
 
-                        }
+                            if (receiver.BusinessUnitId != receiverId.BusinessUnitId)
+                            {
+                                receiver.BusinessUnitId = receiverId.BusinessUnitId;
+                                isChange = true;
+                            }
 
-                        if (isChange)
-                        {
-                            receiver.ModifiedBy = command.Modified_By;
-                            receiver.UpdatedAt = DateTime.Now;
+                            if (isChange)
+                            {
+                                receiver.ModifiedBy = command.Modified_By;
+                                receiver.UpdatedAt = DateTime.Now;
+                                receiverList.Add(receiver);
+                            }
+                            else
+                            {
+                                receiverList.Add(receiver);
+
+                            }
+
                         }
                         else
                         {
-                            receiverList.Add(receiver);
+
+
+                            var addNewReceiver = new Receiver
+                            {
+                                UserId = command.UserId,
+                                BusinessUnitId = receiverId.BusinessUnitId,
+                                AddedBy = command.Added_By,
+
+                            };
+
+
+                            await _context.Receivers.AddAsync(addNewReceiver);
+                            receiverList.Add(addNewReceiver);
+
                         }
+
 
                     }
                     else
                     {
-
-                        if (alreadyExist != null)
-                        {
-                            return Result.Failure(ReceiverError.DuplicateReceiver());
-                        }
 
 
                         var addNewReceiver = new Receiver
@@ -113,21 +131,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                             UserId = command.UserId,
                             BusinessUnitId = receiverId.BusinessUnitId,
                             AddedBy = command.Added_By,
-                             
+
                         };
 
-                        receiverList.Add(addNewReceiver);
-                        await _context.Receivers.AddAsync(addNewReceiver);
 
+                        await _context.Receivers.AddAsync(addNewReceiver);
+                        receiverList.Add(addNewReceiver);
 
                     }
+
+
+
 
                 }
 
                 var removeApproverList = await _context.Receivers.Where(x => x.UserId == userNotExist.Id).ToListAsync();
-                var receiverListId = receiverList.Select(x => x.BusinessUnitId);
+                var receiverListId = receiverList.Select(x => x.Id);
 
-                var removeNotContainReceiver = removeApproverList.Where(x => !receiverListId.Contains(x.BusinessUnitId));
+                var removeNotContainReceiver = removeApproverList.Where(x => !receiverListId.Contains(x.Id));
 
                 foreach (var receiverRemove in removeNotContainReceiver)
                 {
@@ -138,7 +159,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                 return Result.Success();
             }
         }
-
 
     }
 }

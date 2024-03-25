@@ -30,7 +30,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 
             try
             {
-                command.ChannelId = id; 
+                command.SubUnitId = id; 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
@@ -85,19 +85,10 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
         }
 
         [HttpGet("approver-user")]
-        public async Task<IActionResult> GetApproverRole([FromQuery] GetApproverRoleQuery query)
+        public async Task<IActionResult> GetApproverRole([FromQuery] GetApproverRoleQuery query)       
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        query.Role = userRole.Value;
-                    }
-
-                }
                 var result = await _mediator.Send(query);
                 return Ok(result);
             }

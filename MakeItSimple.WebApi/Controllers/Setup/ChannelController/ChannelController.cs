@@ -1,20 +1,16 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿
+
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddMember;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannel;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannelValidation;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.RemoveChannelUser;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannelStatus;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup.GetReceiverBusinessUnit;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
 {
@@ -31,36 +27,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             _validatorHandler = validatorHandler;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddNewChannel([FromBody] AddNewChannelCommand command)
-        {
-            try
-            {
-                var validationResult = await _validatorHandler.AddNewChannelValidator.ValidateAsync(command);
-
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);
-                }
-
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Added_By = userId;
-                }
-
-                var result = await _mediator.Send(command);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
 
         [HttpGet("page")]
         public async Task<IActionResult> GetChannel([FromQuery] GetChannelQuery query)
@@ -101,38 +67,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateChannel([FromBody] UpdateChannelCommand command, [FromRoute] int id)
-        {
-            try
-            {
-                command.Id = id;    
-                var validationResult = await _validatorHandler.UpdateChannelValidator.ValidateAsync(command);
-
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);
-                }
-
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Modified_By = userId;
-                }
-
-                var result = await _mediator.Send(command);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
-
         [HttpPatch("status/{id}")]
         public async Task<IActionResult> UpdateChannelStatus([FromRoute] int id)
         {
@@ -159,27 +93,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
         }
 
 
-        [HttpPost("member/{id}")]
-        public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command, [FromRoute] int id)
-        {
-
-            try
-            {
-                command.ChannelId = id;
-                var results = await _mediator.Send(command);
-                if(results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-               return Ok(results);  
-
-            }
-            catch(Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
 
         [HttpGet("member-list")]
         public async Task<IActionResult> GetMember([FromQuery]GetMemberQuery query)
@@ -197,17 +110,35 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
         }
 
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveChannelUser([FromBody] RemoveChannelUserCommand command, [FromRoute] int id)
+        [HttpPost("validation")]
+        public async Task<IActionResult> GetChannelValidation(GetChannelValidationCommand command)
         {
             try
             {
-                command.ChannelId = id;
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch(Exception ex) 
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddNewChannels([FromBody] AddNewChannelCommands command)
+        {
+            try
+            {
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
+                    command.Added_By = userId;
                     command.Modified_By = userId;
                 }
-
                 var result = await _mediator.Send(command);
                 if (result.IsFailure)
                 {
@@ -219,7 +150,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             {
                 return Conflict(ex.Message);
             }
-
         }
 
     }

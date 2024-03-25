@@ -12,22 +12,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 {
     public class AddNewApprover
     {
-        public class AddNewApproverResult
-        {
-            public int Id { get; set; }
-            public int ChannelId { get; set; }
-            public Guid? Added_By { get; set; }
-            public DateTime Created_At { get; set; }
-            public Guid ? Modified_By { get; set; }
-            public DateTime ? Updated_At { get; set; }
-            public Guid? UserId { get; set; }
-            public int? ApproverLevel { get; set; }
-
-        }
 
         public class AddNewApproverCommand : IRequest<Result>
         {
-            public int ChannelId { get; set; }
+            public int ? SubUnitId { get; set; }
             public Guid? Added_By { get; set; }
             public DateTime CreatedAt { get; set; }
             public Guid? Modified_By { get; set; }
@@ -57,11 +45,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             {
                 var approverList = new List<Approver>();
 
-                var channelNotExist = await _context.Channels.Include(x => x.ChannelUsers).FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
+                var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
 
-                if (channelNotExist == null)
+                if (subUnitNotExist == null)
                 {
-                    return Result.Failure(ApproverError.ChannelNotExist());
+                    return Result.Failure(ApproverError.SubUnitNotExist());
                 }
 
 
@@ -80,12 +68,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         return Result.Failure(ApproverError.UserNotExist());
                     }
 
-                    var invalidUser = await _context.ChannelUsers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId, cancellationToken);
-                    if (invalidUser == null)
-                    {
-                        return Result.Failure(ApproverError.UserNotAuthorize());
-                    }
-
                     if (command.Approvers.Count(x => x.ApproverLevel == approver.ApproverLevel) > 1)
                     {
                         return Result.Failure(ApproverError.ApproverLevelDuplicate());
@@ -95,14 +77,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     if (approverExist != null)
                     {
 
-                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId 
+                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId && x.UserId == approver.UserId 
                         && approverExist.UserId != approver.UserId, cancellationToken);
                         if (userAlreadyExist != null)
                         {
                             return Result.Failure(ApproverError.UserAlreadyExist());
                         }
 
-                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId 
+                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId 
                         && x.ApproverLevel == approver.ApproverLevel && approverExist.ApproverLevel != approver.ApproverLevel, cancellationToken);
                         if(approverLevelDuplicate != null)
                         {
@@ -111,9 +93,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                         bool hasChange = false;
 
-                        if(approverExist.ChannelId != command.ChannelId)
+                        if(approverExist.SubUnitId != command.SubUnitId)
                         {
-                            approverExist.ChannelId = command.ChannelId;
+                            approverExist.SubUnitId = command.SubUnitId;
                             hasChange = true;
                         }
 
@@ -143,13 +125,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     }
                     else
                     {
-                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.UserId == approver.UserId, cancellationToken);
+                        var userAlreadyExist = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId && x.UserId == approver.UserId, cancellationToken);
                         if (userAlreadyExist != null)
                         {
                             return Result.Failure(ApproverError.UserAlreadyExist());
                         }
 
-                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == command.ChannelId && x.ApproverLevel == approver.ApproverLevel, cancellationToken);
+                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId && x.ApproverLevel == approver.ApproverLevel, cancellationToken);
                         if(approverLevelDuplicate != null)
                         {
                             return Result.Failure(ApproverError.ApproverLevelDuplicate());
@@ -159,7 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         var addApprover = new Approver
                         {
                             UserId = approver.UserId,
-                            ChannelId = command.ChannelId,
+                            SubUnitId = command.SubUnitId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,
                             CreatedAt = DateTime.Now
@@ -171,10 +153,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                 }
 
-                var removeApproverList = await _context.Approvers.Where(x => x.ChannelId == channelNotExist.Id).ToListAsync();
-                var approvalListId = approverList.Select(x => x.UserId);
+                var removeApproverList = await _context.Approvers.Where(x => x.SubUnitId == subUnitNotExist.Id).ToListAsync();
+                var approvalListId = approverList.Select(x => x.Id);
 
-                var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.UserId));
+                var removeNotContainApproval = removeApproverList.Where(x => !approvalListId.Contains(x.Id));
 
                 foreach (var approver in removeNotContainApproval)
                 {
@@ -183,20 +165,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var result = approverList.Select(x => new AddNewApproverResult
-                {
-                    Id = x.Id,
-                    ChannelId = x.ChannelId,
-                    Added_By = x.AddedBy,
-                    Created_At = x.CreatedAt,
-                    Modified_By = x.ModifiedBy,
-                    Updated_At = x.UpdatedAt,
-                    UserId = x.UserId,
-                    ApproverLevel = x.ApproverLevel,
 
-                }).ToList();
-
-                return Result.Success(result);
+                return Result.Success();
             }
         }
 

@@ -40,18 +40,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
             }
             public async Task<Result> Handle(UserChangePasswordCommand command, CancellationToken cancellationToken)
             {
-                var user = await  _context.Users.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
 
                 if (user == null)
                 {
                     return Result.Failure(UserError.UserNotExist());
                 }
 
-                
+
                 if (!BCrypt.Net.BCrypt.Verify(command.Current_Password, user.Password))
                 {
                     return Result.Failure(UserError.UserOldPasswordInCorrect());
 
+                }
+
+                if (command.New_Password != command.Confirm_Password)
+                {
+                    return Result.Failure(UserError.NewPasswordInvalid());
                 }
 
                 if (command.New_Password == user.Username)
@@ -59,7 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
                     return Result.Failure(UserError.InvalidDefaultPassword());
                 }
 
-                if(command.New_Password == command.New_Password)
+                if (command.New_Password == command.Current_Password)
                 {
                     return Result.Failure(UserError.UserPasswordShouldChange());
                 }

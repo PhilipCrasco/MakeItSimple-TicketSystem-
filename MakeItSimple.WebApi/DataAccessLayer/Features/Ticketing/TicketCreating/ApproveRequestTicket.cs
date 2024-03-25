@@ -23,6 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public class Concerns
             {
                 public int RequestGeneratorId { get; set; }
+                public Guid ? IssueHandler { get; set; }
             }
 
         }
@@ -49,20 +50,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
+
                     var requestTicketId = await _context.ApproverTicketings
                     .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null).ToListAsync();
 
-                    var ticketConcernExist = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId).ToListAsync();
-                    var ticketConcernHandlerExist = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId && x.TicketApprover != null).ToListAsync();
+
+                    var userExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId
+                    && x.UserId == ticketConcern.IssueHandler && x.IsApprove != true);
+
+                    if (userExist == null)
+                    {
+                        return Result.Failure(TicketRequestError.UserNotExist());
+                    }
+
+                    var ticketConcernExist = await _context.TicketConcerns.Include(x => x.RequestorByUser)
+                        .Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId && x.UserId == userExist.UserId).ToListAsync();
+
+                    var ticketConcernHandlerExist = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId 
+                    && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
+
+ 
 
                     var requestTicketConcernId = await _context.ApproverTicketings
-                     .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null).ToListAsync();
+                     .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null && x.IssueHandler == userExist.UserId).ToListAsync();
 
                     var selectRequestTicketId = requestTicketConcernId.FirstOrDefault(x => x.ApproverLevel == requestTicketConcernId.Min(x => x.ApproverLevel));
 
                     if(selectRequestTicketId != null)
                     {
                         selectRequestTicketId.IsApprove = true;
+
                         if (ticketConcernHandlerExist.First().TicketApprover != command.UserId)
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
@@ -107,10 +124,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 concerns.ApprovedAt = DateTime.Now;
                                 concerns.IsReject = false;
                                 concerns.Remarks = null;
-                                //concerns.IsTransfer = null;
-                                //concerns.TransferBy = null;
-                                //concerns.TransferAt = null;
+                                concerns.ConcernStatus = TicketingConString.CurrentlyFixing;
                                 ticketApproveList.Add(concerns);
+
+                                if(concerns.RequestConcernId != null)
+                                {
+                                    var requestConcernList = await _context.RequestConcerns.Where(x => x.Id == concerns.RequestConcernId).ToListAsync();
+                                    foreach(var request in requestConcernList)
+                                    {
+                                         request.ConcernStatus = TicketingConString.CurrentlyFixing;
+                                    }
+                                }
+
                             }
 
                         }
@@ -118,8 +143,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
-
-
 
                     }
 

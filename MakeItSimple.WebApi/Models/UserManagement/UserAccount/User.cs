@@ -5,6 +5,7 @@ using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -54,6 +55,9 @@ namespace MakeItSimple.WebApi.Models
 
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
+
+        //public int ? TeamId { get; set; }
+        //public virtual Team Team { get; set; }
 
         public int? LocationId { get; set; }
         public virtual Location Location { get; set; }

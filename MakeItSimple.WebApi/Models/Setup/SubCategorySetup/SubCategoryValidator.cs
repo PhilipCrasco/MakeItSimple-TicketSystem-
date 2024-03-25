@@ -9,8 +9,8 @@ namespace MakeItSimple.WebApi.Models.Setup.SubCategorySetup
         {
             public SubCategoryValidator()
             {
-                RuleFor(x => x.SubCategory_Description).NotEmpty().WithMessage("Sub category description code is required")
-                    .MinimumLength(3).WithMessage("Sub category description must be at least 3 character long!");
+                //RuleFor(x => x.SubCategory_Description).NotEmpty().WithMessage("Sub category description code is required")
+                //    .MinimumLength(3).WithMessage("Sub category description must be at least 3 character long!");
             }
         }
     }

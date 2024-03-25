@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +15,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
         {
             public int Id { get; set; }
 
-            public int SubUnit_No { get; set; }
+            public int ? SubUnit_No { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
             
             public int ? UnitId { get; set; }
             public string Unit_Name {  get; set; }
+
+            //public int Num_Of_Team { get; set; }
 
             //public string Location_Name { get; set; }
 
@@ -31,14 +34,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public DateTime SyncDate { get; set; }
             public string SyncStatus { get; set; }
 
-            //public List<Location> Locations {  get; set; }  
+            //public List<Location> Locations { get; set; }
 
-            public class Location
-            {
-                public int LocationId { get; set; }
-                public string Location_Code {  get; set; }
-                public string Location_Name { get; set; }
-            }
+            //public class Location
+            //{
+            //    public int LocationId { get; set; }
+            //    public string Location_Code {  get; set; }
+            //    public string Location_Name { get; set; }
+            //}
 
             public List<User> users { get; set; }
 
@@ -48,15 +51,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
             }
-
-            //public List<Channel> channels{ get; set; }
-
-            //public class Channel
-            //{
-            //    public int ChannelId { get; set; }
-            //    public string Channel_Name { get; set; }
-            //} 
-
 
 
         }
@@ -105,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
-
+                    
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
 
@@ -116,13 +110,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
 
                     }).ToList(),
 
-                    //channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
-                    //{
-                    //    ChannelId = x.Id,
-         
-                    //    Channel_Name = x.ChannelName
+                    
 
-                    //}).ToList(),
+
 
                 });
 

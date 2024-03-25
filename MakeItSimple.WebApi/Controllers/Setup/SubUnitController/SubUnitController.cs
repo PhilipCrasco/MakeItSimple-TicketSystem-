@@ -7,6 +7,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.SyncSubUnit;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpdateSubUnitStatus;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup.UpsertSubUnit;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup.GetSubUnit;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
@@ -86,6 +88,58 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
             {
                 return Conflict(ex.Message);
             }
+        }
+
+        [HttpPost("upsert-subunit")]
+        public async Task<IActionResult> UpsertSubUnit([FromBody] UpsertSubUnitCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Added_By = userId;
+                    command.Modified_By = userId;
+                }
+
+                var result = await _mediator.Send(command);
+                if (result.IsWarning)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+
+        [HttpPatch("status/{id}")]
+        public async Task<IActionResult> UpdateSubUnitStatus([FromRoute] int id)
+        {
+            try
+            {
+                var command = new UpdateSubUnitStatusCommand
+                {
+                    Id = id
+                };
+
+                var result = await _mediator.Send(command);
+                if (result.IsWarning)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
         }
 
     }

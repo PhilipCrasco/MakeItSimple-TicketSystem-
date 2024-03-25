@@ -59,7 +59,7 @@
             _value = value;
 
     
-        public TValue Value => IsSuccess 
+        public TValue Value => IsSuccess
             ? _value! : IsWarning ? _value
             : throw new InvalidOperationException("The value of a failure result can not be accessed.");
   

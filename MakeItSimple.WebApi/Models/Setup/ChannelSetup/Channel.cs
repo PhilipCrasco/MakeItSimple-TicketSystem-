@@ -1,7 +1,8 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
-using MakeItSimple.WebApi.Models.Setup.SubUnitSetup; 
+using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 
 
 namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
@@ -16,16 +17,19 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         public virtual User AddedByUser { get; set; }
         public  Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
-        public string ChannelName { get; set; } 
+        public string ChannelName { get; set; }
 
-        //public int ? SubUnitId { get; set; }
-        //public virtual SubUnit SubUnit { get; set; }
+        public int? SubUnitId { get; set; }
+        public virtual SubUnit SubUnit { get; set; }
 
         public int ? DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
         public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
+
+        //public int? TeamId { get; set; }
+        //public virtual Team Team { get; set; }
 
 
         public ICollection<ChannelUser> ChannelUsers { get; set; }

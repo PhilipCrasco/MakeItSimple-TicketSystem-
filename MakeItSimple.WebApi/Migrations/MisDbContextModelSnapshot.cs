@@ -109,10 +109,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int")
-                        .HasColumnName("receiver_id");
-
                     b.Property<int?>("SubUnitId")
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
@@ -693,7 +689,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("sub_unit_name");
 
-                    b.Property<int>("SubUnitNo")
+                    b.Property<int?>("SubUnitNo")
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_no");
 
@@ -894,10 +890,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int")
-                        .HasColumnName("team_id");
-
                     b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_generator_id");
@@ -920,9 +912,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_approver_ticketings_sub_unit_id");
-
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("ix_approver_ticketings_team_id");
 
                     b.HasIndex("TicketGeneratorId")
                         .HasDatabaseName("ix_approver_ticketings_ticket_generator_id");
@@ -1847,10 +1836,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int")
-                        .HasColumnName("team_id");
-
                     b.Property<int?>("UnitId")
                         .HasColumnType("int")
                         .HasColumnName("unit_id");
@@ -1890,9 +1875,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_users_sub_unit_id");
-
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("ix_users_team_id");
 
                     b.HasIndex("UnitId")
                         .HasDatabaseName("ix_users_unit_id");
@@ -2016,7 +1998,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_approvers_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", "Team")
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", null)
                         .WithMany("Approvers")
                         .HasForeignKey("TeamId")
                         .HasConstraintName("fk_approvers_teams_team_id");
@@ -2033,8 +2015,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("SubUnit");
-
-                    b.Navigation("Team");
 
                     b.Navigation("User");
                 });
@@ -2108,7 +2088,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_channels_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", "Team")
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", null)
                         .WithMany("Channels")
                         .HasForeignKey("TeamId")
                         .HasConstraintName("fk_channels_teams_team_id");
@@ -2125,8 +2105,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("SubUnit");
-
-                    b.Navigation("Team");
 
                     b.Navigation("User");
                 });
@@ -2392,11 +2370,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_approver_ticketings_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .HasConstraintName("fk_approver_ticketings_teams_team_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("ApproverTicketings")
                         .HasForeignKey("TicketGeneratorId")
@@ -2414,8 +2387,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("RequestGenerator");
 
                     b.Navigation("SubUnit");
-
-                    b.Navigation("Team");
 
                     b.Navigation("TicketGenerator");
 
@@ -2920,11 +2891,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_users_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .HasConstraintName("fk_users_teams_team_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", "Units")
                         .WithMany("Users")
                         .HasForeignKey("UnitId")
@@ -2950,8 +2916,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("SubUnit");
-
-                    b.Navigation("Team");
 
                     b.Navigation("Units");
 

@@ -16,7 +16,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
-            public int SubUnitId { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
 
@@ -51,14 +50,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 var channelId = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
 
 
-                var subUnitNotExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
-
-                if (subUnitNotExist == null)
-                {
-                    return Result.Failure(ChannelError.SubUnitNotExist());
-                }
-
-
                 if (channelId != null)
                 {
                     var channelNameAlreadyExist = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
@@ -75,11 +66,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         channelId.ChannelName = channelId.ChannelName;
                         hasChange = true;
                     }
-                    if (channelId.SubUnitId != command.SubUnitId)
-                    {
-                        channelId.SubUnitId = command.SubUnitId;
-                        hasChange = true;
-                    }
+
 
                     if (hasChange)
                     {
@@ -106,7 +93,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     var channels = new Channel
                     {
                         ChannelName = command.Channel_Name,
-                        SubUnitId = command.SubUnitId,
                         AddedBy = command.Added_By,
 
                     };
@@ -149,11 +135,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     {
                         listDelete.Add(channelUser);
                     }
-
-
-
-
-
 
 
                 }

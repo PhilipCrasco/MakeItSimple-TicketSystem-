@@ -30,7 +30,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
 
             try
             {
-                command.ChannelId = id; 
+                command.SubUnitId = id; 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;

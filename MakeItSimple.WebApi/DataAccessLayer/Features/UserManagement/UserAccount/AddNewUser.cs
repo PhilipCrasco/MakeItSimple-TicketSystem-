@@ -25,7 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             public int ? BusinessUnitId { get; set; }
 
-            public int ? TeamId { get; set; }
+            //public int ? TeamId { get; set; }
 
             public Guid ? Added_By { get; set; }
 
@@ -41,7 +41,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int ? DepartmentId { get; set; }
             public int ? SubUnitId { get; set; }
 
-            public int ? TeamId { get; set; }
+            //public int ? TeamId { get; set; }
 
             public int ? UnitId { get; set; }
 
@@ -133,15 +133,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 }
 
 
-                if(command.TeamId != null)
-                {
-                    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
-                    if (teamNotExist == null)
-                    {
-                        return Result.Failure(UserError.TeamNotExist());
-                    }
+                //if(command.TeamId != null)
+                //{
+                //    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
+                //    if (teamNotExist == null)
+                //    {
+                //        return Result.Failure(UserError.TeamNotExist());
+                //    }
 
-                }
+                //}
 
                 var users = new User
                 {
@@ -152,7 +152,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     UserRoleId = command.UserRoleId,
                     SubUnitId = command.SubUnitId,
-                    TeamId = command.TeamId,
+                    //TeamId = command.TeamId,
                     DepartmentId = command.DepartmentId,    
                     CompanyId = command.CompanyId,  
                     LocationId = LocationNotExist.Id,
@@ -175,7 +175,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     UserRoleId = users.UserRoleId,
                     DepartmentId = users.DepartmentId,
                     SubUnitId= users.SubUnitId,
-                    TeamId = users.TeamId,  
+                    //TeamId = users.TeamId,  
                     CompanyId = users.CompanyId,
                     LocationCode = command.LocationCode,
                     BusinessUnitId = users.BusinessUnitId,

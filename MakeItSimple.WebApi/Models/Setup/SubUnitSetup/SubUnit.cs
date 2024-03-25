@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
 
-        public int SubUnitNo { get; set; }
+        public int ? SubUnitNo { get; set; }
         public string SubUnitCode { get; set; }
         public string SubUnitName { get; set; }
 
@@ -40,7 +40,7 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public string SyncStatus { get; set; }
 
 
-        public ICollection<Channel> Channels { get; set; }
+        //public ICollection<Channel> Channels { get; set; }
         public ICollection<User> Users { get; set; }
         public ICollection <Approver > Approvers { get; set; }
         public ICollection <Team> Teams { get; set; }

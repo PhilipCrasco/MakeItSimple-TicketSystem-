@@ -7,8 +7,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
 {
     public class ApproverError
     {
-       public static Error ChannelNotExist() =>
-       new Error("Approver.ChannelNotExist", "Channel not exist!");
+       public static Error SubUnitNotExist() =>
+       new Error("Approver.SubUnitNotExist", "Sub unit not exist!");
 
        public static Error ChannelAlreadyExist() =>
        new Error("Approver.ChannelAlreadyExist", "Channel already exist!");

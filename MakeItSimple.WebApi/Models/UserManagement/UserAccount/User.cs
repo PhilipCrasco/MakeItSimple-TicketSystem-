@@ -56,8 +56,8 @@ namespace MakeItSimple.WebApi.Models
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
-        public int ? TeamId { get; set; }
-        public virtual Team Team { get; set; }
+        //public int ? TeamId { get; set; }
+        //public virtual Team Team { get; set; }
 
         public int? LocationId { get; set; }
         public virtual Location Location { get; set; }

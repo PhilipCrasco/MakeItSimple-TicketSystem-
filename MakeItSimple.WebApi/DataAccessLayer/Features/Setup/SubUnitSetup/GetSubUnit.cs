@@ -15,14 +15,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
         {
             public int Id { get; set; }
 
-            public int SubUnit_No { get; set; }
+            public int ? SubUnit_No { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
             
             public int ? UnitId { get; set; }
             public string Unit_Name {  get; set; }
 
-            public int Num_Of_Team { get; set; }
+            //public int Num_Of_Team { get; set; }
 
             //public string Location_Name { get; set; }
 
@@ -52,19 +52,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                 public string Fullname { get; set; }
             }
 
-            public List<Channel> channels { get; set; }
-
-            public class Channel
-            {
-                public int ChannelId { get; set; }
-                public string Channel_Name { get; set; }
-            }
-            public List<Team> Teams { get; set; }
-            public class Team
-            {
-                public int ? TeamId { get; set;}
-                public string Team_Name { get; set;}
-            }
 
         }
 
@@ -115,7 +102,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
-                    Num_Of_Team = x.Teams.Count(),
 
                     users = x.Users.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.User
                     {
@@ -124,19 +110,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
 
                     }).ToList(),
 
-                    channels = x.Channels.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Channel
-                    {
-                        ChannelId = x.Id,
-
-                        Channel_Name = x.ChannelName
-
-                    }).ToList(),
-                    Teams = x.Teams.Where(x => x.IsActive == true).Select(x => new GetSubUnitResult.Team
-                    {
-                        TeamId = x.Id,
-                        Team_Name = x.TeamName
-
-                    }).ToList()
                     
 
 

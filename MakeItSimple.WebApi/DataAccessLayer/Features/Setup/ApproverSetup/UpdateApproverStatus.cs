@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public ICollection<UpdateApproverStatusId> UpdateApproverStatusIds { get; set; }
             public class UpdateApproverStatusId
             {
-                public int ? ChannelId { get; set; }
+                public int ? SubUnitId { get; set; }
             }
 
         }
@@ -36,14 +36,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                 foreach(var approver in command.UpdateApproverStatusIds)
                 {
 
-                    var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.ChannelId == approver.ChannelId, cancellationToken);
+                    var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == approver.SubUnitId, cancellationToken);
 
                     if (approverExist == null)
                     {
-                        return Result.Failure(ApproverError.ChannelNotExist());
+                        return Result.Failure(ApproverError.SubUnitNotExist());
                     }
 
-                    var approverChannelList = await _context.Approvers.Where(x => x.ChannelId == approver.ChannelId).ToListAsync();
+                    var approverChannelList = await _context.Approvers.Where(x => x.SubUnitId == approver.SubUnitId).ToListAsync();
 
                     foreach(var approverId in approverChannelList)
                     {

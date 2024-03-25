@@ -11,8 +11,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
     {
         public class GetApproverResult
         {
-            public int ? ChannelId { get; set; }
-            public string Channel_Name { get; set; }
+            public int ? SubUnitId { get; set; }
+            public string SubUnit_Code { get; set; }
+            public string SubUnit_Name { get; set; }
             public bool Is_Active { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
@@ -46,7 +47,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
             public async Task<PagedList<GetApproverResult>> Handle(GetApproverQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Approver> approverQuery = _context.Approvers.Include(x => x.User).Include(x => x.Channel)
+                IQueryable<Approver> approverQuery = _context.Approvers.Include(x => x.User).Include(x => x.SubUnit)
                                                       .Include(x => x.AddedByUser).Include(x => x.ModifiedByUser);
 
                 if(!string.IsNullOrEmpty(request.Search))
@@ -59,11 +60,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     approverQuery = approverQuery.Where(x => x.IsActive == request.Status);
                 }
 
-                var result = approverQuery.GroupBy(x => x.ChannelId)
+                var result = approverQuery.GroupBy(x => x.SubUnitId)
                                 .Select(x => new GetApproverResult
                                 {
-                                    ChannelId = x.Key,
-                                    Channel_Name = x.First().Channel.ChannelName,
+                                    SubUnitId = x.Key,
+                                    SubUnit_Code = x.First().SubUnit.SubUnitCode,
+                                    SubUnit_Name = x.First().SubUnit.SubUnitName,
                                     Is_Active = x.First().IsActive,
                                     Added_By = x.First().AddedByUser.Fullname,
                                     Created_At = x.First().CreatedAt,

@@ -28,8 +28,8 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
 
-        public int? TeamId { get; set; }
-        public virtual Team Team { get; set; }
+        //public int? TeamId { get; set; }
+        //public virtual Team Team { get; set; }
 
 
         public ICollection<ChannelUser> ChannelUsers { get; set; }

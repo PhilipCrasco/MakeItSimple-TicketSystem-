@@ -18,7 +18,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
         public class GetMemberQuery : IRequest<Result>
         {
-            public int ? SubUnitId { get; set; }
             public int ? ChannelId { get; set; }
         }
 
@@ -40,16 +39,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 var selectedChannelUsers = channelUsers.Select(x => x.UserId);
 
                 var results = await _context.Users
-                    .Where(x => x.SubUnitId == request.SubUnitId)
                     .Where(x => !selectedChannelUsers.Contains(x.Id))
                     .Select(x => new GetMemberResult
-                {
-                   UserId = x.Id,
-                   EmpId = x.EmpId,
-                   FullName = x.Fullname,
-                   UserRole = x.UserRole.UserRoleName
+                    {
 
-                }).ToListAsync();   
+                        UserId = x.Id,
+                        EmpId = x.EmpId,
+                        FullName = x.Fullname,
+                        UserRole = x.UserRole.UserRoleName
+
+                    }).ToListAsync();   
 
                 return Result.Success(results);
             }

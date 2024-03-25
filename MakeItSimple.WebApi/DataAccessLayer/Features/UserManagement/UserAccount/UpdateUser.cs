@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             public int? BusinessUnitId { get; set; }
 
-            public int ? TeamId { get; set; }
+            //public int ? TeamId { get; set; }
 
             public string UserName { get; set; }
             public int ? UnitId { get; set; }
@@ -43,7 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public int? DepartmentId { get; set; }
             public string UserName { get; set; }
             public int ? SubUnitId { get; set; }
-            public int? TeamId { get; set; }
+            //public int? TeamId { get; set; }
             public int? UnitId { get; set; }
             public int? CompanyId { get; set; }
             public string LocationCode { get; set; }
@@ -123,15 +123,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 }
 
 
-                if (command.TeamId != null)
-                {
-                    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
-                    if (teamNotExist == null)
-                    {
-                        return Result.Failure(UserError.TeamNotExist());
-                    }
+                //if (command.TeamId != null)
+                //{
+                //    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
+                //    if (teamNotExist == null)
+                //    {
+                //        return Result.Failure(UserError.TeamNotExist());
+                //    }
 
-                }
+                //}
 
 
                 var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
@@ -161,7 +161,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.LocationId = LocationNotExist.Id;
                 user.BusinessUnitId = command.BusinessUnitId;
                 user.UnitId = command.UnitId;
-                user.TeamId = command.TeamId;
+                //user.TeamId = command.TeamId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;
                 user.Username = command.UserName;
@@ -176,7 +176,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     UserRoleId = user.UserRoleId,
                     DepartmentId = user.DepartmentId,
                     SubUnitId = user.SubUnitId,
-                    TeamId = user.TeamId,
+                    //TeamId = user.TeamId,
                     CompanyId = user.CompanyId,
                     LocationCode = command.LocationCode,
                     BusinessUnitId = user.BusinessUnitId,    

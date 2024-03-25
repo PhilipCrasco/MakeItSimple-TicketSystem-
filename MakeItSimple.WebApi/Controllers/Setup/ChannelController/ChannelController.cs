@@ -10,7 +10,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.Add
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannel;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetChannelValidation;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.RemoveChannelUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.UpdateChannelStatus;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
@@ -110,31 +109,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ChannelController
             }
         }
 
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveChannelUser([FromBody] RemoveChannelUserCommand command, [FromRoute] int id)
-        {
-            try
-            {
-                command.ChannelId = id;
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Modified_By = userId;
-                }
-
-                var result = await _mediator.Send(command);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
 
         [HttpPost("validation")]
         public async Task<IActionResult> GetChannelValidation(GetChannelValidationCommand command)

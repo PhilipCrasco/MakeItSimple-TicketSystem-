@@ -18,8 +18,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
-        public int? TeamId { get; set; }
-        public virtual Team Team { get; set; }
+        //public int? TeamId { get; set; }
+        //public virtual Team Team { get; set; }
 
 
         public Guid ? UserId { get; set; }

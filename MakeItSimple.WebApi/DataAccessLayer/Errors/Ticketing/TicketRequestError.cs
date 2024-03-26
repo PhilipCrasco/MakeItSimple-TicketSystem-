@@ -24,7 +24,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.ChannelNotExist", "Channel not exist!");
 
       public static Error UserNotExist() =>
-      new Error("TicketRequest.UserNotExist", "Member not exist!");
+      new Error("TicketRequest.UserNotExist", "user not exist!");
 
       public static Error CategoryNotExist() =>
       new Error("TicketRequest.CategoryNotExist", "Category not exist!");
@@ -49,6 +49,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       
       public static Error InvalidAttachmentType() =>
       new Error("TicketRequest.InvalidAttachmentType", "Invalid Attachment Type!");
+
+      public static Error ConcernWasInApproval() =>
+      new Error("TicketRequest.ConcernWasInApproval", "Concern is for approval!");
 
     }
 }

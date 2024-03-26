@@ -8,6 +8,7 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.AddNewApprover;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.GetApprover;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.GetApproverRole;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.GetSubUnitApprover;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup.UpdateApproverStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.GetMember;
 
@@ -96,7 +97,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
             {
 
                 return Conflict(ex.Message);
-                //s
+                
             }
         }
 
@@ -118,7 +119,24 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ApproverController
                 return Conflict(ex.Message);
             }
         }
-        
-        
+
+        [HttpGet("subunit-approver")]
+        public async Task<IActionResult> GetSubUnitApprover([FromQuery] GetSubUnitApproverCommand query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                return Conflict(ex.Message);
+
+            }
+        }
+
+
+
     }
 }

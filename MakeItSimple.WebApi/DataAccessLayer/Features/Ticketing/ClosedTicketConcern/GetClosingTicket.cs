@@ -94,57 +94,63 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.ClosedByUser);
 
 
-                ////var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == closingTicketsQuery.Firs);
-                var closingTicket = closingTicketsQuery.Include(x => x.User).ThenInclude(x => x.BusinessUnit).Select(x => x.User.BusinessUnitId);
-           
-                var receiverList = await _context.Receivers.Include(x => x.User).FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
-                var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
-
-
-                if (!string.IsNullOrEmpty(request.Search))
+                if(closingTicketsQuery.Count() > 0)
                 {
-                    closingTicketsQuery = closingTicketsQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                                    || x.User.EmpId.Contains(request.Search));
-                }
+                    var closingTicket = closingTicketsQuery.Include(x => x.User).ThenInclude(x => x.BusinessUnit).Select(x => x.User.BusinessUnitId);
+                    var receiverList = await _context.Receivers.Include(x => x.User).FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
+                    var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                    var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
 
-                if (request.IsReject != null)
-                {
-                    closingTicketsQuery = closingTicketsQuery.Where(x => x.IsRejectClosed == request.IsReject);
-                }
 
-                if (request.IsClosed != null)
-                {
-                    closingTicketsQuery = closingTicketsQuery.Where(x => x.IsClosing == request.IsClosed);
-                }
-
-                if (TicketingConString.Approval == request.Approval)
-                {
-
-                    if (request.UserId != null && TicketingConString.Approver == request.Role)
+                    if (!string.IsNullOrEmpty(request.Search))
                     {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                        var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
-                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                        closingTicketsQuery = closingTicketsQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
-
+                        closingTicketsQuery = closingTicketsQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                                        || x.User.EmpId.Contains(request.Search));
                     }
 
-                    else if ( request.Role == TicketingConString.Receiver && receiverList != null)
+                    if (request.IsReject != null)
                     {
-                        if(request.UserId == receiverList.UserId)
-                        {
-                            var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.TicketGeneratorId) && x.IsApprove == null).ToListAsync();
+                        closingTicketsQuery = closingTicketsQuery.Where(x => x.IsRejectClosed == request.IsReject);
+                    }
 
-                            if (approverTransactList != null && approverTransactList.Any())
+                    if (request.IsClosed != null)
+                    {
+                        closingTicketsQuery = closingTicketsQuery.Where(x => x.IsClosing == request.IsClosed);
+                    }
+
+                    if (TicketingConString.Approval == request.Approval)
+                    {
+
+                        if (request.UserId != null && TicketingConString.Approver == request.Role)
+                        {
+                            var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
+                            var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
+                            var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
+                            var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                            closingTicketsQuery = closingTicketsQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
+
+                        }
+
+                        else if (request.Role == TicketingConString.Receiver && receiverList != null)
+                        {
+                            if (request.UserId == receiverList.UserId)
                             {
-                                var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketGeneratorId);
-                                closingTicketsQuery = closingTicketsQuery.Where(x => !generatedIdInApprovalList.Contains(x.TicketGeneratorId));
+                                var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.TicketGeneratorId) && x.IsApprove == null).ToListAsync();
+
+                                if (approverTransactList != null && approverTransactList.Any())
+                                {
+                                    var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketGeneratorId);
+                                    closingTicketsQuery = closingTicketsQuery.Where(x => !generatedIdInApprovalList.Contains(x.TicketGeneratorId));
+                                }
+                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
                             }
-                            var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
-                            var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                            closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
+                            else
+                            {
+                                closingTicketsQuery = closingTicketsQuery.Where(x => x.TicketGeneratorId == null);
+                            }
+
                         }
                         else
                         {
@@ -152,16 +158,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         }
 
                     }
-                    else
+
+                    if (TicketingConString.Users == request.Users)
                     {
-                        closingTicketsQuery = closingTicketsQuery.Where(x => x.TicketGeneratorId == null);
+                        closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                     }
 
-                }
 
-                if (TicketingConString.Users == request.Users)
-                {
-                     closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                 }
 
                 var distictQuery = closingTicketsQuery.Select(x => x.TicketGeneratorId).Distinct();
@@ -185,7 +188,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         Reject_Remarks = x.First().RejectRemarks,
                         Closed_By = x.First().ClosedByUser.Fullname,
                         Closed_At = x.First().ClosingAt,
-                        RequestCount = distictQuery.Count(),
+                        RequestCount = distictQuery.Count() ,
                         Closed_Remarks = x.First().ClosingRemarks,
                         GetClosedTicketConcerns = x.Select(x => new GetClosingTicketResults.GetClosedTicketConcern
                         {

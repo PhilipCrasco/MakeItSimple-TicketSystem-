@@ -87,6 +87,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(TicketRequestError.UserNotExist ());
                 }
 
+                if(command.Role == TicketingConString.IssueHandler)
+                {
+                    var approverUserValidation = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.IsApprove != null)
+                        .FirstOrDefaultAsync();
+
+                    if (approverUserValidation != null)
+                    {
+                        return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                    }
+                }
+
+
+
                 foreach (var concerns in command.AddRequestConcernbyConcerns)
                 {
 
@@ -307,7 +321,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         await _context.TicketConcerns.AddAsync(addnewTicketConcern);
 
-
                     }
                         
                 }
@@ -347,9 +360,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                 }
-
-
-
 
             await _context.SaveChangesAsync(cancellationToken); 
                 return Result.Success();

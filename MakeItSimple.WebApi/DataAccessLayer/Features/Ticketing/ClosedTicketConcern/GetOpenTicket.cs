@@ -98,39 +98,47 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.RequestorByUser)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit);
-                    
-
-                var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
-                var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-                var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
-
-                if (!string.IsNullOrEmpty(request.Search))
+                
+                
+                if(ticketConcernQuery.Count() > 0)
                 {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                    || x.User.SubUnit.SubUnitName.Contains(request.Search));
+                    var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
+                    var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+                    var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
 
-                }
-
-                if (request.Status != null)
-                {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
-                }
-
-                if (request.Users == TicketingConString.Users)
-                {
-                    ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
-                }
-
-                if (request.Receiver != null)
-                {
-                    if (request.Receiver == TicketingConString.Receiver && receiverList != null)
+                    if (!string.IsNullOrEmpty(request.Search))
                     {
-                        if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
-                        {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                        || x.User.SubUnit.SubUnitName.Contains(request.Search));
 
-                            var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
-                            var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                            ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
+                    }
+
+                    if (request.Status != null)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
+                    }
+
+                    if (request.Users == TicketingConString.Users)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                    }
+
+                    if (request.Receiver != null)
+                    {
+                        if (request.Receiver == TicketingConString.Receiver && receiverList != null)
+                        {
+                            if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
+                            {
+
+                                var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
+
+                            }
+                            else
+                            {
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                            }
 
                         }
                         else
@@ -139,15 +147,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         }
 
                     }
-                    else
-                    {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
-                    }
-
                 }
-                
-
-
 
                 var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false)
                     .GroupBy(x => x.RequestGeneratorId).Select(x => new GetOpenTicketResult

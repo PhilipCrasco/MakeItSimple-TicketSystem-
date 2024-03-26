@@ -844,7 +844,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("approver_level");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
@@ -2332,8 +2332,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_approver_ticketings_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")

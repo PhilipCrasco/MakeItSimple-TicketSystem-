@@ -19,6 +19,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
+
 {
     [Route("api/closing-ticket")]
     [ApiController]

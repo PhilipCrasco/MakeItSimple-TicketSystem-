@@ -75,14 +75,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 var getTicketConcern = await _context.TicketConcerns
-                    .Include(x => x.User)
+                    .Include(x => x.RequestorByUser)
                     .ThenInclude(x => x.SubUnit)
-                    .Include(x => x.User)
-                    .ThenInclude(x => x.Department).Include(x => x.RequestGenerator)
+                    .Include(x => x.RequestorByUser)
+                    .ThenInclude(x => x.Department)
+                    .Include(x => x.RequestGenerator)
                     .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
 
-                var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
-                var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+            
 
 
                 var uploadTasks = new List<Task>();
@@ -95,6 +95,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 foreach (var attachments in command.Attachments.Where(attachments => attachments.Attachment.Length > 0))
                 {
 
+
+                    var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                    var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
 
                     var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketAttachmentId);
 
@@ -124,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.User.Department.DepartmentName}/{getTicketConcern.User.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/{getTicketConcern.RequestorByUser.Department.DepartmentName}/{getTicketConcern.RequestorByUser.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -168,13 +171,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
+
+
                     }, cancellationToken));
 
-                }
 
-                foreach (var concern in ticketConcernList)
-                {
-                    concern.IsReject = false;
+                    foreach (var concern in ticketConcernList)
+                    {
+                        concern.IsReject = false;
+                    }
                 }
 
 

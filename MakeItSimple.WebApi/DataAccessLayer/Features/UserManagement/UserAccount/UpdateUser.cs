@@ -133,14 +133,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
                 //}
 
-
-                var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
-                if (userIsUse == true)
-                {
-                    return Result.Failure(UserError.UserIsUse(user.Fullname));
-                }
-
-
+                //var userIsUse = await _context.ChannelUsers.AnyAsync(x => x.UserId == command.Id, cancellationToken);
+                //if (userIsUse == true)
+                //{
+                //    return Result.Failure(UserError.UserIsUse(user.Fullname));
+                //}
 
                 var usernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
                 if (usernameAlreadyExist != null && user.Username != command.UserName)

@@ -46,7 +46,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                 var results = await _context.Users
                     .Include(x => x.UserRole)
                     .Where(x => !selectApprover.Contains(x.Id) && x.UserRole.UserRoleName == TicketingConString.Approver
-                    )
+                   && x.IsActive == true )
                     .Select(x => new GetApproverRoleResult
                     {
                         UserId = x.Id,

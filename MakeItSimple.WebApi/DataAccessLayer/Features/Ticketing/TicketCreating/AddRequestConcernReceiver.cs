@@ -95,10 +95,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if (approverUserValidation != null)
                     {
-                        return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                        var receiverValidation = await _context.TicketConcerns
+                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.UserId == command.Added_By && x.IsApprove != false)
+                            .FirstOrDefaultAsync();
+
+
+                        if (receiverValidation != null)
+                        {
+                            return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                        }
+
                     }
                 }
-
 
 
                 foreach (var concerns in command.AddRequestConcernbyConcerns)
@@ -335,28 +343,39 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TransferTicketError.NoApproverExist());
                     }
 
+
+                    
                     foreach (var approver in getApprover)
                     {
-                        var addNewApprover = new ApproverTicketing
-                        {
-                            RequestGeneratorId = requestTicketConcernList.First().RequestGeneratorId,
-                            //ChannelId = approver.ChannelId,
-                            SubUnitId = approver.SubUnitId,
-                            UserId = approver.UserId,
-                            ApproverLevel = approver.ApproverLevel,
-                            AddedBy = command.Added_By,
-                            CreatedAt = DateTime.Now,
-                            Status = TicketingConString.RequestTicket,
+                        var approverValidation = await _context.ApproverTicketings
+                            .Where(x => x.RequestGeneratorId == requestTicketConcernList.First().RequestGeneratorId 
+                            && x.IssueHandler == command.Added_By && x.IsApprove == null)
+                            .FirstOrDefaultAsync();
 
-                        };
-
-                        foreach(var issueHandler in ticketConcernList)
+                        if (approverValidation == null)
                         {
-                            addNewApprover.IssueHandler = issueHandler.UserId;
+                            var addNewApprover = new ApproverTicketing
+                            {
+                                RequestGeneratorId = requestTicketConcernList.First().RequestGeneratorId,
+                                //ChannelId = approver.ChannelId,
+                                SubUnitId = approver.SubUnitId,
+                                UserId = approver.UserId,
+                                ApproverLevel = approver.ApproverLevel,
+                                AddedBy = command.Added_By,
+                                CreatedAt = DateTime.Now,
+                                Status = TicketingConString.RequestTicket,
+
+                            };
+
+                            foreach (var issueHandler in ticketConcernList)
+                            {
+                                addNewApprover.IssueHandler = issueHandler.UserId;
+                            }
+
+                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                            await _context.SaveChangesAsync(cancellationToken);
                         }
 
-                        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
-                        await _context.SaveChangesAsync(cancellationToken);
                     }
 
                 }

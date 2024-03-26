@@ -130,6 +130,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
                     receiver.TotalCount,
                     receiver.TotalPages,
                     receiver.HasPreviousPage,
+
                     receiver.HasNextPage
                 };
 

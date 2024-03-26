@@ -36,7 +36,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                 var selectApprover = approverList.Select(x => x.SubUnitId);
 
-                var subUnitList = await _context.SubUnits.Where(x => !selectApprover.Contains(x.Id)).Select(x => new GetSubUnitApproverResult
+                var subUnitList = await _context.SubUnits.Where(x => !selectApprover.Contains(x.Id) && x.IsActive == true).Select(x => new GetSubUnitApproverResult
                 {
                     SubUnitId = x.Id,
                     SubUnit_Code = x.SubUnitCode,

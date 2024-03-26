@@ -39,7 +39,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 var selectedChannelUsers = channelUsers.Select(x => x.UserId);
 
                 var results = await _context.Users
-                    .Where(x => !selectedChannelUsers.Contains(x.Id))
+                    .Where(x => !selectedChannelUsers.Contains(x.Id) && x.IsActive == true)
                     .Select(x => new GetMemberResult
                     {
 

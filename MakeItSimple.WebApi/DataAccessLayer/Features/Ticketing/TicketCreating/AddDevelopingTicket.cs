@@ -77,7 +77,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                foreach(var concerns in command.AddDevelopingTicketByConcerns)
+                if (command.Role == TicketingConString.IssueHandler)
+                {
+                    var approverUserValidation = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.IsApprove != null)
+                        .FirstOrDefaultAsync();
+
+                    if (approverUserValidation != null)
+                    {
+                        var receiverValidation = await _context.TicketConcerns
+                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.UserId == command.Added_By && x.IsApprove != false)
+                            .FirstOrDefaultAsync();
+
+
+                        if (receiverValidation != null)
+                        {
+                            return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                        }
+
+                    }
+                }
+
+                foreach (var concerns in command.AddDevelopingTicketByConcerns)
                 {
 
                     switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == concerns.CategoryId))
@@ -236,7 +257,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
 
-                if (ticketConcernList.Count() < 0)
+                if (ticketConcernList.Count() > 0)
                 {
 
                     var getApprover = await _context.Approvers.Include(x => x.User)

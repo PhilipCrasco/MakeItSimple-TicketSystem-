@@ -79,16 +79,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (command.Role == TicketingConString.IssueHandler)
                 {
-                    var approverUserValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.IsApprove != null)
-                        .FirstOrDefaultAsync();
+                    var approverUserList = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
+
+                    var approverUserValidation = approverUserList
+                        .FirstOrDefault(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By
+                        && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
+
 
                     if (approverUserValidation != null)
                     {
-                        var receiverValidation = await _context.TicketConcerns
-                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.UserId == command.Added_By && x.IsApprove != false)
-                            .FirstOrDefaultAsync();
 
+                        var ticketConcernListApprover = await _context.TicketConcerns.Where(x => x.RequestGeneratorId
+                        == command.RequestGeneratorId && x.UserId == command.Added_By).ToListAsync();
+
+                        var receiverValidation = ticketConcernListApprover 
+                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId
+                            && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
+                            .FirstOrDefault();
 
                         if (receiverValidation != null)
                         {
@@ -268,21 +276,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TransferTicketError.NoApproverExist());
                     }
 
-                    foreach (var approver in getApprover)
-                    {
-                        var addNewApprover = new ApproverTicketing
-                        {
-                            RequestGeneratorId = requestGeneratorList.First().Id,
-                            //ChannelId = approver.ChannelId,
-                            SubUnitId = approver.SubUnitId,
-                            UserId = approver.UserId,
-                            ApproverLevel = approver.ApproverLevel,
-                            AddedBy = command.Added_By,
-                            CreatedAt = DateTime.Now,
-                            Status = TicketingConString.RequestTicket,
-                        };
+                    var approverValidation = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == requestTicketConcernList.First().RequestGeneratorId
+                        && x.IssueHandler == command.Added_By && x.IsApprove == null)
+                        .FirstOrDefaultAsync();
 
-                        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                    if (approverValidation == null)
+                    {
+                        foreach (var approver in getApprover)
+                        {
+                            var addNewApprover = new ApproverTicketing
+                            {
+                                RequestGeneratorId = requestGeneratorList.First().Id,
+                                //ChannelId = approver.ChannelId,
+                                SubUnitId = approver.SubUnitId,
+                                UserId = approver.UserId,
+                                ApproverLevel = approver.ApproverLevel,
+                                AddedBy = command.Added_By,
+                                CreatedAt = DateTime.Now,
+                                Status = TicketingConString.RequestTicket,
+                            };
+
+                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                        }
                     }
 
                 }

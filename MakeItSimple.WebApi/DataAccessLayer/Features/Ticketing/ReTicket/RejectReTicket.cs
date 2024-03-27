@@ -16,11 +16,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public Guid? Requestor_By { get; set; }
             public Guid? Approver_By { get; set; }
             public string Role { get; set; }
+            public string Reject_Remarks { get; set; }
             public ICollection<RejectReTicketConcern> RejectReTicketConcerns { get; set; }
             public class RejectReTicketConcern
             {
                 public int TicketGeneratorId { get; set; }
-                public string Reject_Remarks { get; set; }
             }
 
         }
@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             {
                 foreach (var reTicket in command.RejectReTicketConcerns)
                 {
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == reTicket.TicketGeneratorId, cancellationToken);
+                    var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == reTicket.TicketGeneratorId, cancellationToken);
 
                     if (requestGeneratorExist == null)
                     {
@@ -62,17 +62,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     {
                         perTicketId.RejectReTicketAt = DateTime.Now;
                         perTicketId.IsRejectReTicket = true;
-                        perTicketId.RejectReTicketBy = command.RejectReTicket_By;
+                             perTicketId.RejectReTicketBy = command.RejectReTicket_By;
                         perTicketId.TicketApprover = approverLevelValidation.UserId;
-                        perTicketId.RejectRemarks = reTicket.Reject_Remarks;
+                        perTicketId.RejectRemarks = command.Reject_Remarks;
                     }
 
                     if (ticketHistoryId.Status != TicketingConString.RejectedBy)
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId
-                            = requestGeneratorExist.Id,
+                            TicketGeneratorId = requestGeneratorExist.Id,
                             RequestorBy = reTicketList.First().AddedBy,
                             ApproverBy = command.Approver_By,
                             TransactionDate = DateTime.Now,

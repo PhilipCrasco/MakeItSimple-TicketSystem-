@@ -124,6 +124,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 concernTicketById.IsClosedApprove = true;
                                 concernTicketById.Closed_At = DateTime.Now;
                                 concernTicketById.ClosedApproveBy = command.Closed_By;
+                                concernTicketById.IsDone = true;
                                 concernTicketById.Remarks = TicketingConString.CloseTicket;
                                 concernTicketById.ConcernStatus = TicketingConString.Done;
 
@@ -144,6 +145,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                     foreach ( var request in requestConcern)
                                     {
                                         request.ConcernStatus = TicketingConString.Done;
+                                        request.IsDone = true;
+                                       
                                     }
 
 

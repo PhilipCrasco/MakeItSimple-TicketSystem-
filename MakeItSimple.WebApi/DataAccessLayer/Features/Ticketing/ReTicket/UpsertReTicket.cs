@@ -136,9 +136,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         {
                             TicketGeneratorId = requestGeneratorIdInTransfer.TicketGeneratorId,
                             UserId = ticketConcern.UserId,
+                            ChannelId = ticketConcern.ChannelId,
                             ConcernDetails = ticketConcern.ConcernDetails,
                             ReTicketRemarks = command.Re_Ticket_Remarks,
                             AddedBy = command.Added_By,
+                            Category = ticketConcern.Category,
+                            SubCategory = ticketConcern.SubCategory,
                             StartDate = reTicket.Start_Date,
                             TargetDate = reTicket.Target_Date,
                             IsReTicket = false,
@@ -156,31 +159,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
-
-                }
-
-                if ((requestReTicketList.First().IsRejectReTicket == true && transferUpdateList.First() == true)
-                     || (transferNewList.Count > 0 && requestReTicketList.First().IsRejectReTicket == true))
-                {
-
-                    var addTicketHistory = new TicketHistory
-                    {
-                        RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
-                        RequestorBy = command.Requestor_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.ReTicket,
-                        Status = TicketingConString.RequestUpdate,
-
-                    };
-
-                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
-                    foreach (var ticketHistory in requestReTicketList)
-                    {
-                        ticketHistory.IsRejectReTicket = false;
-                        ticketHistory.RejectReTicketAt = null;
-                        ticketHistory.RejectReTicketBy = null;
-                    }
 
                 }
 

@@ -32,7 +32,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
 
         [HttpPost("add-request-concern")]
-        public async Task<IActionResult> AddRequestConcern(AddRequestConcernCommand command)
+        public async Task<IActionResult> AddRequestConcern([FromForm]AddRequestConcernCommand command)
         {
             try
             {

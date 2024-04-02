@@ -176,10 +176,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }, cancellationToken));
 
 
-                    foreach (var concern in ticketConcernList)
-                    {
-                        concern.IsReject = false;
-                    }
+
                 }
 
 

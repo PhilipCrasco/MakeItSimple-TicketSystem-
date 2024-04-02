@@ -90,7 +90,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.Channel)
                     .Include(x => x.User)
                     .ThenInclude(x => x.BusinessUnit)
-                    .Include(x => x.RejectClosedByUser)
+                    .Include(x => x.RejectClosedByUser) 
                     .Include(x => x.ClosedByUser);
 
 

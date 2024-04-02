@@ -1355,6 +1355,60 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_attachments", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("longtext")
+                        .HasColumnName("comment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsClicked")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_clicked");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int?>("RequestGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_generator_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_comments");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_comments_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_comments_modified_by");
+
+                    b.HasIndex("RequestGeneratorId")
+                        .HasDatabaseName("ix_ticket_comments_request_generator_id");
+
+                    b.ToTable("ticket_comments", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
                 {
                     b.Property<int>("Id")
@@ -2606,6 +2660,32 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("RequestGenerator");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_comments_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_comments_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                        .WithMany("TicketComments")
+                        .HasForeignKey("RequestGeneratorId")
+                        .HasConstraintName("fk_ticket_comments_request_generators_request_generator_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("RequestGenerator");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -2972,6 +3052,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ReTicketConcerns");
 
                     b.Navigation("TicketAttachments");
+
+                    b.Navigation("TicketComments");
 
                     b.Navigation("TicketConcerns");
 

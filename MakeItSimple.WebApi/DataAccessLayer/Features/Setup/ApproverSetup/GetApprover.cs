@@ -23,6 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
             public class Approver
             {
+                public int ? ApproverId {  get; set; }
                 public Guid ? UserId { get; set; }
 
                 public string Fullname { get; set; }
@@ -64,6 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                                 .Select(x => new GetApproverResult
                                 {
                                     SubUnitId = x.Key,
+                                   
                                     SubUnit_Code = x.First().SubUnit.SubUnitCode,
                                     SubUnit_Name = x.First().SubUnit.SubUnitName,
                                     Is_Active = x.First().IsActive,
@@ -73,11 +75,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                                     Updated_At = x.First().UpdatedAt,
                                     Approvers = x.Select(x => new GetApproverResult.Approver
                                     {
+                                       ApproverId = x.Id,
                                        UserId = x.UserId,
                                        Fullname = x.User.Fullname,
                                        ApproverLevel = x.ApproverLevel
 
-                                    }).ToList(),
+                                    }).OrderBy(x => x.ApproverLevel).ToList(),
                                     
                                 });
 

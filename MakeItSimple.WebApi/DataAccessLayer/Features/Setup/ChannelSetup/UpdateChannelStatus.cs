@@ -53,24 +53,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
                 channels.IsActive = !channels.IsActive;
 
-                if(channels.IsActive == false)
-                {
+                //if(channels.IsActive == false)
+                //{
 
-                    var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+                //    var channelUserList = await _context.ChannelUsers.Where(x => x.ChannelId == channels.Id).ToListAsync();
 
-                    var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
+                //    var ApproverSetupList = await _context.Approvers.Where(x => x.ChannelId == channels.Id).ToListAsync();
 
-                    foreach (var channelUsers in channelUserList)
-                    {
-                        channelUsers.IsActive = false;
-                    }
+                //    foreach (var channelUsers in channelUserList)
+                //    {
+                //        channelUsers.IsActive = false;
+                //    }
 
-                    foreach (var approver in ApproverSetupList)
-                    {
-                        approver.IsActive = false;
-                    }
+                //    foreach (var approver in ApproverSetupList)
+                //    {
+                //        approver.IsActive = false;
+                //    }
 
-                }
+                //}
 
                 await _context.SaveChangesAsync();
 

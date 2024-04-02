@@ -149,12 +149,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                        
                                     }
 
-
                                 }
 
                             }
-
-                            
 
                             if (ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
                             {
@@ -179,8 +176,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
                  
                 }
-
-
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

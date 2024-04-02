@@ -42,6 +42,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
        
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+
+        // Setup
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Company> Companies { get; set; }
         public virtual DbSet<BusinessUnit> BusinessUnits { get; set; }
@@ -54,22 +56,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<Category> Categories {  get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<Approver> Approvers { get; set; }
+
+
+        //Ticketing
+
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
         public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
-
-
         public virtual DbSet<ReTicketConcern> ReTicketConcerns { get; set; }
         public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
-
         public virtual DbSet<ApproverTicketing> ApproverTicketings { get; set; }
-
         public virtual DbSet<TicketHistory> TicketHistories { get; set; }
         public virtual DbSet<Receiver> Receivers { get; set; }
-
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
         public virtual DbSet<TicketGenerator> TicketGenerators { get; set; }
+        public virtual DbSet<TicketComment> TicketComments { get; set; }
+
 
         public virtual DbSet<Team> Teams { get; set; }
 
@@ -80,9 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         }
 
 
-        
-
-
+       
         protected override async void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
@@ -108,6 +109,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());
             modelBuilder.ApplyConfiguration(new RequestConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
 
 
             //DateTime time = DateTime.Parse("2024-10-08");

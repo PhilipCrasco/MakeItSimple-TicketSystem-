@@ -4,7 +4,7 @@
     {
 
         public const string Approval = "Approval";
-        public const string OnGoing = "OnGoing";
+        public const string OnGoing = "Ongoing";
         public const string Done = "Done";
 
 

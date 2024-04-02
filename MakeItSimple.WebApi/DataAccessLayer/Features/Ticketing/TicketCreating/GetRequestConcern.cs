@@ -17,27 +17,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public int? RequestGeneratorId { get; set; }
             public int ? DepartmentId { get; set; }
             public string Department_Name { get; set; }
-            public int ? UnitId { get; set; }
-            public string Unit_Name { get; set; }
-            public int ? SubUnitId { get; set; }
-            public string SubUnit_Name { get; set; }
+            public Guid? Requestor_By { get; set; }
+            public string Requestor_Name { get; set; }
             public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
-            public Guid ? Requestor_By { get; set; }
-            public string Requestor_Name { get; set; }
+            public int? UnitId { get; set; }
+            public string Unit_Name { get; set; }
+            public int? SubUnitId { get; set; }
+            public string SubUnit_Name { get; set; }
+            public Guid? UserId { get; set; }
+            public string Issue_Handler { get; set; }
             public string Ticket_Status { get; set; }
             public string Remarks { get; set; }
             public string Concern_Type { get; set; }
             public bool ? Done { get; set; }
             public List<GetRequestConcernByConcern> GetRequestConcernByConcerns { get; set; }
 
-
             public class GetRequestConcernByConcern
             {
 
                 public int? TicketConcernId { get; set; }
-                public Guid? UserId { get; set; }
-                public string Issue_Handler { get; set; }
                 public string Concern_Description { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategory_Description { get; set; }
@@ -171,10 +170,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
-                    var result = ticketConcernQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetRequestConcernResult
+                    var result = ticketConcernQuery.GroupBy(x => new
+                    {
+                        x.RequestGeneratorId,
+                        x.UserId,
+                        IssueHandler = x.User.Fullname
+                        
+
+                    }).Select(x => new GetRequestConcernResult
                     {
 
-                        RequestGeneratorId = x.Key,
+                        RequestGeneratorId = x.Key.RequestGeneratorId,
+                        UserId = x.Key.UserId,
+                        Issue_Handler = x.Key.IssueHandler,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,
                         UnitId = x.First().User.UnitId,
@@ -193,8 +201,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         GetRequestConcernByConcerns = x.Select(x => new GetRequestConcernResult.GetRequestConcernByConcern
                         {
                             TicketConcernId = x.Id,
-                            UserId = x.UserId,
-                            Issue_Handler = x.User.Fullname,
                             Concern_Description = x.ConcernDetails,
                             Category_Description = x.Category.CategoryDescription,
                             SubCategory_Description = x.SubCategory.SubCategoryDescription,

@@ -158,7 +158,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
                     var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
-                    if (upsertConcern != null)
+
+                    if (upsertConcern != null )
                     {
 
                         var duplicateConcern = requestTicketConcernList.FirstOrDefault(x => x.UserId == concerns.UserId && x.ConcernDetails == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
@@ -228,7 +229,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             foreach(var request in requestUpsertConcern)
                             {
-                                if (request.Concern != upsertConcern.ConcernDetails)
+                                if (request.Concern != upsertConcern.ConcernDetails) 
                                 {
                                     request.Concern = upsertConcern.ConcernDetails;
                                     hasChanged = true;
@@ -253,6 +254,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.TicketApprover = getApproverUserId.UserId;
 
                         }
+
+                        //if(command.Role == TicketingConString.IssueHandler)
+                        //{
+                        //    ticketConcernList.Add(upsertConcern);  
+                        //}
+
                         await _context.SaveChangesAsync(cancellationToken);
                     }
                     else
@@ -383,15 +390,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                             await _context.SaveChangesAsync(cancellationToken);
                         }
-
                     }
-
-
-                   
-
                 }
 
-            await _context.SaveChangesAsync(cancellationToken); 
+                await _context.SaveChangesAsync(cancellationToken); 
                 return Result.Success();
             }
         }

@@ -59,12 +59,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
                 && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
-                if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsTransfer == true && command.Role != TicketingConString.Admin))
+                if (validateApprover != null)
                 {
                     return Result.Failure(TransferTicketError.TransferConcernUnable());
                 }
-
-
 
                 switch (await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken))
                 {

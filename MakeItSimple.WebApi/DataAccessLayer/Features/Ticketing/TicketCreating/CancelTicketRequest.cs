@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public class CancelTicketGenerator
             {
                 public int RequestGeneratorId { get; set; }
+                public Guid ? Issue_Handler {  get; set; }
                 public ICollection<CancelTicketConcern> CancelTicketConcerns { get; set; }
                 public class CancelTicketConcern
                 {
@@ -45,7 +47,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-                    var ticketConcernExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId).ToListAsync();
+                    var issueHandlerExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
+                    && x.UserId == ticketGenerator.Issue_Handler).FirstOrDefaultAsync();
+
+                    if (issueHandlerExist == null)
+                    {
+                        return Result.Failure(TicketRequestError.UserNotExist());
+                    }
+                    var ticketConcernExist = await _context.TicketConcerns
+                        .Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId && x.UserId == ticketGenerator.Issue_Handler).ToListAsync();
 
                     if (ticketGenerator.CancelTicketConcerns == null)
                     {

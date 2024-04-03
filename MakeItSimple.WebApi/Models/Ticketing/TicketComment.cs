@@ -12,8 +12,6 @@
         public virtual User ModifiedByUser { get; set; }
 
         public string Comment { get; set; }
-
-
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
 

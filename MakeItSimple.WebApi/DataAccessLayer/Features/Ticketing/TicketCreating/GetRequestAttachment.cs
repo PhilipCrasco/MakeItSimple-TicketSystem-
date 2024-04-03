@@ -34,6 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestAttachmentQuery : IRequest<Result>
         {
             public int? Id { get; set; }
+            public bool ? Status { get; set; }
         }
 
         public class Handler : IRequestHandler<GetRequestAttachmentQuery, Result>
@@ -56,6 +57,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 if (request.Id != null)
                 {
                     requestGeneratorQuery = requestGeneratorQuery.Where(x => x.Id == request.Id);
+                }
+
+                if(request.Status != null)
+                {
+                    requestGeneratorQuery = requestGeneratorQuery.Where(x => x.IsActive == request.Status);
                 }
 
 

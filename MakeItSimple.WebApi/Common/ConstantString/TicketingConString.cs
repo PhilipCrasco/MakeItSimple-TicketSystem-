@@ -3,7 +3,7 @@
     public class TicketingConString
     {
 
-        public const string Approval = "Approval";
+        public const string Approval = "For approval";
         public const string OnGoing = "Ongoing";
         public const string Done = "Done";
 
@@ -38,8 +38,8 @@
 
         // Concern Status 
 
-        public const string ForApprovalTicket = "For Concern Approval";
-        public const string CurrentlyFixing = "Currently Fixing Issue";
+        public const string ForApprovalTicket = "For approval";
+        public const string CurrentlyFixing = "Ongoing";
 
         public const string ConcernStatus = "ConcernStatus";
 

@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,13 +8,16 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddNewTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketRequest;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 
 
@@ -55,6 +59,31 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
+
+
+        [HttpPut("remove-attachment")]
+        public async Task<IActionResult> RemoveTicketAttachment([FromBody] RemoveTicketAttachmentCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.UserId = userId;
+
+                }
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
 
         [HttpPost("add-ticket-concern")]
         public async Task<IActionResult> AddRequestConcernReceiver(AddRequestConcernReceiverCommand command)
@@ -391,6 +420,45 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Ok(results);
             }
             catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("add-comment")]
+        public async Task<IActionResult> AddTicketComment([FromBody] AddTicketCommentCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Modified_By = userId;
+                    command.Added_By = userId;
+                    command.UserId = userId;
+
+                }
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpGet("view-comment")]
+        public async Task<IActionResult> GetTicketComment([FromQuery]GetTicketCommentQuery query)
+        {
+            try
+            {
+                var result = await _mediator.Send(query);
+                return Ok(result);
+            }
+            catch(Exception ex)
             {
                 return Conflict(ex.Message);
             }

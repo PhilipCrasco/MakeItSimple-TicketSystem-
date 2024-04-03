@@ -104,6 +104,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                 }
+
+
                 
                 var results = requestConcernsQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetRequestorTicketConcernResult
                 {

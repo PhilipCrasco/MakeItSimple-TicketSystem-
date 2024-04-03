@@ -40,7 +40,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
       public static Error AttachmentNotNull() =>
       new Error("TicketRequest.AttachmentNotNull", "Attachment must not be empty!");
-     
+
+      public static Error AttachmentNotExist() =>
+      new Error("TicketRequest.AttachmentNotExist", "Attachment not Exist!");
+
       public static Error AttachmentAlreadyExist() =>
       new Error("TicketRequest.AttachmentAlreadyExist", "Attachment already exist!");
 
@@ -53,5 +56,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error ConcernWasInApproval() =>
       new Error("TicketRequest.ConcernWasInApproval", "Concern is for approval!");
 
+      public static Error NotAutorizeToEdit() =>
+      new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to edit!");
+
+      public static Error NotAutorizeToDelete() =>
+      new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to delete!");
+
+      public static Error ProhibitedWord(string comment) =>
+      new Error("TicketRequest.ProhibitedWord", $"Warning Inappropriate word '{comment}'!");
     }
 }

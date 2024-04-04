@@ -20,6 +20,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
 
+            public string Remarks { get; set; }
+
             public List<AddDevelopingTicketByConcern> AddDevelopingTicketByConcerns { get; set; }
             public class AddDevelopingTicketByConcern
             {
@@ -61,7 +63,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                var requestTicketConcernList = await _context.TicketConcerns.Include(x => x.RequestorByUser).ThenInclude(x => x.UserRole)
+                var requestTicketConcernList = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .ThenInclude(x => x.UserRole)
                     .Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
 
 
@@ -108,6 +112,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 foreach (var concerns in command.AddDevelopingTicketByConcerns)
                 {
+
 
                     switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == concerns.CategoryId))
                     {
@@ -199,10 +204,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (hasChanged)
                         {
-                            upsertConcern.IsReject = false;
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
                             upsertConcern.TicketType = TicketingConString.Concern;
+                        }
+
+                        if (upsertConcern.IsReject is true)
+                        {
+                            upsertConcern.IsReject = false;
+                            upsertConcern.Remarks = command.Remarks;
                         }
 
                     }
@@ -254,8 +264,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (command.Role == TicketingConString.IssueHandler)
                         {
-                            addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
+                        }
+
+                        if (requestGeneratorexist != null)
+                        {
+                            var rejectTicketConcern = await _context.TicketConcerns
+                                .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IsReject == true
+                                && x.UserId == command.Added_By).ToListAsync();
+
+                            foreach (var reject in rejectTicketConcern)
+                            {
+                                reject.IsReject = false;
+                                reject.Remarks = command.Remarks;
+                            }
+
                         }
 
                         await _context.TicketConcerns.AddAsync(addnewTicketConcern);

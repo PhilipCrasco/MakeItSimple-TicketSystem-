@@ -149,7 +149,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
                 }
 
-                var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false)
+                var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false && x.IsReTicket != true)
                     .GroupBy(x => x.RequestGeneratorId).Select(x => new GetOpenTicketResult
                     {
                         CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
@@ -176,8 +176,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             UserId = x.UserId,
                             Issue_Handler = x.User.Fullname,
                             Concern_Description = x.ConcernDetails,
-                            Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? "Open Ticket"
-                                    : x.IsTransfer == false ? "For Approval Transfer" : x.IsReTicket == false ? "For ReTicket" : x.IsClosedApprove == false ? "For Closing Ticket" : "Unknown",
+
+                            Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
+                                    : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
+
                             Category_Description = x.Category.CategoryDescription,
                             SubCategory_Description = x.SubCategory.SubCategoryDescription,
                             Start_Date = x.StartDate,

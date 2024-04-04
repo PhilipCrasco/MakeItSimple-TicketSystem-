@@ -13,8 +13,11 @@ namespace MakeItSimple.WebApi.Common.ConstantString
             "bading",
             "bakla",
             "vading",
-            "vaklaa",
-            "vovo"
+            "vakla",
+            "vovo",
+            "idiot",
+            "bayot",
+
         };
     }
 }

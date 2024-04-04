@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public Guid? Users { get; set; }
             public Guid? Requestor_By { get; set; }
             public Guid? Approver_By { get; set; }
+            public Guid ? Added_By { get; set; }
             public List<ApproveReTicketRequest> ApproveReTicketRequests { get; set; }
             public class ApproveReTicketRequest
             {
@@ -89,7 +90,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             else
                             {
                                 concernTicket.TicketApprover = null;
-
                                 concernTicket.IsReTicket = true;
                                 concernTicket.ReTicketAt = DateTime.Now;
                                 concernTicket.ReTicketBy = command.Re_Ticket_By;
@@ -99,8 +99,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                                 concernTicketById.IsReTicket = true;
                                 concernTicketById.ReticketAt = DateTime.Now;
                                 concernTicketById.ReticketBy = command.Re_Ticket_By;
-                                concernTicketById.StartDate = concernTicket.StartDate;
-                                concernTicketById.TargetDate = concernTicket.TargetDate;
+                                concernTicketById.Remarks = TicketingConString.ReTicket;
+
+                                var addNewTicketConcern = new TicketConcern
+                                {
+                                    RequestGeneratorId = concernTicketById.RequestGeneratorId,
+                                    RequestorBy = concernTicketById.RequestorBy,
+                                    ChannelId = concernTicketById.ChannelId,
+                                    UserId = concernTicketById.UserId,
+                                    ConcernDetails = concernTicketById.ConcernDetails,
+                                    CategoryId = concernTicketById.CategoryId,
+                                    SubCategoryId = concernTicketById.SubCategoryId,
+                                    StartDate = concernTicket.StartDate,
+                                    TargetDate = concernTicket.TargetDate,
+                                    Remarks = concernTicketById.Remarks,
+                                    IsApprove = true,
+                                    RequestConcernId = concernTicketById.RequestConcernId,
+                                    TicketType = concernTicketById.TicketType,
+                                    ConcernStatus = concernTicketById.ConcernStatus,
+                                    AddedBy = command.Added_By,
+                                    
+                                };
+
+                                await _context.SaveChangesAsync(cancellationToken);
+
                                 concernTicketById.Remarks = TicketingConString.ReTicket;
                             }
 

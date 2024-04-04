@@ -25,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid ? IssueHandler { get; set; }
             public string Role { get; set; }
 
+            public string Remarks { get; set; } 
+
             public List<AddRequestConcernbyConcern> AddRequestConcernbyConcerns { get; set; }
             public class AddRequestConcernbyConcern
             {
@@ -72,7 +74,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
                     .ThenInclude(x => x.UserRole)
                     .Include(x => x.RequestorByUser)
-                    .ThenInclude(x => x.UserRole)
                     .Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -155,8 +156,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var getApproverSubUnit = await _context.Users.FirstOrDefaultAsync(x => x.Id == concerns.UserId, cancellationToken);
                     var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
-                    var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
-
+                    var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
                     var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
 
                     if (upsertConcern != null )
@@ -249,10 +249,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (command.Role == TicketingConString.IssueHandler)
                         {
-                            upsertConcern.IsReject = false;
                             upsertConcern.TicketType = TicketingConString.Concern;
                             upsertConcern.TicketApprover = getApproverUserId.UserId;
 
+                        }
+
+                        if(upsertConcern.IsReject is true)
+                        {
+                            upsertConcern.IsReject = false;
+                            upsertConcern.Remarks = command.Remarks;
                         }
 
                         //if(command.Role == TicketingConString.IssueHandler)
@@ -306,7 +311,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 UserId = addnewTicketConcern.RequestorBy,
                                 AddedBy = command.Added_By,
                                 ConcernStatus = TicketingConString.ForApprovalTicket,
-                                
                                 IsDone = false,
 
                             };
@@ -322,8 +326,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (addedList.UserRole.UserRoleName == TicketingConString.IssueHandler)
                         {
-
-                            addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketType = TicketingConString.Concern;
 
                             ticketConcernList.Add(addnewTicketConcern);
@@ -331,9 +333,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (command.Role == TicketingConString.IssueHandler)
                         {
-                            addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }
+                        
+                        if(requestGeneratorexist != null)
+                        {
+                            var rejectTicketConcern = await _context.TicketConcerns
+                                .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IsReject == true 
+                                && x.UserId == command.Added_By).ToListAsync();
+
+                            foreach(var reject in rejectTicketConcern)
+                            {
+                                reject.IsReject = false;
+                                reject.Remarks = command.Remarks;
+                            }
+
+
+                        }
+
 
                         var checkingList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
                         && x.RequestConcernId != null, cancellationToken);

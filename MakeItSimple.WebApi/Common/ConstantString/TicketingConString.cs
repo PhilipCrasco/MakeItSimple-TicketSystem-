@@ -40,12 +40,18 @@
 
         public const string ForApprovalTicket = "For approval";
         public const string CurrentlyFixing = "Ongoing";
-
         public const string ConcernStatus = "ConcernStatus";
-
 
         public const string Concern = "Concern";
         public const string Developing = "Developing";
         public const string RequestTicket = "Request Ticket";
+
+        public const string ForReticket = "For Re-Ticket";
+        public const string ForClosing = "For Closing Ticket";
+        public const string ForTransfer = "For Transfer Ticket";
+        public const string OpenTicket = "Open Ticket";
+
+        public const string RequestApproval = "For approval by ";
+
     }
 }

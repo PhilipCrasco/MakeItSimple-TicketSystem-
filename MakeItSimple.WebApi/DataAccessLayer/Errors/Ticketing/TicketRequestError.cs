@@ -64,5 +64,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
       public static Error ProhibitedWord(string comment) =>
       new Error("TicketRequest.ProhibitedWord", $"Warning Inappropriate word '{comment}'!");
+      public static Error TicketCommentNotExist() =>
+      new Error("TicketRequest.TicketCommentNotExist", "Comment not Exist!");
+
+     public static Error UnAuthorizedReceiver() =>
+     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized to approve concern!");
     }
 }

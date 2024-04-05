@@ -4,13 +4,15 @@ using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddCommentNotificationValidator;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddDevelopingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddNewTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketRequest;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelRequestConcern;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
@@ -50,6 +52,24 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 }
                 var result = await _mediator.Send(command);
                 if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        } 
+
+        [HttpPut("cancel-request")]
+        public async Task<IActionResult> CancelRequestConcern([FromBody] CancelRequestConcernCommand command)
+        {
+            try
+            {
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
                 {
                     return BadRequest(result);
                 }
@@ -202,8 +222,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }  
         }
 
-        [HttpPut("cancel")]
-        public async Task<IActionResult> CancelTicketRequest(CancelTicketRequestCommand command)
+        [HttpPut("cancel-concern")]
+        public async Task<IActionResult> CancelTicketConcern(CancelTicketConcernCommand command)
         {
             try
             {
@@ -483,6 +503,30 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Ok(result);
             }
             catch(Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("add-comment-view")]
+        public async Task<IActionResult> AddCommentNotificationValidator([FromBody] AddCommentNotificationValidatorCommand command)
+        {
+            try
+            {
+
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.UserId = userId;
+
+                }
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }

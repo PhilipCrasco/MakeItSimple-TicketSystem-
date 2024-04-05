@@ -1409,6 +1409,37 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_comments", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<bool?>("IsClicked")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_clicked");
+
+                    b.Property<int?>("TicketCommentId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_comment_id");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_comment_views");
+
+                    b.HasIndex("TicketCommentId")
+                        .HasDatabaseName("ix_ticket_comment_views_ticket_comment_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_ticket_comment_views_user_id");
+
+                    b.ToTable("ticket_comment_views", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
                 {
                     b.Property<int>("Id")
@@ -2684,6 +2715,23 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RequestGenerator");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketComment", "TicketComment")
+                        .WithMany()
+                        .HasForeignKey("TicketCommentId")
+                        .HasConstraintName("fk_ticket_comment_views_ticket_comments_ticket_comment_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_ticket_comment_views_users_user_id");
+
+                    b.Navigation("TicketComment");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>

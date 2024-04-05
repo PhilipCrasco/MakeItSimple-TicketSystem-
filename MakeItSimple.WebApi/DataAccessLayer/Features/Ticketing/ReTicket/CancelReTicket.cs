@@ -48,7 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         }
 
 
-                        if (transferTicket.CancelReTicketByIds.Count() <= 0)
+                        if (transferTicket.CancelReTicketByIds.Count(x => x.ReTicketConcernId != null) <= 0)
                         {
                             foreach (var reTicketList in reTicketQuery)
                             {

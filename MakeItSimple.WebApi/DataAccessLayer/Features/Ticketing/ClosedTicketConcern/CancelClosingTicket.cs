@@ -47,7 +47,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    if(close.CancelClosingConcerns.Count() <= 0)
+                    if (close.CancelClosingConcerns.Count(x => x.ClosingTicketId != null) <= 0)
                     {
                         foreach (var closingList in closingTicketQuery)
                         {

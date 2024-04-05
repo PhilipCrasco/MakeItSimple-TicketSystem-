@@ -72,7 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
         public virtual DbSet<TicketGenerator> TicketGenerators { get; set; }
         public virtual DbSet<TicketComment> TicketComments { get; set; }
-
+        public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
 
         public virtual DbSet<Team> Teams { get; set; }
 

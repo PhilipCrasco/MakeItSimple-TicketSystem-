@@ -141,7 +141,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var uploadTasks = new List<Task>();
 
-
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0 )
                 {
                     foreach (var attachments in command.RequestAttachmentsFiles.Where(attachments => attachments.Attachment.Length > 0))

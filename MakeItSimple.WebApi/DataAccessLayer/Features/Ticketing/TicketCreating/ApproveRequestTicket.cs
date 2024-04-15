@@ -102,8 +102,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 concernTicket.ConcernDetails = $"{TicketingConString.RequestApproval} Receiver";
                             }
 
-
-
                         }
 
                     }
@@ -128,7 +126,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
  
                                 concerns.IsApprove = true;
                                 concerns.ApprovedBy = command.Approved_By;
-                                concerns.ApprovedAt = DateTime.Now;
+                                concerns.ApprovedAt = DateTime.Now;                                                                                       
                                 concerns.IsReject = false;
                                 concerns.Remarks = null;
                                 concerns.ConcernStatus = TicketingConString.CurrentlyFixing;

@@ -199,7 +199,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketHistory.RejectTransferBy = null;
                     }
 
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

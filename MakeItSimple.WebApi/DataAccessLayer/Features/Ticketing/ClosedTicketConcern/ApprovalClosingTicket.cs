@@ -155,6 +155,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             if (ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
                             {
+
                                 var addTicketHistory = new TicketHistory
                                 {
                                     TicketGeneratorId = requestTicketExist.Id,

@@ -193,10 +193,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         }).ToList()
 
-
                     });
-
-
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

@@ -26,10 +26,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
          new Error("ClosingtTicketError.TicketConcernIdAlreadyExist", "Ticket concern already exist!");
 
         public static Error ClosingTicketIdNotExist() =>
-       new Error("TransferTicketError.ReTicketIdNotExist", "Closing Ticket request not exist!");
+       new Error("ClosingTicketError.ReTicketIdNotExist", "Closing Ticket request not exist!");
 
         public static Error ClosingTicketIdAlreadyExist() =>
-       new Error("TransferTicketError.ClosingTicketIdAlreadyExist", "Closing Ticket request already exist!");
+       new Error("ClosingTicketError.ClosingTicketIdAlreadyExist", "Closing Ticket request already exist!");
+
+       public static Error NoApproverHasSetup() =>
+       new Error("ClosingTicketError.NoApproverHasSetup", "No aprrover has been setup!");
 
     }
 }

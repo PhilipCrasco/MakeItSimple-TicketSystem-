@@ -61,7 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         public class GetClosingTicketQuery : UserParams , IRequest<PagedList<GetClosingTicketResults>>
         {
             public Guid? UserId { get; set; }
-            public string Approval { get; set; }
+            public string Approver { get; set; }
             public string Users { get; set; }
             public string Role { get; set; }
             public string Search { get; set; }
@@ -118,7 +118,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         closingTicketsQuery = closingTicketsQuery.Where(x => x.IsClosing == request.IsClosed);
                     }
 
-                    if (TicketingConString.Approval == request.Approval)
+                    if (TicketingConString.Approver == request.Approver)
                     {
 
                         if (request.UserId != null && TicketingConString.Approver == request.Role)

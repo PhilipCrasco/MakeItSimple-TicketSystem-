@@ -56,7 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class GetReTicketQuery : UserParams, IRequest<PagedList<GetReTicketResult>>
         {
             public Guid ? UserId { get; set; }
-            public string Approval { get; set; }
+            public string Approver { get; set; }
             public string Users { get; set; }
             public string Role { get; set; }
 
@@ -104,7 +104,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var fillterApproval = reTicketQuery.Select(x => x.TicketGeneratorId);
 
-                if (TicketingConString.Approval == request.Approval)
+                if (TicketingConString.Approver == request.Approver)
                 {
 
                     if (request.UserId != null && TicketingConString.Approver == request.Role)

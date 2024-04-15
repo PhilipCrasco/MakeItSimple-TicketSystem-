@@ -43,7 +43,7 @@
         public const string ConcernStatus = "ConcernStatus";
 
         public const string Concern = "Concern";
-        public const string Developing = "Developing";
+        public const string Manual = "Manual";
         public const string RequestTicket = "Request Ticket";
 
         public const string ForReticket = "For Re-Ticket";

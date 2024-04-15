@@ -58,15 +58,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     var requestGeneratorId = new RequestGenerator { IsActive = true };
                     await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    requestGeneratorList.Add(requestGeneratorId);
+                    requestGeneratorexist = requestGeneratorId;
 
                 }
+
+                await _context.SaveChangesAsync(cancellationToken);
+                requestGeneratorList.Add(requestGeneratorexist);
 
                 var requestTicketConcernList = await _context.TicketConcerns
                     .Include(x => x.RequestorByUser)
                     .ThenInclude(x => x.UserRole)
-                    .Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                    .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
 
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -98,7 +100,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         == command.RequestGeneratorId && x.UserId == command.Added_By).ToListAsync();
 
                         var receiverValidation = ticketConcernListApprover 
-                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId
+                            .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
                             && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
                             .FirstOrDefault();
 
@@ -244,11 +246,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         };
 
-                        var userList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
-                        var addedList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
+                        var userList = await _context.Users.Include(x => x.UserRole)
+                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
+
+                        var addedList = await _context.Users.Include(x => x.UserRole)
+                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
 
 
-                        addnewTicketConcern.TicketType = TicketingConString.Developing;
+                        addnewTicketConcern.TicketType = TicketingConString.Manual;
 
                         if (addedList.UserRole.UserRoleName == TicketingConString.IssueHandler)
                         {
@@ -300,7 +305,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var approverValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == requestTicketConcernList.First().RequestGeneratorId
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
                         && x.IssueHandler == command.Added_By && x.IsApprove == null)
                         .FirstOrDefaultAsync();
 
@@ -310,7 +315,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             var addNewApprover = new ApproverTicketing
                             {
-                                RequestGeneratorId = requestGeneratorList.First().Id,
+                                RequestGeneratorId = requestGeneratorexist.Id,
                                 //ChannelId = approver.ChannelId,
                                 SubUnitId = approver.SubUnitId,
                                 UserId = approver.UserId,
@@ -319,6 +324,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 CreatedAt = DateTime.Now,
                                 Status = TicketingConString.RequestTicket,
                             };
+
+
+                            foreach (var issueHandler in ticketConcernList)
+                            {
+                                addNewApprover.IssueHandler = issueHandler.UserId;
+                            }
 
                             await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                         }

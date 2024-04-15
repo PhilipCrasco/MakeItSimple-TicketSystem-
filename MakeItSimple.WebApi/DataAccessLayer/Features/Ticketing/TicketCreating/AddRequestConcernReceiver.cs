@@ -62,19 +62,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var ticketConcernList = new List<TicketConcern>();
 
                 var requestGeneratorexist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
-                if(requestGeneratorexist == null)
+                if (requestGeneratorexist == null)
                 {
                     var requestGeneratorId = new RequestGenerator { IsActive = true };
                     await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    requestGeneratorList.Add(requestGeneratorId);
-                    
+                    requestGeneratorexist = requestGeneratorId;
+
                 }
+
+                await _context.SaveChangesAsync(cancellationToken);
+                requestGeneratorList.Add(requestGeneratorexist);
 
                 var requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
                     .ThenInclude(x => x.UserRole)
                     .Include(x => x.RequestorByUser)
-                    .Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                    .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
                 if(channelidExist == null)
@@ -91,10 +93,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 if(command.Role == TicketingConString.IssueHandler)
                 {
                     var approverUserList = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
 
                     var approverUserValidation = approverUserList
-                        .FirstOrDefault(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By
+                        .FirstOrDefault(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IssueHandler == command.Added_By
                         && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
                         
 
@@ -105,7 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         == command.RequestGeneratorId && x.UserId == command.Added_By).ToListAsync();
 
                         var receiverValidation = ticketConcernListApprover
-                            .Where(x => x.RequestGeneratorId == command.RequestGeneratorId 
+                            .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id 
                             && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
                             .FirstOrDefault();
 
@@ -156,6 +158,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var getApproverSubUnit = await _context.Users.FirstOrDefaultAsync(x => x.Id == concerns.UserId, cancellationToken);
                     var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
+                    if (getApproverUser.Count() < 0)
+                    {
+                        return Result.Failure(ClosingTicketError.NoApproverHasSetup());
+                    }
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
                     var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
 
@@ -280,7 +286,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         var addnewTicketConcern = new TicketConcern
                         {
-                            RequestGeneratorId = requestGeneratorexist.Id == null ? requestGeneratorList.First().Id : requestGeneratorexist.Id,
+                            RequestGeneratorId = requestGeneratorexist.Id,
                             RequestorBy = command.Requestor_By,
                             ChannelId = command.ChannelId,
                             UserId = concerns.UserId,
@@ -348,9 +354,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 reject.Remarks = command.Remarks;
                             }
 
-
+                             
                         }
-
 
                         var checkingList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
                         && x.RequestConcernId != null, cancellationToken);
@@ -377,7 +382,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                     var approverValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == requestTicketConcernList.First().RequestGeneratorId
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
                         && x.IssueHandler == command.Added_By && x.IsApprove == null)
                         .FirstOrDefaultAsync();
 
@@ -388,7 +393,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             var addNewApprover = new ApproverTicketing
                             {
-                                RequestGeneratorId = requestTicketConcernList.First().RequestGeneratorId,
+                                RequestGeneratorId = requestGeneratorexist.Id,
                                 //ChannelId = approver.ChannelId,
                                 SubUnitId = approver.SubUnitId,
                                 UserId = approver.UserId,

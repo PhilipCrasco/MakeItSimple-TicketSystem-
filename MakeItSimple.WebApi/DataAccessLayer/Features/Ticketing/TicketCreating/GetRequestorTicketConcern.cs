@@ -32,8 +32,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public string Modified_By { get; set; }
                 public DateTime ? updated_At { get; set; }
 
-            
-
         }
 
         public class GetRequestorTicketConcernQuery :UserParams , IRequest<PagedList<GetRequestorTicketConcernResult>>
@@ -44,8 +42,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Concern_Status { get; set ; } 
             public string Search { get; set; }
             public bool ? Status { get; set; }
-
-
         }
 
         public class Handler : IRequestHandler<GetRequestorTicketConcernQuery, PagedList<GetRequestorTicketConcernResult>>
@@ -62,7 +58,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns.Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser);
-
 
                 if (request.Status != null)
                 {
@@ -101,9 +96,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                 }
-
-
-                
+ 
                 var results = requestConcernsQuery.Select(x => new GetRequestorTicketConcernResult
                 {
                     RequestGeneratorId = x.RequestGeneratorId,

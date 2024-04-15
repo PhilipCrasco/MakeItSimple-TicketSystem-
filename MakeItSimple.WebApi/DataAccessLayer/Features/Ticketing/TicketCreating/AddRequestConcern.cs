@@ -66,12 +66,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     var requestGeneratorId = new RequestGenerator { IsActive = true };
                     await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    requestGeneratorList.Add(requestGeneratorId);
-
+                    requestGeneratorexist = requestGeneratorId;
                 }
-
-                requestGeneratorList.Add(requestGeneratorexist);
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
@@ -79,11 +75,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(UserError.UserNotExist());
                 }
 
+                await _context.SaveChangesAsync(cancellationToken);
+                requestGeneratorList.Add(requestGeneratorexist);
+
                 var requestConcernIdExist = await _context.RequestConcerns
                     .Include(x => x.User).ThenInclude(x => x.Department)
                     .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId, cancellationToken);
                 if (requestConcernIdExist != null)
                 {
+
                     var ticketConcernExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestConcernId == requestConcernIdExist.Id, cancellationToken);
 
                     bool isChange = false;
@@ -108,7 +108,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var addRequestConcern = new RequestConcern
                     {
-                        RequestGeneratorId = requestGeneratorexist == null ? requestGeneratorList.First().Id : requestGeneratorexist.Id,
+                        RequestGeneratorId = requestGeneratorexist.Id,
                         UserId = userId.Id,
                         Concern = command.Concern,
                         AddedBy = command.Added_By,
@@ -123,7 +123,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var addTicketConcern = new TicketConcern
                     {
-                        RequestGeneratorId = requestGeneratorexist == null ? requestGeneratorList.First().Id : requestGeneratorexist.Id,
+                        RequestGeneratorId = requestGeneratorexist.Id,
                         RequestConcernId = addRequestConcern.Id,
                         RequestorBy = command.UserId,
                         ConcernDetails = addRequestConcern.Concern,

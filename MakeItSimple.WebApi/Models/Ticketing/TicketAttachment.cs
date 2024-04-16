@@ -15,6 +15,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string Attachment { get; set; }
 
         public string FileName { get; set; }
+        public decimal ? FileSize { get; set; }
 
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }

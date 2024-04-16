@@ -196,6 +196,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 {
                                     ticketAttachment.ModifiedBy = command.Modified_By;
                                     ticketAttachment.FileName = attachments.Attachment.FileName;
+                                    ticketAttachment.FileSize = attachments.Attachment.Length;
                                     ticketAttachment.UpdatedAt = DateTime.Now;
                                 }
 
@@ -207,6 +208,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     RequestGeneratorId = requestGeneratorList.First().Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
+                                    FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
                                 };
 

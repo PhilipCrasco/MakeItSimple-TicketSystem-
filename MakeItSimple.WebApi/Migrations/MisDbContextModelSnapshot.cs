@@ -1328,6 +1328,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("file_name");
 
+                    b.Property<decimal?>("FileSize")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("file_size");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");

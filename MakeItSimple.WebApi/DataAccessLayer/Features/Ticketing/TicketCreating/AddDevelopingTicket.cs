@@ -147,7 +147,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
-                    var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
+                    var upsertConcern = requestTicketConcernList
+                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId && x.UserId == command.IssueHandler);
+
                     if(upsertConcern != null)
                     {
 
@@ -208,7 +210,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
-                            upsertConcern.TicketType = TicketingConString.Concern;
+                            upsertConcern.TicketType = TicketingConString.Manual;
                         }
 
                         if (upsertConcern.IsReject is true)
@@ -242,7 +244,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             CreatedAt = DateTime.Now,
                             StartDate = concerns.Start_Date,
                             TargetDate = concerns.Target_Date,
-                            IsApprove = false
+                            IsApprove = false,
+
 
                         };
 

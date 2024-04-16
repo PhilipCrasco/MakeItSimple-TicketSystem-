@@ -22,7 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public Guid ? IssueHandler { get; set; }
+            public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
 
             public string Remarks { get; set; } 
@@ -119,7 +119,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
-
                 foreach (var concerns in command.AddRequestConcernbyConcerns)
                 {
 
@@ -163,7 +162,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(ClosingTicketError.NoApproverHasSetup());
                     }
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
-                    var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
+                    var upsertConcern = requestTicketConcernList
+                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId && x.UserId == command.IssueHandler);
 
                     if (upsertConcern != null )
                     {
@@ -266,11 +266,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.Remarks = command.Remarks;
                         }
 
-                        //if(command.Role == TicketingConString.IssueHandler)
-                        //{
-                        //    ticketConcernList.Add(upsertConcern);  
-                        //}
-
                         await _context.SaveChangesAsync(cancellationToken);
                     }
                     else
@@ -354,7 +349,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 reject.Remarks = command.Remarks;
                             }
 
-                             
                         }
 
                         var checkingList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails

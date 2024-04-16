@@ -34,6 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public int ? TicketAttachmentId { get; set; }
                 public IFormFile Attachment { get; set; }
 
+
             }
 
         }
@@ -194,6 +195,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 if (hasChanged)
                                 {
                                     ticketAttachment.ModifiedBy = command.Modified_By;
+                                    ticketAttachment.FileName = attachments.Attachment.FileName;
                                     ticketAttachment.UpdatedAt = DateTime.Now;
                                 }
 
@@ -204,6 +206,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 {
                                     RequestGeneratorId = requestGeneratorList.First().Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
+                                    FileName = attachments.Attachment.FileName,
                                     AddedBy = command.Added_By,
                                 };
 
@@ -217,6 +220,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 await Task.WhenAll(uploadTasks);
+
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
 

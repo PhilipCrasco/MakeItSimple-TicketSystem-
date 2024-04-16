@@ -28,6 +28,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
 
+            public Guid? UserId { get; set; }
+            public string Issue_Handler { get; set; }
+
             public int? UnitId { get; set; }
             public string Unit_Name { get; set; }
 
@@ -39,16 +42,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public string Concern_Type { get; set; }
 
-            
-
             public List<OpenTicket> OpenTickets { get; set; }
             public class OpenTicket
             {
 
                 public int? TicketConcernId { get; set; }
                 public int ? RequestConcernId { get; set; }
-                public Guid? UserId { get; set; }
-                public string Issue_Handler { get; set; }
                 public string Concern_Description { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategory_Description { get; set; }
@@ -150,17 +149,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 }
 
                 var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false && x.IsReTicket != true)
-                    .GroupBy(x => x.RequestGeneratorId).Select(x => new GetOpenTicketResult
+                    .GroupBy(x => new
+                    {
+                        x.RequestGeneratorId,
+                        x.UserId,
+                        IssueHandler = x.User.Fullname
+
+                    }).Select(x => new GetOpenTicketResult
                     {
                         CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
                         RequestedTicketCount = ticketConcernQuery.Count(),
                         OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
                         DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
-                        RequestGeneratorId = x.Key,
+                        RequestGeneratorId = x.Key.RequestGeneratorId,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,
                         Requestor_By = x.First().RequestorBy,
                         Requestor_Name = x.First().RequestorByUser.Fullname,
+                        UserId = x.Key.UserId,
+                        Issue_Handler = x.Key.IssueHandler,
                         UnitId = x.First().User.UnitId,
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnitId = x.First().User.SubUnitId,
@@ -173,8 +180,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             TicketConcernId = x.Id,
                             RequestConcernId = x.RequestConcernId,
-                            UserId = x.UserId,
-                            Issue_Handler = x.User.Fullname,
                             Concern_Description = x.ConcernDetails,
 
                             Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket

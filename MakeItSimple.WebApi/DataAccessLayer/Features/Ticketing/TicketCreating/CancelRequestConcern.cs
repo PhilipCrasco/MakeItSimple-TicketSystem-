@@ -24,7 +24,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             }
 
         }
-
         public class Handler : IRequestHandler<CancelRequestConcernCommand, Result>
         {
             private readonly MisDbContext _context;
@@ -65,7 +64,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             cancelAttachment.IsActive = false;
                         }
-
                     }
                     else
                     {
@@ -83,8 +81,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             requestAttachment.IsActive = false;
                         }
                     }
-       
-
                 }
                 await _context.SaveChangesAsync(cancellationToken);  
                 return Result.Success();

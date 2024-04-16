@@ -50,10 +50,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-
                     var requestTicketId = await _context.ApproverTicketings
                     .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null).ToListAsync();
-
 
                     var userExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId
                     && x.UserId == ticketConcern.IssueHandler && x.IsApprove != true);
@@ -68,7 +66,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var ticketConcernHandlerExist = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId 
                     && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
-
 
                     var requestTicketConcernId = await _context.ApproverTicketings
                      .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null && x.IssueHandler == userExist.UserId).ToListAsync();
@@ -99,7 +96,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             else
                             {
                                 concernTicket.TicketApprover = null;
-                                concernTicket.ConcernDetails = $"{TicketingConString.RequestApproval} Receiver";
+                                concernTicket.ConcernStatus = $"{TicketingConString.RequestApproval} Receiver";
                             }
 
                         }
@@ -107,7 +104,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                     else
                     {
-
                         var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernExist.First().RequestorByUser.BusinessUnitId);
                         var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                         if (receiverList == null)
@@ -140,17 +136,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                          request.ConcernStatus = TicketingConString.CurrentlyFixing;
                                     }
                                 }
-
                             }
-
                         }
                         else
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
-
                     }
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

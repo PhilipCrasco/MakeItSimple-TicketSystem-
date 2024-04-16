@@ -14,6 +14,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User ModifiedByUser { get; set; }
         public string Attachment { get; set; }
 
+        public string FileName { get; set; }
+
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
 

@@ -99,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                                 concernTicketById.IsReTicket = true;
                                 concernTicketById.ReticketAt = DateTime.Now;
                                 concernTicketById.ReticketBy = command.Re_Ticket_By;
-                                concernTicketById.Remarks = TicketingConString.ReTicket;
+                                //concernTicketById.Remarks = TicketingConString.ReTicket;
 
                                 var addNewTicketConcern = new TicketConcern
                                 {

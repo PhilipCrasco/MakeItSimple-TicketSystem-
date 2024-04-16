@@ -1324,6 +1324,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("FileName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("file_name");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");

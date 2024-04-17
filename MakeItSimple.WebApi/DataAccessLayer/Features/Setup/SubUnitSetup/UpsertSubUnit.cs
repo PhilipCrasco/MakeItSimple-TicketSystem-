@@ -1,9 +1,9 @@
-﻿using MakeItSimple.WebApi.Common;
-using MakeItSimple.WebApi.DataAccessLayer.Data;
+﻿using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
+using MediatR;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
@@ -12,20 +12,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
     {
         public class UpsertSubUnitCommand : IRequest<Result>
         {
+
             public int? SubUnitId { get; set; }
-            public int ? UnitId { get; set; }
+            public int? UnitId { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
-            public Guid ? Added_By { get; set; }
-            public Guid ? Modified_By { get; set; }
+            public Guid? Added_By { get; set; }
+            public Guid? Modified_By { get; set; }
 
             public List<Location> Locations { get; set; }
 
             public class Location
             {
 
-               public string  Location_Code { get; set; }
-               public string Location_Name { get; set; }
+                public string Location_Code { get; set; }
+                public string Location_Name { get; set; }
             }
 
         }
@@ -42,10 +43,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
             public async Task<Result> Handle(UpsertSubUnitCommand command, CancellationToken cancellationToken)
             {
-                var unitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+                var unitNotExist = await _context.Units.FirstOrDefaultAsync(x => x.Id == command.UnitId, cancellationToken);
                 if (unitNotExist == null)
                 {
-                    return Result.Failure(SubUnitError.SubUnitNotExist());
+                    return Result.Failure(SubUnitError.UnitNotExist());
                 }
 
 
@@ -71,25 +72,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
                     bool hasChange = false;
 
-                    if(subUnitExist.UnitId != command.UnitId)
+                    if (subUnitExist.UnitId != command.UnitId)
                     {
                         subUnitExist.UnitId = command.UnitId;
                         hasChange = true;
                     }
 
-                    if(subUnitExist.SubUnitCode != command.SubUnit_Code)
+                    if (subUnitExist.SubUnitCode != command.SubUnit_Code)
                     {
                         subUnitExist.SubUnitCode = command.SubUnit_Code;
                         hasChange = true;
                     }
 
-                    if(subUnitExist.SubUnitName != command.SubUnit_Name)
+                    if (subUnitExist.SubUnitName != command.SubUnit_Name)
                     {
                         subUnitExist.SubUnitName = command.SubUnit_Name;
                         hasChange = true;
                     }
 
-                    if(hasChange)
+                    if (hasChange)
                     {
                         subUnitExist.ModifiedBy = command.Modified_By;
                         subUnitExist.UpdatedAt = DateTime.Now;
@@ -124,9 +125,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                     };
 
                     await _context.SubUnits.AddAsync(addSubUnit);
-                    await _context.SaveChangesAsync(cancellationToken);  
-                    
-                    foreach(var location in command.Locations)
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    foreach (var location in command.Locations)
                     {
                         var locationExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == location.Location_Code, cancellationToken);
                         if (locationExist == null)
@@ -136,6 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
                         var addLocation = new Location
                         {
+                            LocationNo = locationExist.LocationNo,
                             LocationCode = locationExist.LocationCode,
                             LocationName = locationExist.LocationName,
                             SubUnitId = addSubUnit.Id,

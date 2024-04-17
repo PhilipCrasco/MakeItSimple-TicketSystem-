@@ -69,7 +69,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
                     return Result.Failure(UserError.UserPasswordShouldChange());
                 }
 
-
                 user.Password = BCrypt.Net.BCrypt.HashPassword(command.New_Password);
                 user.IsPasswordChange = true;
 

@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket.AddNewTransferTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
@@ -18,13 +19,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid ? Transfer_By { get; set; }
             public int ChannelId { get; set; }
             public string TransferRemarks { get; set; }
-
             public List<AddTransferTicket> AddTransferTickets { get; set; }
 
             public class AddTransferTicket
             {
                 public int ? TicketConcernId { get; set; }
                 public Guid? UserId { get; set; }
+                public DateTime ? Start_Date { get; set; }
+                public DateTime ? Target_Date { get; set; }
             }
         }
 
@@ -59,9 +61,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TransferTicketError.DuplicateConcernTicket());
                     }
 
-                    switch (await _context.Users.FirstOrDefaultAsync(x => x.Id == transferConcern.UserId, cancellationToken))
+
+                    var userExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == transferConcern.UserId, cancellationToken);
+
+                    if(userExist is null)
                     {
-                        case null:
                             return Result.Failure(TransferTicketError.UserNotExist());
                     }
 
@@ -82,7 +86,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());  
                         }
 
-                        var getApproverUser = await _context.Approvers.Where(x => x.ChannelId == ticketConcern.ChannelId).ToListAsync();
+                        var getApproverUser = await _context.Approvers.Include(x => x.User).Where(x => x.SubUnitId == userExist.SubUnitId).ToListAsync();
                         
                         var getApproverUserId = getApproverUser.First(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
@@ -99,13 +103,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             TargetDate = ticketConcern.TargetDate,
                             IsTransfer = false,
                             TicketApprover = getApproverUserId.UserId
-                            
+
                         };
 
-                        ticketConcern.IsTransfer = false;
-                        transferList.Add(ticketConcern);
+                        ticketConcern.IsTransfer = false; 
 
+                        var ticketConcernApproverExist = await _context.TransferTicketConcerns
+                            .FirstOrDefaultAsync(x => x.TicketConcernId == transferConcern.TicketConcernId);
+                        {
+
+                        }
+
+                        transferList.Add(ticketConcern);
                         await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
+
                         await _context.SaveChangesAsync(cancellationToken);
 
                     }
@@ -114,11 +125,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                     }
 
-
                 }
 
-                var getApprover = await _context.Approvers
-                    .Where(x => x.ChannelId == transferList.First().ChannelId).ToListAsync();
+                var getApprover = await _context.Approvers.Include(x => x.User)
+                    .Where(x => x.SubUnitId == transferList.First().User.SubUnitId).ToListAsync();
 
 
                 if (getApprover == null)
@@ -131,7 +141,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var addNewApprover = new ApproverTicketing
                     {
                         TicketGeneratorId = ticketGenerator.Id,
-                        //ChannelId = approver.ChannelId,
+                        SubUnitId = approver.SubUnitId,
                         UserId = approver.UserId,
                         ApproverLevel = approver.ApproverLevel,
                         AddedBy = command.Added_By,
@@ -141,16 +151,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     };
 
                     await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
-
                 }
 
                 var addTicketHistory = new TicketHistory
                 {
+                    
                    TicketGeneratorId = ticketGenerator.Id,
                    RequestorBy = command.Requestor_By,
                    TransactionDate = DateTime.Now,
                    Request = TicketingConString.Transfer,
                    Status = TicketingConString.RequestCreated
+
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
@@ -162,3 +173,4 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
     }
 }
+ 

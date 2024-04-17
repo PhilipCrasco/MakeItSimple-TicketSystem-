@@ -47,7 +47,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         }
 
 
-                    if(transferTicket.CancelTransferTicketByIds.Count <= 0)
+                    if(transferTicket.CancelTransferTicketByIds.Count(x => x.TransferTicketConcernId != null) <= 0)
                     {
                         foreach (var transferList in transferTicketQuery)
                         {

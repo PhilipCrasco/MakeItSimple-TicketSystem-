@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Guid? Requestor_By { get; set; }
             public string Role { get; set; }
 
+            public string Remarks { get; set; }
+
             public List<UpsertClosingTicketConcern> UpsertClosingTicketConcerns {  get; set; }
             public class UpsertClosingTicketConcern
             {
@@ -39,6 +41,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 {
                     var closeUpdateList = new List<bool>();
                     var closeNewList = new List<ClosingTicket>();
+                    var closeHistoryList = new List<ClosingTicket>();
 
                     var requestGeneratorIdInTransfer = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
                     var requestClosingList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
@@ -106,6 +109,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 closingTicketConcern.ClosedBy = null;
                             }
 
+                            if(closingTicketConcern.IsRejectClosed is true)
+                            {
+                                closingTicketConcern.Remarks = command.Remarks;
+                                closeHistoryList.Add(closingTicketConcern);
+                            }
+
                             closeUpdateList.Add(HasChange);
                         }
                         else if (ticketConcern != null && closingTicketConcern is null)
@@ -132,6 +141,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             };
 
+                            if (requestGeneratorIdInTransfer != null)
+                            {
+                                var rejectTicketConcern = await _context.ClosingTickets
+                                    .Where(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.Id && x.IsRejectClosed == true
+                                    && x.UserId == command.Added_By).ToListAsync();
+
+                                foreach (var reject in rejectTicketConcern)
+                                {
+                                    reject.Remarks = command.Remarks;
+
+                                    if (reject.IsRejectClosed is true)
+                                    {
+                                        closeHistoryList.Add(addClosingTicket);
+                                    }
+
+                                }
+
+                            }
+
                             ticketConcern.IsClosedApprove = false;
                             await _context.ClosingTickets.AddAsync(addClosingTicket, cancellationToken);
 
@@ -143,6 +171,34 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
+                    if(closeHistoryList.Count(x => x.IsRejectClosed is true) > 0)
+                    { 
+                       
+                        var closeTicketList = await _context.ClosingTickets
+                            .Where(x => x.TicketGeneratorId == closeHistoryList.First().Id 
+                            && x.IsRejectClosed == true && x.UserId == closeHistoryList.First().UserId).ToListAsync();
+
+                        foreach(var closeTicket in closeTicketList)
+                        {
+                            closeTicket.RejectRemarks = null;
+                            closeTicket.RejectClosedBy = null;
+                            closeTicket.IsRejectClosed = false;
+                            closeTicket.RejectClosedAt = null;
+                        }
+
+
+                        var addTicketHistory = new TicketHistory
+                        {
+                            TicketGeneratorId = closeHistoryList.First().TicketGeneratorId,
+                            RequestorBy = command.Requestor_By,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.CloseTicket,
+                            Status = TicketingConString.RequestUpdate
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                    }
 
                     await _context.SaveChangesAsync(cancellationToken);
                     return Result.Success();

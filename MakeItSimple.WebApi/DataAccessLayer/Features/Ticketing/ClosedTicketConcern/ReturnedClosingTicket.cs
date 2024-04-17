@@ -40,13 +40,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 {
 
                     var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
-
                     if (requestGeneratorExist == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
+
+                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     var closedList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
                    
@@ -67,7 +67,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             RequestorBy = command.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,
-                            Status = TicketingConString.RejectedBy
+                            Status = TicketingConString.Returned
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

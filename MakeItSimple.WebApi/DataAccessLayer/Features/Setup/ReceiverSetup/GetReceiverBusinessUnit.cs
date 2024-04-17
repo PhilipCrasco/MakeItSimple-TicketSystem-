@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                 var selectBusinessUnit = businessUnit.Select(x => x.BusinessUnitId);
 
                 var result = await _context.BusinessUnits
-                    .Where(x => x.IsActive == true  && !selectBusinessUnit.Contains(x.Id))
+                    .Where(x => x.IsActive == true  && !selectBusinessUnit.Contains(x.Id) && x.IsActive == true)
                     .Select(x => new GetReceiverBusinessUnitResult
                     {
                         BusinessUnitId = x.Id,

@@ -56,7 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         public class GetReTicketQuery : UserParams, IRequest<PagedList<GetReTicketResult>>
         {
             public Guid ? UserId { get; set; }
-            public string Approval { get; set; }
+            public string Approver { get; set; }
             public string Users { get; set; }
             public string Role { get; set; }
 
@@ -85,11 +85,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     .Include(x => x.RejectReTicketByUser)
                     .Include(x => x.ReTicketByUser);
 
-                
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    reTicketQuery = reTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                                    || x.User.EmpId.Contains(request.Search));
+                }
+
+                if (request.IsReject != null)
+                {
+                    reTicketQuery = reTicketQuery.Where(x => x.IsRejectReTicket == request.IsReject);
+                }
+
+                if (request.IsReTicket != null)
+                {
+                    reTicketQuery = reTicketQuery.Where(x => x.IsReTicket == request.IsReTicket);
+                }
+
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 var fillterApproval = reTicketQuery.Select(x => x.TicketGeneratorId);
 
-                if (TicketingConString.Approval == request.Approval)
+                if (TicketingConString.Approver == request.Approver)
                 {
 
                     if (request.UserId != null && TicketingConString.Approver == request.Role)
@@ -114,24 +129,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     reTicketQuery = reTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
                        
                 }
-
-                
-                if(!string.IsNullOrEmpty(request.Search))
-                {
-                    reTicketQuery = reTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                                    || x.User.EmpId.Contains(request.Search));
-                }
-
-                if(request.IsReject != null)
-                {
-                    reTicketQuery = reTicketQuery.Where(x => x.IsRejectReTicket  == request.IsReject);
-                }
-
-                if (request.IsReTicket != null)
-                {
-                    reTicketQuery = reTicketQuery.Where(x => x.IsReTicket == request.IsReTicket);
-                }
-
 
                 var results = reTicketQuery.GroupBy(x => x.TicketGeneratorId)
                     .Select(x => new GetReTicketResult

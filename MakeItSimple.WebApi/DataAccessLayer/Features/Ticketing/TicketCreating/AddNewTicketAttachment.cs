@@ -75,14 +75,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 var getTicketConcern = await _context.TicketConcerns
-                    .Include(x => x.User)
+                    .Include(x => x.RequestorByUser)
                     .ThenInclude(x => x.SubUnit)
-                    .Include(x => x.User)
-                    .ThenInclude(x => x.Department).Include(x => x.RequestGenerator)
+                    .Include(x => x.RequestorByUser)
+                    .ThenInclude(x => x.Department)
+                    .Include(x => x.RequestGenerator)
                     .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
 
-                var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
-                var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+            
 
 
                 var uploadTasks = new List<Task>();
@@ -96,6 +96,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
 
 
+                    var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                    var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+
                     var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketAttachmentId);
 
                     if (attachments.Attachment == null || attachments.Attachment.Length == 0)
@@ -108,7 +111,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.InvalidAttachmentSize());
                     }
 
-                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" };
+                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" ,".pdf" ,".xlsx" };
                     var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
 
                     if (extension == null || !allowedFileTypes.Contains(extension))
@@ -124,11 +127,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.User.Department.DepartmentName}/{getTicketConcern.User.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/{getTicketConcern.RequestorByUser.Department.DepartmentName}/{getTicketConcern.RequestorByUser.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-
 
                         if (ticketAttachment != null)
                         {
@@ -144,6 +146,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 ticketAttachment.ModifiedBy = command.Modified_By;
                                 ticketAttachment.UpdatedAt = DateTime.Now;
+                                ticketAttachment.FileName = attachments.Attachment.FileName;
+                                ticketAttachment.FileSize = attachments.Attachment.Length;
                                 attachmentList.Add(ticketAttachment);
 
                             }
@@ -160,6 +164,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 RequestGeneratorId = command.RequestGeneratorId,
                                 Attachment = attachmentResult.SecureUrl.ToString(),
+                                FileName = attachments.Attachment.FileName,
+                                FileSize = attachments.Attachment.Length,
                                 AddedBy = command.Added_By,
                             };
 
@@ -168,13 +174,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
+
+
                     }, cancellationToken));
 
-                }
-
-                foreach (var concern in ticketConcernList)
-                {
-                    concern.IsReject = false;
                 }
 
 

@@ -24,7 +24,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.ChannelNotExist", "Channel not exist!");
 
       public static Error UserNotExist() =>
-      new Error("TicketRequest.UserNotExist", "Member not exist!");
+      new Error("TicketRequest.UserNotExist", "user not exist!");
 
       public static Error CategoryNotExist() =>
       new Error("TicketRequest.CategoryNotExist", "Category not exist!");
@@ -40,7 +40,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
       public static Error AttachmentNotNull() =>
       new Error("TicketRequest.AttachmentNotNull", "Attachment must not be empty!");
-     
+
+      public static Error AttachmentNotExist() =>
+      new Error("TicketRequest.AttachmentNotExist", "Attachment not Exist!");
+
       public static Error AttachmentAlreadyExist() =>
       new Error("TicketRequest.AttachmentAlreadyExist", "Attachment already exist!");
 
@@ -50,5 +53,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error InvalidAttachmentType() =>
       new Error("TicketRequest.InvalidAttachmentType", "Invalid Attachment Type!");
 
+      public static Error ConcernWasInApproval() =>
+      new Error("TicketRequest.ConcernWasInApproval", "Concern is for approval!");
+
+      public static Error NotAutorizeToEdit() =>
+      new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to edit!");
+
+      public static Error NotAutorizeToDelete() =>
+      new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to delete!");
+
+      public static Error ProhibitedWord(string comment) =>
+      new Error("TicketRequest.ProhibitedWord", $"Warning Inappropriate word '{comment}'!");
+      public static Error TicketCommentNotExist() =>
+      new Error("TicketRequest.TicketCommentNotExist", "Comment not Exist!");
+
+     public static Error UnAuthorizedReceiver() =>
+     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized to approve concern!");
     }
 }

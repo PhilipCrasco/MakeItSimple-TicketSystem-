@@ -12,7 +12,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }
-        public int ChannelId { get; set; }
+        public int ? ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
 
         public int ? SubUnitId { get; set; }

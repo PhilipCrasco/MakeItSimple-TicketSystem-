@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
             public class CancelReTicketConcern
             {
-                public int RequestGeneratorId { get; set; }
+                public int TicketGeneratorId { get; set; }
 
                 public List<CancelReTicketById> CancelReTicketByIds { get; set; }
                 public class CancelReTicketById
@@ -40,7 +40,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                     foreach (var transferTicket in command.CancelReTicketConcerns)
                     {
-                        var reTicketQuery = await _context.ReTicketConcerns.Where(x => x.RequestGeneratorId == transferTicket.RequestGeneratorId).ToListAsync();
+                        var reTicketQuery = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == transferTicket.TicketGeneratorId).ToListAsync();
 
                         if (reTicketQuery == null)
                         {
@@ -48,7 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         }
 
 
-                        if (transferTicket.CancelReTicketByIds.Count <= 0)
+                        if (transferTicket.CancelReTicketByIds.Count(x => x.ReTicketConcernId != null) <= 0)
                         {
                             foreach (var reTicketList in reTicketQuery)
                             {
@@ -76,7 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             }
                             else
                             {
-                                return Result.Failure(ReTicketConcernError.ReTicketIdAlreadyExist());
+                                return Result.Failure(ReTicketConcernError.ReTicketIdNotExist());
                             }
 
                         }

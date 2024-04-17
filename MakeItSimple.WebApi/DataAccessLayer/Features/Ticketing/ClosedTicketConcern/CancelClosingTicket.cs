@@ -47,7 +47,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
+                    if (close.CancelClosingConcerns.Count(x => x.ClosingTicketId != null) <= 0)
+                    {
+                        foreach (var closingList in closingTicketQuery)
+                        {
+                            var closingTicketConcernRequest = await _context.TicketConcerns.Where(x => x.Id == closingList.TicketConcernId).ToListAsync();
 
+                            foreach (var reTicketConcern in closingTicketConcernRequest)
+                            {
+                                reTicketConcern.IsClosedApprove = null;
+                            }
+
+                            _context.Remove(closingList);
+                        }
+                    }
                   
                    
                     foreach (var closingId in close.CancelClosingConcerns)
@@ -58,22 +71,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             var reTicketConcernRequest = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == closingConcernId.TicketConcernId, cancellationToken);
 
                             reTicketConcernRequest.IsClosedApprove = null;
-
+                             
                             _context.Remove(closingConcernId);
                         }
                         else
                         {
-                            foreach (var closingList in closingTicketQuery)
-                            {
-                                var closingTicketConcernRequest = await _context.TicketConcerns.Where(x => x.Id == closingList.TicketConcernId).ToListAsync();
-
-                                foreach (var reTicketConcern in closingTicketConcernRequest)
-                                {
-                                    reTicketConcern.IsClosedApprove = null;
-                                }
-
-                                _context.Remove(closingList);
-                            }
+                          return Result.Failure(ClosingTicketError.ClosingTicketIdNotExist());
                         }
 
                     }

@@ -20,6 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
             public string SubUnit_Name { get; set; }
             
             public int ? UnitId { get; set; }
+            public string Unit_Code { get; set; }
             public string Unit_Name {  get; set; }
 
             //public int Num_Of_Team { get; set; }
@@ -93,13 +94,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
                     SubUnit_Code = x.SubUnitCode,
                     SubUnit_Name = x.SubUnitName,
                     UnitId = x.UnitId,
+                    Unit_Code = x.Unit.UnitCode,
                     Unit_Name = x.Unit.UnitName,
                     Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     Updated_At = x.UpdatedAt,
-                    
                     SyncDate = x.SyncDate,
                     SyncStatus = x.SyncStatus,
 

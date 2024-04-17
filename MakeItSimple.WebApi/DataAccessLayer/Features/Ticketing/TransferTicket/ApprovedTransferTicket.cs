@@ -145,11 +145,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
                         }
 
-
-
                     }
 
-       
                  }
 
                 await _context.SaveChangesAsync(cancellationToken);

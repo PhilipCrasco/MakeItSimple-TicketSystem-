@@ -38,7 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
                 var users = await _context.Users.Include(x => x.UserRole)
                     .Where(x => x.UserRole.UserRoleName == TicketingConString.Receiver)
-                    .Where(x => !selectReceiver.Contains(x.Id))
+                    .Where(x => !selectReceiver.Contains(x.Id) && x.IsActive == true)
                     .Select(x => new GetReceiverRoleResult
                     {
                         UserId = x.Id,

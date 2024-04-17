@@ -844,7 +844,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("approver_level");
 
-                    b.Property<int>("ChannelId")
+                    b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
@@ -1324,6 +1324,14 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("FileName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("file_name");
+
+                    b.Property<decimal?>("FileSize")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("file_size");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
@@ -1353,6 +1361,91 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasDatabaseName("ix_ticket_attachments_request_generator_id");
 
                     b.ToTable("ticket_attachments", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("longtext")
+                        .HasColumnName("comment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsClicked")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_clicked");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int?>("RequestGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_generator_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_comments");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_comments_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_comments_modified_by");
+
+                    b.HasIndex("RequestGeneratorId")
+                        .HasDatabaseName("ix_ticket_comments_request_generator_id");
+
+                    b.ToTable("ticket_comments", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<bool?>("IsClicked")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_clicked");
+
+                    b.Property<int?>("TicketCommentId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_comment_id");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_comment_views");
+
+                    b.HasIndex("TicketCommentId")
+                        .HasDatabaseName("ix_ticket_comment_views_ticket_comment_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_ticket_comment_views_user_id");
+
+                    b.ToTable("ticket_comment_views", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
@@ -2332,8 +2425,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_approver_ticketings_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
@@ -2606,6 +2697,49 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RequestGenerator");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_comments_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_comments_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                        .WithMany("TicketComments")
+                        .HasForeignKey("RequestGeneratorId")
+                        .HasConstraintName("fk_ticket_comments_request_generators_request_generator_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("RequestGenerator");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketComment", "TicketComment")
+                        .WithMany()
+                        .HasForeignKey("TicketCommentId")
+                        .HasConstraintName("fk_ticket_comment_views_ticket_comments_ticket_comment_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_ticket_comment_views_users_user_id");
+
+                    b.Navigation("TicketComment");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
@@ -2974,6 +3108,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ReTicketConcerns");
 
                     b.Navigation("TicketAttachments");
+
+                    b.Navigation("TicketComments");
 
                     b.Navigation("TicketConcerns");
 

@@ -18,6 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public class ReturnTicketRequestById
             {
                 public int? RequestGeneratorId { get; set; }
+                public Guid ? Issue_Handler {  get; set; }
             }
 
         }
@@ -42,7 +43,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-                    var ticketConcernExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId).ToListAsync();
+                    var issueHandlerExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
+                    && x.UserId == ticketConcern.Issue_Handler).FirstOrDefaultAsync();
+
+                    if (issueHandlerExist == null)
+                    {
+                        return Result.Failure(TicketRequestError.UserNotExist());   
+                    }
+
+                    var ticketConcernExist = await _context.TicketConcerns
+                        .Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId && x.UserId == ticketConcern.Issue_Handler).ToListAsync();
 
                     foreach (var concerns in ticketConcernExist)
                     {

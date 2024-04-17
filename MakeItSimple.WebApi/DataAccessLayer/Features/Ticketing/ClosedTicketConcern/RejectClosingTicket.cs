@@ -16,12 +16,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Guid? Requestor_By { get; set; }
             public Guid? Approver_By { get; set; }
             public string Role { get; set; }
+            public string Reject_Remarks { get; set; }
 
             public ICollection<RejectClosedTicketConcern> RejectClosedTicketConcerns { get; set; }
             public class RejectClosedTicketConcern
             {
                 public int TicketGeneratorId { get; set; }
-                public string Reject_Remarks { get; set; }
+
             }
         }
 
@@ -63,7 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         perTicketId.IsRejectClosed = true;
                         perTicketId.RejectClosedBy = command.RejectClosed_By;
                         perTicketId.TicketApprover = approverLevelValidation.UserId;
-                        perTicketId.RejectRemarks = close.Reject_Remarks;
+                        perTicketId.RejectRemarks = command.Reject_Remarks;
                     }
 
                     if (ticketHistoryId.Status != TicketingConString.RejectedBy)

@@ -97,7 +97,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TicketApprover { get; set; }
 
 
-
+        //public ICollection<TicketComment> TicketComments { get; set; }
 
     }
 }

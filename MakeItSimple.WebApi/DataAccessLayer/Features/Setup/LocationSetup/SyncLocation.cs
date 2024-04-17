@@ -160,23 +160,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                     AllInputSync.Add(location);
                 }
 
-                var allInputByNo = AllInputSync.Select(x => x.Location_No);
+                //var allInputByNo = AllInputSync.Select(x => x.Location_No);
 
-                var allDataInput = await _context.Locations.Where(x => !allInputByNo.Contains(x.LocationNo)).ToListAsync();
+                //var allDataInput = await _context.Locations.Where(x => !allInputByNo.Contains(x.LocationNo)).ToListAsync();
 
-                foreach (var location in allDataInput)
-                {
-                    //_context.Remove(department);
-                    location.IsActive = false;
+                //foreach (var location in allDataInput)
+                //{
+                //    //_context.Remove(department);
+                //    location.IsActive = false;
                     
-                    var subUnitlist = await _context.SubUnits.Where(x => x.Id == location.SubUnitId).ToListAsync();
+                //    var subUnitlist = await _context.SubUnits.Where(x => x.Id == location.SubUnitId).ToListAsync();
 
-                    foreach(var subUnit in subUnitlist)
-                    {
-                        subUnit.IsActive = false;
-                    }
+                //    foreach(var subUnit in subUnitlist)
+                //    {
+                //        subUnit.IsActive = false;
+                //    }
 
-                }
+                //}
 
                 var resultList = new
                 {

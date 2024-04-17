@@ -19,6 +19,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 public int TicketAttachmentId { get; set; }
                 public string Attachment { get; set; }
+                public string FileName { get; set; }
+
+                public decimal ? FileSize {  get; set; }
 
                 public string Added_By { get; set; }
                 public DateTime Created_At { get; set; }
@@ -34,6 +37,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestAttachmentQuery : IRequest<Result>
         {
             public int? Id { get; set; }
+            public bool ? Status { get; set; }
         }
 
         public class Handler : IRequestHandler<GetRequestAttachmentQuery, Result>
@@ -58,6 +62,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     requestGeneratorQuery = requestGeneratorQuery.Where(x => x.Id == request.Id);
                 }
 
+                if(request.Status != null)
+                {
+                    requestGeneratorQuery = requestGeneratorQuery.Where(x => x.IsActive == request.Status);
+                }
+
 
                 var results = await requestGeneratorQuery.Select(x => new GetRequestAttachmentResult
                 {
@@ -66,6 +75,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         TicketAttachmentId = x.Id,
                         Attachment = x.Attachment,
+                        FileName = x.FileName,
+                        FileSize = x.FileSize,
                         Added_By = x.AddedByUser.Fullname,
                         Created_At = x.CreatedAt,
                         Modified_By = x.ModifiedByUser.Fullname,

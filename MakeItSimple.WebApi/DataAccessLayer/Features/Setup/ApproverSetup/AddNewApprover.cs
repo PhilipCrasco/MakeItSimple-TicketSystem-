@@ -68,10 +68,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                         return Result.Failure(ApproverError.UserNotExist());
                     }
 
-                    if (command.Approvers.Count(x => x.ApproverLevel == approver.ApproverLevel) > 1)
-                    {
-                        return Result.Failure(ApproverError.ApproverLevelDuplicate());
-                    }
+                    //if (command.Approvers.Count(x => x.ApproverLevel == approver.ApproverLevel) > 1)
+                    //{
+                    //    return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                    //}
 
                     var approverExist = await _context.Approvers.FirstOrDefaultAsync(x => x.Id == approver.ApproverId, cancellationToken);
                     if (approverExist != null)
@@ -84,12 +84,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                             return Result.Failure(ApproverError.UserAlreadyExist());
                         }
 
-                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId 
-                        && x.ApproverLevel == approver.ApproverLevel && approverExist.ApproverLevel != approver.ApproverLevel, cancellationToken);
-                        if(approverLevelDuplicate != null)
-                        {
-                            return Result.Failure(ApproverError.ApproverLevelDuplicate());
-                        }
+                        //var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId 
+                        //&& x.ApproverLevel == approver.ApproverLevel && approverExist.ApproverLevel != approver.ApproverLevel, cancellationToken);
+                        //if(approverLevelDuplicate != null)
+                        //{
+                        //    return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                        //}
 
                         bool hasChange = false;
 
@@ -131,11 +131,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                             return Result.Failure(ApproverError.UserAlreadyExist());
                         }
 
-                        var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId && x.ApproverLevel == approver.ApproverLevel, cancellationToken);
-                        if(approverLevelDuplicate != null)
-                        {
-                            return Result.Failure(ApproverError.ApproverLevelDuplicate());
-                        }
+                        //var approverLevelDuplicate = await _context.Approvers.FirstOrDefaultAsync(x => x.SubUnitId == command.SubUnitId && x.ApproverLevel == approver.ApproverLevel, cancellationToken);
+                        //if(approverLevelDuplicate != null)
+                        //{
+                        //    return Result.Failure(ApproverError.ApproverLevelDuplicate());
+                        //}
                         
 
                         var addApprover = new Approver

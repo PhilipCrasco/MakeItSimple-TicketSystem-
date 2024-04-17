@@ -6,11 +6,13 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnedClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.ApproveReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.CancelReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.RejectReTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.ReturnedReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.UpsertReTicket;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -212,6 +214,34 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("returned")]
+        public async Task<IActionResult> ReturnedReTicket([FromBody] ReturnedReTicketCommand command)
+        {
+            try
+            {
+
+                if (User.Identity is ClaimsIdentity identity)
+                {
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.UserId = userId;
+                    }
+                }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

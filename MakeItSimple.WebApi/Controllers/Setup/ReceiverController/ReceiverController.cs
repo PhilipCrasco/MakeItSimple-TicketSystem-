@@ -31,7 +31,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
         }
 
         [HttpGet("receiver-list")]
-        public async Task<IActionResult> GetReceiverRole(GetReceiverRoleQuery query)
+        public async Task<IActionResult> GetReceiverRole([FromQuery]GetReceiverRoleQuery query)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
         }
 
         [HttpGet("receiver-business-unit")]
-        public async Task<IActionResult> GetReceiverBusinessUnit(GetReceiverBusinessUnitQuery query)
+        public async Task<IActionResult> GetReceiverBusinessUnit([FromQuery]GetReceiverBusinessUnitQuery query)
         {
             try
             {
@@ -130,6 +130,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.ReceiverController
                     receiver.TotalCount,
                     receiver.TotalPages,
                     receiver.HasPreviousPage,
+
                     receiver.HasNextPage
                 };
 

@@ -1,10 +1,14 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MakeItSimple.WebApi.Common.Cloudinary;
+using Microsoft.Extensions.Options;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -20,6 +24,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
 
+            public string Remarks { get; set; }
+
             public List<AddDevelopingTicketByConcern> AddDevelopingTicketByConcerns { get; set; }
             public class AddDevelopingTicketByConcern
             {
@@ -30,16 +36,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime Start_Date { get; set; }
                 public DateTime Target_Date { get; set; }
             }
+
+            public List<ManualAttachment> ManualAttachments { get; set; }
+            public class ManualAttachment 
+            {
+                public int? TicketAttachmentId { get; set; }
+                public IFormFile Attachment { get; set; }
+            }
+
+
         }
 
 
         public class Handler : IRequestHandler<AddDevelopingTicketCommand, Result>
         {
             private readonly MisDbContext _context;
+            private readonly Cloudinary _cloudinary;
 
-            public Handler(MisDbContext context)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
             {
                 _context = context;
+                var account = new Account(
+                    options.Value.Cloudname,
+                    options.Value.ApiKey,
+                    options.Value.ApiSecret
+                    );
+                _cloudinary = new Cloudinary(account);
             }
 
             public async Task<Result> Handle(AddDevelopingTicketCommand command, CancellationToken cancellationToken)
@@ -56,13 +78,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     var requestGeneratorId = new RequestGenerator { IsActive = true };
                     await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    requestGeneratorList.Add(requestGeneratorId);
+                    requestGeneratorexist = requestGeneratorId;
 
                 }
 
-                var requestTicketConcernList = await _context.TicketConcerns.Include(x => x.RequestorByUser).ThenInclude(x => x.UserRole)
-                    .Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                requestGeneratorList.Add(requestGeneratorexist);
+
+                var requestTicketConcernList = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .ThenInclude(x => x.UserRole)
+                    .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
 
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -77,8 +103,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                foreach(var concerns in command.AddDevelopingTicketByConcerns)
+                if (command.Role == TicketingConString.IssueHandler)
                 {
+                    var approverUserList = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
+
+                    var approverUserValidation = approverUserList
+                        .FirstOrDefault(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By
+                        && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
+
+
+                    if (approverUserValidation != null)
+                    {
+
+                        var ticketConcernListApprover = await _context.TicketConcerns.Where(x => x.RequestGeneratorId
+                        == command.RequestGeneratorId && x.UserId == command.Added_By).ToListAsync();
+
+                        var receiverValidation = ticketConcernListApprover 
+                            .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
+                            && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
+                            .FirstOrDefault();
+
+                        if (receiverValidation != null)
+                        {
+                            return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                        }
+
+                    }
+                }
+
+                foreach (var concerns in command.AddDevelopingTicketByConcerns)
+                {
+
 
                     switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == concerns.CategoryId))
                     {
@@ -111,7 +167,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
 
-                    var upsertConcern = requestTicketConcernList.FirstOrDefault(x => x.Id == concerns.TicketConcernId);
+                    var upsertConcern = requestTicketConcernList
+                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId && x.UserId == command.IssueHandler);
+
                     if(upsertConcern != null)
                     {
 
@@ -170,10 +228,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (hasChanged)
                         {
-                            upsertConcern.IsReject = false;
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
-                            upsertConcern.TicketType = TicketingConString.Concern;
+                            upsertConcern.TicketType = TicketingConString.Manual;
+                        }
+
+                        if (upsertConcern.IsReject is true)
+                        {
+                            upsertConcern.IsReject = false;
+                            upsertConcern.Remarks = command.Remarks;
                         }
 
                     }
@@ -201,15 +264,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             CreatedAt = DateTime.Now,
                             StartDate = concerns.Start_Date,
                             TargetDate = concerns.Target_Date,
-                            IsApprove = false
+                            IsApprove = false,
+
 
                         };
 
-                        var userList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
-                        var addedList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
+                        var userList = await _context.Users.Include(x => x.UserRole)
+                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
+
+                        var addedList = await _context.Users.Include(x => x.UserRole)
+                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
 
 
-                        addnewTicketConcern.TicketType = TicketingConString.Developing;
+                        addnewTicketConcern.TicketType = TicketingConString.Manual;
 
                         if (addedList.UserRole.UserRoleName == TicketingConString.IssueHandler)
                         {
@@ -225,8 +292,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (command.Role == TicketingConString.IssueHandler)
                         {
-                            addnewTicketConcern.IsReject = false;
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
+                        }
+
+                        if (requestGeneratorexist != null)
+                        {
+                            var rejectTicketConcern = await _context.TicketConcerns
+                                .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IsReject == true
+                                && x.UserId == command.Added_By).ToListAsync();
+
+                            foreach (var reject in rejectTicketConcern)
+                            {
+                                reject.IsReject = false;
+                                reject.Remarks = command.Remarks;
+                            }
+
                         }
 
                         await _context.TicketConcerns.AddAsync(addnewTicketConcern);
@@ -235,8 +315,92 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
+                var uploadTasks = new List<Task>();
 
-                if (ticketConcernList.Count() < 0)
+                if (command.ManualAttachments.Count(x => x.Attachment != null) > 0)
+                {
+                    foreach (var attachments in command.ManualAttachments.Where(attachments => attachments.Attachment.Length > 0))
+                    {
+
+                        //var ticketAttachmentList = await _context.TicketAttachments.Include(x => x.RequestGenerator)
+                        //.Where(x => x.RequestGeneratorId == requestGeneratorList.First().Id).ToListAsync();
+
+                        var ticketAttachment = await _context.TicketAttachments.FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
+                        {
+                            return Result.Failure(TicketRequestError.AttachmentNotNull());
+                        }
+
+                        if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                        }
+
+                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                        if (extension == null || !allowedFileTypes.Contains(extension))
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                        }
+
+                        //var userAttachment = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+
+                        uploadTasks.Add(Task.Run(async () =>
+                        {
+                            await using var stream = attachments.Attachment.OpenReadStream();
+
+                            var attachmentsParams = new RawUploadParams
+                            {
+                                File = new FileDescription(attachments.Attachment.FileName, stream),
+                                PublicId = $"MakeITSimple/Ticketing/Request/{requestGeneratorexist.Id}/{attachments.Attachment.FileName}"
+                            };
+
+                            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+
+                            if (ticketAttachment != null)
+                            {
+                                var hasChanged = false;
+
+                                if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
+                                {
+                                    ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
+                                    hasChanged = true;
+                                }
+
+                                if (hasChanged)
+                                {
+                                    ticketAttachment.ModifiedBy = command.Modified_By;
+                                    ticketAttachment.FileName = attachments.Attachment.FileName;
+                                    ticketAttachment.FileSize = attachments.Attachment.Length;
+                                    ticketAttachment.UpdatedAt = DateTime.Now;
+                                }
+
+                            }
+                            else
+                            {
+                                var addAttachment = new TicketAttachment
+                                {
+                                    RequestGeneratorId = requestGeneratorList.First().Id,
+                                    Attachment = attachmentResult.SecureUrl.ToString(),
+                                    FileName = attachments.Attachment.FileName,
+                                    FileSize = attachments.Attachment.Length,
+                                    AddedBy = command.Added_By,
+                                };
+
+                                await _context.AddAsync(addAttachment, cancellationToken);
+
+                            }
+
+                        }, cancellationToken));
+
+                    }
+                }
+
+                await Task.WhenAll(uploadTasks);
+
+                if (ticketConcernList.Count() > 0)
                 {
 
                     var getApprover = await _context.Approvers.Include(x => x.User)
@@ -247,21 +411,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TransferTicketError.NoApproverExist());
                     }
 
-                    foreach (var approver in getApprover)
-                    {
-                        var addNewApprover = new ApproverTicketing
-                        {
-                            RequestGeneratorId = requestGeneratorList.First().Id,
-                            //ChannelId = approver.ChannelId,
-                            SubUnitId = approver.SubUnitId,
-                            UserId = approver.UserId,
-                            ApproverLevel = approver.ApproverLevel,
-                            AddedBy = command.Added_By,
-                            CreatedAt = DateTime.Now,
-                            Status = TicketingConString.RequestTicket,
-                        };
+                    var approverValidation = await _context.ApproverTicketings
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
+                        && x.IssueHandler == command.Added_By && x.IsApprove == null)
+                        .FirstOrDefaultAsync();
 
-                        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                    if (approverValidation == null)
+                    {
+                        foreach (var approver in getApprover)
+                        {
+                            var addNewApprover = new ApproverTicketing
+                            {
+                                RequestGeneratorId = requestGeneratorexist.Id,
+                                //ChannelId = approver.ChannelId,
+                                SubUnitId = approver.SubUnitId,
+                                UserId = approver.UserId,
+                                ApproverLevel = approver.ApproverLevel,
+                                AddedBy = command.Added_By,
+                                CreatedAt = DateTime.Now,
+                                Status = TicketingConString.RequestTicket,
+                            };
+
+
+                            foreach (var issueHandler in ticketConcernList)
+                            {
+                                addNewApprover.IssueHandler = issueHandler.UserId;
+                            }
+
+                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                        }
                     }
 
                 }

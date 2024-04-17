@@ -20,13 +20,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string EmpId { get; set; }
 
             public string FullName { get; set; }
+            public string Concern { get; set; }
 
-            public List<RequestConcern> RequestConcerns { get; set; }
-
-            public class RequestConcern
-            {
                 public int? RequestConcernId { get; set; }
-                public string Concern { get; set; }
+
                 public string Concern_Status { get; set; }
                 public bool ? Is_Done { get; set; }
                 public string Remarks { get; set; }
@@ -34,8 +31,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
                 public DateTime ? updated_At { get; set; }
-
-            }
 
         }
 
@@ -47,8 +42,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Concern_Status { get; set ; } 
             public string Search { get; set; }
             public bool ? Status { get; set; }
-
-
         }
 
         public class Handler : IRequestHandler<GetRequestorTicketConcernQuery, PagedList<GetRequestorTicketConcernResult>>
@@ -65,7 +58,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns.Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser);
-
 
                 if (request.Status != null)
                 {
@@ -104,27 +96,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                 }
-                
-                var results = requestConcernsQuery.GroupBy(x => x.RequestGeneratorId).Select(x => new GetRequestorTicketConcernResult
+ 
+                var results = requestConcernsQuery.Select(x => new GetRequestorTicketConcernResult
                 {
-                    RequestGeneratorId = x.Key,
-                    UserId = x.First().UserId,
-                    EmpId = x.First().User.EmpId,
-                    FullName = x.First().User.Fullname,
-                    RequestConcerns = x.Select(x => new GetRequestorTicketConcernResult.RequestConcern
-                    {
-                        RequestConcernId = x.Id,
-                        Concern = x.Concern,
-                        Concern_Status = x.ConcernStatus,
-                        Is_Done = x.IsDone,
-                        Remarks = x.Remarks,
-                        Added_By = x.AddedByUser.Fullname,
-                        Created_At = x.CreatedAt,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        updated_At = x.UpdatedAt
+                    RequestGeneratorId = x.RequestGeneratorId,
+                    UserId = x.UserId,
+                    EmpId = x.User.EmpId,
+                    FullName = x.User.Fullname,
+                    Concern = x.Concern,
+                    RequestConcernId = x.Id,
+                    Concern_Status = x.ConcernStatus,
+                    Is_Done = x.IsDone,
+                    Remarks = x.Remarks,
+                    Added_By = x.AddedByUser.Fullname,
+                    Created_At = x.CreatedAt,
+                    Modified_By = x.ModifiedByUser.Fullname,
+                    updated_At = x.UpdatedAt
 
-                    }).ToList()
-                    
                 });
 
                 return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results , request.PageNumber , request.PageSize);

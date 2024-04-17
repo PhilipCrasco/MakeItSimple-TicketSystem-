@@ -40,8 +40,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var ticketGeneratorId = new TicketGenerator { IsActive = true };
 
                     await _context.TicketGenerators.AddAsync(ticketGeneratorId, cancellationToken);
-                    await _context.SaveChangesAsync(cancellationToken);
-
 
                     foreach (var close in command.AddClosingTicketConcerns)
                     {
@@ -62,7 +60,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         var approverByUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == ticketConcernExist.UserId, cancellationToken);
                         var approverList = await _context.Approvers.Where(x => x.SubUnitId == approverByUser.SubUnitId).ToListAsync();
+                        if(approverList.Count() < 0)
+                        {
+                            return Result.Failure(ClosingTicketError.NoApproverHasSetup());
+                        }
+
                         var approverUser = approverList.First(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
+
+                        await _context.SaveChangesAsync(cancellationToken);
 
                         var addNewClosingConcern = new ClosingTicket
                         {

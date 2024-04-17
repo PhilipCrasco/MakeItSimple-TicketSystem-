@@ -3,8 +3,8 @@
     public class TicketingConString
     {
 
-        public const string Approval = "Approval";
-        public const string OnGoing = "OnGoing";
+        public const string Approval = "For Approval";
+        public const string OnGoing = "Ongoing";
         public const string Done = "Done";
 
 
@@ -38,14 +38,20 @@
 
         // Concern Status 
 
-        public const string ForApprovalTicket = "For Concern Approval";
-        public const string CurrentlyFixing = "Currently Fixing Issue";
-
+        public const string ForApprovalTicket = "For Approval";
+        public const string CurrentlyFixing = "Ongoing";
         public const string ConcernStatus = "ConcernStatus";
 
-
         public const string Concern = "Concern";
-        public const string Developing = "Developing";
+        public const string Manual = "Manual";
         public const string RequestTicket = "Request Ticket";
+
+        public const string ForReticket = "For Re-Ticket";
+        public const string ForClosing = "For Closing Ticket";
+        public const string ForTransfer = "For Transfer Ticket";
+        public const string OpenTicket = "Open Ticket";
+
+        public const string RequestApproval = "For approval by ";
+
     }
 }

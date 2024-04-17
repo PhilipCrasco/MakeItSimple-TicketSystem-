@@ -111,7 +111,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.InvalidAttachmentSize());
                     }
 
-                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" };
+                    var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" ,".pdf" ,".xlsx" };
                     var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
 
                     if (extension == null || !allowedFileTypes.Contains(extension))
@@ -132,7 +132,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
 
-
                         if (ticketAttachment != null)
                         {
                             var hasChanged = false;
@@ -147,6 +146,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 ticketAttachment.ModifiedBy = command.Modified_By;
                                 ticketAttachment.UpdatedAt = DateTime.Now;
+                                ticketAttachment.FileName = attachments.Attachment.FileName;
+                                ticketAttachment.FileSize = attachments.Attachment.Length;
                                 attachmentList.Add(ticketAttachment);
 
                             }
@@ -163,6 +164,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 RequestGeneratorId = command.RequestGeneratorId,
                                 Attachment = attachmentResult.SecureUrl.ToString(),
+                                FileName = attachments.Attachment.FileName,
+                                FileSize = attachments.Attachment.Length,
                                 AddedBy = command.Added_By,
                             };
 
@@ -174,8 +177,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                     }, cancellationToken));
-
-
 
                 }
 

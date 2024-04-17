@@ -107,7 +107,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
 
         [HttpPost("add-ticket-concern")]
-        public async Task<IActionResult> AddRequestConcernReceiver(AddRequestConcernReceiverCommand command)
+        public async Task<IActionResult> AddRequestConcernReceiver([FromForm]AddRequestConcernReceiverCommand command)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
         [HttpPost("add-development")]
-        public async Task<IActionResult> AddDevelopingTicket([FromBody] AddDevelopingTicketCommand command)
+        public async Task<IActionResult> AddDevelopingTicket([FromForm] AddDevelopingTicketCommand command)
         {
             try
             {

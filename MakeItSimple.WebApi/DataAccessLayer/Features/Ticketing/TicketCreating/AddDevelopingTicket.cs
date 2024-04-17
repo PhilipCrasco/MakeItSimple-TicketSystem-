@@ -1,10 +1,14 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MakeItSimple.WebApi.Common.Cloudinary;
+using Microsoft.Extensions.Options;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -32,16 +36,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime Start_Date { get; set; }
                 public DateTime Target_Date { get; set; }
             }
+
+            public List<ManualAttachment> ManualAttachments { get; set; }
+            public class ManualAttachment 
+            {
+                public int? TicketAttachmentId { get; set; }
+                public IFormFile Attachment { get; set; }
+            }
+
+
         }
 
 
         public class Handler : IRequestHandler<AddDevelopingTicketCommand, Result>
         {
             private readonly MisDbContext _context;
+            private readonly Cloudinary _cloudinary;
 
-            public Handler(MisDbContext context)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
             {
                 _context = context;
+                var account = new Account(
+                    options.Value.Cloudname,
+                    options.Value.ApiKey,
+                    options.Value.ApiSecret
+                    );
+                _cloudinary = new Cloudinary(account);
             }
 
             public async Task<Result> Handle(AddDevelopingTicketCommand command, CancellationToken cancellationToken)
@@ -295,6 +315,90 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
+                var uploadTasks = new List<Task>();
+
+                if (command.ManualAttachments.Count(x => x.Attachment != null) > 0)
+                {
+                    foreach (var attachments in command.ManualAttachments.Where(attachments => attachments.Attachment.Length > 0))
+                    {
+
+                        //var ticketAttachmentList = await _context.TicketAttachments.Include(x => x.RequestGenerator)
+                        //.Where(x => x.RequestGeneratorId == requestGeneratorList.First().Id).ToListAsync();
+
+                        var ticketAttachment = await _context.TicketAttachments.FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
+                        {
+                            return Result.Failure(TicketRequestError.AttachmentNotNull());
+                        }
+
+                        if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                        }
+
+                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                        if (extension == null || !allowedFileTypes.Contains(extension))
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                        }
+
+                        //var userAttachment = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+
+                        uploadTasks.Add(Task.Run(async () =>
+                        {
+                            await using var stream = attachments.Attachment.OpenReadStream();
+
+                            var attachmentsParams = new RawUploadParams
+                            {
+                                File = new FileDescription(attachments.Attachment.FileName, stream),
+                                PublicId = $"MakeITSimple/Ticketing/Request/{requestGeneratorexist.Id}/{attachments.Attachment.FileName}"
+                            };
+
+                            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+
+                            if (ticketAttachment != null)
+                            {
+                                var hasChanged = false;
+
+                                if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
+                                {
+                                    ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
+                                    hasChanged = true;
+                                }
+
+                                if (hasChanged)
+                                {
+                                    ticketAttachment.ModifiedBy = command.Modified_By;
+                                    ticketAttachment.FileName = attachments.Attachment.FileName;
+                                    ticketAttachment.FileSize = attachments.Attachment.Length;
+                                    ticketAttachment.UpdatedAt = DateTime.Now;
+                                }
+
+                            }
+                            else
+                            {
+                                var addAttachment = new TicketAttachment
+                                {
+                                    RequestGeneratorId = requestGeneratorList.First().Id,
+                                    Attachment = attachmentResult.SecureUrl.ToString(),
+                                    FileName = attachments.Attachment.FileName,
+                                    FileSize = attachments.Attachment.Length,
+                                    AddedBy = command.Added_By,
+                                };
+
+                                await _context.AddAsync(addAttachment, cancellationToken);
+
+                            }
+
+                        }, cancellationToken));
+
+                    }
+                }
+
+                await Task.WhenAll(uploadTasks);
 
                 if (ticketConcernList.Count() > 0)
                 {

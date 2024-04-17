@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             
             public int ? RequestGeneratorId { get; set; }
-            public Guid ? Added_By { get; set; }
+            public Guid ? Added_By { get; set; } 
             public Guid ? Modified_By { get; set; }
             public Guid ? UserId { get; set; }
             public int? RequestConcernId { get; set; }
@@ -162,7 +162,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             return Result.Failure(TicketRequestError.InvalidAttachmentSize());
                         }
 
-                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" };
+                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx" , ".pdf",".xlsx" };
                         var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
 
                         if (extension == null || !allowedFileTypes.Contains(extension))
@@ -177,7 +177,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/{requestConcernList.First().User.Fullname}/Request/{requestGeneratorList.First().Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{requestGeneratorList.First().Id}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);

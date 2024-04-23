@@ -175,7 +175,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     { 
                        
                         var closeTicketList = await _context.ClosingTickets
-                            .Where(x => x.TicketGeneratorId == closeHistoryList.First().Id 
+                            .Where(x => x.TicketGeneratorId == closeHistoryList.First().TicketGeneratorId 
                             && x.IsRejectClosed == true && x.UserId == closeHistoryList.First().UserId).ToListAsync();
 
                         foreach(var closeTicket in closeTicketList)

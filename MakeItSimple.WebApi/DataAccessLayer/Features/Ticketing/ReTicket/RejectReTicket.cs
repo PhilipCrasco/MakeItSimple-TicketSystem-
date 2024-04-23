@@ -24,7 +24,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             }
 
         }
-
         public class Handler : IRequestHandler<RejectReTicketCommand, Result>
         {
             private readonly MisDbContext _context;

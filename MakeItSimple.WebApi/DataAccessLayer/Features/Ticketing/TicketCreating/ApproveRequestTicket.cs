@@ -96,7 +96,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             else
                             {
                                 concernTicket.TicketApprover = null;
-                                concernTicket.ConcernStatus = $"{TicketingConString.RequestApproval} Receiver";
+                                concernTicket.ConcernStatus = TicketingConString.ForApprovalTicket;
                             }
 
                         }

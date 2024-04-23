@@ -74,8 +74,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     }
                 }
 
-                
-
                 await _context.SaveChangesAsync();
                 return Result.Success();
             }

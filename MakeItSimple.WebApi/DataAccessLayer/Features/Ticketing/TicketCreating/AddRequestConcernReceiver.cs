@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public Guid? IssueHandler { get; set; }
+            //public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
 
             public string Remarks { get; set; } 
@@ -182,7 +182,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
                     var upsertConcern = requestTicketConcernList
-                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId && x.UserId == command.IssueHandler);
+                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId);
 
                     if (upsertConcern != null )
                     {

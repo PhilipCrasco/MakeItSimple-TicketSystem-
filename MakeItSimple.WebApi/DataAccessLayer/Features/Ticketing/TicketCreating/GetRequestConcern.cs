@@ -104,7 +104,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (request.Reject != null)
                         {
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Reject);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReject == request.Reject);
                         }
 
                         if (request.Approval != null)

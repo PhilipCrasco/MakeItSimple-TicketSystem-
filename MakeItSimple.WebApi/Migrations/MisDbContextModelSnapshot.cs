@@ -663,6 +663,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_active");
 
+                    b.Property<string>("Manual")
+                        .HasColumnType("longtext")
+                        .HasColumnName("manual");
+
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
@@ -1428,6 +1432,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_clicked");
 
+                    b.Property<int?>("RequestGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_generator_id");
+
                     b.Property<int?>("TicketCommentId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_comment_id");
@@ -1438,6 +1446,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_ticket_comment_views");
+
+                    b.HasIndex("RequestGeneratorId")
+                        .HasDatabaseName("ix_ticket_comment_views_request_generator_id");
 
                     b.HasIndex("TicketCommentId")
                         .HasDatabaseName("ix_ticket_comment_views_ticket_comment_id");
@@ -2727,6 +2738,11 @@ namespace MakeItSimple.WebApi.Migrations
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
                 {
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                        .WithMany()
+                        .HasForeignKey("RequestGeneratorId")
+                        .HasConstraintName("fk_ticket_comment_views_request_generators_request_generator_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketComment", "TicketComment")
                         .WithMany()
                         .HasForeignKey("TicketCommentId")
@@ -2736,6 +2752,8 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_ticket_comment_views_users_user_id");
+
+                    b.Navigation("RequestGenerator");
 
                     b.Navigation("TicketComment");
 

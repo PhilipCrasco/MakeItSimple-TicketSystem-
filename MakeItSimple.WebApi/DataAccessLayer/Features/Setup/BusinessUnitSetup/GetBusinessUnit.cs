@@ -63,6 +63,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.BusinessUnitSetup
                     || x.BusinessName.Contains(request.Search));
                 }
 
+                if(request.Status != null)
+                {
+                    businessUnitQuery = businessUnitQuery.Where(x => x.IsActive == request.Status);
+                }
+
                 var results = businessUnitQuery.Select(x => new GetBussinessUnitResults
                 {
                     

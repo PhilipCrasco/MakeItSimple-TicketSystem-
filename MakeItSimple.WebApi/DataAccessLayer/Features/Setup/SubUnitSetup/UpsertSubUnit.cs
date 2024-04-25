@@ -122,6 +122,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                         SubUnitCode = command.SubUnit_Code,
                         SubUnitName = command.SubUnit_Name,
                         AddedBy = command.Added_By,
+                        Manual = "Manual"
                     };
 
                     await _context.SubUnits.AddAsync(addSubUnit);

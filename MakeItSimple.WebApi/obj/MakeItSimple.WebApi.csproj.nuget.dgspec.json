@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj": {}
+    "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj": {}
   },
   "projects": {
-    "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj": {
+    "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
+        "projectUniqueName": "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
         "projectName": "MakeItSimple.WebApi",
-        "projectPath": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
-        "packagesPath": "C:\\Users\\philipcrasco\\.nuget\\packages\\",
-        "outputPath": "E:\\PhilipLorenz\\FullStack\\MakeItSimple(TicketSystem)\\MakeItSimple.WebApi\\obj\\",
+        "projectPath": "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
+        "packagesPath": "C:\\Users\\pcrasco\\.nuget\\packages\\",
+        "outputPath": "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\philipcrasco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\pcrasco\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,6 +34,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -160,7 +165,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
         }
       }
     }

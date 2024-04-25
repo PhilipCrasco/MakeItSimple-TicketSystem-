@@ -13,12 +13,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class AddCommentNotificationValidatorCommand : IRequest<Result>
         {
             public Guid? UserId { get; set; }
-
-            public List<CommentValidator> CommentValidators { get; set; }
-            public class CommentValidator
-            {
-                public int ? TicketCommentId { get; set; }
-            }
+            public int? RequestGeneratorId { get; set; }
+            //public List<CommentValidator> CommentValidators { get; set; }
+            //public class CommentValidator
+            //{
+            //    public int ? TicketCommentId { get; set; }
+            //}
 
         }
 
@@ -35,32 +35,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddCommentNotificationValidatorCommand command, CancellationToken cancellationToken)
             {
 
-                foreach(var comment in command.CommentValidators)
+                var requestGeneratorExist = await _context.RequestGenerators
+                .FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
+
+                if (requestGeneratorExist == null)
                 {
-                    var commentExist = await _context.TicketComments
-                        .FirstOrDefaultAsync(x => x.Id == comment.TicketCommentId && x.IsActive == true);
-
-                    if(commentExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.TicketCommentNotExist());
-                    }
-
-                    var viewCommentExist = await _context.TicketCommentViews
-                        .FirstOrDefaultAsync(x => x.Id == commentExist.Id && x.UserId == command.UserId);
-
-                    if(viewCommentExist == null)
-                    {
-                        var addCommentView = new TicketCommentView
-                        {
-                            TicketCommentId = comment.TicketCommentId,
-                            UserId = command.UserId,
-                        };
-
-                        await _context.TicketCommentViews.AddAsync(addCommentView);
-
-                    }
+                    return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
 
+                var commentExist = await _context.TicketComments
+                .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsActive == true).ToListAsync();
+
+                foreach (var comment in commentExist)
+                {
+                    var addCommentView = new TicketCommentView
+                    {
+                        TicketCommentId = comment.Id,
+                        UserId = command.UserId,
+                        RequestGeneratorId = comment.RequestGeneratorId,
+                        IsClicked = true,
+                    };
+
+                    await _context.TicketCommentViews.AddAsync(addCommentView, cancellationToken);
+
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

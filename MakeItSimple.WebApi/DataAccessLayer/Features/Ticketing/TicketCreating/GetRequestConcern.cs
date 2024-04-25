@@ -28,6 +28,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? UserId { get; set; }
             public string Issue_Handler { get; set; }
             public string Ticket_Status { get; set; }
+            //public string Concern_Status {  get; set; }
             public string Remarks { get; set; }
             public string Concern_Type { get; set; }
             public bool ? Done { get; set; }
@@ -76,11 +77,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public async Task<PagedList<GetRequestConcernResult>> Handle(GetRequestConcernQuery request, CancellationToken cancellationToken)
                 {
                     IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
-                        .Include(x => x.ModifiedByUser)
+                        .Include(x => x.ModifiedByUser)  
                         .Include(x => x.AddedByUser)
                         .Include(x => x.Channel)
                         .Include(x => x.User)
-                        .Include(x => x.RequestorByUser);
+                        .Include(x => x.RequestorByUser); 
 
 
                     if(ticketConcernQuery.Count() > 0)
@@ -103,7 +104,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (request.Reject != null)
                         {
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Reject);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReject == request.Reject);
                         }
 
                         if (request.Approval != null)
@@ -126,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
                                         ticketConcernQuery = ticketConcernQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
                                     }
-                                    var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                                    var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
                                     ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
                                 }
@@ -193,10 +194,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Channel_Name = x.First().Channel.ChannelName,
                         Requestor_By = x.First().RequestorBy,
                         Requestor_Name = x.First().RequestorByUser.Fullname,
-                        Ticket_Status = x.First().IsApprove == true ? "Ticket Approve" : x.First().IsApprove == false
-                        && x.First().IsReject == false ? "For Approval" : x.First().IsReject == true ? "Rejected" : "Unknown",
+                        Ticket_Status = x.First().IsApprove == true ? "Ticket Approve" : x.First().IsReject == true ? "Rejected" :
+                         x.First().ConcernStatus != TicketingConString.ForApprovalTicket ? x.First().ConcernStatus : x.First().IsApprove == false 
+                         && x.First().IsReject == false ? "For Approval" : "Unknown" ,
+
                         Remarks = x.First().Remarks,
                         Concern_Type = x.First().TicketType,
+                        //Concern_Status = x.First().ConcernStatus,
                         Done = x.First().IsDone,
                         GetRequestConcernByConcerns = x.Select(x => new GetRequestConcernResult.GetRequestConcernByConcern
                         {
@@ -223,10 +227,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
             }
-
-
-
-               
 
         }
     }

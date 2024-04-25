@@ -92,10 +92,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 await _context.SaveChangesAsync(cancellationToken);
                 requestGeneratorList.Add(requestGeneratorexist);
 
-                var requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
-                    .ThenInclude(x => x.UserRole)
-                    .Include(x => x.RequestorByUser)
-                    .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
+                var requestTicketConcernList = await _context.TicketConcerns.ToListAsync();
+
+                if (command.IssueHandler == null)
+                {
+                     requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
+                        .ThenInclude(x => x.UserRole)
+                        .Include(x => x.RequestorByUser)
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
+                }
+                else
+                {
+                     requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
+                        .ThenInclude(x => x.UserRole)
+                        .Include(x => x.RequestorByUser)
+                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.UserId == command.IssueHandler).ToListAsync();
+                }
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
                 if(channelidExist == null)
@@ -182,7 +194,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                     var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
                     var upsertConcern = requestTicketConcernList
-                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId && x.UserId == command.IssueHandler);
+                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId);
 
                     if (upsertConcern != null )
                     {

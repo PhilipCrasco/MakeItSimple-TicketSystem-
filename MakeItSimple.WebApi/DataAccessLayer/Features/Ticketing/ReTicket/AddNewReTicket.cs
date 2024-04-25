@@ -117,7 +117,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         CreatedAt = DateTime.Now,
                         Status = TicketingConString.ReTicket,
 
-                    };
+                    };                                             
 
                     await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                 }

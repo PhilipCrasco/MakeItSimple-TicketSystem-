@@ -123,10 +123,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         if(reTicketConcern.IsRejectReTicket is true)
                         {
-                            reTicketConcern.RejectRemarks = null;
-                            reTicketConcern.RejectReTicketAt = null;
-                            reTicketConcern.RejectReTicketBy = null;
-                            reTicketConcern.IsRejectReTicket = false;
+
                             reTicketConcern.Remarks = command.Remarks;
                             reTicketHistoryList.Add(reTicketConcern);
                         }
@@ -168,15 +165,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                             foreach (var reject in rejectTicketConcern)
                             {
-                                reject.IsRejectReTicket = false;
 
                                 reject.RejectRemarks = null;
-                                reject.RejectReTicketBy = null;
-                                reject.RejectReTicketAt = null;
 
                                 if (reject.IsRejectReTicket is true)
                                 {
-                                    reject.Remarks = command.Remarks;
                                     reTicketHistoryList.Add(addReTicket);
                                 }
 
@@ -197,16 +190,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 if (reTicketHistoryList.Count(x => x.IsRejectReTicket is true) > 0)
                 {
+                   var reTicketList = await _context.ReTicketConcerns
+                            .Where(x => x.TicketGeneratorId == reTicketHistoryList.First().TicketGeneratorId 
+                            && x.IsRejectReTicket == true && x.UserId == reTicketHistoryList.First().UserId).ToListAsync();
+
+                        foreach(var reTicket in reTicketList)
+                        {
+                            reTicket.RejectRemarks = null;
+                            reTicket.RejectReTicketBy = null;
+                            reTicket.IsRejectReTicket = false;
+                            reTicket.RejectReTicketAt = null;
+                        }
 
                     var addTicketHistory = new TicketHistory
                     {
                         TicketGeneratorId = reTicketHistoryList.First().TicketGeneratorId,
                         RequestorBy = command.Requestor_By,
                         TransactionDate = DateTime.Now,
-                        Request = TicketingConString.CloseTicket,
+                        Request = TicketingConString.ReTicket,
                         Status = TicketingConString.RequestUpdate
                     };
 
+                    await _context.TicketHistories.AddAsync(addTicketHistory,cancellationToken);
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

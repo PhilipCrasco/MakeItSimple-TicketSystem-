@@ -110,10 +110,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
-
                         foreach (var concernTicket in userTranferTicket)
                         {
-
                             concernTicket.IsTransfer = true;
                             concernTicket.TransferAt = DateTime.Now;
                             concernTicket.TransferBy = command.Transfer_By;
@@ -144,9 +142,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
                         }
-
                     }
-
                  }
 
                 await _context.SaveChangesAsync(cancellationToken);

@@ -22,6 +22,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -252,7 +253,12 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
                         query.UserId = userId;
-
+                        
+                    }
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        query.Role = userRole.Value;
                     }
                 }
 

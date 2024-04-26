@@ -102,7 +102,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
                 }
 
                 var result = await _mediator.Send(command);
-                if (result.IsWarning)
+                if (result.IsFailure)
                 {
                     return BadRequest(result);
                 }
@@ -128,7 +128,7 @@ namespace MakeItSimple.WebApi.Controllers.Setup.TeamController
                 };
 
                 var result = await _mediator.Send(command);
-                if (result.IsWarning)
+                if (result.IsFailure)
                 {
                     return BadRequest(result);
                 }

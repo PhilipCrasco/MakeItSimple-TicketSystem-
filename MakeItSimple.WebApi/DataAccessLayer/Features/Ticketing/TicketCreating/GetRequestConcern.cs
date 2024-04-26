@@ -81,7 +81,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .Include(x => x.AddedByUser)
                         .Include(x => x.Channel)
                         .Include(x => x.User)
-                        .Include(x => x.RequestorByUser); 
+                        .Include(x => x.RequestorByUser)
+                        .ThenInclude(x => x.UserRole); 
 
 
                     if(ticketConcernQuery.Count() > 0)
@@ -171,7 +172,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
-                    var result = ticketConcernQuery.GroupBy(x => new
+                    var result = ticketConcernQuery
+                        .Where(x => x.RequestorByUser.UserRole.UserRoleName != TicketingConString.Requestor)
+                        .GroupBy(x => new
                     {
                         x.RequestGeneratorId,
                         x.UserId,

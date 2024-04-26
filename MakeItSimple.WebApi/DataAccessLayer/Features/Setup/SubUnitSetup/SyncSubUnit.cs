@@ -168,7 +168,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 foreach (var subUnit in allDataInput)
                 {
                     subUnit.IsActive = false;
-                    
                 }
 
                 var resultList = new

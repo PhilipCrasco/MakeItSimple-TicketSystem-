@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -36,7 +37,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public async Task<Result> Handle(CommentNotificationQueryResult request, CancellationToken cancellationToken)
             {
-               //var query = await _context.TicketCommentViews.Where(x => )
+                var query = await _context.TicketComments.Include(x => x.TicketCommentViews)
+                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId).ToListAsync();
+
+                  
 
                 return Result.Success(request);
             }

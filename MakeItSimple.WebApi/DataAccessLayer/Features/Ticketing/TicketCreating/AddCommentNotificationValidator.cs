@@ -14,11 +14,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             public Guid? UserId { get; set; }
             public int? RequestGeneratorId { get; set; }
-            //public List<CommentValidator> CommentValidators { get; set; }
-            //public class CommentValidator
-            //{
-            //    public int ? TicketCommentId { get; set; }
-            //}
 
         }
 

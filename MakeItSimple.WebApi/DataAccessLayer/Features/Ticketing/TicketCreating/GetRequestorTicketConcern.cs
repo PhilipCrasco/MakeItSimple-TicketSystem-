@@ -146,7 +146,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
                     }
 
-
                     if (request.Concern_Status != null)
                         {
                         if (request.Concern_Status == TicketingConString.Approval)
@@ -226,8 +225,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }).ToList(),
 
 
-                    }).ToList(),
-                    
+                    }).ToList(), 
 
                 });
 

@@ -98,8 +98,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                 }
 
-
-
                 if (TicketingConString.Users == request.Users)
                 {
                     query = query.Where(x => x.First().AddedByUser.Id == request.UserId).ToList();

@@ -18,6 +18,8 @@ namespace MakeItSimple.WebApi.Models.Setup.LocationSetup
         public string LocationCode { get; set; }
         public string LocationName { get; set; }
 
+        public string Manual { get; set; }
+
         public int? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 

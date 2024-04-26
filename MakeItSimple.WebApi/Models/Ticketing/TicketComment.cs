@@ -19,5 +19,8 @@
         //public virtual TicketConcern TicketConcern { get; set; }
         public bool? IsClicked { get; set; }
 
+
+        public ICollection<TicketCommentView>  TicketCommentViews { get; set; }
+
     }
 }

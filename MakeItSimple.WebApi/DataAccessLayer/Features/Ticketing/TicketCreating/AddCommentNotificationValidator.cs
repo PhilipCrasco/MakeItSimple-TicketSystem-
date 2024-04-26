@@ -13,6 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class AddCommentNotificationValidatorCommand : IRequest<Result>
         {
             public Guid? UserId { get; set; }
+            public Guid Added_By { get; set; }
             public int? RequestGeneratorId { get; set; }
 
         }
@@ -49,6 +50,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         UserId = command.UserId,
                         RequestGeneratorId = comment.RequestGeneratorId,
                         IsClicked = true,
+                        AddedBy = command.Added_By
                     };
 
                     await _context.TicketCommentViews.AddAsync(addCommentView, cancellationToken);

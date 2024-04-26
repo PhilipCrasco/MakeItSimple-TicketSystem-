@@ -110,6 +110,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new RequestConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
 
 
             //DateTime time = DateTime.Parse("2024-10-08");

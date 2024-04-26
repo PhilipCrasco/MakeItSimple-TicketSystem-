@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -9,18 +10,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
     {
         public class CommentTicketNotificationResult
         {
-            public int ClosingTicketCount { get; set; }
+            public int CommentTicketCount { get; set; }
         }
 
         public class CommentTicketNotificationQuery
         {
-            public int? TicketGeneratorId { get; set; }
+            public int? RequestGeneratorId { get; set; }
+
+            public int ? TicketCommentId { get; set; }
+
+            public bool IsActive { get; set; }
+
+            
 
         }
+
+     
 
         public class CommentNotificationQueryResult : IRequest<Result>
         {
             public int ? RequestGeneratorId { get; set; }
+            public bool ? Status { get; set; }
             public Guid ? UserId { get; set; }
 
         }
@@ -37,12 +47,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public async Task<Result> Handle(CommentNotificationQueryResult request, CancellationToken cancellationToken)
             {
-                var query = await _context.TicketComments.Include(x => x.TicketCommentViews)
-                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId).ToListAsync();
+                var query = await _context.TicketComments
+                    .Include(x => x.TicketCommentViews)
+                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId && x.AddedBy != request.UserId)
+                    .ToListAsync();
 
-                  
+                if (request.Status != null)
+                {
+                    query = query.Where(x => x.IsActive == request.Status).ToList();
+                }
 
-                return Result.Success(request);
+                var ticketComment = await _context.TicketCommentViews
+                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId 
+                    && x.UserId == request.UserId)
+                    .ToListAsync();
+
+                var ticketCommentSelect = ticketComment.Select(x => x.Id);
+
+                query = query.Where(x => !ticketCommentSelect.Contains(x.Id)).ToList();
+
+                var notification = query.Select(x => new CommentTicketNotificationResult
+                {
+                    CommentTicketCount = query.Count()
+                }).DistinctBy(x => x.CommentTicketCount).ToList();
+         
+
+                return Result.Success(notification);
             }
         }
     }

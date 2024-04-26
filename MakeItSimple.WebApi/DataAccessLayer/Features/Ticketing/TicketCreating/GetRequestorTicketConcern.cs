@@ -16,6 +16,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestorTicketConcernResult
         {
             public int ? RequestGeneratorId { get; set; }
+
+            public int? DepartmentId { get; set; }
+            public string Department_Name { get; set; }
             public Guid ? UserId { get; set; }  
 
             public string EmpId { get; set; }
@@ -98,6 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
                      .Include(x => x.User)
+                     .ThenInclude(x => x.Department)
                      .Include(x => x.TicketConcerns);
 
                 if(requestConcernsQuery.Count() > 0)
@@ -171,6 +175,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var results = requestConcernsQuery.Select(x => new GetRequestorTicketConcernResult
                 {
                     RequestGeneratorId = x.RequestGeneratorId,
+                    DepartmentId = x.User.DepartmentId,
+                    Department_Name = x.User.Department.DepartmentName,
                     UserId = x.UserId,
                     EmpId = x.User.EmpId,
                     FullName = x.User.Fullname,

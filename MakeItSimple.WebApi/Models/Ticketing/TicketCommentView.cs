@@ -9,6 +9,12 @@
         public bool ? IsClicked { get; set; }
         public int ? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
+
+
+        public Guid? AddedBy { get; set; }
+        public virtual User AddedByUser { get; set; }
+
+
         public int ? TicketCommentId { get; set; }
         public virtual TicketComment TicketComment { get; set; }
 

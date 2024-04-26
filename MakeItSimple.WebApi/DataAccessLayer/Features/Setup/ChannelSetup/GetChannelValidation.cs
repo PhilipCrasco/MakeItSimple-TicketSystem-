@@ -33,7 +33,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     return Result.Failure(ChannelError.ChannelNameAlreadyExist(command.Channel_Name));
                 }
 
-                return Result.Success("Tama kana bai!");
+                return Result.Success();
 
             }
         }

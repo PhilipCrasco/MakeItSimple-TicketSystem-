@@ -227,7 +227,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 return Conflict(ex.Message);
             }
-        }
+        } 
 
         [HttpPut("reject")]
         public async Task<IActionResult> RejectClosingTicket([FromBody] RejectClosingTicketCommand command)

@@ -83,7 +83,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
                     }).ToList()
 
-
                 });
 
                 return await PagedList<GetChannelResult>.CreateAsync(results , request.PageNumber , request.PageSize);  

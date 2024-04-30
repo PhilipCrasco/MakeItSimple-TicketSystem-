@@ -56,13 +56,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User RejectTransferByUser { get; set; }
         public string RejectRemarks { get; set; }
         public Guid? TicketApprover { get; set; }
-
-
         public int? ReceiverId { get; set; }
-
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
-
         public int? TicketGeneratorId { get; set; }
         public virtual TicketGenerator TicketGenerator {get; set; } 
 

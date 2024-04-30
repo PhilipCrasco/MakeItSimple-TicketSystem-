@@ -39,8 +39,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
 
+                var commentViewList = await _context.TicketCommentViews
+                    .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.UserId == command.Added_By)
+                    .ToListAsync();
+
+                var commentViewSelect =  commentViewList.Select(x => x.RequestGeneratorId);
+
                 var commentExist = await _context.TicketComments
-                .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsActive == true).ToListAsync();
+                .Where(x =>!commentViewSelect.Contains( x.RequestGeneratorId) && x.IsActive == true)
+                .ToListAsync();
 
                 foreach (var comment in commentExist)
                 {
@@ -50,11 +57,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         UserId = command.UserId,
                         RequestGeneratorId = comment.RequestGeneratorId,
                         IsClicked = true,
-                        AddedBy = command.Added_By
+                        AddedBy = command.Added_By     
                     };
 
                     await _context.TicketCommentViews.AddAsync(addCommentView, cancellationToken);
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

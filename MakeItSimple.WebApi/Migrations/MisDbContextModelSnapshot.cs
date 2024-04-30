@@ -1382,6 +1382,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("added_by");
 
+                    b.Property<string>("Attachment")
+                        .HasColumnType("longtext")
+                        .HasColumnName("attachment");
+
                     b.Property<string>("Comment")
                         .HasColumnType("longtext")
                         .HasColumnName("comment");
@@ -1389,6 +1393,14 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("file_name");
+
+                    b.Property<decimal?>("FileSize")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("file_size");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")

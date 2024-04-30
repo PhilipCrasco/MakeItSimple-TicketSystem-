@@ -453,7 +453,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
         [HttpPost("add-comment")]
-        public async Task<IActionResult> AddTicketComment([FromBody] AddTicketCommentCommand command)
+        public async Task<IActionResult> AddTicketComment([FromForm] AddTicketCommentCommand command)
         {
             try
             {

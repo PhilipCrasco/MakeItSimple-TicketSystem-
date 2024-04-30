@@ -53,5 +53,7 @@
 
         public const string RequestApproval = "For approval by ";
 
+        public const string Support = "Support";
+
     }
 }

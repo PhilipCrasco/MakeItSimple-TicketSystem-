@@ -101,7 +101,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
 
-
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         closingTicketsQuery = closingTicketsQuery.Where(x => x.User.Fullname.Contains(request.Search)
@@ -159,13 +158,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
+
                     if (TicketingConString.Users == request.Users)
                     {
                         closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                     }
-
-
                 }
+                //if()
 
                 var distictQuery = closingTicketsQuery.Select(x => x.TicketGeneratorId).Distinct();
 

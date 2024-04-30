@@ -64,7 +64,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public string Requestor { get; set; }
 
             }
-
             public class Handler : IRequestHandler<GetRequestConcernQuery, PagedList<GetRequestConcernResult>>
             {
                 private readonly MisDbContext _context;
@@ -154,7 +153,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             }
 
                         }
-
 
                         if (request.Requestor == TicketingConString.Requestor)
                         {

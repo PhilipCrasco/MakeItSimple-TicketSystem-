@@ -174,8 +174,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-
-
                     }, cancellationToken));
 
                 }
@@ -191,7 +189,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     Attachments = x.Attachment,
                     Added_By = x.AddedBy,
                     Created_At = x.CreatedAt,
-
 
                 });
 

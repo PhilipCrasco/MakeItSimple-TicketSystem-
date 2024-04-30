@@ -12,7 +12,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
     public class GetOpenTicket
-    {
+    {                                                                                       
 
         public class GetOpenTicketResult
         {
@@ -70,9 +70,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public bool? Status { get; set; }
             public string Search { get; set; }
+            public bool ? IsClosedApprove {  get; set; }
             public string Receiver { get; set; }
             public string Users { get; set; }
             public Guid? UserId { get; set; }
+
+            public string Support {  get; set; }
 
             public string Role { get; set; }
         }
@@ -104,7 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                     var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
-
+                   
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
@@ -117,9 +120,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                     }
 
+                    if(request.IsClosedApprove == true )
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
+                    }
+
                     if (request.Users == TicketingConString.Users)
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                    }
+
+                    if (request.Support == TicketingConString.Support)
+                    {
+                        var channelUserValidation = await _context.ChannelUsers.Where(x => x.UserId == request.UserId).ToListAsync();
+                        var channelSelectValidation = channelUserValidation.Select(x => x.ChannelId);
+                        ticketConcernQuery = ticketConcernQuery.Where(x => channelSelectValidation.Contains(x.ChannelId.Value));
                     }
 
                     if (request.Receiver != null)
@@ -148,7 +163,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
                 }
 
-                var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false && x.IsReTicket != true)
+                var results = ticketConcernQuery.Where( x => x.IsApprove != false && x.IsReTicket != true)
                     .GroupBy(x => new
                     {
                         x.RequestGeneratorId,

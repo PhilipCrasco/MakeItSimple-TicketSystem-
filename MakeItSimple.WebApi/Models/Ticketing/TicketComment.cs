@@ -12,6 +12,11 @@
         public virtual User ModifiedByUser { get; set; }
 
         public string Comment { get; set; }
+
+        public string Attachment { get; set; }
+        public string FileName { get; set; }
+        public decimal? FileSize { get; set; }
+
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
 

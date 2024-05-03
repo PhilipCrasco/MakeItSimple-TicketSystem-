@@ -25,6 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public class ChannelUser
             {
+                public int ? ChannelId { get; set; }
                 public int ChannelUserId {  get; set; }
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
@@ -75,6 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     Is_Active = x.IsActive,
                     channelUsers = x.ChannelUsers.Where(x => x.IsActive == true).Select(x => new GetChannelResult.ChannelUser
                     {
+                        ChannelId = x.ChannelId,
                         ChannelUserId = x.Id,
                         UserId = x.UserId,
                         Fullname = x.User.Fullname,

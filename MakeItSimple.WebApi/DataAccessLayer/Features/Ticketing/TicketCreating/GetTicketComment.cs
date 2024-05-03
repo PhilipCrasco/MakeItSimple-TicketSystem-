@@ -51,7 +51,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                        GetComments = x.Select(x => new GetComment
                        {
                            TicketCommentId = x.Id,
-                           Comment = x.Comment,
+                           Comment = !string.IsNullOrEmpty(x.Comment) ? x.Comment : x.Attachment,
                            Added_By = x.AddedByUser.Fullname,
                            Created_At = x.CreatedAt,
                            Modified_By = x.ModifiedByUser.Fullname,

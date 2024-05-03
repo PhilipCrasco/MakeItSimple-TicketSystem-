@@ -135,9 +135,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             if (request.UserId == receiverList.UserId)
                             {
+                                //var ticketConcernApproveList = await _context.
 
-                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true).ToListAsync();
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+
                                 requestConcernsQuery = requestConcernsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
                             }
                             else

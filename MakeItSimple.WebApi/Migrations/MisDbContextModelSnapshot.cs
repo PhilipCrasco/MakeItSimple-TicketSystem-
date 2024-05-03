@@ -1352,6 +1352,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("request_generator_id");
 
+                    b.Property<int?>("TicketGeneratorId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_generator_id");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -1367,6 +1371,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("RequestGeneratorId")
                         .HasDatabaseName("ix_ticket_attachments_request_generator_id");
+
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_ticket_attachments_ticket_generator_id");
 
                     b.ToTable("ticket_attachments", (string)null);
                 });
@@ -2726,11 +2733,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("RequestGeneratorId")
                         .HasConstraintName("fk_ticket_attachments_request_generators_request_generator_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
+                        .WithMany("TicketAttachments")
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_ticket_attachments_ticket_generators_ticket_generator_id");
+
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RequestGenerator");
+
+                    b.Navigation("TicketGenerator");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
@@ -3179,6 +3193,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ClosingTickets");
 
                     b.Navigation("ReTicketConcerns");
+
+                    b.Navigation("TicketAttachments");
 
                     b.Navigation("TicketHistories");
 

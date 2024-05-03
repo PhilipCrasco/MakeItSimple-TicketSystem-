@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public class CommentAttachment
             {
                 public int ? TicketCommentId {  get; set; }
-                public FormFile Attachment { get; set; }
+                public IFormFile Attachment { get; set; }
             }
 
         }
@@ -65,7 +65,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
 
-                if(command.RequestComments.Count() > 0)
+                var uploadTasks = new List<Task>();
+
+                if (command.RequestComments.Count(x => x.Comment != null) > 0)
                 {
                     foreach (var comment in command.RequestComments)
                     {
@@ -123,10 +125,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
-                else if(command.CommentAttachments.Count() > 0)
+                else if(command.CommentAttachments.Count(x => x.Attachment != null) > 0)
                 {
-                    var uploadTasks = new List<Task>();
-
 
                     foreach (var attachments in command.CommentAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {

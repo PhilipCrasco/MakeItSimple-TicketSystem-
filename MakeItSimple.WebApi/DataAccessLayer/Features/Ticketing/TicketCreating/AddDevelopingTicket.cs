@@ -21,9 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? UserId { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            //public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
-
             public string Remarks { get; set; }
 
             public List<AddDevelopingTicketByConcern> AddDevelopingTicketByConcerns { get; set; }
@@ -73,6 +71,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var ticketConcernList = new List<TicketConcern>();
 
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                var requestorPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
+
                 var requestGeneratorexist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
                 if (requestGeneratorexist == null)
                 {
@@ -103,7 +112,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                if (command.Role == TicketingConString.IssueHandler)
+                if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                 {
                     var approverUserList = await _context.ApproverTicketings
                         .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
@@ -280,7 +289,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         addnewTicketConcern.TicketType = TicketingConString.Manual;
 
-                        if (addedList.UserRole.UserRoleName == TicketingConString.IssueHandler)
+                        if (issueHandlerPermissionList.Any(x => x.Contains(addedList.UserRole.UserRoleName)))
                         {
 
                             addnewTicketConcern.IsReject = false;
@@ -292,7 +301,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-                        if (command.Role == TicketingConString.IssueHandler)
+                        if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                         {
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }

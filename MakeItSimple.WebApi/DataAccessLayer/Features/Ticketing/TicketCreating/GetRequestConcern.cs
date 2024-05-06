@@ -49,6 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime? Updated_At { get; set; }
                 public bool IsActive { get; set; }
 
+
             }
 
             public class GetRequestConcernQuery : UserParams, IRequest< PagedList<GetRequestConcernResult>>
@@ -62,6 +63,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public bool ? Reject { get; set; }
                 public string Approver { get; set; }
                 public string Requestor { get; set; }
+                public bool? Ascending { get; set; }
 
             }
             public class Handler : IRequestHandler<GetRequestConcernQuery, PagedList<GetRequestConcernResult>>
@@ -91,10 +93,37 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                         var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
 
+                        var allUserList = await _context.UserRoles.ToListAsync();
+
+                        var receiverPermissionList = allUserList.Where(x => x.Permissions
+                        .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                        var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                        .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                        var requestorPermissionList = allUserList.Where(x => x.Permissions
+                        .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
+
+                        var approverPermissionList = allUserList.Where(x => x.Permissions
+                        .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
 
                         if (request.Search != null)
                         {
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestorByUser.Fullname.Contains(request.Search));
+                        }
+
+                        if(request.Ascending != null)
+                        {
+                            if(request.Ascending is true)
+                            {
+                                ticketConcernQuery = ticketConcernQuery.OrderBy(x => x.RequestGeneratorId);
+                            }
+                            else
+                            {
+                                ticketConcernQuery = ticketConcernQuery.OrderByDescending(x => x.RequestGeneratorId);
+                            }
+
                         }
 
                         if (request.Status != null)
@@ -116,7 +145,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (request.Approver == TicketingConString.Approver)
                         {
-                            if (request.Role == TicketingConString.Receiver && receiverList != null)
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role))  && receiverList != null)
                             {
                                 if (request.UserId == receiverList.UserId)
                                 {
@@ -138,7 +167,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             }
 
-                            else if (request.Role == TicketingConString.Approver)
+                            else if (approverPermissionList.Any(x => x.Contains(request.Role)))
                             {
                                 var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
                                 var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
@@ -156,16 +185,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (request.Requestor == TicketingConString.Requestor)
                         {
-
-                            var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
-                            var requestConcernContains = requestConcernList.Select(x => x.UserId);
-                            ticketConcernQuery = ticketConcernQuery.Where(x => requestConcernContains.Contains(x.RequestorBy));
+                            if(requestorPermissionList.Any(x => x.Contains(request.Role)))
+                            {
+                                var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
+                                var requestConcernContains = requestConcernList.Select(x => x.UserId);
+                                ticketConcernQuery = ticketConcernQuery.Where(x => requestConcernContains.Contains(x.RequestorBy));
+                            }
+                            else
+                            {
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                            }
 
                         }
 
                         if (request.IssueHandler == TicketingConString.IssueHandler)
                         {
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                            if (issueHandlerPermissionList.Any(x => x.Contains(request.Role)))
+                            {
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                            }
+                            else
+                            {
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                            }
+
                         }
 
                     }

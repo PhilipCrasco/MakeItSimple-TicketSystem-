@@ -1,4 +1,5 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
@@ -83,6 +84,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Concern_Status { get; set; }
             public string Search { get; set; }
             public bool? Status { get; set; }
+
+            public bool ? Ascending { get; set; }
         }
 
         public class Handler : IRequestHandler<GetRequestorTicketConcernQuery, PagedList<GetRequestorTicketConcernResult>>
@@ -113,6 +116,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     var fillterApproval = requestConcernsQuery.Select(x => x.RequestGeneratorId);
 
+                    var allUserList = await _context.UserRoles.ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                    var requestorPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
+
+                    var approverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
                     if (request.Status != null)
                     {
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
@@ -124,14 +141,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         && x.Id.ToString().Contains(request.Search));
                     }
 
+                    if (request.Ascending != null)
+                    {
+                        if (request.Ascending is true)
+                        {
+                            requestConcernsQuery = requestConcernsQuery.OrderBy(x => x.RequestGeneratorId);
+                        }
+                        else
+                        {
+                            requestConcernsQuery = requestConcernsQuery.OrderByDescending(x => x.RequestGeneratorId);
+                        }
+
+                    }
+
                     if (request.Requestor == TicketingConString.Requestor)
                     {
-                        requestConcernsQuery = requestConcernsQuery.Where(x => x.UserId == request.UserId);
+                        if (requestorPermissionList.Any(x => x.Contains(request.Role)))
+                        {
+                            requestConcernsQuery = requestConcernsQuery.Where(x => x.UserId == request.UserId);
+                        }
+                        else
+                        {
+                           requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
+                        }
+
                     }
 
                     if (request.Approver == TicketingConString.Approver)
                     {
-                        if (request.Role == TicketingConString.Receiver && receiverList != null)
+                        if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                         {
                             if (request.UserId == receiverList.UserId)
                             {

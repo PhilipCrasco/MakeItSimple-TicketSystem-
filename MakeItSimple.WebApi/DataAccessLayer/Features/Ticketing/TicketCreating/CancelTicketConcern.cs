@@ -54,6 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         return Result.Failure(TicketRequestError.UserNotExist());
                     }
+
                     var ticketConcernExist = await _context.TicketConcerns
                         .Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId && x.UserId == ticketGenerator.Issue_Handler).ToListAsync();
 

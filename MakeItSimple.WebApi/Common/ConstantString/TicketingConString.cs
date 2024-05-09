@@ -26,6 +26,7 @@
         public const string Requestor = "Requestor";
         public const string Receiver = "Receiver";
         public const string IssueHandler = "Issue Handler";
+        public const string Support = "Support";
 
         //TicketHistory
 
@@ -54,7 +55,6 @@
 
         public const string RequestApproval = "For approval by ";
 
-        public const string Support = "Support";
 
     }
 }

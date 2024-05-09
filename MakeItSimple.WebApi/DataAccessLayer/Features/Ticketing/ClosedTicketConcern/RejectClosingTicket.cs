@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Guid? RejectClosed_By { get; set; }
             public Guid? Requestor_By { get; set; }
             public Guid? Approver_By { get; set; }
-            public string Role { get; set; }
+            //public string Role { get; set; }
             public string Reject_Remarks { get; set; }
 
             public ICollection<RejectClosedTicketConcern> RejectClosedTicketConcerns { get; set; }
@@ -37,6 +37,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public async Task<Result> Handle(RejectClosingTicketCommand command, CancellationToken cancellationToken)
             {
+
+
+
                 foreach (var close in command.RejectClosedTicketConcerns)
                 {
                     var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);

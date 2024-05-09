@@ -142,6 +142,7 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseRouting();
 

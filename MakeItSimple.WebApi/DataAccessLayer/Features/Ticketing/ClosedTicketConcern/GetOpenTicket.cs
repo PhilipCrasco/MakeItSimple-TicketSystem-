@@ -107,7 +107,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                     var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
-                   
+
+                    var allUserList = await _context.UserRoles.ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                    var supportPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Support)).Select(x => x.UserRoleName).ToList();
+
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
@@ -132,16 +143,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     if (request.Support == TicketingConString.Support)
                     {
-                        var channelUserValidation = await _context.ChannelUsers.Where(x => x.UserId == request.UserId).ToListAsync();
-                        var channelSelectValidation = channelUserValidation.Select(x => x.ChannelId);
-                        ticketConcernQuery = ticketConcernQuery.Where(x => channelSelectValidation.Contains(x.ChannelId.Value));
+                        if(supportPermissionList.Any(x => x.Contains(request.Role)))
+                        {
+                            var channelUserValidation = await _context.ChannelUsers.Where(x => x.UserId == request.UserId).ToListAsync();
+                            var channelSelectValidation = channelUserValidation.Select(x => x.ChannelId);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => channelSelectValidation.Contains(x.ChannelId.Value));
+                        }
+                        else
+                        {
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                        }
+
                     }
 
                     if (request.Receiver != null)
                     {
                         if (request.Receiver == TicketingConString.Receiver && receiverList != null)
                         {
-                            if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && request.UserId == receiverList.UserId)
                             {
 
                                 var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();

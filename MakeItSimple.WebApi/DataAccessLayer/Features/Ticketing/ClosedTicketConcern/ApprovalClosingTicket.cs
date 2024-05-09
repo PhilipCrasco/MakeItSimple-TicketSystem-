@@ -38,7 +38,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             {
                 var dateToday = DateTime.Today;
 
-                foreach(var close in command.ApproveClosingRequests)
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                var approverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
+                foreach (var close in command.ApproveClosingRequests)
                 {
                     var requestTicketExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);
                     if (requestTicketExist == null)
@@ -60,7 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     {
                         selectClosedRequestId.IsApprove = true;
 
-                        if ( command.Role != TicketingConString.Approver)
+                        if (!approverPermissionList.Any(x => x.Contains(command.Role)))
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
@@ -110,7 +121,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == userClosedTicket.First().User.BusinessUnitId);
                         var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
 
-                        if (receiverList.UserId == command.Users && command.Role == TicketingConString.Receiver)
+                        if (receiverList.UserId == command.Users && receiverPermissionList.Any(x => x.Contains(command.Role)))
                         {
 
                             foreach (var concernTicket in userClosedTicket)

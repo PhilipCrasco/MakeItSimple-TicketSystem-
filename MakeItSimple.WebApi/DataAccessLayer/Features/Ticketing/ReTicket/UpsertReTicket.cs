@@ -18,7 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public int ? TicketGeneratorId { get; set; }
             public string Re_Ticket_Remarks { get; set; }
             public Guid? Requestor_By { get; set; }
-            public string Role { get; set; }
+            //public string Role { get; set; }
             public string Remarks { get; set; }
             public List<UpsertReTicketConsern> UpsertReTicketConserns {  get; set; }
 
@@ -47,6 +47,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 var transferUpdateList = new List<bool>();
                 var reTicketHistoryList = new List<ReTicketConcern>();
+
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                var approverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
                 var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
                 var requestReTicketList = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();

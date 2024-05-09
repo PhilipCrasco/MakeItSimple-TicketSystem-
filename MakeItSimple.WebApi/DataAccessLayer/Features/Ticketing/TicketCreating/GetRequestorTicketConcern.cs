@@ -49,6 +49,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public string Unit_Name { get; set; }
                 public int? SubUnitId { get; set; }
                 public string SubUnit_Name { get; set; }
+                public string Concern_Description { get; set; }
+                public int? CategoryId { get; set; }
+                public string Category_Description { get; set; }
+                public int? SubCategoryId { get; set; }
+                public string SubCategory_Description { get; set; }
+                public DateTime? Start_Date { get; set; }
+                public DateTime? Target_Date { get; set; }
+
+
                 public string Ticket_Status { get; set; }
                 //public string Concern_Status {  get; set; }
                 public string Remarks { get; set; }
@@ -59,11 +68,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     public int? TicketConcernId { get; set; }
                     public Guid? UserId { get; set; }
                     public string Issue_Handler { get; set; }
-                    public string Concern_Description { get; set; }
-                    public string Category_Description { get; set; }
-                    public string SubCategory_Description { get; set; }
-                    public DateTime? Start_Date { get; set; }
-                    public DateTime? Target_Date { get; set; }
                     public string Added_By { get; set; }
                     public DateTime Created_At { get; set; }
                     public string Modified_By { get; set; }
@@ -242,6 +246,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         SubUnit_Name = x.User.SubUnit.SubUnitName,
                         ChannelId = x.ChannelId,
                         Channel_Name = x.Channel.ChannelName,
+                        Concern_Description = x.ConcernDetails,
+                        CategoryId = x.CategoryId,
+                        Category_Description = x.Category.CategoryDescription,
+                        SubCategoryId = x.SubCategoryId,
+                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
+                        Start_Date = x.StartDate,
+                        Target_Date = x.TargetDate,
                         Remarks = x.Remarks,
                         Concern_Type = x.TicketType,
                         Ticket_Status = x.IsApprove == true ? "Ticket Approve" : x.IsReject == true ? "Rejected" :
@@ -260,6 +271,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         SubUnit_Name = x.Key.SubUnit_Name,
                         ChannelId = x.Key.ChannelId,
                         Channel_Name = x.Key.Channel_Name,
+                        Concern_Description = x.Key.Concern_Description,
+                        CategoryId = x.Key.CategoryId,
+                        Category_Description = x.Key.Category_Description,
+                        SubCategoryId = x.Key.SubCategoryId,
+                        SubCategory_Description = x.Key.SubCategory_Description,
+                        Start_Date = x.Key.Start_Date,
+                        Target_Date = x.Key.Target_Date,
                         Ticket_Status = x.Key.Ticket_Status,
                         Remarks = x.Key.Remarks,
                         Concern_Type = x.Key.Concern_Type,
@@ -268,11 +286,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             TicketConcernId = x.Id,
                             UserId = x.UserId,
                             Issue_Handler = x.User.Fullname,
-                            Concern_Description = x.ConcernDetails,
-                            Category_Description = x.Category.CategoryDescription,
-                            SubCategory_Description = x.SubCategory.SubCategoryDescription,
-                            Start_Date = x.StartDate,
-                            Target_Date = x.TargetDate,
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
                             Modified_By = x.ModifiedByUser.Fullname,

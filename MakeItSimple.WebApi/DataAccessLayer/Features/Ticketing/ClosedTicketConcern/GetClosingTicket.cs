@@ -101,6 +101,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
 
+                    var allUserList = await _context.UserRoles.ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var approverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
+
 
                     if (!string.IsNullOrEmpty(request.Search))
                     {
@@ -121,7 +130,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     if (TicketingConString.Approver == request.Approver)
                     {
 
-                        if (request.UserId != null && TicketingConString.Approver == request.Role)
+                        if (request.UserId != null && approverPermissionList.Any(x => x.Contains(request.Role)))
                         {
                             var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
                             var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
@@ -131,7 +140,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         }
 
-                        else if (request.Role == TicketingConString.Receiver && receiverList != null)
+                        else if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                         {
                             if (request.UserId == receiverList.UserId)
                             {
@@ -159,13 +168,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
+
                     if (TicketingConString.Users == request.Users)
                     {
                         closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                     }
-
-
                 }
+                //if()
 
                 var distictQuery = closingTicketsQuery.Select(x => x.TicketGeneratorId).Distinct();
 

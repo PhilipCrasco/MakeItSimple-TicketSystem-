@@ -13,6 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
         {
             public int Id { get; set; }
             public string SubCategory_Description { get; set; }
+            public int ? CategoryId {  get; set; }
             public string Category_Description { get; set; }
             public bool Is_Active { get; set; }
             public string Added_By { get; set; }
@@ -57,6 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
                 {
                     Id = x.Id,
                     SubCategory_Description = x.SubCategoryDescription,
+                    CategoryId = x.CategoryId,
                     Category_Description = x.Category.CategoryDescription,
                     Is_Active = x.IsActive,
                     Added_By = x.AddedByUser.Fullname,
@@ -69,6 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
                 return await PagedList<GetSubCategoryResult>.CreateAsync(results, request.PageNumber , request.PageSize);
 
             }
+
         }
     }
 }

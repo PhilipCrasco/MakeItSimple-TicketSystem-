@@ -19,6 +19,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         public class GetMemberQuery : IRequest<Result>
         {
             public int ? ChannelId { get; set; }
+
+            public  List<int> ? DepartmentId  { get; set; }
+
+
         }
 
         public class Handler : IRequestHandler<GetMemberQuery, Result>
@@ -38,8 +42,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
                 var selectedChannelUsers = channelUsers.Select(x => x.UserId);
 
+                var departmentList = await _context.Departments.Where(x => request.DepartmentId.Contains(x.Id)).ToListAsync();
+
+                var departmentSelect = departmentList.Select(x => x.Id).ToList();
+
                 var results = await _context.Users
                     .Where(x => !selectedChannelUsers.Contains(x.Id) && x.IsActive == true)
+                    .Where(x => departmentSelect.Contains(x.DepartmentId.Value))
                     .Select(x => new GetMemberResult
                     {
 

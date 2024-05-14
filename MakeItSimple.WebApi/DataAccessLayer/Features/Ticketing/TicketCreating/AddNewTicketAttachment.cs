@@ -127,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var attachmentsParams = new RawUploadParams
                         {
                             File = new FileDescription(attachments.Attachment.FileName, stream),
-                            PublicId = $"MakeITSimple/{getTicketConcern.RequestorByUser.Department.DepartmentName}/{getTicketConcern.RequestorByUser.Fullname}/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
+                            PublicId = $"MakeITSimple/Ticketing/Request/{ticketIdNotExist.Id}/{attachments.Attachment.FileName}"
                         };
 
                         var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -174,8 +174,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-
-
                     }, cancellationToken));
 
                 }
@@ -191,7 +189,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     Attachments = x.Attachment,
                     Added_By = x.AddedBy,
                     Created_At = x.CreatedAt,
-
 
                 });
 

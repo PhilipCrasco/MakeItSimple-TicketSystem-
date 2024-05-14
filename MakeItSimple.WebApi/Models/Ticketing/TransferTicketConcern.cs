@@ -1,14 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
-using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
-using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
-using MakeItSimple.WebApi.Models.Setup.CompanySetup;
-using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
-using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MakeItSimple.WebApi.Models.Setup.UnitSetup;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
@@ -56,13 +49,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User RejectTransferByUser { get; set; }
         public string RejectRemarks { get; set; }
         public Guid? TicketApprover { get; set; }
-
-
         public int? ReceiverId { get; set; }
-
         public int? RequestGeneratorId { get; set; }
         public virtual RequestGenerator RequestGenerator { get; set; }
-
         public int? TicketGeneratorId { get; set; }
         public virtual TicketGenerator TicketGenerator {get; set; } 
 

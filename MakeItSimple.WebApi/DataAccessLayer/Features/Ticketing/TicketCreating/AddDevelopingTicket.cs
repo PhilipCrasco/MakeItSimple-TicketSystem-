@@ -21,9 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? UserId { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            //public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
-
             public string Remarks { get; set; }
 
             public List<AddDevelopingTicketByConcern> AddDevelopingTicketByConcerns { get; set; }
@@ -70,8 +68,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var dateToday = DateTime.Today;
 
                 var requestGeneratorList = new List<RequestGenerator>();
-
                 var ticketConcernList = new List<TicketConcern>();
+                var removeTicketConcern = new List<TicketConcern>();
+
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                var requestorPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
 
                 var requestGeneratorexist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
                 if (requestGeneratorexist == null)
@@ -103,7 +112,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                if (command.Role == TicketingConString.IssueHandler)
+                if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                 {
                     var approverUserList = await _context.ApproverTicketings
                         .Where(x => x.RequestGeneratorId == command.RequestGeneratorId && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
@@ -241,6 +250,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.Remarks = command.Remarks;
                         }
 
+                        removeTicketConcern.Add(upsertConcern);
+
                     }
                     else
                     {
@@ -280,7 +291,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         addnewTicketConcern.TicketType = TicketingConString.Manual;
 
-                        if (addedList.UserRole.UserRoleName == TicketingConString.IssueHandler)
+                        if (issueHandlerPermissionList.Any(x => x.Contains(addedList.UserRole.UserRoleName)))
                         {
 
                             addnewTicketConcern.IsReject = false;
@@ -292,7 +303,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-                        if (command.Role == TicketingConString.IssueHandler)
+                        if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                         {
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }
@@ -317,7 +328,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
-                var uploadTasks = new List<Task>();
+                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestGeneratorId);
+                var selectRemoveUserId = removeTicketConcern.Select(x => x.UserId);
+                
+                var removeConcernList = await _context.TicketConcerns
+                    .Where(x => !selectRemoveConcern.Contains(x.Id)
+                    && selectRemoveGenerator.Contains(x.RequestGeneratorId)
+                    && selectRemoveUserId.Contains(x.UserId)
+                    && x.IsApprove != true && x.IsActive == true)
+                    .ToListAsync();
+
+                if (removeConcernList.Count() > 0)
+                {
+                    foreach (var removeConcern in removeConcernList)
+                    {
+                        removeConcern.IsActive = false;
+                    }
+                }
+
+                    var uploadTasks = new List<Task>();
 
                 if (command.ManualAttachments.Count(x => x.Attachment != null) > 0)
                 {

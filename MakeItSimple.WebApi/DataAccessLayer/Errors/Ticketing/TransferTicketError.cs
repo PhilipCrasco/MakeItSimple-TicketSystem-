@@ -50,7 +50,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TransferTicketError.DuplicateTransferTicket", "Transfer ticket duplicated!");
 
       public static Error DuplicateConcernTicket() =>
-      new Error("TransferTicketError.DuplicateConcernTicket", "Concern ticket duplicated!"); 
+      new Error("TransferTicketError.DuplicateConcernTicket", "Request ticket duplicated!"); 
 
         public static Error DateTimeInvalid() =>
       new Error("TransferTicketError.DateTimeInvalid", "Invalid start/target date!");

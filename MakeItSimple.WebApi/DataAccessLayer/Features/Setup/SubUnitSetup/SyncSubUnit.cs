@@ -134,6 +134,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                                 ExistingSubUnit.SyncStatus = "No new Update";
                             }
 
+                            
+
                         }
                         else
                         {
@@ -161,12 +163,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 
                 var allInputByNo = AllInputSync.Select(x => x.SubUnit_No);
 
-                var allDataInput = await _context.SubUnits.Where(x => !allInputByNo.Contains(x.SubUnitNo) && x.SubUnitNo != null).ToListAsync();
+                var allDataInput = await _context.SubUnits.Where(x => !allInputByNo.Contains(x.SubUnitNo) && x.SubUnitNo != null && x.Manual == null).ToListAsync();
 
                 foreach (var subUnit in allDataInput)
                 {
                     subUnit.IsActive = false;
-                    
                 }
 
                 var resultList = new

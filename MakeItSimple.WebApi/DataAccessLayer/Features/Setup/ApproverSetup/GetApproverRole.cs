@@ -42,10 +42,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
                 var selectApprover = approver.Select(x => x.UserId);
 
+                var allUserRole = await _context.UserRoles.ToListAsync();
+
+                var roleList = allUserRole
+                    .Where(x => x.Permissions.Contains(TicketingConString.Approver))
+                     .ToList();
+
+                var roleSelect = roleList.Select(x => x.Id).ToList();
 
                 var results = await _context.Users
                     .Include(x => x.UserRole)
-                    .Where(x => !selectApprover.Contains(x.Id) && x.UserRole.UserRoleName == TicketingConString.Approver
+                    .Where(x => !selectApprover.Contains(x.Id) && roleSelect.Contains(x.UserRoleId)
                    && x.IsActive == true )
                     .Select(x => new GetApproverRoleResult
                     {
@@ -56,8 +63,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
 
                     }).ToListAsync();
-
-
 
                 return Result.Success(results);
 

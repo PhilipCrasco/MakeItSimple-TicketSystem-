@@ -36,6 +36,8 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         public int? UnitId { get; set; }
         public virtual Unit Unit {get; set;}
 
+        public string Manual { get; set;}
+
         public DateTime SyncDate { get; set; }
         public string SyncStatus { get; set; }
 

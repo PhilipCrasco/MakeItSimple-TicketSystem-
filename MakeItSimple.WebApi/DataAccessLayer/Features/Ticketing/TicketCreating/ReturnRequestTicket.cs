@@ -61,7 +61,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         concerns.Remarks = command.Remarks;
                     }
 
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

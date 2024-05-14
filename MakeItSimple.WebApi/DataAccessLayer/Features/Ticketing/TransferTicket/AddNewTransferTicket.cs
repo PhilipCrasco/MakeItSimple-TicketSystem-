@@ -1,4 +1,6 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
@@ -7,6 +9,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket.AddNewTransferTicketCommand;
+using MakeItSimple.WebApi.Common.Cloudinary;
+using Microsoft.Extensions.Options;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
@@ -20,71 +24,99 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public int ChannelId { get; set; }
             public string TransferRemarks { get; set; }
             public List<AddTransferTicket> AddTransferTickets { get; set; }
+            public List<AddTransferAttachment> AddTransferAttachments { get; set; }
 
             public class AddTransferTicket
             {
-                public int ? TicketConcernId { get; set; }
+                public int? RequestGeneratorId { get; set; }
                 public Guid? UserId { get; set; }
                 public DateTime ? Start_Date { get; set; }
                 public DateTime ? Target_Date { get; set; }
+            }
+
+            public class AddTransferAttachment
+            {
+                public IFormFile Attachment { get; set; }
             }
         }
 
         public class Handler : IRequestHandler<AddNewTransferTicketCommand, Result>
         {
             private readonly MisDbContext _context;
+            private readonly Cloudinary _cloudinary;
 
-            public Handler(MisDbContext context)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
             {
                 _context = context;
+                var account = new Account(
+                    options.Value.Cloudname,
+                    options.Value.ApiKey,
+                    options.Value.ApiSecret
+                    );
+                _cloudinary = new Cloudinary(account);
             }
 
             public async Task<Result> Handle(AddNewTransferTicketCommand command, CancellationToken cancellationToken)
             {
-                var transferList = new List<TicketConcern>();
+                var transferList = new List<TransferTicketConcern>();
                 var ticketGenerator = new TicketGenerator { IsActive = true };
 
-                await  _context.TicketGenerators.AddAsync(ticketGenerator, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
+                await _context.TicketGenerators.AddAsync(ticketGenerator, cancellationToken);
 
                 var channelexist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
                 if (channelexist is null)
                 {
                     return Result.Failure(TransferTicketError.ChannelNotExist());
                 }
-               
+
                 foreach (var transferConcern in command.AddTransferTickets)
                 {
-
-                    if(command.AddTransferTickets.Count(x => x.TicketConcernId == transferConcern.TicketConcernId ) > 1)
-                    {
-                        return Result.Failure(TransferTicketError.DuplicateConcernTicket());
-                    }
-
 
                     var userExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == transferConcern.UserId, cancellationToken);
 
                     if(userExist is null)
                     {
-                            return Result.Failure(TransferTicketError.UserNotExist());
+                        return Result.Failure(TransferTicketError.UserNotExist());
                     }
 
-                    var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == transferConcern.TicketConcernId, cancellationToken);
-                    if (ticketConcern != null )
+                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == transferConcern.RequestGeneratorId, cancellationToken);
+                    if (requestGeneratorExist != null )
                     {
 
-                        if(ticketConcern.UserId == transferConcern.UserId) 
+                        if (command.AddTransferTickets.Count(x => x.RequestGeneratorId == transferConcern.RequestGeneratorId) > 1)
+                        {
+                            return Result.Failure(TransferTicketError.DuplicateConcernTicket());
+                        }
+
+                        var ticketConcern = await _context.TicketConcerns
+                            .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
+                            && x.UserId == command.Added_By && x.RequestConcernId != null && x.IsActive == true)
+                            .FirstOrDefaultAsync();
+
+                        var ticketConcernList = await _context.TicketConcerns
+                               .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsActive == true)
+                               .ToListAsync();
+
+                        foreach (var concern in ticketConcernList)
+                        {
+                            concern.IsTransfer = false;
+                        }
+
+                        if (ticketConcern.UserId == transferConcern.UserId) 
                         {
                             return Result.Failure(TransferTicketError.InvalidTransferTicket());
                         }
 
-                        var transferTicketAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transferConcern.TicketConcernId
+                        var transferTicketAlreadyExist = await _context.TransferTicketConcerns
+                            .FirstOrDefaultAsync(x => x.RequestGeneratorId == transferConcern.RequestGeneratorId
                           && x.IsActive == true && x.IsTransfer == false, cancellationToken);
 
                         if (transferTicketAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());  
                         }
+
+                        await _context.SaveChangesAsync(cancellationToken);
 
                         var getApproverUser = await _context.Approvers.Include(x => x.User).Where(x => x.SubUnitId == userExist.SubUnitId).ToListAsync();
                         
@@ -93,7 +125,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         var addTransferTicket = new TransferTicketConcern
                         {
                             TicketGeneratorId = ticketGenerator.Id,
-                            TicketConcernId = ticketConcern.Id,
+                            RequestGeneratorId = requestGeneratorExist.Id,
                             ChannelId = command.ChannelId,
                             UserId = transferConcern.UserId,
                             ConcernDetails = ticketConcern.ConcernDetails,
@@ -106,15 +138,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         };
 
-                        ticketConcern.IsTransfer = false; 
-
-                        var ticketConcernApproverExist = await _context.TransferTicketConcerns
-                            .FirstOrDefaultAsync(x => x.TicketConcernId == transferConcern.TicketConcernId);
-                        {
-
-                        }
-
-                        transferList.Add(ticketConcern);
+                        transferList.Add(addTransferTicket);
                         await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
 
                         await _context.SaveChangesAsync(cancellationToken);
@@ -122,7 +146,63 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
                     else
                     {
-                        return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
+                        return Result.Failure(TransferTicketError.TicketIdNotExist());
+                    }
+
+                    var uploadTasks = new List<Task>();
+
+                    if (command.AddTransferAttachments.Count(x => x.Attachment != null) > 0)
+                    {
+                        foreach (var attachments in command.AddTransferAttachments.Where(attachments => attachments.Attachment.Length > 0))
+                        {
+
+   
+                            if (attachments.Attachment == null || attachments.Attachment.Length == 0)
+                            {
+                                return Result.Failure(TicketRequestError.AttachmentNotNull());
+                            }
+
+                            if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                            {
+                                return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                            }
+
+                            var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                            var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                            if (extension == null || !allowedFileTypes.Contains(extension))
+                            {
+                                return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                            }
+
+                            uploadTasks.Add(Task.Run(async () =>
+                            {
+                                await using var stream = attachments.Attachment.OpenReadStream();
+
+                                var attachmentsParams = new RawUploadParams
+                                {
+                                    File = new FileDescription(attachments.Attachment.FileName, stream),
+                                    PublicId = $"MakeITSimple/Ticketing/Request/{ticketGenerator.Id}/{attachments.Attachment.FileName}"
+                                };
+
+                                var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+
+                                    var addAttachment = new TicketAttachment
+                                    {
+                                        TicketGeneratorId = ticketGenerator.Id,
+                                        Attachment = attachmentResult.SecureUrl.ToString(),
+                                        FileName = attachments.Attachment.FileName,
+                                        FileSize = attachments.Attachment.Length,
+                                        AddedBy = command.Added_By,
+                                    };
+
+                                    await _context.AddAsync(addAttachment, cancellationToken);
+
+                            }, cancellationToken));
+
+                        }
+
+                        await Task.WhenAll(uploadTasks);
                     }
 
                 }

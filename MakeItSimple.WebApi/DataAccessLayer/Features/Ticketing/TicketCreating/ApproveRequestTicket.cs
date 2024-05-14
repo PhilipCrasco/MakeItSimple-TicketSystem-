@@ -42,6 +42,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var dateToday = DateTime.Today;
                 var ticketApproveList = new List<TicketConcern>();
 
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
                 foreach (var ticketConcern in command.Concern)
                 {
                     var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestGeneratorId, cancellationToken);
@@ -111,7 +116,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
                         }
 
-                        if (receiverList.UserId == command.UserId && command.Role == TicketingConString.Receiver)
+                        if (receiverList.UserId == command.UserId && receiverPermissionList.Contains(command.Role))
                         {
                             foreach (var concerns in ticketConcernExist)
                             {

@@ -85,6 +85,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     .Include(x => x.RejectReTicketByUser)
                     .Include(x => x.ReTicketByUser);
 
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+
+                var approverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
                 if (!string.IsNullOrEmpty(request.Search))
                 {
                     reTicketQuery = reTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
@@ -107,7 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 if (TicketingConString.Approver == request.Approver)
                 {
 
-                    if (request.UserId != null && TicketingConString.Approver == request.Role)
+                    if (request.UserId != null && approverPermissionList.Any(x => x.Contains(request.Role)))
                     {
                         var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
                         var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();

@@ -12,7 +12,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
     public class GetOpenTicket
-    {
+    {                                                                                       
 
         public class GetOpenTicketResult
         {
@@ -70,9 +70,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public bool? Status { get; set; }
             public string Search { get; set; }
+            public bool ? IsClosedApprove {  get; set; }
             public string Receiver { get; set; }
             public string Users { get; set; }
             public Guid? UserId { get; set; }
+
+            public string Support {  get; set; }
 
             public string Role { get; set; }
         }
@@ -105,6 +108,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                     var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
 
+                    var allUserList = await _context.UserRoles.ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                    var supportPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Support)).Select(x => x.UserRoleName).ToList();
+
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.User.Fullname.Contains(request.Search)
@@ -117,16 +131,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                     }
 
+                    if(request.IsClosedApprove == true )
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
+                    }
+
                     if (request.Users == TicketingConString.Users)
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                    }
+
+                    if (request.Support == TicketingConString.Support)
+                    {
+                        if(supportPermissionList.Any(x => x.Contains(request.Role)))
+                        {
+                            var channelUserValidation = await _context.ChannelUsers.Where(x => x.UserId == request.UserId).ToListAsync();
+                            var channelSelectValidation = channelUserValidation.Select(x => x.ChannelId);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => channelSelectValidation.Contains(x.ChannelId.Value));
+                        }
+                        else
+                        {
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                        }
+
                     }
 
                     if (request.Receiver != null)
                     {
                         if (request.Receiver == TicketingConString.Receiver && receiverList != null)
                         {
-                            if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && request.UserId == receiverList.UserId)
                             {
 
                                 var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
@@ -148,7 +182,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
                 }
 
-                var results = ticketConcernQuery.Where(x => x.IsClosedApprove != true && x.IsApprove != false && x.IsReTicket != true)
+                var results = ticketConcernQuery.Where( x => x.IsApprove != false && x.IsReTicket != true)
                     .GroupBy(x => new
                     {
                         x.RequestGeneratorId,

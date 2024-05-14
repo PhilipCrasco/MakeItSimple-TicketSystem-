@@ -42,6 +42,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var closeUpdateList = new List<bool>();
                     var closeNewList = new List<ClosingTicket>();
                     var closeHistoryList = new List<ClosingTicket>();
+                    var removeTicketConcern = new List<ClosingTicket>();
+
+                    var allUserList = await _context.UserRoles.ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                    var supportPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Support)).Select(x => x.UserRoleName).ToList();
 
                     var requestGeneratorIdInTransfer = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
                     var requestClosingList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
@@ -53,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.TicketGeneratorId
                     && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
-                    if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsClosing == true && command.Role != TicketingConString.Receiver))
+                    if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsClosing == true && !receiverPermissionList.Any(x => x.Contains(command.Role))))
                     {
                         return Result.Failure(ClosingTicketError.ClosingTicketConcernUnable());
                     }
@@ -116,6 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             }
 
                             closeUpdateList.Add(HasChange);
+                            removeTicketConcern.Add(closingTicketConcern);
                         }
                         else if (ticketConcern != null && closingTicketConcern is null)
                         {
@@ -171,7 +184,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
-                    if(closeHistoryList.Count(x => x.IsRejectClosed is true) > 0)
+                    var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                    var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+
+                    var removeConcernList = await _context.ClosingTickets
+                        .Where(x => !selectRemoveConcern.Contains(x.Id)
+                        && selectRemoveGenerator.Contains(x.TicketGeneratorId))
+                        .ToListAsync();
+
+                    if(removeTicketConcern.Count() > 0)
+                    {
+                        foreach (var removeConcern in removeTicketConcern)
+                        {
+                            removeConcern.IsActive = false;
+                        }
+                    }
+
+                    if (closeHistoryList.Count(x => x.IsRejectClosed is true) > 0)
                     { 
                        
                         var closeTicketList = await _context.ClosingTickets

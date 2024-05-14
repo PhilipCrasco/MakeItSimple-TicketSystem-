@@ -39,7 +39,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 var dateToday = DateTime.Today;
 
-                foreach(var reTicket in command.ApproveReTicketRequests)
+                var allUserList = await _context.UserRoles.ToListAsync();
+
+                var approverPermissionList = allUserList.Where(x => x.Permissions
+                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
+                foreach (var reTicket in command.ApproveReTicketRequests)
                 {
                     var requestTicketExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == reTicket.TicketGeneratorId, cancellationToken);
                     if (requestTicketExist == null)
@@ -61,7 +66,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     {
                         selectTransferRequestId.IsApprove = true;
 
-                        if (command.Role != TicketingConString.Approver)
+                        if (!approverPermissionList.Any(x => x.Contains(command.Role)))
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }

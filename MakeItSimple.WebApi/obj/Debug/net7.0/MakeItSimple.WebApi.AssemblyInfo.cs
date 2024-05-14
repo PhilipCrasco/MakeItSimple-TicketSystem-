@@ -17,12 +17,16 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 =======
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9718215d172ef3329afec582bac216388cb8be75")]
 >>>>>>> Development
 =======
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+>>>>>>> Development
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+39c7c0588082683ceb69d66c570f00fe7ffc0782")]
 >>>>>>> Development
 [assembly: System.Reflection.AssemblyProductAttribute("MakeItSimple.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MakeItSimple.WebApi")]

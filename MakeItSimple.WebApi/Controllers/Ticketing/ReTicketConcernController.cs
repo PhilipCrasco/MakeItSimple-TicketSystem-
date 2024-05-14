@@ -147,11 +147,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 command.TicketGeneratorId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {

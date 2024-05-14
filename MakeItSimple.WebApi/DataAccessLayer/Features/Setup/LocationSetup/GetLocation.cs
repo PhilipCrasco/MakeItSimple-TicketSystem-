@@ -39,6 +39,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
         public class GetLocationQuery : UserParams , IRequest<PagedList<GetLocationResult>>
         {
             public string Search { get; set; }
+
+            public bool ? Status { get; set; }
         }
 
         public class IHandler : IRequestHandler<GetLocationQuery, PagedList<GetLocationResult>>
@@ -58,6 +60,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.LocationSetup
                 {
                     locationQuery = locationQuery.Where(x => x.LocationCode.Contains(request.Search) || x.LocationName.Contains(request.Search));
 
+                }
+
+
+                if (request.Status != null)
+                {
+                    locationQuery = locationQuery.Where(x => x.IsActive == request.Status);
                 }
 
                 var results = locationQuery.GroupBy(x => x.LocationNo).Select(x => new GetLocationResult

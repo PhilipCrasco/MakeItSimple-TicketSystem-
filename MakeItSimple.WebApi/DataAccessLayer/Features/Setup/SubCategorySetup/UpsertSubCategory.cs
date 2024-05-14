@@ -52,17 +52,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubCategorySetup
             public async Task<Result> Handle(UpsertSubCategoryCommand command, CancellationToken cancellationToken)
             {
 
-                var subCategoryAlreadyExist = await _context.SubCategories.FirstOrDefaultAsync(x => x.SubCategoryDescription == command.SubCategory_Description, cancellationToken);
+                var categoryNotExist = await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId
+                    && x.IsActive == true, cancellationToken);
+
+                if(categoryNotExist == null)
+                {
+                    return Result.Failure(SubCategoryError.CategoryNotExist());
+                }
+
+                var subCategoryAlreadyExist = await _context.SubCategories
+                    .FirstOrDefaultAsync(x => x.SubCategoryDescription == command.SubCategory_Description 
+                    && x.CategoryId == command.CategoryId, cancellationToken);
 
                 if (subCategoryAlreadyExist != null)
                 {
                     return Result.Failure(SubCategoryError.SubCategoryAlreadyExist(command.SubCategory_Description));
-                }
-
-                var categoryNotExist = await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId && x.IsActive == true, cancellationToken);
-                if(categoryNotExist == null)
-                {
-                    return Result.Failure(SubCategoryError.CategoryNotExist());
                 }
 
                 var subCategory = await _context.SubCategories.FirstOrDefaultAsync(x => x.Id == command.Id , cancellationToken);

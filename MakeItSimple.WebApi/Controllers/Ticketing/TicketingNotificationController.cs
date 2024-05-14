@@ -2,15 +2,18 @@
 using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.CommentNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.OpenTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.RequestTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ReTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -215,6 +218,37 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
+
+        [HttpGet("ticket-comment")]
+        public async Task<IActionResult> CommentNotification([FromQuery] CommentNotificationQueryResult command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        //query.Users = userId;
+                        command.UserId = userId;
+
+                    }
+                }
+
+                var results = await _mediator.Send(command);
+                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+
+                return Ok(results);
+
+            }
+            catch(Exception ex) 
+            {
+                return Conflict(ex.Message);
+
+            }
+        }
+
+
 
 
     }

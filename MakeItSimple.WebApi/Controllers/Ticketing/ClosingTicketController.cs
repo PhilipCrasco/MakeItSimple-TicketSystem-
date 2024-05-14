@@ -227,7 +227,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 return Conflict(ex.Message);
             }
-        }
+        } 
 
         [HttpPut("reject")]
         public async Task<IActionResult> RejectClosingTicket([FromBody] RejectClosingTicketCommand command)
@@ -237,11 +237,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                 if (User.Identity is ClaimsIdentity identity)
                 {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {

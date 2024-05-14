@@ -12,5 +12,6 @@
         public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
 
         public ICollection<ReTicketConcern> ReTicketConcerns { get;set; }
+        public ICollection<TicketAttachment> TicketAttachments { get; set; }
     }
 }

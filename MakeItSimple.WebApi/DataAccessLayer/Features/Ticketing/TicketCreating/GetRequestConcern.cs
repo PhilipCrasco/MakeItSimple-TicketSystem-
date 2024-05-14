@@ -108,7 +108,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
 
-                        if (request.Search != null)
+                        if (!string.IsNullOrEmpty(request.Search))
                         {
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestorByUser.Fullname.Contains(request.Search));
                         }

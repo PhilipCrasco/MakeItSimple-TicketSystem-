@@ -42,6 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var closeUpdateList = new List<bool>();
                     var closeNewList = new List<ClosingTicket>();
                     var closeHistoryList = new List<ClosingTicket>();
+                    var removeTicketConcern = new List<ClosingTicket>();
 
                     var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -127,6 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             }
 
                             closeUpdateList.Add(HasChange);
+                            removeTicketConcern.Add(closingTicketConcern);
                         }
                         else if (ticketConcern != null && closingTicketConcern is null)
                         {
@@ -182,7 +184,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
-                    if(closeHistoryList.Count(x => x.IsRejectClosed is true) > 0)
+                    var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                    var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+
+                    var removeConcernList = await _context.ClosingTickets
+                        .Where(x => !selectRemoveConcern.Contains(x.Id)
+                        && selectRemoveGenerator.Contains(x.TicketGeneratorId))
+                        .ToListAsync();
+
+                    if(removeTicketConcern.Count() > 0)
+                    {
+                        foreach (var removeConcern in removeTicketConcern)
+                        {
+                            removeConcern.IsActive = false;
+                        }
+                    }
+
+                    if (closeHistoryList.Count(x => x.IsRejectClosed is true) > 0)
                     { 
                        
                         var closeTicketList = await _context.ClosingTickets

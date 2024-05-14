@@ -48,6 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 var transferUpdateList = new List<bool>(); 
                 var transferNewList = new List<TransferTicketConcern>();
+                var removeTicketConcern = new List<TransferTicketConcern>();
 
                 var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
                 var requestTransferList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
@@ -136,6 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         }
 
                         transferUpdateList.Add(HasChange);
+                        removeTicketConcern.Add(transferTicket);
                         
 
                     }
@@ -174,6 +176,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
+                }
+
+                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+
+                var removeConcernList = await _context.TransferTicketConcerns
+                    .Where(x => !selectRemoveConcern.Contains(x.Id)
+                    && selectRemoveGenerator.Contains(x.TicketGeneratorId) 
+                    && x.IsActive == true)
+                    .ToListAsync();
+
+                if (removeTicketConcern.Count() > 0)
+                {
+                    foreach (var removeConcern in removeTicketConcern)
+                    {
+                        removeConcern.IsActive = false;
+                    }
                 }
 
                 if ((requestTransferList.First().IsRejectTransfer == true && transferUpdateList.First() == true) 

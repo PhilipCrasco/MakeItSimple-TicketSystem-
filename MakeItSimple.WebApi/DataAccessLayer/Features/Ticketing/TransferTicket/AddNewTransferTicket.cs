@@ -128,7 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             RequestGeneratorId = requestGeneratorExist.Id,
                             ChannelId = command.ChannelId,
                             UserId = transferConcern.UserId,
-                            ConcernDetails = transferTicketAlreadyExist.ConcernDetails,
+                            ConcernDetails = ticketConcern.ConcernDetails,
                             TransferRemarks = command.TransferRemarks,
                             AddedBy = command.Added_By,
                             StartDate = ticketConcern.StartDate,

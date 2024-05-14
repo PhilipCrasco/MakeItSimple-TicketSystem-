@@ -87,6 +87,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
+
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 

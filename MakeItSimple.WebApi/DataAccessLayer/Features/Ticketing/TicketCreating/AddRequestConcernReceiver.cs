@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Migrations;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.CodeAnalysis.FlowAnalysis;
@@ -77,6 +78,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var dateToday = DateTime.Today;
                 var requestGeneratorList = new List<RequestGenerator>();
                 var ticketConcernList = new List<TicketConcern>();
+                var removeTicketConcern = new List<TicketConcern>();
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -308,6 +310,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.Remarks = command.Remarks;
                         }
 
+                        removeTicketConcern.Add(upsertConcern);
+
                         await _context.SaveChangesAsync(cancellationToken);
                     }
                     else
@@ -345,24 +349,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                         if(requestorPermissionList.Any(x => x.Contains(userList.UserRole.UserRoleName))
-                            && issueHandlerPermissionList.Any(x => !x.Contains(addedList.UserRole.UserRoleName)) && concernAlreadyExist == null)
+                            && issueHandlerPermissionList.Any(x => !x.Contains(addedList.UserRole.UserRoleName)))
                         {
-                            var addRequestConcern = new RequestConcern
+
+                            var requestConcernExist = await _context.RequestConcerns
+                                .Where(x => x.Concern == addnewTicketConcern.ConcernDetails && x.IsActive)
+                                .FirstOrDefaultAsync();
+
+                            if (concernAlreadyExist == null)
                             {
+                                var addRequestConcern = new RequestConcern
+                                {
 
-                                RequestGeneratorId = requestGeneratorexist.Id,
-                                UserId = addnewTicketConcern.RequestorBy,
-                                AddedBy = command.Added_By,
-                                ConcernStatus = TicketingConString.ForApprovalTicket,
-                                IsDone = false,
+                                    RequestGeneratorId = requestGeneratorexist.Id,
+                                    UserId = addnewTicketConcern.RequestorBy,
+                                    Concern = concerns.Concern_Details,
+                                    AddedBy = command.Added_By,
+                                    ConcernStatus = TicketingConString.ForApprovalTicket,
+                                    IsDone = false,
 
-                            };
+                                };
 
-                            await _context.RequestConcerns.AddAsync(addRequestConcern);
-                            await _context.SaveChangesAsync(cancellationToken);
+                                await _context.RequestConcerns.AddAsync(addRequestConcern);
+                                await _context.SaveChangesAsync(cancellationToken);
+
+                                requestConcernExist = addRequestConcern;
+                            }
 
                             addnewTicketConcern.TicketType = TicketingConString.Concern;
-                            addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
+                            addnewTicketConcern.RequestConcernId = requestConcernExist.Id;
                         }
 
                         addnewTicketConcern.TicketType = TicketingConString.Concern;
@@ -393,7 +408,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-                        var checkingList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
+                        var checkingList = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
                         && x.RequestConcernId != null, cancellationToken);
                         if (checkingList != null)
                         {
@@ -402,6 +418,43 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         await _context.TicketConcerns.AddAsync(addnewTicketConcern);
 
+                    }
+
+                }
+
+                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestGeneratorId);
+
+                var removeConcernList = await _context.TicketConcerns
+                    .Where(x => !selectRemoveConcern.Contains(x.Id) 
+                    && selectRemoveGenerator.Contains(x.RequestGeneratorId) 
+                    && x.IsApprove != true && x.IsActive == true)
+                    .ToListAsync();
+
+                if (removeConcernList.Count() > 0)
+                {
+                    foreach (var removeConcern in removeConcernList)
+                    {
+                        var concernList = await _context.TicketConcerns
+                             .Where(x => selectRemoveGenerator.Contains(x.RequestGeneratorId)
+                             && x.IsApprove != true && x.IsActive == true)
+                             .ToListAsync();
+
+                        if (concernList.Count() > 1)
+                        {
+                            removeConcern.IsActive = false;
+                        }
+
+                        if (concernList.Count() == 1)
+                        {
+                            removeConcern.UserId = null;
+                            removeConcern.CategoryId = null;
+                            removeConcern.SubCategoryId = null;
+                            removeConcern.StartDate = null;
+                            removeConcern.TargetDate = null;
+                            removeConcern.UpdatedAt = null;
+                            removeConcern.ModifiedBy = null;
+                        }
                     }
 
                 }

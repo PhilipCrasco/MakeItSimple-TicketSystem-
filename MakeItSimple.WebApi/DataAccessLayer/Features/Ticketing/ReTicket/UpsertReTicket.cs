@@ -47,6 +47,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 var transferUpdateList = new List<bool>();
                 var reTicketHistoryList = new List<ReTicketConcern>();
+                var removeTicketConcern = new List<ReTicketConcern>();
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -76,7 +77,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == reTicket.TicketConcernId, cancellationToken);
                     if (ticketConcern == null)
                     {
-
                         return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                     }
 
@@ -137,6 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         }
 
                         transferUpdateList.Add(HasChange);
+                        removeTicketConcern.Add(reTicketConcern);
                     }
                     else if (ticketConcern != null && reTicketConcern is null)
                     {
@@ -182,18 +183,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                                 }
 
                             }
-
                         }
 
                         ticketConcern.IsReTicket = false;
                         await _context.ReTicketConcerns.AddAsync(addReTicket, cancellationToken);
-
                     }
                     else
                     {
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
+                }
+
+                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+
+                var removeConcernList = await _context.ReTicketConcerns
+                    .Where(x => !selectRemoveConcern.Contains(x.Id)
+                    && selectRemoveGenerator.Contains(x.TicketGeneratorId)
+                    && x.IsActive == true)
+                    .ToListAsync();
+
+                if (removeTicketConcern.Count() > 0)
+                {
+                    foreach (var removeConcern in removeTicketConcern)
+                    {
+                        removeConcern.IsActive = false;
+                    }
                 }
 
                 if (reTicketHistoryList.Count(x => x.IsRejectReTicket is true) > 0)

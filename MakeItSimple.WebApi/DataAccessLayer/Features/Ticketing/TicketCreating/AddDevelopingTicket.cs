@@ -68,8 +68,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var dateToday = DateTime.Today;
 
                 var requestGeneratorList = new List<RequestGenerator>();
-
                 var ticketConcernList = new List<TicketConcern>();
+                var removeTicketConcern = new List<TicketConcern>();
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -250,6 +250,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.Remarks = command.Remarks;
                         }
 
+                        removeTicketConcern.Add(upsertConcern);
+
                     }
                     else
                     {
@@ -326,7 +328,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
                 }
 
-                var uploadTasks = new List<Task>();
+                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestGeneratorId);
+                var selectRemoveUserId = removeTicketConcern.Select(x => x.UserId);
+                
+                var removeConcernList = await _context.TicketConcerns
+                    .Where(x => !selectRemoveConcern.Contains(x.Id)
+                    && selectRemoveGenerator.Contains(x.RequestGeneratorId)
+                    && selectRemoveUserId.Contains(x.UserId)
+                    && x.IsApprove != true && x.IsActive == true)
+                    .ToListAsync();
+
+                if (removeConcernList.Count() > 0)
+                {
+                    foreach (var removeConcern in removeConcernList)
+                    {
+                        removeConcern.IsActive = false;
+                    }
+                }
+
+                    var uploadTasks = new List<Task>();
 
                 if (command.ManualAttachments.Count(x => x.Attachment != null) > 0)
                 {

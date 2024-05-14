@@ -56,8 +56,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public string SubCategory_Description { get; set; }
                 public DateTime? Start_Date { get; set; }
                 public DateTime? Target_Date { get; set; }
-
-
                 public string Ticket_Status { get; set; }
                 //public string Concern_Status {  get; set; }
                 public string Remarks { get; set; }
@@ -66,6 +64,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public class TicketConcern
                 {
                     public int? TicketConcernId { get; set; }
+                    //public int ? ChannelUserId { get; set; }
+
                     public Guid? UserId { get; set; }
                     public string Issue_Handler { get; set; }
                     public string Added_By { get; set; }
@@ -111,7 +111,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.User)
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.RequestorByUser);
+                     .ThenInclude(x => x.RequestorByUser)
+                     .Include(x => x.TicketConcerns)
+                     .ThenInclude(x => x.Channel)
+                     .ThenInclude(x => x.ChannelUsers);
 
                 if (requestConcernsQuery.Count() > 0)
                 {
@@ -139,7 +142,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
                     }
 
-                    if (!request.Search.IsNullOrEmpty())
+                    if (!string.IsNullOrEmpty(request.Search))
                     {
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.User.Fullname.Contains(request.Search)
                         && x.Id.ToString().Contains(request.Search));
@@ -284,6 +287,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         TicketConcerns = x.Select(x => new TicketRequestConcern.TicketConcern
                         {
                             TicketConcernId = x.Id,
+                            //ChannelUserId = x.Channel,
                             UserId = x.UserId,
                             Issue_Handler = x.User.Fullname,
                             Added_By = x.AddedByUser.Fullname,

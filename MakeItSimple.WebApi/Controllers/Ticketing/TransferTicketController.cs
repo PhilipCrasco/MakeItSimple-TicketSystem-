@@ -26,11 +26,11 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
         public TransferTicketController(IMediator mediator)
         {
-            _mediator = mediator;
+            _mediator = mediator;    
         }
 
         [HttpPost("AddNewTransferTicket")]
-        public async Task<IActionResult> AddNewTransferTicket([FromBody] AddNewTransferTicketCommand command)
+        public async Task<IActionResult> AddNewTransferTicket([FromForm] AddNewTransferTicketCommand command)
         {
             try
             {

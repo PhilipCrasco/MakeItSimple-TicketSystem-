@@ -63,7 +63,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
                     if (channelId.ChannelName != command.Channel_Name)
                     {
-                        channelId.ChannelName = channelId.ChannelName;
+                        channelId.ChannelName = command.Channel_Name;
                         hasChange = true;
                     }
 
@@ -77,6 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
 
                     listChannel.Add(channelId);
+                    await _context.SaveChangesAsync();
 
 
                 }
@@ -115,7 +116,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
 
 
-                    var channelName = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name, cancellationToken);
+                    var channelName = await _context.Channels.FirstOrDefaultAsync(x => x.ChannelName == command.Channel_Name || x.Id == command.ChannelId, cancellationToken);
 
                     var channelUser = await _context.ChannelUsers.Include(x => x.User).FirstOrDefaultAsync(x => x.UserId == member.UserId && x.ChannelId == channelName.Id);
 

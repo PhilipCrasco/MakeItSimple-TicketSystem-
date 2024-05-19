@@ -21,6 +21,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public string Unit_Name { get; set; }
             public int ? SubUnitId { get; set; }
             public string SubUnit_Name { get; set; }
+            public int ? ProjectId { get; set; }
+            public string Project_Name { get; set; }
+            public int ? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public Guid? UserId { get; set; }
             public string Fullname { get; set; }
@@ -88,6 +91,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 IQueryable<ClosingTicket> closingTicketsQuery = _context.ClosingTickets
                     .Include(x => x.AddedByUser)
                     .Include(x => x.Channel)
+                    .ThenInclude(x => x.Project)
                     .Include(x => x.User)
                     .ThenInclude(x => x.BusinessUnit)
                     .Include(x => x.RejectClosedByUser) 
@@ -153,7 +157,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 }
                                 var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
+                                var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
+
+                                closingTicketsQuery = closingTicketsQuery
+                                    .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect.Contains(x.RequestGeneratorId));
                             }
                             else
                             {
@@ -188,6 +195,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnitId = x.First().User.SubUnitId,
                         SubUnit_Name = x.First().User.SubUnit.SubUnitName,
+                        ProjectId = x.First().Channel.ProjectId,
+                        Project_Name = x.First().Channel.Project.ProjectName,
+                        ChannelId = x.First().ChannelId,
                         Channel_Name = x.First().Channel.ChannelName,
                         UserId = x.First().UserId,   
                         Fullname = x.First().User.Fullname,

@@ -36,7 +36,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public int? SubUnitId { get; set; }
             public string SubUnit_Name { get; set; }
-
+            public int? ProjectId { get; set; }
+            public string Project_Name { get; set; }
             public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
 
@@ -98,6 +99,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
+                    .Include(x => x.Channel)
+                    .ThenInclude(x => x.Project)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit);
                 
@@ -165,7 +168,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                                 var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
+                                var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
+
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestGeneratorId));
+
 
                             }
                             else
@@ -206,6 +213,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnitId = x.First().User.SubUnitId,
                         SubUnit_Name = x.First().User.SubUnit.SubUnitName,
+                        ProjectId = x.First().Channel.ProjectId,
+                        Project_Name = x.First().Channel.Project.ProjectName,
                         ChannelId = x.First().ChannelId,
                         Channel_Name = x.First().Channel.ChannelName,
                         Concern_Type = x.First().TicketType,

@@ -20,6 +20,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public string Unit_Name { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
+            public int? ProjectId { get; set; }
+            public string Project_Name { get; set; }
+            public int ? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public string EmpId { get; set; }
             public string Fullname { get; set; }
@@ -81,6 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.Channel)
+                    .ThenInclude(x  => x.Project)
                     .Include(x => x.User)
                     .Include(x => x.RejectReTicketByUser)
                     .Include(x => x.ReTicketByUser);
@@ -146,6 +150,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnit_Code = x.First().User.SubUnit.SubUnitCode,
                         SubUnit_Name = x.First().User.SubUnit.SubUnitName,
+                        ProjectId = x.First().Channel.ProjectId,
+                        Project_Name = x.First().Channel.Project.ProjectName,
+                        ChannelId = x.First().ChannelId,
                         Channel_Name = x.First().Channel.ChannelName,
                         EmpId = x.First().User.EmpId,   
                         Fullname = x.First().User.Fullname,
@@ -168,7 +175,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
                             Updated_At = x.UpdatedAt,
-                            Modified_By = x.ModifiedByUser.Fullname
+                            Modified_By = x.ModifiedByUser.Fullname 
 
                         }).ToList(),
                     });

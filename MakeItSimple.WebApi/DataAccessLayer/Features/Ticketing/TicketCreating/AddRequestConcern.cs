@@ -131,7 +131,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         IsApprove = false,
                         AddedBy = command.Added_By,
                         TicketType = TicketingConString.Concern,
-                        ConcernStatus = addRequestConcern.ConcernStatus
+                        ConcernStatus = addRequestConcern.ConcernStatus,
+                        IsAssigned = false,
 
                     };
 

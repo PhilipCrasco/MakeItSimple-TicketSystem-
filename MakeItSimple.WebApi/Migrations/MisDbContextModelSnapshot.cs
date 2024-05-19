@@ -282,6 +282,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("modified_by");
 
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int")
+                        .HasColumnName("project_id");
+
                     b.Property<int?>("SubUnitId")
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
@@ -305,6 +309,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_channels_modified_by");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_channels_project_id");
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_channels_sub_unit_id");
@@ -539,6 +546,49 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasDatabaseName("ix_locations_sub_unit_id");
 
                     b.ToTable("locations", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ProjectSetup.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("ProjectName")
+                        .HasColumnType("longtext")
+                        .HasColumnName("project_name");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_projects");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_projects_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_projects_modified_by");
+
+                    b.ToTable("projects", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.Receiver", b =>
@@ -1544,6 +1594,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_approve");
 
+                    b.Property<bool?>("IsAssigned")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_assigned");
+
                     b.Property<bool?>("IsClosedApprove")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_closed_approve");
@@ -2198,6 +2252,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_channels_users_modified_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ProjectSetup.Project", "Project")
+                        .WithMany("Channels")
+                        .HasForeignKey("ProjectId")
+                        .HasConstraintName("fk_channels_projects_project_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
                         .WithMany()
                         .HasForeignKey("SubUnitId")
@@ -2213,6 +2272,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("ModifiedByUser");
+
+                    b.Navigation("Project");
 
                     b.Navigation("SubUnit");
 
@@ -2307,6 +2368,25 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("SubUnit");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ProjectSetup.Project", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_projects_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_projects_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.Receiver", b =>
@@ -3141,6 +3221,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Units");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ProjectSetup.Project", b =>
+                {
+                    b.Navigation("Channels");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", b =>

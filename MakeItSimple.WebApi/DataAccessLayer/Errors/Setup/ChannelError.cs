@@ -8,6 +8,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Setup
       public static Error ChannelNameAlreadyExist(string ChannelName) =>
       new Error("Channel.ChannelNameAlreadyExist", $"Channel name {ChannelName} already exist!");
 
+        public static Error ProjectNameAlreadyExist(string ProjectName) =>
+        new Error("Channel.ProjectNameAlreadyExist", $"Project name {ProjectName} already exist!");
+      public static Error ProjectNotExist() =>
+      new Error("Channel.ProjectNotExist", $"Project not exist!");
       public static Error SubUnitNotExist() =>
       new Error("Channel.SubUnitNotExist", "SubUnit doesn't exist!");
 

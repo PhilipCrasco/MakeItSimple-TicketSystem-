@@ -22,6 +22,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Department_Name { get; set; }
             public Guid? UserId { get; set; }
 
+
+
             public string EmpId { get; set; }
 
             public string FullName { get; set; }
@@ -57,6 +59,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime? Start_Date { get; set; }
                 public DateTime? Target_Date { get; set; }
                 public string Ticket_Status { get; set; }
+                public bool ? Is_Assigned { get; set; }
                 //public string Concern_Status {  get; set; }
                 public string Remarks { get; set; }
                 public string Concern_Type { get; set; }
@@ -65,8 +68,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     public int? TicketConcernId { get; set; }
                     //public int ? ChannelUserId { get; set; }
-
+                    
                     public Guid? UserId { get; set; }
+                    public int? SubUnitId { get; set; }
+                    public string SubUnit_Name { get; set; }
                     public string Issue_Handler { get; set; }
                     public string Added_By { get; set; }
                     public DateTime Created_At { get; set; }
@@ -89,7 +94,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Search { get; set; }
             public bool? Status { get; set; }
 
-            public bool ? Ascending { get; set; }
+            public bool? Ascending { get; set; }
         }
 
         public class Handler : IRequestHandler<GetRequestorTicketConcernQuery, PagedList<GetRequestorTicketConcernResult>>
@@ -169,7 +174,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
                         else
                         {
-                           requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
+                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
                         }
 
                     }
@@ -182,10 +187,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 //var ticketConcernApproveList = await _context.
 
-                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true).ToListAsync();
+                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
+                                    .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
+                                    .ToListAsync();
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
 
-                                requestConcernsQuery = requestConcernsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect
+                                         .Contains(x.RequestGeneratorId));
                             }
                             else
                             {
@@ -245,8 +255,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Department_Name = x.User.Department.DepartmentName,
                         UnitId = x.User.UnitId,
                         Unit_Name = x.User.Units.UnitName,
-                        SubUnitId = x.User.SubUnitId,
-                        SubUnit_Name = x.User.SubUnit.SubUnitName,
                         ChannelId = x.ChannelId,
                         Channel_Name = x.Channel.ChannelName,
                         Concern_Description = x.ConcernDetails,
@@ -261,6 +269,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Ticket_Status = x.IsApprove == true ? "Ticket Approve" : x.IsReject == true ? "Rejected" :
                          x.ConcernStatus != TicketingConString.ForApprovalTicket ? x.ConcernStatus : x.IsApprove == false
                          && x.IsReject == false ? "For Approval" : "Unknown",
+                         x.IsAssigned
 
 
                     }).Select(x => new TicketRequestConcern
@@ -270,8 +279,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Department_Name = x.Key.Department_Name,
                         UnitId = x.Key.UnitId,
                         Unit_Name = x.Key.Unit_Name,
-                        SubUnitId = x.Key.SubUnitId,
-                        SubUnit_Name = x.Key.SubUnit_Name,
+                        //SubUnitId = x.Key.SubUnitId,
+                        //SubUnit_Name = x.Key.SubUnit_Name,
                         ChannelId = x.Key.ChannelId,
                         Channel_Name = x.Key.Channel_Name,
                         Concern_Description = x.Key.Concern_Description,
@@ -284,10 +293,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Ticket_Status = x.Key.Ticket_Status,
                         Remarks = x.Key.Remarks,
                         Concern_Type = x.Key.Concern_Type,
+                        Is_Assigned = x.Key.IsAssigned,
                         TicketConcerns = x.Select(x => new TicketRequestConcern.TicketConcern
                         {
                             TicketConcernId = x.Id,
                             //ChannelUserId = x.Channel,
+                            SubUnitId = x.User.SubUnitId,
+                            SubUnit_Name = x.User.SubUnit.SubUnitName,
                             UserId = x.UserId,
                             Issue_Handler = x.User.Fullname,
                             Added_By = x.AddedByUser.Fullname,

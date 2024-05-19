@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Department_Name { get; set; }
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
+            public int ? ProjectId { get; set; }
+            public string Project_Name { get; set; }
             public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public int? UnitId { get; set; }
@@ -32,6 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Remarks { get; set; }
             public string Concern_Type { get; set; }
             public bool ? Done { get; set; }
+            public bool ? Is_Assigned { get; set; }
             public List<GetRequestConcernByConcern> GetRequestConcernByConcerns { get; set; }
 
             public class GetRequestConcernByConcern
@@ -81,6 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .Include(x => x.ModifiedByUser)  
                         .Include(x => x.AddedByUser)
                         .Include(x => x.Channel)
+                        .ThenInclude(x  => x.Project)
                         .Include(x => x.User)
                         .Include(x => x.RequestorByUser)
                         .ThenInclude(x => x.UserRole); 
@@ -158,7 +162,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     }
                                     var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                    ticketConcernQuery = ticketConcernQuery.Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId));
+                                    var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
+
+                                    ticketConcernQuery = ticketConcernQuery
+                                        .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestGeneratorId));
                                 }
                                 else
                                 {
@@ -234,6 +241,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnitId = x.First().User.SubUnitId,
                         SubUnit_Name = x.First().User.SubUnit.SubUnitName,
+                        ProjectId = x.First().Channel.ProjectId,
+                        Project_Name = x.First().Channel.Project.ProjectName,
                         ChannelId = x.First().ChannelId,
                         Channel_Name = x.First().Channel.ChannelName,
                         Requestor_By = x.First().RequestorBy,
@@ -246,6 +255,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Concern_Type = x.First().TicketType,
                         //Concern_Status = x.First().ConcernStatus,
                         Done = x.First().IsDone,
+                        Is_Assigned = x.First().IsAssigned,
                         GetRequestConcernByConcerns = x.Select(x => new GetRequestConcernResult.GetRequestConcernByConcern
                         {
                             TicketConcernId = x.Id,

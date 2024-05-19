@@ -12,6 +12,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         public class GetChannelResult
         {
             public int Id { get; set; }
+            public int ? ProjectId { get; set; }
+            public string Project_Name { get; set; }
             public string Channel_Name { get; set; }
 
             public int No_Of_Members { get; set; }
@@ -26,6 +28,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public class ChannelUser
             {
                 public int ? ChannelId { get; set; }
+                public int ? DepartmentId { get; set; }
+                public string Department_Name { get; set; }
                 public int ChannelUserId {  get; set; }
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
@@ -51,8 +55,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public async Task<PagedList<GetChannelResult>> Handle(GetChannelQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Channel> channelQuery = _context.Channels.Include(x => x.AddedByUser)
-                    .Include(x => x.ModifiedByUser).Include(x => x.ChannelUsers);
+                IQueryable<Channel> channelQuery = _context.Channels
+                    .Include(x => x.AddedByUser)
+                    .Include(x => x.ModifiedByUser)
+                    .Include(x => x.Project)
+                    .Include(x => x.ChannelUsers)
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Department);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -67,6 +76,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 var results = channelQuery.Select(x => new GetChannelResult
                 {
                     Id = x.Id,
+                    ProjectId = x.ProjectId,
+                    Project_Name = x.Project.ProjectName,   
                     Channel_Name = x.ChannelName,
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
@@ -78,6 +89,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     {
                         ChannelId = x.ChannelId,
                         ChannelUserId = x.Id,
+                        DepartmentId = x.Id,
+                        Department_Name = x.User.Department.DepartmentName,
                         UserId = x.UserId,
                         Fullname = x.User.Fullname,
                         UserRole = x.User.UserRole.UserRoleName

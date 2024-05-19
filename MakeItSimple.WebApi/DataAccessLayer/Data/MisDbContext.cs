@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CompanySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ProjectSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ReceiverSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
@@ -24,6 +25,7 @@ using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
+using MakeItSimple.WebApi.Models.Setup.ProjectSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.TeamSetup;
@@ -51,6 +53,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<Unit> Units { get; set; }
         public virtual DbSet<SubUnit> SubUnits { get; set; }
+        public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Channel> Channels {  get; set; }
         public virtual DbSet<ChannelUser> ChannelUsers { get; set; }
         public virtual DbSet<Category> Categories {  get; set; }
@@ -96,6 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new SubUnitConfiguration());
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new ChannelConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new SubCategoryConfiguration());

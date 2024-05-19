@@ -214,7 +214,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         var duplicateConcern = requestTicketConcernList.FirstOrDefault(x => x.UserId == concerns.UserId && x.ConcernDetails == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
                            && x.SubCategoryId == concerns.SubCategoryId && (upsertConcern.ConcernDetails != concerns.Concern_Details
-                           && upsertConcern.CategoryId != concerns.CategoryId && upsertConcern.SubCategoryId != concerns.SubCategoryId));
+                           && upsertConcern.CategoryId != concerns.CategoryId && upsertConcern.SubCategoryId != concerns.SubCategoryId && x.IsActive == true));
 
                         if (duplicateConcern != null)
                         {
@@ -294,6 +294,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
+                            upsertConcern.IsAssigned = true;
                         }
                         upsertConcern.TicketType = TicketingConString.Concern;
 
@@ -318,7 +319,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
 
                         var duplicateConcern = requestTicketConcernList.FirstOrDefault(x => x.UserId == concerns.UserId && x.ConcernDetails == concerns.Concern_Details
-                        && concerns.CategoryId == concerns.CategoryId && x.SubCategoryId == concerns.SubCategoryId);
+                        && concerns.CategoryId == concerns.CategoryId && x.SubCategoryId == concerns.SubCategoryId && x.IsActive == true);
 
                         if (duplicateConcern != null)
                         {
@@ -339,7 +340,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             StartDate = concerns.Start_Date,
                             TargetDate = concerns.Target_Date,
                             IsApprove = false,
-                            ConcernStatus = TicketingConString.ForApprovalTicket
+                            ConcernStatus = TicketingConString.ForApprovalTicket,
+                            IsAssigned = true,
                           
                         };
 
@@ -454,6 +456,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             removeConcern.TargetDate = null;
                             removeConcern.UpdatedAt = null;
                             removeConcern.ModifiedBy = null;
+                            removeConcern.IsAssigned = false;
                         }
                     }
 

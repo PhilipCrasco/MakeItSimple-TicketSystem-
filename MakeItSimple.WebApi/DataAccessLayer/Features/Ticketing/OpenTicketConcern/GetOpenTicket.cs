@@ -5,27 +5,27 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetOpenTicket.GetOpenTicketResult;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetOpenTicket.GetOpenTicketResult.OpenTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket.GetOpenTicketResult;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket.GetOpenTicketResult.OpenTicket;
 
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern
 {
     public class GetOpenTicket
-    {                                                                                       
+    {
 
         public class GetOpenTicketResult
         {
-            
-            public int ? RequestedTicketCount { get; set; }
-            public int ? OpenTicketCount { get; set; }
-            public int ? CloseTicketCount { get; set; }
-            public int ? DelayedTicketCount { get; set; }
+
+            public int? RequestedTicketCount { get; set; }
+            public int? OpenTicketCount { get; set; }
+            public int? CloseTicketCount { get; set; }
+            public int? DelayedTicketCount { get; set; }
             public int? RequestTransactionId { get; set; }
             public string Description { get; set; }
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
-        
+
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
 
@@ -49,7 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             {
 
                 public int? TicketConcernId { get; set; }
-                public int ? RequestConcernId { get; set; }
+                public int? RequestConcernId { get; set; }
                 public string Concern_Description { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategory_Description { get; set; }
@@ -72,7 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public bool? Status { get; set; }
             public string Search { get; set; }
-            public bool ? IsClosedApprove {  get; set; }
+            public bool? IsClosedApprove { get; set; }
             //public string Receiver { get; set; }
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
@@ -104,9 +104,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .ThenInclude(x => x.Project)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit);
-                
-                
-                if(ticketConcernQuery.Count() > 0)
+
+
+                if (ticketConcernQuery.Count() > 0)
                 {
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
@@ -135,12 +135,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
                     }
 
-                    if(request.IsClosedApprove == true )
+                    if (request.IsClosedApprove == true)
                     {
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
                     }
 
-                    if(!string.IsNullOrEmpty(request.UserType))
+                    if (!string.IsNullOrEmpty(request.UserType))
                     {
                         if (request.UserType == TicketingConString.IssueHandler)
                         {
@@ -189,9 +189,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         }
                     }
 
-                 }
+                }
 
-                var results = ticketConcernQuery.Where( x => x.IsApprove != false && x.IsReTicket != true)
+                var results = ticketConcernQuery.Where(x => x.IsApprove != false && x.IsReTicket != true)
                     .GroupBy(x => new
                     {
                         x.RequestTransactionId,

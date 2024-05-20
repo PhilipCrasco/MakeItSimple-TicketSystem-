@@ -1,6 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetOpenTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnedClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicket;
@@ -30,57 +29,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         public ClosingTicketController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        [HttpGet("open-ticket")]
-        public async Task<IActionResult> GetOpenTicket([FromQuery] GetOpenTicketQuery query)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        query.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-                    }
-                }
-                var closingTicket = await _mediator.Send(query);
-
-                Response.AddPaginationHeader(
-
-                closingTicket.CurrentPage,
-                closingTicket.PageSize,
-                closingTicket.TotalCount,
-                closingTicket.TotalPages,
-                closingTicket.HasPreviousPage,
-                closingTicket.HasNextPage
-
-                );
-
-                var result = new
-                {
-                    closingTicket,
-                    closingTicket.CurrentPage,
-                    closingTicket.PageSize,
-                    closingTicket.TotalCount,
-                    closingTicket.TotalPages,
-                    closingTicket.HasPreviousPage,
-                    closingTicket.HasNextPage
-                };
-
-                var successResult = Result.Success(result);
-                return Ok(successResult);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
         }
 
         [HttpPost]
@@ -141,7 +89,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpGet("close-ticket")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetClosingTicket([FromQuery] GetClosingTicketQuery query)
         {
             try

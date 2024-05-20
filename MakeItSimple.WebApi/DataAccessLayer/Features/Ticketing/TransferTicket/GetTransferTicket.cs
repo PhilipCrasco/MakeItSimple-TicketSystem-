@@ -66,8 +66,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketQuery : UserParams, IRequest<PagedList<GetTransferTicketResult>>
         {
             public Guid ? UserId { get; set; }
-            public string Approval { get; set; }
-            public string Users { get; set; }
+            //public string Approval { get; set; }
+            public string UserType { get; set; }
             public string Role { get; set; }
             public bool ? IsTransfer { get; set; }
             public bool ? IsReject { get; set; }
@@ -127,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     transferTicketQuery = transferTicketQuery.Where(x => x.IsRejectTransfer == request.IsReject);
                 }
 
-                if (TicketingConString.Approval == request.Approval)
+                if (request.UserType == TicketingConString.Approval)
                 {
 
                     if (request.UserId != null && TicketingConString.Approver == request.Role)
@@ -146,7 +146,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 }
 
-                if(TicketingConString.Users == request.Users)
+                if(request.UserType == TicketingConString.Users)
                 {
                    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId); 
                 }

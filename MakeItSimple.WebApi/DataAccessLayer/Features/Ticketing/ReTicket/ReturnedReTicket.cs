@@ -39,17 +39,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 foreach(var reTicket in command.ReTickets)
                 {
 
-                    var reTicketExist = await _context.TicketGenerators
-                        .Where(x => x.Id == reTicket.TicketGeneratorId).FirstOrDefaultAsync();
+                    var reTicketExist = await _context.TicketTransactions
+                        .Where(x => x.Id == reTicket.TicketGeneratorId)
+                        .FirstOrDefaultAsync();
+
                     if (reTicketExist == null)
                     {
                         return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == reTicketExist.Id).ToListAsync();
+                    var ticketHistoryList = await _context.TicketHistories
+                        .Where(x => x.TicketTransactionId == reTicketExist.Id)
+                        .ToListAsync();
+
                     var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
-                    var reticketList = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == reTicket.TicketGeneratorId).ToListAsync();
+                    var reticketList = await _context.ReTicketConcerns
+                        .Where(x => x.TicketTransactionId == reTicket.TicketGeneratorId)
+                        .ToListAsync();
 
                     foreach (var ticket in reticketList)
                     {
@@ -63,7 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId = reTicketExist.Id,
+                            TicketTransactionId = reTicketExist.Id,
                             RequestorBy = command.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.ReTicket,

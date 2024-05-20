@@ -19,13 +19,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketResult
         {
 
-            public int ? TicketGeneratorId { get; set; }
+            public int ? TicketTransactionId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
             public string Unit_Code { get; set; }
             public string Unit_Name { get; set; }
             public string SubUnit_Code { get; set; }
             public string SubUnit_Name { get; set; }
+            public int? ProjectId { get; set; }
+            public string Project_Name { get; set; }
+            public int ? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public string EmpId { get; set; }
             public string Fullname { get; set; }
@@ -93,16 +96,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 IQueryable<TransferTicketConcern> transferTicketQuery = _context.TransferTicketConcerns
                     .Include(x => x.TicketConcern)
-                    .Include(x => x.RequestGenerator)
+                    .Include(x => x.RequestTransaction)
                     .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
                     .Include(x => x.User)
+                    .Include(x => x.Channel)
+                    .ThenInclude(x => x.Project)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
 
 
+
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                var fillterApproval = transferTicketQuery.Select(x => x.RequestGeneratorId);
+                var fillterApproval = transferTicketQuery.Select(x => x.RequestTransactionId);
 
 
                 if (!string.IsNullOrEmpty(request.Search))
@@ -132,16 +138,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                     if (request.UserId != null && TicketingConString.Approver == request.Role)
                     {
-                        var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                        var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
+                        var approverTransactList = await _context.ApproverTicketings
+                            .Where(x => x.UserId == userApprover.Id)
+                            .ToListAsync();
+
+                        var approvalLevelList = approverTransactList
+                            .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
+                            .ToList();
+
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketTransactionId);
+
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                        transferTicketQuery = transferTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
+
+                        transferTicketQuery = transferTicketQuery
+                            .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
+                            && userRequestIdApprovalList.Contains(x.TicketTransactionId));
 
                     }
                     else
                     {
-                        transferTicketQuery = transferTicketQuery.Where(x => x.TicketGeneratorId == null);
+                        transferTicketQuery = transferTicketQuery.Where(x => x.TicketTransactionId == null);
                     }
 
                 }
@@ -151,15 +167,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId); 
                 }
 
-                var results = transferTicketQuery.GroupBy(x => x.TicketGeneratorId).Select(x => new GetTransferTicketResult
+                var results = transferTicketQuery.GroupBy(x => x.TicketTransactionId).Select(x => new GetTransferTicketResult
                 {
-                    TicketGeneratorId = x.Key,
+                    TicketTransactionId = x.Key,
                     Department_Code = x.First().User.Department.DepartmentCode,
                     Department_Name = x.First().User.Department.DepartmentName,
                     Unit_Code = x.First().User.Units.UnitCode,
                     Unit_Name = x.First().User.Units.UnitName,
                     SubUnit_Code = x.First().User.SubUnit.SubUnitCode,
                     SubUnit_Name = x.First().User.SubUnit.SubUnitName,
+                    ProjectId = x.First().Channel.ProjectId,
+                    Project_Name = x.First().Channel.Project.ProjectName,
+                    ChannelId = x.First().ChannelId,
                     Channel_Name = x.First().Channel.ChannelName,
                     EmpId = x.First().User.EmpId,
                     Fullname = x.First().User.Fullname,

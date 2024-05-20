@@ -22,7 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public class Concerns
             {
-                public int RequestGeneratorId { get; set; }
+                public int RequestTrasactionId { get; set; }
                 public Guid ? IssueHandler { get; set; }
             }
 
@@ -49,16 +49,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 foreach (var ticketConcern in command.Concern)
                 {
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestGeneratorId, cancellationToken);
-                    if (requestGeneratorExist == null)
+                    var requestTransactionExist = await _context.RequestTransactions
+                        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTrasactionId, cancellationToken);
+
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
                     var requestTicketId = await _context.ApproverTicketings
-                    .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null).ToListAsync();
+                    .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsApprove == null).ToListAsync();
 
-                    var userExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId
+                    var userExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId
                     && x.UserId == ticketConcern.IssueHandler && x.IsApprove != true);
 
                     if (userExist == null)
@@ -67,15 +69,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var ticketConcernExist = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId && x.UserId == userExist.UserId).ToListAsync();
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId && x.UserId == userExist.UserId).ToListAsync();
 
-                    var ticketConcernHandlerExist = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId 
+                    var ticketConcernHandlerExist = await _context.TicketConcerns
+                        .Include(x => x.RequestorByUser)
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId 
                     && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
 
                     var requestTicketConcernId = await _context.ApproverTicketings
-                     .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsApprove == null && x.IssueHandler == userExist.UserId).ToListAsync();
+                     .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                     && x.IsApprove == null && x.IssueHandler == userExist.UserId)
+                     .ToListAsync();
 
-                    var selectRequestTicketId = requestTicketConcernId.FirstOrDefault(x => x.ApproverLevel == requestTicketConcernId.Min(x => x.ApproverLevel));
+                    var selectRequestTicketId = requestTicketConcernId
+                        .FirstOrDefault(x => x.ApproverLevel == requestTicketConcernId.Min(x => x.ApproverLevel));
 
                     if(selectRequestTicketId != null)
                     {
@@ -86,7 +93,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
 
-                        var userApprovalId = await _context.ApproverTicketings.Include(x => x.User).Where(x => x.RequestGeneratorId == selectRequestTicketId.RequestGeneratorId).ToListAsync();
+                        var userApprovalId = await _context.ApproverTicketings
+                            .Include(x => x.User)
+                            .Where(x => x.RequestTransactionId == selectRequestTicketId.RequestTransactionId)
+                            .ToListAsync();
 
                         foreach (var concernTicket in ticketConcernHandlerExist)
                         {

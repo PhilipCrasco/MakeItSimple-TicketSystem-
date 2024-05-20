@@ -26,8 +26,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public string Remarks { get; set; }
 
-        public int ? RequestGeneratorId { get; set; }
-        public virtual RequestGenerator RequestGenerator { get; set; }
+        public int? RequestTransactionId { get; set; }
+        public virtual RequestTransaction RequestTransaction { get; set; }
         public ICollection<TicketConcern> TicketConcerns { get; set; }
 
 

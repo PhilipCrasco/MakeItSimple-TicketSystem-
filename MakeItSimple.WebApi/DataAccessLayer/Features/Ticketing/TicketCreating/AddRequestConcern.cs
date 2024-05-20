@@ -20,7 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class AddRequestConcernCommand : IRequest<Result>
         {
             
-            public int ? RequestGeneratorId { get; set; }
+            public int ? RequestTransactionId { get; set; }
             public Guid ? Added_By { get; set; } 
             public Guid ? Modified_By { get; set; }
             public Guid ? UserId { get; set; }
@@ -58,16 +58,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddRequestConcernCommand command, CancellationToken cancellationToken)
             {
 
-                var requestGeneratorList = new List<RequestGenerator>();
+                var requestTransactionList = new List<RequestTransaction>();
                 var requestConcernList = new List<RequestConcern>();
 
 
-                var requestGeneratorexist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
-                if (requestGeneratorexist == null)
+                var requestTransactionExist = await _context.RequestTransactions
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
+
+                if (requestTransactionExist == null)
                 {
-                    var requestGeneratorId = new RequestGenerator { IsActive = true };
-                    await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    requestGeneratorexist = requestGeneratorId;
+                    var requestTransactionId = new RequestTransaction { IsActive = true };
+                    await _context.RequestTransactions.AddAsync(requestTransactionId);
+                    requestTransactionExist = requestTransactionId;
                 }
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
@@ -77,7 +79,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);
-                requestGeneratorList.Add(requestGeneratorexist);
+                requestTransactionList.Add(requestTransactionExist);
 
                 var requestConcernIdExist = await _context.RequestConcerns
                     .Include(x => x.User).ThenInclude(x => x.Department)
@@ -109,7 +111,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var addRequestConcern = new RequestConcern
                     {
-                        RequestGeneratorId = requestGeneratorexist.Id,
+                        RequestTransactionId = requestTransactionExist.Id,
                         UserId = userId.Id,
                         Concern = command.Concern,
                         AddedBy = command.Added_By,
@@ -124,7 +126,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var addTicketConcern = new TicketConcern
                     {
-                        RequestGeneratorId = requestGeneratorexist.Id,
+                        RequestTransactionId = requestTransactionExist.Id,
                         RequestConcernId = addRequestConcern.Id,
                         RequestorBy = command.UserId,
                         ConcernDetails = addRequestConcern.Concern,
@@ -178,7 +180,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{requestGeneratorList.First().Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{requestTransactionList.First().Id}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -206,7 +208,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    RequestGeneratorId = requestGeneratorList.First().Id,
+                                    RequestTransactionId = requestTransactionList.First().Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,

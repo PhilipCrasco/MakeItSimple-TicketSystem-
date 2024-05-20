@@ -11,7 +11,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestAttachmentResult
         {
-            public int RequestGeneratorId { get; set; }
+            public int RequestTransactionId { get; set; }
 
             public List<TicketAttachment> Attachments { get; set; }
 
@@ -51,7 +51,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(GetRequestAttachmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<RequestGenerator> requestGeneratorQuery = _context.RequestGenerators
+                IQueryable<RequestTransaction> requestTransactionQuery = _context.RequestTransactions
                     .Include(x => x.TicketConcerns)
                     .Include(x => x.TicketAttachments)
                     .ThenInclude(x => x.AddedByUser)
@@ -59,18 +59,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (request.Id != null)
                 {
-                    requestGeneratorQuery = requestGeneratorQuery.Where(x => x.Id == request.Id);
+                    requestTransactionQuery = requestTransactionQuery.Where(x => x.Id == request.Id);
                 }
 
                 if(request.Status != null)
                 {
-                    requestGeneratorQuery = requestGeneratorQuery.Where(x => x.IsActive == request.Status);
+                    requestTransactionQuery = requestTransactionQuery.Where(x => x.IsActive == request.Status);
                 }
 
 
-                var results = await requestGeneratorQuery.Select(x => new GetRequestAttachmentResult
+                var results = await requestTransactionQuery.Select(x => new GetRequestAttachmentResult
                 {
-                    RequestGeneratorId = x.Id,
+                    RequestTransactionId = x.Id,
                     Attachments = x.TicketAttachments.Select(x => new GetRequestAttachmentResult.TicketAttachment
                     {
                         TicketAttachmentId = x.Id,

@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class RejectRequestTicketResult
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
            
 
             public List<RejectConcern> RejectConcerns { get; set; }
@@ -36,7 +36,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public class RejectConcern
             {
-                public int RequestGeneratorId { get; set; }
+                public int RequestTransactionId { get; set; }
                 public Guid ? Issue_Handler { get; set; }
             }
         }
@@ -58,14 +58,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 foreach (var ticketConcern in command.RejectConcerns)
                 {
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestGeneratorId, cancellationToken);
-                    if (requestGeneratorExist == null)
+                    var requestTransactionExist = await _context.RequestTransactions
+                        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTransactionId, cancellationToken);
+
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-                    var issueHandlerExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
-                    && x.UserId == ticketConcern.Issue_Handler).FirstOrDefaultAsync();
+                    var issueHandlerExist = await _context.TicketConcerns
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                    && x.UserId == ticketConcern.Issue_Handler)
+                        .FirstOrDefaultAsync();
 
                     if (issueHandlerExist == null)
                     {
@@ -73,7 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var ticketConcernExist = await _context.TicketConcerns
-                        .Where(x => x.RequestGeneratorId == ticketConcern.RequestGeneratorId 
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId 
                         && x.UserId == ticketConcern.Issue_Handler).ToListAsync();
 
                     foreach (var concerns in ticketConcernExist)
@@ -89,9 +93,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var results = ticketApproveList.DistinctBy(x => x.RequestGeneratorId).Select(x => new RejectRequestTicketResult
+                var results = ticketApproveList.DistinctBy(x => x.RequestTransactionId).Select(x => new RejectRequestTicketResult
                 {
-                    RequestGeneratorId = x.RequestGeneratorId,
+                    RequestTransactionId = x.RequestTransactionId,
                     RejectConcerns = ticketApproveList.Select(x => new RejectRequestTicketResult.RejectConcern
                     {
                         TicketConcernId = x.Id,

@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public class CancelTransferTicketConcern
             {
-                public int RequestGeneratorId { get; set; }
+                public int RequestTransactionId { get; set; }
 
                 public List<CancelTransferTicketById>  CancelTransferTicketByIds { get; set; }
                 public class CancelTransferTicketById
@@ -39,7 +39,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 foreach(var transferTicket in command.CancelTransferTicketConcerns)
                 {
-                        var transferTicketQuery = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == transferTicket.RequestGeneratorId ).ToListAsync();
+                        var transferTicketQuery = await _context.TransferTicketConcerns
+                        .Where(x => x.RequestTransactionId == transferTicket.RequestTransactionId )
+                        .ToListAsync();
 
                         if (transferTicketQuery == null)
                         {

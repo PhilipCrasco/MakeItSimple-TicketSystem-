@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             public List<ApproveReTicketRequest> ApproveReTicketRequests { get; set; }
             public class ApproveReTicketRequest
             {
-                public int ? TicketGeneratorId { get; set; }
+                public int ? TicketTransactionId { get; set; }
             }
         }
 
@@ -46,21 +46,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                 foreach (var reTicket in command.ApproveReTicketRequests)
                 {
-                    var requestTicketExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == reTicket.TicketGeneratorId, cancellationToken);
+                    var requestTicketExist = await _context.TicketTransactions
+                        .FirstOrDefaultAsync(x => x.Id == reTicket.TicketTransactionId, cancellationToken);
+
                     if (requestTicketExist == null)
                     {
                         return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == x.TicketGeneratorId).ToListAsync();
+                    var ticketHistoryList = await _context.TicketHistories
+                        .Where(x => x.TicketTransactionId == x.TicketTransactionId)
+                        .ToListAsync();
+
                     var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
-                    var userReTicket = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == requestTicketExist.Id).ToListAsync();
+                    var userReTicket = await _context.ReTicketConcerns
+                        .Where(x => x.TicketTransactionId == requestTicketExist.Id)
+                        .ToListAsync();
+
                     var reTicketRequestId = await _context.ApproverTicketings
-                        .Where(x => x.TicketGeneratorId == requestTicketExist.Id && x.IsApprove == null).ToListAsync();
+                        .Where(x => x.TicketTransactionId == requestTicketExist.Id && x.IsApprove == null)
+                        .ToListAsync();
 
-
-                    var selectTransferRequestId = reTicketRequestId.FirstOrDefault(x => x.ApproverLevel == reTicketRequestId.Min(x => x.ApproverLevel));
+                    var selectTransferRequestId = reTicketRequestId
+                        .FirstOrDefault(x => x.ApproverLevel == reTicketRequestId.Min(x => x.ApproverLevel));
 
                     if (selectTransferRequestId != null)
                     {
@@ -76,7 +85,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
 
-                        var userApprovalId = await _context.ApproverTicketings.Where(x => x.TicketGeneratorId == selectTransferRequestId.TicketGeneratorId).ToListAsync();
+                        var userApprovalId = await _context.ApproverTicketings
+                            .Where(x => x.TicketTransactionId == selectTransferRequestId.TicketTransactionId)
+                            .ToListAsync();
 
                         foreach (var concernTicket in userReTicket)
                         {
@@ -108,7 +119,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                                 var addNewTicketConcern = new TicketConcern
                                 {
-                                    RequestGeneratorId = concernTicketById.RequestGeneratorId,
+                                    RequestTransactionId = concernTicketById.RequestTransactionId,
                                     RequestorBy = concernTicketById.RequestorBy,
                                     ChannelId = concernTicketById.ChannelId,
                                     UserId = concernTicketById.UserId,
@@ -141,7 +152,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId = requestTicketExist.Id,
+                            TicketTransactionId  = requestTicketExist.Id,
                             ApproverBy = command.Approver_By,
                             RequestorBy = userReTicket.First().AddedBy,
                             TransactionDate = DateTime.Now,

@@ -3,6 +3,7 @@ using System;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    partial class MisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240520052943_UpdateRequestTransaction")]
+    partial class UpdateRequestTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -934,9 +937,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("char(36)")
@@ -957,8 +960,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_approver_ticketings_sub_unit_id");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_approver_ticketings_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_approver_ticketings_ticket_generator_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_approver_ticketings_user_id");
@@ -1065,9 +1068,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
@@ -1107,8 +1110,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_closing_tickets_ticket_concern_id");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_closing_tickets_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_closing_tickets_ticket_generator_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_closing_tickets_user_id");
@@ -1215,9 +1218,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
@@ -1257,8 +1260,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_re_ticket_concerns_ticket_concern_id");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_re_ticket_concerns_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_re_ticket_concerns_ticket_generator_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_re_ticket_concerns_user_id");
@@ -1402,9 +1405,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("request_transaction_id");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
@@ -1422,8 +1425,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("RequestTransactionId")
                         .HasDatabaseName("ix_ticket_attachments_request_transaction_id");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_ticket_attachments_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_ticket_attachments_ticket_generator_id");
 
                     b.ToTable("ticket_attachments", (string)null);
                 });
@@ -1731,6 +1734,23 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_concerns", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_generators");
+
+                    b.ToTable("ticket_generators", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -1758,9 +1778,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("status");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<DateTime?>("TransactionDate")
                         .HasColumnType("datetime(6)")
@@ -1778,27 +1798,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("RequestorBy")
                         .HasDatabaseName("ix_ticket_histories_requestor_by");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_ticket_histories_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_ticket_histories_ticket_generator_id");
 
                     b.ToTable("ticket_histories", (string)null);
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.HasKey("Id")
-                        .HasName("pk_ticket_transactions");
-
-                    b.ToTable("ticket_transactions", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
@@ -1888,9 +1891,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketTransactionId")
+                    b.Property<int?>("TicketGeneratorId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_transaction_id");
+                        .HasColumnName("ticket_generator_id");
 
                     b.Property<DateTime?>("TransferAt")
                         .HasColumnType("datetime(6)")
@@ -1939,8 +1942,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_transfer_ticket_concerns_ticket_concern_id");
 
-                    b.HasIndex("TicketTransactionId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_ticket_transaction_id");
+                    b.HasIndex("TicketGeneratorId")
+                        .HasDatabaseName("ix_transfer_ticket_concerns_ticket_generator_id");
 
                     b.HasIndex("TransferBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_transfer_by");
@@ -2558,10 +2561,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_approver_ticketings_sub_units_sub_unit_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("ApproverTicketings")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_approver_ticketings_ticket_transactions_ticket_transaction_id");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_approver_ticketings_ticket_generators_ticket_generator_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
@@ -2576,7 +2579,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("SubUnit");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
 
                     b.Navigation("User");
                 });
@@ -2634,10 +2637,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_closing_tickets_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("ClosingTickets")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_closing_tickets_ticket_transactions_ticket_transaction_id");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_closing_tickets_ticket_generators_ticket_generator_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
@@ -2662,7 +2665,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("TicketConcern");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
 
                     b.Navigation("User");
                 });
@@ -2720,10 +2723,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_re_ticket_concerns_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("ReTicketConcerns")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_re_ticket_concerns_ticket_transactions_ticket_transaction_id");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_re_ticket_concerns_ticket_generators_ticket_generator_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
@@ -2748,7 +2751,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("TicketConcern");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
 
                     b.Navigation("User");
                 });
@@ -2813,10 +2816,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("RequestTransactionId")
                         .HasConstraintName("fk_ticket_attachments_request_transactions_request_transaction_");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("TicketAttachments")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_ticket_attachments_ticket_transactions_ticket_transaction_id");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_ticket_attachments_ticket_generators_ticket_generator_id");
 
                     b.Navigation("AddedByUser");
 
@@ -2824,7 +2827,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("RequestTransaction");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
@@ -3005,10 +3008,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_histories_users_requestor_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("TicketHistories")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_ticket_histories_ticket_transactions_ticket_transaction_id");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_ticket_histories_ticket_generators_ticket_generator_id");
 
                     b.Navigation("ApproverByUser");
 
@@ -3016,7 +3019,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("RequestorByUser");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
@@ -3066,10 +3069,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_transfer_ticket_concerns_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
                         .WithMany("TransferTicketConcerns")
-                        .HasForeignKey("TicketTransactionId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_ticket_transactions_ticket_transact");
+                        .HasForeignKey("TicketGeneratorId")
+                        .HasConstraintName("fk_transfer_ticket_concerns_ticket_generators_ticket_generator_");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "TransferByUser")
                         .WithMany()
@@ -3098,7 +3101,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("TicketConcern");
 
-                    b.Navigation("TicketTransaction");
+                    b.Navigation("TicketGenerator");
 
                     b.Navigation("TransferByUser");
 
@@ -3271,7 +3274,7 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("TicketCommentViews");
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", b =>
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", b =>
                 {
                     b.Navigation("ApproverTicketings");
 

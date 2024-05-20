@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class AddTicketCommentCommand : IRequest<Result>
         {
-            public int ? RequestGeneratorId { get; set; }
+            public int ? RequestTransactionId { get; set; }
 
             public Guid ? UserId { get; set; }
             public Guid ? Added_By { get; set; }
@@ -59,8 +59,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 var prohibitedList = new List<string>();
 
-                var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId);
-                if (requestGeneratorExist is null)
+                var requestTransactionExist = await _context.RequestTransactions
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId);
+
+                if (requestTransactionExist is null)
                 {
                     return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
@@ -107,7 +109,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             var addComment = new TicketComment
                             {
-                                RequestGeneratorId = command.RequestGeneratorId,
+                                RequestTransactionId = command.RequestTransactionId,
                                 Comment = comment.Comment,
                                 AddedBy = command.Added_By,
                                 IsClicked = false
@@ -131,7 +133,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     foreach (var attachments in command.CommentAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {
 
-                        var ticketAttachmentList = await _context.TicketComments.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                        var ticketAttachmentList = await _context.TicketComments.Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
 
                         var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketCommentId);
 
@@ -161,7 +163,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Ticket Comment/{requestGeneratorExist.Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Ticket Comment/{requestTransactionExist.Id}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -190,7 +192,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketComment
                                 {
-                                    RequestGeneratorId = command.RequestGeneratorId,
+                                    RequestTransactionId = command.RequestTransactionId,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,

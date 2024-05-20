@@ -17,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
         public class UpserTransferAttachmentCommand : IRequest<Result>
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
 
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
@@ -55,7 +55,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var transferUpdateList = new List<bool>();
                 var transferNewList = new List<TicketAttachment>();
 
-                var ticketIdNotExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
+                var ticketIdNotExist = await _context.RequestTransactions
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
+
                 if (ticketIdNotExist == null)
                 {
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
@@ -63,12 +65,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 var getTicketConcern = await _context.TransferTicketConcerns.Include(x => x.AddedByUser)
                     .ThenInclude(x => x.Department)
-                    .FirstOrDefaultAsync(x => x.RequestGeneratorId == ticketIdNotExist.Id, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.RequestTransactionId == ticketIdNotExist.Id, cancellationToken);
 
-                var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
-                var getTicketConcernList = await _context.TransferTicketConcerns.Include(x => x.AddedByUser).ThenInclude(x => x.Department).Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                var ticketAttachmentList = await _context.TicketAttachments
+                    .Where(x => x.RequestTransactionId == ticketIdNotExist.Id)
+                    .ToListAsync();
 
-                var ticketHistoryList = await _context.TicketHistories.Where(x => x.RequestGeneratorId == x.RequestGeneratorId).ToListAsync();
+                var getTicketConcernList = await _context.TransferTicketConcerns
+                    .Include(x => x.AddedByUser)
+                    .ThenInclude(x => x.Department)
+                    .Where(x => x.RequestTransactionId == ticketIdNotExist.Id)
+                    .ToListAsync();
+
+                var ticketHistoryList = await _context.TicketHistories
+                    .Where(x => x.RequestTransactionId == x.RequestTransactionId)
+                    .ToListAsync();
+
                 var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id) );
 
                 var uploadTasks = new List<Task>();
@@ -132,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         {
                             var addAttachment = new TicketAttachment
                             {
-                                RequestGeneratorId = command.RequestGeneratorId,
+                                RequestTransactionId = command.RequestTransactionId,
                                 Attachment = attachmentResult.SecureUrl.ToString(),
                                 AddedBy = command.Added_By,
                             };
@@ -154,7 +166,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            RequestGeneratorId = ticketIdNotExist.Id,
+                            RequestTransactionId = ticketIdNotExist.Id,
                             RequestorBy = command.Requestor_By,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.Transfer,

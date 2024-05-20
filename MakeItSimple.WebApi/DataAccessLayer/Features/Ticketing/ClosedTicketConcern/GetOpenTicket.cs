@@ -21,10 +21,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public int ? OpenTicketCount { get; set; }
             public int ? CloseTicketCount { get; set; }
             public int ? DelayedTicketCount { get; set; }
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
+            public string Description { get; set; }
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
-
+        
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
 
@@ -109,7 +110,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 {
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-                    var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
+                    var fillterApproval = ticketConcernQuery.Select(x => x.RequestTransactionId);
 
                     var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -156,7 +157,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             }
                             else
                             {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
                             }
 
                         }
@@ -169,22 +170,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                                 var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
+                                var requestorSelect = receiver.Select(x => x.RequestTransactionId);
 
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestGeneratorId));
+                                    .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestTransactionId));
 
 
                             }
                             else
                             {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
                             }
 
                         }
                         else
                         {
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
                         }
                     }
 
@@ -193,7 +194,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var results = ticketConcernQuery.Where( x => x.IsApprove != false && x.IsReTicket != true)
                     .GroupBy(x => new
                     {
-                        x.RequestGeneratorId,
+                        x.RequestTransactionId,
                         x.UserId,
                         IssueHandler = x.User.Fullname
 
@@ -203,7 +204,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         RequestedTicketCount = ticketConcernQuery.Count(),
                         OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
                         DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
-                        RequestGeneratorId = x.Key.RequestGeneratorId,
+                        RequestTransactionId = x.Key.RequestTransactionId,
+                        Description = x.First().ConcernDetails,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,
                         Requestor_By = x.First().RequestorBy,

@@ -41,14 +41,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public async Task<Result> Handle(OpenTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
-                var query = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.IsApprove == true && x.IsClosedApprove != true)
-                    .GroupBy(x => x.RequestGeneratorId).ToListAsync();
+                var query = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .Where(x => x.IsApprove == true && x.IsClosedApprove != true)
+                    .GroupBy(x => x.RequestTransactionId)
+                    .ToListAsync();
 
                 var getQuery = query.Select(x => x.First().RequestorByUser.BusinessUnitId);
 
-                var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => getQuery.Contains(x.Id));
-                var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-                var fillterApproval = query.Select(x => x.First().RequestGeneratorId);
+                var businessUnitList = await _context.BusinessUnits
+                    .FirstOrDefaultAsync(x => getQuery.Contains(x.Id));
+
+                var receiverList = await _context.Receivers
+                    .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+
+                var fillterApproval = query.Select(x => x.First().RequestTransactionId);
 
                 if (request.Status != null)
                 {
@@ -66,14 +73,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
                     {
 
-                        var receiver = await _context.TicketConcerns.Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
+                        var receiver = await _context.TicketConcerns
+                            .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
+                            .ToListAsync();
+
                         var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                        query = query.Where(x => receiverContains.Contains(x.First().RequestorByUser.BusinessUnitId)).ToList();
+
+                        query = query.Where(x => receiverContains.Contains(x.First().RequestorByUser.BusinessUnitId))
+                            .ToList();
 
                     }
                     else
                     {
-                        query = query.Where(x => x.First().RequestGeneratorId == null).ToList();
+                        query = query.Where(x => x.First().RequestTransactionId == null).ToList();
                     }
 
                 }

@@ -10,7 +10,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetTicketCommentResult
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
             public List<GetComment> GetComments { get; set; }
 
             public class GetComment
@@ -27,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class GetTicketCommentQuery : IRequest<Result>
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
         }
 
 
@@ -43,11 +43,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(GetTicketCommentQuery request, CancellationToken cancellationToken)
             {
                 var result = await _context.TicketComments.Include(x => x.AddedByUser).Include(x => x.ModifiedByUser)
-                    .Where(x => x.IsActive == true && x.RequestGeneratorId == request.RequestGeneratorId)
-                    .GroupBy(x => x.RequestGeneratorId)
+                    .Where(x => x.IsActive == true && x.RequestTransactionId == request.RequestTransactionId)
+                    .GroupBy(x => x.RequestTransactionId)
                     .Select(x => new GetTicketCommentResult
                     {
-                       RequestGeneratorId = x.Key,
+                       RequestTransactionId = x.Key,
                        GetComments = x.Select(x => new GetComment
                        {
                            TicketCommentId = x.Id,

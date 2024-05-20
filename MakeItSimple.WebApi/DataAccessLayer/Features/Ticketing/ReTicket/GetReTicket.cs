@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
     {
         public class GetReTicketResult
         {
-            public int? TicketGeneratorId { get; set; }
+            public int? TicketTransactionId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
             public string Unit_Code { get; set; }
@@ -92,12 +92,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 var allUserList = await _context.UserRoles.ToListAsync();
 
 
-                var approverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                var approverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                .Contains(TicketingConString.Approver))
+                    .Select(x => x.UserRoleName)
+                    .ToList();
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
-                    reTicketQuery = reTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
+                    reTicketQuery = reTicketQuery
+                        .Where(x => x.User.Fullname.Contains(request.Search)
                                     || x.User.EmpId.Contains(request.Search));
                 }
 
@@ -112,7 +116,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 }
 
                 var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                var fillterApproval = reTicketQuery.Select(x => x.TicketGeneratorId);
+                var fillterApproval = reTicketQuery.Select(x => x.TicketTransactionId);
 
                 if (!string.IsNullOrEmpty(request.UserType))
                 {
@@ -121,16 +125,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         if (request.UserId != null && approverPermissionList.Any(x => x.Contains(request.Role)))
                         {
-                            var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                            var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                            var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
+                            var approverTransactList = await _context.ApproverTicketings
+                                .Where(x => x.UserId == userApprover.Id)
+                                .ToListAsync();
+
+                            var approvalLevelList = approverTransactList
+                                .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
+                                .ToList();
+
+                            var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketTransactionId);
                             var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                            reTicketQuery = reTicketQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
+
+                            reTicketQuery = reTicketQuery
+                                .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
+                                && userRequestIdApprovalList.Contains(x.TicketTransactionId));
 
                         }
                         else
                         {
-                            reTicketQuery = reTicketQuery.Where(x => x.TicketGeneratorId == null);
+                            reTicketQuery = reTicketQuery.Where(x => x.TicketTransactionId == null);
                         }
 
                     }
@@ -144,10 +157,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 }
 
 
-                var results = reTicketQuery.GroupBy(x => x.TicketGeneratorId)
+                var results = reTicketQuery.GroupBy(x => x.TicketTransactionId)
                     .Select(x => new GetReTicketResult
                     {
-                        TicketGeneratorId = x.Key,
+                        TicketTransactionId = x.Key,
                         Department_Code = x.First().User.Department.DepartmentCode,
                         Department_Name = x.First().User.Department.DepartmentName,
                         Unit_Code = x.First().User.Units.UnitCode,

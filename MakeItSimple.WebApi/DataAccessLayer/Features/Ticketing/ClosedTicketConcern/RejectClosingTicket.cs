@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public ICollection<RejectClosedTicketConcern> RejectClosedTicketConcerns { get; set; }
             public class RejectClosedTicketConcern
             {
-                public int TicketGeneratorId { get; set; }
+                public int TicketTransactionId { get; set; }
 
             }
         }
@@ -42,18 +42,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 foreach (var close in command.RejectClosedTicketConcerns)
                 {
-                    var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);
+                    var requestTransactionExist = await _context.TicketTransactions
+                        .FirstOrDefaultAsync(x => x.Id == close.TicketTransactionId, cancellationToken);
 
-                    if (requestGeneratorExist == null)
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    var closedList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var approverUserList = await _context.ApproverTicketings.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var approverLevelValidation = approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
+                    var closedList = await _context.ClosingTickets
+                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                        .ToListAsync();
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var approverUserList = await _context.ApproverTicketings
+                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                        .ToListAsync();
+
+                    var approverLevelValidation = approverUserList
+                        .FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
+
+                    var ticketHistoryList = await _context.TicketHistories
+                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                        .ToListAsync();
+
                     var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     foreach (var approverUserId in approverUserList)
@@ -74,7 +85,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId = requestGeneratorExist.Id,
+                            TicketTransactionId = requestTransactionExist.Id,
                             RequestorBy = closedList.First().AddedBy,
                             ApproverBy = command.Approver_By,
                             TransactionDate = DateTime.Now,

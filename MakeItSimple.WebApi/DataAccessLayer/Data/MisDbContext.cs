@@ -65,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
 
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
-        public virtual DbSet<RequestGenerator> RequestGenerators { get; set; }
+        public virtual DbSet<RequestTransaction> RequestTransactions { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
         public virtual DbSet<ReTicketConcern> ReTicketConcerns { get; set; }
         public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
@@ -73,7 +73,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketHistory> TicketHistories { get; set; }
         public virtual DbSet<Receiver> Receivers { get; set; }
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
-        public virtual DbSet<TicketGenerator> TicketGenerators { get; set; }
+        public virtual DbSet<TicketTransaction> TicketTransactions { get; set; }
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
 

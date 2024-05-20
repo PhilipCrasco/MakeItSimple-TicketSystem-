@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class CommentTicketNotificationQuery
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
 
             public int ? TicketCommentId { get; set; }
 
@@ -29,7 +29,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class CommentNotificationQueryResult : IRequest<Result>
         {
-            public int ? RequestGeneratorId { get; set; }
+            public int ? RequestTransactionId { get; set; }
             public bool ? Status { get; set; }
             public Guid ? UserId { get; set; }
 
@@ -49,7 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             {
                 var query = await _context.TicketComments
                     .Include(x => x.TicketCommentViews)
-                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId && x.AddedBy != request.UserId)
+                    .Where(x => x.RequestTransactionId == request.RequestTransactionId && x.AddedBy != request.UserId)
                     .ToListAsync();
 
                 if (request.Status != null)
@@ -58,7 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 }
 
                 var ticketComment = await _context.TicketCommentViews
-                    .Where(x => x.RequestGeneratorId == request.RequestGeneratorId 
+                    .Where(x => x.RequestTransactionId == request.RequestTransactionId 
                     && x.UserId == request.UserId)
                     .ToListAsync();
 

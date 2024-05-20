@@ -40,7 +40,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 foreach (var close in command.CancelClosingGenerators)
                 {
-                    var closingTicketQuery = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == close.TicketGeneratorId).ToListAsync();
+                    var closingTicketQuery = await _context.ClosingTickets
+                        .Where(x => x.TicketTransactionId == close.TicketGeneratorId)
+                        .ToListAsync();
 
                     if (closingTicketQuery == null)
                     {

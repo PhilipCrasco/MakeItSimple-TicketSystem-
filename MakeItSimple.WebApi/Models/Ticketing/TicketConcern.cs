@@ -77,8 +77,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public DateTime ? TargetDate { get; set; }
 
-        public int ? RequestGeneratorId { get; set; }
-        public virtual RequestGenerator RequestGenerator { get; set; }
+        public int? RequestTransactionId { get; set; }
+        public virtual RequestTransaction RequestTransaction { get; set; }
 
         public bool ? IsDone { get; set; }
 

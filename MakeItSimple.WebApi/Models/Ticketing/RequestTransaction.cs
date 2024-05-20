@@ -2,7 +2,7 @@
 
 namespace MakeItSimple.WebApi.Models.Ticketing
 {
-    public class RequestGenerator
+    public class RequestTransaction
     {
         public int Id { get; set; }
         public bool IsActive { get; set; } =  true;                                              

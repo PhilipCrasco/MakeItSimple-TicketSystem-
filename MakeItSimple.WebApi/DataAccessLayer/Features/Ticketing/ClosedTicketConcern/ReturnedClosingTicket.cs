@@ -17,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public List<ReturnedClosingTicketById> ReturnedClosingTicketByIds { get; set; }
             public class ReturnedClosingTicketById
             {
-                public int ? TicketGeneratorId { get; set; }
+                public int ? TicketTrasactionId { get; set; }
 
             }
 
@@ -39,16 +39,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 foreach(var close in command.ReturnedClosingTicketByIds)
                 {
 
-                    var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);
-                    if (requestGeneratorExist == null)
+                    var requestTransactionExist = await _context.TicketTransactions
+                        .FirstOrDefaultAsync(x => x.Id == close.TicketTrasactionId, cancellationToken);
+
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var ticketHistoryList = await _context.TicketHistories
+                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                        .ToListAsync();
+
                     var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
-                    var closedList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var closedList = await _context.ClosingTickets
+                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                        .ToListAsync();
                    
 
                     foreach(var ticket in closedList)
@@ -63,7 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId = requestGeneratorExist.Id,
+                            TicketTransactionId = requestTransactionExist.Id,
                             RequestorBy = command.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,

@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid? UserId { get; set; }
             public string Role { get; set; }
             public string TransferRemarks { get; set; }
-            public int ? RequestGeneratorId {  get; set; }
+            public int ? RequesTransactionId {  get; set; }
             public List<UpsertTransferTicketConcern> UpsertTransferTicketConcerns { get; set; }
 
             public class UpsertTransferTicketConcern
@@ -50,14 +50,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var transferNewList = new List<TransferTicketConcern>();
                 var removeTicketConcern = new List<TransferTicketConcern>();
 
-                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
-                var requestTransferList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == command.RequestGeneratorId).ToListAsync();
+                var requestGeneratorIdInTransfer = await _context.TransferTicketConcerns
+                    .FirstOrDefaultAsync(x => x.RequestTransactionId == command.RequesTransactionId, cancellationToken);
+
+                var requestTransferList = await _context.TransferTicketConcerns
+                    .Where(x => x.RequestTransactionId == command.RequesTransactionId)
+                    .ToListAsync();
+
                 if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(TransferTicketError.TicketIdNotExist());
                 }
 
-                var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.RequestGeneratorId == requestGeneratorIdInTransfer.RequestGeneratorId
+                var validateApprover = await _context.ApproverTicketings
+                    .FirstOrDefaultAsync(x => x.RequestTransactionId == requestGeneratorIdInTransfer.RequestTransactionId
                 && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
                 if (validateApprover != null)
@@ -103,7 +109,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     if(ticketConcern != null && transferTicket != null)
                     {
 
-                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId && transferTicket.TicketConcernId != transfer.TicketConcernId && x.IsTransfer == false, cancellationToken);
+                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns
+                            .FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId 
+                            && transferTicket.TicketConcernId != transfer.TicketConcernId && x.IsTransfer == false, cancellationToken);
+
                         if (ticketConcernAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
@@ -143,7 +152,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
                     else if(ticketConcern != null && transferTicket is null)
                     {
-                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns.FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId && x.IsTransfer == false, cancellationToken);
+                        var ticketConcernAlreadyExist = await _context.TransferTicketConcerns
+                            .FirstOrDefaultAsync(x => x.TicketConcernId == transfer.TicketConcernId 
+                            && x.IsTransfer == false, cancellationToken);
+
                         if (ticketConcernAlreadyExist != null)
                         {
                             return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());
@@ -151,7 +163,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         var addTransferTicket = new TransferTicketConcern
                         {
-                            RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                            RequestTransactionId = requestGeneratorIdInTransfer.RequestTransactionId,
                             TicketConcernId = ticketConcern.Id,
                             ChannelId = command.ChannelId,
                             UserId = command.UserId,
@@ -179,11 +191,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 }
 
                 var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
-                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketTransactionId);
 
                 var removeConcernList = await _context.TransferTicketConcerns
                     .Where(x => !selectRemoveConcern.Contains(x.Id)
-                    && selectRemoveGenerator.Contains(x.TicketGeneratorId) 
+                    && selectRemoveGenerator.Contains(x.TicketTransactionId) 
                     && x.IsActive == true)
                     .ToListAsync();
 
@@ -201,7 +213,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                     var addTicketHistory = new TicketHistory
                     {
-                        RequestGeneratorId = requestGeneratorIdInTransfer.RequestGeneratorId,
+                        RequestTransactionId = requestGeneratorIdInTransfer.RequestTransactionId,
                         RequestorBy = command.Requestor_By,
                         TransactionDate = DateTime.Now,
                         Request = TicketingConString.Transfer,

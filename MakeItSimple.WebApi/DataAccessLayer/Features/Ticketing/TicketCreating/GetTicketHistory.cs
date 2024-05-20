@@ -11,7 +11,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetTicketHistoryResult
         {
-            public int? TicketGeneratorId { get; set; }
+            public int? TicketTransactionId { get; set; }
             public string Requestor_Name { get; set; }
             public List<GetTicketHistoryConcern> GetTicketHistoryConcerns { get; set; }
             public class GetTicketHistoryConcern
@@ -27,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class GetTicketHistoryQuery : IRequest<Result>
         {
-            public int TicketGeneratorId { get; set; }
+            public int TicketTransactionId { get; set; }
         }
 
         public class Handler : IRequestHandler<GetTicketHistoryQuery, Result>
@@ -41,10 +41,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(GetTicketHistoryQuery request, CancellationToken cancellationToken)
             {
-                var requestGenerator = await _context.TicketHistories.Where(x => x.TicketGeneratorId == request.TicketGeneratorId)
-                    .GroupBy(x => x.TicketGeneratorId).Select(x => new GetTicketHistoryResult
+                var requestGenerator = await _context.TicketHistories.Where(x => x.TicketTransactionId == request.TicketTransactionId)
+                    .GroupBy(x => x.TicketTransactionId).Select(x => new GetTicketHistoryResult
                     {
-                        TicketGeneratorId = x.Key,
+                        TicketTransactionId = x.Key,
                         Requestor_Name = x.First().RequestorByUser.Fullname,
                         GetTicketHistoryConcerns = x.OrderByDescending(x => x.Id).Select(x => new GetTicketHistoryConcern
                         {

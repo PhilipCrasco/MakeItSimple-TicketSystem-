@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            public int? TicketGeneratorId { get; set; }
+            public int? TicketTransactionId { get; set; }
             public Guid? Requestor_By { get; set; }
             public string Role { get; set; }
 
@@ -55,14 +55,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var supportPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Support)).Select(x => x.UserRoleName).ToList();
 
-                    var requestGeneratorIdInTransfer = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
-                    var requestClosingList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
+                    var requestGeneratorIdInTransfer = await _context.ClosingTickets
+                        .FirstOrDefaultAsync(x => x.TicketTransactionId == command.TicketTransactionId, cancellationToken);
+
+                    var requestClosingList = await _context.ClosingTickets
+                        .Where(x => x.TicketTransactionId == command.TicketTransactionId)
+                        .ToListAsync();
+
                     if (requestGeneratorIdInTransfer == null)
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
 
-                    var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.TicketGeneratorId
+                    var validateApprover = await _context.ApproverTicketings
+                        .FirstOrDefaultAsync(x => x.TicketTransactionId == requestGeneratorIdInTransfer.TicketTransactionId
                     && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
                     if ((validateApprover is not null) || (requestGeneratorIdInTransfer.IsClosing == true && !receiverPermissionList.Any(x => x.Contains(command.Role))))
@@ -72,7 +78,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     foreach( var close in command.UpsertClosingTicketConcerns )
                     {
-                        var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == close.TicketConcernId, cancellationToken);
+                        var ticketConcern = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.Id == close.TicketConcernId, cancellationToken);
                         if (ticketConcern == null)
                         {
 
@@ -91,8 +98,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var closingTicketConcern = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.Id == close.ClosingTicketId, cancellationToken);
                         if(ticketConcern != null && closingTicketConcern != null)
                         {
-                            var ticketConcernAlreadyExist = await _context.ClosingTickets.FirstOrDefaultAsync(x => x.TicketConcernId == close.TicketConcernId
+                            var ticketConcernAlreadyExist = await _context.ClosingTickets
+                                .FirstOrDefaultAsync(x => x.TicketConcernId == close.TicketConcernId
                             && close.TicketConcernId != close.TicketConcernId && x.IsClosing == false, cancellationToken);
+
                             if (ticketConcernAlreadyExist != null)
                             {
                                 return Result.Failure(ClosingTicketError.ClosingTicketIdAlreadyExist());
@@ -104,7 +113,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             {
                                 closingTicketConcern.TicketConcernId = close.TicketConcernId;
 
-                                var ticketConcernList = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == closingTicketConcern.TicketConcernId, cancellationToken);
+                                var ticketConcernList = await _context.TicketConcerns
+                                    .FirstOrDefaultAsync(x => x.Id == closingTicketConcern.TicketConcernId, cancellationToken);
 
                                 closingTicketConcern.StartDate = ticketConcernList.StartDate;
                                 closingTicketConcern.TargetDate = ticketConcernList.TargetDate;
@@ -142,7 +152,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             var addClosingTicket = new ClosingTicket
                             {
-                                TicketGeneratorId = requestGeneratorIdInTransfer.TicketGeneratorId,
+                                TicketTransactionId = requestGeneratorIdInTransfer.TicketTransactionId,
                                 TicketConcernId = ticketConcern.Id,
                                 UserId = ticketConcern.UserId,
                                 ConcernDetails = ticketConcern.ConcernDetails,
@@ -157,8 +167,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             if (requestGeneratorIdInTransfer != null)
                             {
                                 var rejectTicketConcern = await _context.ClosingTickets
-                                    .Where(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.Id && x.IsRejectClosed == true
-                                    && x.UserId == command.Added_By).ToListAsync();
+                                    .Where(x => x.TicketTransactionId == requestGeneratorIdInTransfer.Id && x.IsRejectClosed == true
+                                    && x.UserId == command.Added_By)
+                                    .ToListAsync();
 
                                 foreach (var reject in rejectTicketConcern)
                                 {
@@ -185,11 +196,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
 
                     var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
-                    var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+                    var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketTransactionId);
 
                     var removeConcernList = await _context.ClosingTickets
                         .Where(x => !selectRemoveConcern.Contains(x.Id)
-                        && selectRemoveGenerator.Contains(x.TicketGeneratorId))
+                        && selectRemoveGenerator.Contains(x.TicketTransactionId))
                         .ToListAsync();
 
                     if(removeTicketConcern.Count() > 0)
@@ -204,8 +215,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     { 
                        
                         var closeTicketList = await _context.ClosingTickets
-                            .Where(x => x.TicketGeneratorId == closeHistoryList.First().TicketGeneratorId 
-                            && x.IsRejectClosed == true && x.UserId == closeHistoryList.First().UserId).ToListAsync();
+                            .Where(x => x.TicketTransactionId == closeHistoryList.First().TicketTransactionId 
+                            && x.IsRejectClosed == true && x.UserId == closeHistoryList.First().UserId)
+                            .ToListAsync();
 
                         foreach(var closeTicket in closeTicketList)
                         {
@@ -218,7 +230,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         var addTicketHistory = new TicketHistory
                         {
-                            TicketGeneratorId = closeHistoryList.First().TicketGeneratorId,
+                            TicketTransactionId = closeHistoryList.First().TicketTransactionId,
                             RequestorBy = command.Requestor_By,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,

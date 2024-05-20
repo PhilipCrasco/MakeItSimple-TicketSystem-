@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class AddRequestConcernReceiverCommand : IRequest<Result>
         {
 
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
             
             public int ? ChannelId { get; set; }
             public Guid ? Requestor_By { get; set; }
@@ -76,7 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddRequestConcernReceiverCommand command, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
-                var requestGeneratorList = new List<RequestGenerator>();
+                var requestTransactionList = new List<RequestTransaction>();
                 var ticketConcernList = new List<TicketConcern>();
                 var removeTicketConcern = new List<TicketConcern>();
 
@@ -91,17 +91,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var requestorPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
 
-                var requestGeneratorexist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
-                if (requestGeneratorexist == null)
+                var requestTransactionExist = await _context.RequestTransactions
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
+
+                if (requestTransactionExist == null)
                 {
-                    var requestGeneratorId = new RequestGenerator { IsActive = true };
-                    await _context.RequestGenerators.AddAsync(requestGeneratorId);
-                    requestGeneratorexist = requestGeneratorId;
+                    var requestTransactionId = new RequestTransaction { IsActive = true };
+                    await _context.RequestTransactions.AddAsync(requestTransactionId);
+                    requestTransactionExist = requestTransactionId;
 
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);
-                requestGeneratorList.Add(requestGeneratorexist);
+                requestTransactionList.Add(requestTransactionExist);
 
                 var requestTicketConcernList = await _context.TicketConcerns.ToListAsync();
 
@@ -110,14 +112,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
                         .ThenInclude(x => x.UserRole)
                         .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id).ToListAsync();
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
                 }
                 else
                 {
                      requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
                         .ThenInclude(x => x.UserRole)
                         .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.UserId == command.IssueHandler).ToListAsync();
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.IssueHandler).ToListAsync();
                 }
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -135,23 +137,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 if(issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                 {
                     var approverUserList = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id 
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id 
                         && x.IssueHandler == command.Added_By && x.ApproverLevel == 1)
                         .ToListAsync();
 
                     var approverUserValidation = approverUserList
-                        .FirstOrDefault(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IssueHandler == command.Added_By
+                        .FirstOrDefault(x => x.RequestTransactionId == requestTransactionExist.Id && x.IssueHandler == command.Added_By
                         && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
                         
                     if (approverUserValidation != null)
                     {
 
                         var ticketConcernListApprover = await _context.TicketConcerns
-                            .Where(x => x.RequestGeneratorId== command.RequestGeneratorId && x.UserId == command.Added_By)
+                            .Where(x => x.RequestTransactionId == command.RequestTransactionId && x.UserId == command.Added_By)
                             .ToListAsync();
 
                         var receiverValidation = ticketConcernListApprover
-                            .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id 
+                            .Where(x => x.RequestTransactionId == requestTransactionExist.Id 
                             && x.UserId == command.Added_By && x.IsApprove != true 
                             && x.Id == ticketConcernListApprover.Max(x => x.Id))
                             .FirstOrDefault();
@@ -328,7 +330,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         var addnewTicketConcern = new TicketConcern
                         {
-                            RequestGeneratorId = requestGeneratorexist.Id,
+                            RequestTransactionId = requestTransactionExist.Id,
                             RequestorBy = command.Requestor_By,
                             ChannelId = command.ChannelId,
                             UserId = concerns.UserId,
@@ -363,7 +365,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 var addRequestConcern = new RequestConcern
                                 {
 
-                                    RequestGeneratorId = requestGeneratorexist.Id,
+                                    RequestTransactionId = requestTransactionExist.Id,
                                     UserId = addnewTicketConcern.RequestorBy,
                                     Concern = concerns.Concern_Details,
                                     AddedBy = command.Added_By,
@@ -396,10 +398,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
                         }
                         
-                        if(requestGeneratorexist != null)
+                        if(requestTransactionExist != null)
                         {
                             var rejectTicketConcern = await _context.TicketConcerns
-                                .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id && x.IsReject == true 
+                                .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsReject == true 
                                 && x.UserId == command.Added_By).ToListAsync();
 
                             foreach(var reject in rejectTicketConcern)
@@ -425,11 +427,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
-                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestGeneratorId);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestTransactionId);
 
                 var removeConcernList = await _context.TicketConcerns
                     .Where(x => !selectRemoveConcern.Contains(x.Id) 
-                    && selectRemoveGenerator.Contains(x.RequestGeneratorId) 
+                    && selectRemoveGenerator.Contains(x.RequestTransactionId) 
                     && x.IsApprove != true && x.IsActive == true)
                     .ToListAsync();
 
@@ -438,7 +440,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     foreach (var removeConcern in removeConcernList)
                     {
                         var concernList = await _context.TicketConcerns
-                             .Where(x => selectRemoveGenerator.Contains(x.RequestGeneratorId)
+                             .Where(x => selectRemoveGenerator.Contains(x.RequestTransactionId)
                              && x.IsApprove != true && x.IsActive == true)
                              .ToListAsync();
 
@@ -499,7 +501,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{requestGeneratorList.First().Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{requestTransactionList.First().Id}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -527,7 +529,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    RequestGeneratorId = requestGeneratorList.First().Id,
+                                    RequestTransactionId = requestTransactionList.First().Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
@@ -558,7 +560,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                     var approverValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestGeneratorId == requestGeneratorexist.Id
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
                         && x.IssueHandler == command.Added_By && x.IsApprove == null)
                         .FirstOrDefaultAsync();
 
@@ -569,7 +571,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             var addNewApprover = new ApproverTicketing
                             {
-                                RequestGeneratorId = requestGeneratorexist.Id,
+                                RequestTransactionId = requestTransactionExist.Id,
                                 //ChannelId = approver.ChannelId,
                                 SubUnitId = approver.SubUnitId,
                                 UserId = approver.UserId,

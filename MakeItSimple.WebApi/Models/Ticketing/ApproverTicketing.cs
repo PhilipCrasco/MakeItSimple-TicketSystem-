@@ -29,12 +29,14 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public Guid ? IssueHandler { get; set; }
 
-        public int ? RequestGeneratorId { get; set; }
+        public int ? RequestTransactionId { get; set; }
+        public virtual RequestTransaction RequestTransaction { get; set; }
+
         public string Status { get; set; }
-        public virtual RequestGenerator RequestGenerator { get; set; }
 
 
-        public int ? TicketGeneratorId { get; set; }
-        public virtual TicketGenerator TicketGenerator { get; set; }
+
+        public int ? TicketTransactionId { get; set; }
+        public virtual TicketTransaction TicketTransaction { get; set; }
     }
 }

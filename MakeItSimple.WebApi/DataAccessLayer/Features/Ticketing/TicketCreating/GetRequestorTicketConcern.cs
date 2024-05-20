@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestorTicketConcernResult
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
 
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
@@ -42,7 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public List<TicketRequestConcern> TicketRequestConcerns { get; set; }
             public class TicketRequestConcern
             {
-                public int? RequestGeneratorId { get; set; }
+                public int? RequestTransactionId { get; set; }
                 public int? DepartmentId { get; set; }
                 public string Department_Name { get; set; }
                 public int? ChannelId { get; set; }
@@ -85,8 +85,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
         {
-            public string Requestor { get; set; }
-            public string Approver { get; set; }
+            //public string Requestor { get; set; }
+            //public string Approver { get; set; }
+            public string UserType {  get; set; }
 
             public string Role { get; set; }
             public Guid? UserId { get; set; }
@@ -126,7 +127,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                     var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                    var fillterApproval = requestConcernsQuery.Select(x => x.RequestGeneratorId);
+                    var fillterApproval = requestConcernsQuery.Select(x => x.RequestTransactionId);
 
                     var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -157,56 +158,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         if (request.Ascending is true)
                         {
-                            requestConcernsQuery = requestConcernsQuery.OrderBy(x => x.RequestGeneratorId);
+                            requestConcernsQuery = requestConcernsQuery.OrderBy(x => x.RequestTransactionId);
                         }
                         else
                         {
-                            requestConcernsQuery = requestConcernsQuery.OrderByDescending(x => x.RequestGeneratorId);
+                            requestConcernsQuery = requestConcernsQuery.OrderByDescending(x => x.RequestTransactionId);
                         }
 
-                    }
-
-                    if (request.Requestor == TicketingConString.Requestor)
-                    {
-                        if (requestorPermissionList.Any(x => x.Contains(request.Role)))
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.UserId == request.UserId);
-                        }
-                        else
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
-                        }
-
-                    }
-
-                    if (request.Approver == TicketingConString.Approver)
-                    {
-                        if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
-                        {
-                            if (request.UserId == receiverList.UserId)
-                            {
-                                //var ticketConcernApproveList = await _context.
-
-                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                                    .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
-                                    .ToListAsync();
-                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
-
-                                requestConcernsQuery = requestConcernsQuery
-                                    .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect
-                                         .Contains(x.RequestGeneratorId));
-                            }
-                            else
-                            {
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
-                            }
-
-                        }
-                        else
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
-                        }
                     }
 
                     if (request.Concern_Status != null)
@@ -225,15 +183,63 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
                         else
                         {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestGeneratorId == null);
+                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
                         }
 
                     }
+
+                    if(!string.IsNullOrEmpty(request.UserType))
+                    {
+                        if (request.UserType == TicketingConString.Requestor)
+                        {
+                            if (requestorPermissionList.Any(x => x.Contains(request.Role)))
+                            {
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.UserId == request.UserId);
+                            }
+                            else
+                            {
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
+                            }
+
+                        }
+
+                        if (request.UserType == TicketingConString.Approver)
+                        {
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
+                            {
+                                if (request.UserId == receiverList.UserId)
+                                {
+                                    //var ticketConcernApproveList = await _context.
+
+                                    var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
+                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
+                                        .ToListAsync();
+                                    var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                    var requestorSelect = receiver.Select(x => x.RequestTransactionId);
+
+                                    requestConcernsQuery = requestConcernsQuery
+                                        .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect
+                                             .Contains(x.RequestTransactionId));
+                                }
+                                else
+                                {
+                                    requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
+                                }
+
+                            }
+                            else
+                            {
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
+                            }
+                        }
+
+                    }
+
                 }
 
                 var results = requestConcernsQuery.Select(x => new GetRequestorTicketConcernResult
                 {
-                    RequestGeneratorId = x.RequestGeneratorId,
+                    RequestTransactionId = x.RequestTransactionId,
                     DepartmentId = x.User.DepartmentId,
                     Department_Name = x.User.Department.DepartmentName,
                     UserId = x.UserId,
@@ -250,7 +256,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     updated_At = x.UpdatedAt,
                     TicketRequestConcerns = x.TicketConcerns.GroupBy(x => new
                     {
-                        x.RequestGeneratorId,
+                        x.RequestTransactionId,
                         DepartmentId = x.User.DepartmentId,
                         Department_Name = x.User.Department.DepartmentName,
                         UnitId = x.User.UnitId,
@@ -274,7 +280,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }).Select(x => new TicketRequestConcern
                     {
-                        RequestGeneratorId = x.Key.RequestGeneratorId,
+                        RequestTransactionId = x.Key.RequestTransactionId,
                         DepartmentId = x.Key.DepartmentId,
                         Department_Name = x.Key.Department_Name,
                         UnitId = x.Key.UnitId,

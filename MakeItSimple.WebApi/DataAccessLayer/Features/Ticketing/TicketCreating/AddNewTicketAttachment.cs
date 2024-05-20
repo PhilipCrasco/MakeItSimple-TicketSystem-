@@ -18,7 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     public class AddNewTicketAttachmentResult
     {
         public int Id { get; set; }
-        public int? RequestGeneratorId { get; set; }
+        public int? RequestTransactionId { get; set; }
         public Guid? Added_By { get; set; }
         public DateTime Created_At { get; set; }
         public string Attachments { get; set; }
@@ -29,7 +29,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public record AddNewTicketAttachmentCommand : IRequest<Result>
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
 
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
@@ -67,8 +67,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 var attachmentList = new List<TicketAttachment>();
 
-                var ticketIdNotExist = await _context.RequestGenerators
-                    .FirstOrDefaultAsync(x => x.Id == command.RequestGeneratorId, cancellationToken);
+                var ticketIdNotExist = await _context.RequestTransactions
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
                 if (ticketIdNotExist == null)
                 {
                     return Result.Failure(TicketRequestError.TicketIdNotExist());
@@ -79,8 +79,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.RequestorByUser)
                     .ThenInclude(x => x.Department)
-                    .Include(x => x.RequestGenerator)
-                    .FirstOrDefaultAsync(x => x.RequestGeneratorId == command.RequestGeneratorId, cancellationToken);
+                    .Include(x => x.RequestTransaction)
+                    .FirstOrDefaultAsync(x => x.RequestTransactionId == command.RequestTransactionId, cancellationToken);
 
             
 
@@ -96,8 +96,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
 
 
-                    var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
-                    var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == ticketIdNotExist.Id).ToListAsync();
+                    var ticketAttachmentList = await _context.TicketAttachments.Where(x => x.RequestTransactionId == ticketIdNotExist.Id).ToListAsync();
+                    var ticketConcernList = await _context.TicketConcerns.Where(x => x.RequestTransactionId == ticketIdNotExist.Id).ToListAsync();
 
                     var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketAttachmentId);
 
@@ -162,7 +162,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             var addAttachment = new TicketAttachment
                             {
-                                RequestGeneratorId = command.RequestGeneratorId,
+                                RequestTransactionId = command.RequestTransactionId,
                                 Attachment = attachmentResult.SecureUrl.ToString(),
                                 FileName = attachments.Attachment.FileName,
                                 FileSize = attachments.Attachment.Length,
@@ -185,7 +185,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var results = attachmentList.Select(x => new AddNewTicketAttachmentResult
                 {
                     Id = x.Id,
-                    RequestGeneratorId = x.RequestGeneratorId,
+                    RequestTransactionId = x.RequestTransactionId,
                     Attachments = x.Attachment,
                     Added_By = x.AddedBy,
                     Created_At = x.CreatedAt,

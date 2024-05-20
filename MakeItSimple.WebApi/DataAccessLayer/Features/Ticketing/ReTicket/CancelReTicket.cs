@@ -16,7 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
             public class CancelReTicketConcern
             {
-                public int TicketGeneratorId { get; set; }
+                public int TicketTransactionId { get; set; }
 
                 public List<CancelReTicketById> CancelReTicketByIds { get; set; }
                 public class CancelReTicketById
@@ -40,7 +40,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                     foreach (var transferTicket in command.CancelReTicketConcerns)
                     {
-                        var reTicketQuery = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == transferTicket.TicketGeneratorId).ToListAsync();
+                        var reTicketQuery = await _context.ReTicketConcerns
+                            .Where(x => x.TicketTransactionId == transferTicket.TicketTransactionId)
+                            .ToListAsync();
 
                         if (reTicketQuery == null)
                         {
@@ -52,7 +54,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         {
                             foreach (var reTicketList in reTicketQuery)
                             {
-                                var reTicketConcernRequest = await _context.TicketConcerns.Where(x => x.Id == reTicketList.TicketConcernId).ToListAsync();
+                                var reTicketConcernRequest = await _context.TicketConcerns
+                                    .Where(x => x.Id == reTicketList.TicketConcernId)
+                                    .ToListAsync();
 
                                 foreach (var reTicketConcern in reTicketConcernRequest)
                                 {
@@ -68,7 +72,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             var reTicketConcernId = reTicketQuery.FirstOrDefault(x => x.Id == reTicketId.ReTicketConcernId);
                             if (reTicketConcernId != null)
                             {
-                                var reTicketConcernRequest = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == reTicketConcernId.TicketConcernId, cancellationToken);
+                                var reTicketConcernRequest = await _context.TicketConcerns
+                                    .FirstOrDefaultAsync(x => x.Id == reTicketConcernId.TicketConcernId, cancellationToken);
 
                                 reTicketConcernRequest.IsReTicket = null;
 

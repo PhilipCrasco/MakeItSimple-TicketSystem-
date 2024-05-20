@@ -61,7 +61,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             try
             {
 
-                command.RequestGeneratorId = id;
+                command.RequestTransactionId = id;
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;

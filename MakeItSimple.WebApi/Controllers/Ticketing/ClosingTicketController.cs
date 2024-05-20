@@ -111,7 +111,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                command.TicketGeneratorId = id;
+                command.TicketTransactionId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
                     var userRole = identity.FindFirst(ClaimTypes.Role);

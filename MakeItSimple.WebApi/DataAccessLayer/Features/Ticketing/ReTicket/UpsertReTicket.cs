@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
         {
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
-            public int ? TicketGeneratorId { get; set; }
+            public int ? TicketTransactionId { get; set; }
             public string Re_Ticket_Remarks { get; set; }
             public Guid? Requestor_By { get; set; }
             //public string Role { get; set; }
@@ -57,14 +57,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
-                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns.FirstOrDefaultAsync(x => x.TicketGeneratorId == command.TicketGeneratorId, cancellationToken);
-                var requestReTicketList = await _context.ReTicketConcerns.Where(x => x.TicketGeneratorId == command.TicketGeneratorId).ToListAsync();
+                var requestGeneratorIdInTransfer = await _context.ReTicketConcerns
+                    .FirstOrDefaultAsync(x => x.TicketTransactionId == command.TicketTransactionId, cancellationToken);
+
+                var requestReTicketList = await _context.ReTicketConcerns
+                    .Where(x => x.TicketTransactionId == command.TicketTransactionId)
+                    .ToListAsync();
+
                 if (requestGeneratorIdInTransfer == null)
                 {
                     return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                 }
 
-                var validateApprover = await _context.ApproverTicketings.FirstOrDefaultAsync(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.TicketGeneratorId
+                var validateApprover = await _context.ApproverTicketings
+                    .FirstOrDefaultAsync(x => x.TicketTransactionId == requestGeneratorIdInTransfer.TicketTransactionId
                 && x.IsApprove != null && x.ApproverLevel == 1, cancellationToken);
 
                 if (validateApprover != null)
@@ -151,7 +157,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                         var addReTicket = new ReTicketConcern
                         {
-                            TicketGeneratorId = requestGeneratorIdInTransfer.TicketGeneratorId,
+                            TicketTransactionId = requestGeneratorIdInTransfer.TicketTransactionId,
                             UserId = ticketConcern.UserId,
                             ChannelId = ticketConcern.ChannelId,
                             ConcernDetails = ticketConcern.ConcernDetails,
@@ -169,7 +175,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         if (requestGeneratorIdInTransfer != null)
                         {
                             var rejectTicketConcern = await _context.ReTicketConcerns
-                                .Where(x => x.TicketGeneratorId == requestGeneratorIdInTransfer.Id && x.IsRejectReTicket == true
+                                .Where(x => x.TicketTransactionId == requestGeneratorIdInTransfer.Id && x.IsRejectReTicket == true
                                 && x.UserId == command.Added_By).ToListAsync();
 
                             foreach (var reject in rejectTicketConcern)
@@ -196,11 +202,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 }
 
                 var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
-                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketGeneratorId);
+                var selectRemoveGenerator = removeTicketConcern.Select(x => x.TicketTransactionId);
 
                 var removeConcernList = await _context.ReTicketConcerns
                     .Where(x => !selectRemoveConcern.Contains(x.Id)
-                    && selectRemoveGenerator.Contains(x.TicketGeneratorId)
+                    && selectRemoveGenerator.Contains(x.TicketTransactionId)
                     && x.IsActive == true)
                     .ToListAsync();
 
@@ -215,7 +221,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                 if (reTicketHistoryList.Count(x => x.IsRejectReTicket is true) > 0)
                 {
                    var reTicketList = await _context.ReTicketConcerns
-                            .Where(x => x.TicketGeneratorId == reTicketHistoryList.First().TicketGeneratorId 
+                            .Where(x => x.TicketTransactionId == reTicketHistoryList.First().TicketTransactionId 
                             && x.IsRejectReTicket == true && x.UserId == reTicketHistoryList.First().UserId).ToListAsync();
 
                         foreach(var reTicket in reTicketList)
@@ -228,7 +234,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
 
                     var addTicketHistory = new TicketHistory
                     {
-                        TicketGeneratorId = reTicketHistoryList.First().TicketGeneratorId,
+                        TicketTransactionId = reTicketHistoryList.First().TicketTransactionId,
                         RequestorBy = command.Requestor_By,
                         TransactionDate = DateTime.Now,
                         Request = TicketingConString.ReTicket,

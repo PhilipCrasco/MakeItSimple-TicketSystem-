@@ -23,7 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public ICollection<RejectTransferTicket> RejectTransferTickets { get; set; }
             public class RejectTransferTicket
             {
-                public int RequestGeneratorId { get; set; }
+                public int RequestTransactionId { get; set; }
                 public string Reject_Remarks { get; set; }
             }
         }
@@ -42,20 +42,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             {
                 foreach(var transferTicket in command.RejectTransferTickets)
                 {
-                    var requestGeneratorExist= await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == transferTicket.RequestGeneratorId, cancellationToken);
+                    var requestTransactionExist= await _context.RequestTransactions.
+                        FirstOrDefaultAsync(x => x.Id == transferTicket.RequestTransactionId, cancellationToken);
 
-                    if (requestGeneratorExist == null) 
+                    if (requestTransactionExist == null) 
                     {
                         return Result.Failure(TransferTicketError.TicketIdNotExist());
                     }
 
-                    var transferTicketList = await _context.TransferTicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var transferTicketList = await _context.TransferTicketConcerns
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
 
-                    var approverUserList = await _context.ApproverTicketings.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id).ToListAsync();
+                    var approverUserList = await _context.ApproverTicketings
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
 
                     var approverLevelValidation =  approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.RequestGeneratorId == x.RequestGeneratorId).ToListAsync();
+                    var ticketHistoryList = await _context.TicketHistories
+                        .Where(x => x.RequestTransactionId == x.RequestTransactionId)
+                        .ToListAsync();
+
                     var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     foreach (var approverUserId in approverUserList)
@@ -77,7 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         var addTicketHistory = new TicketHistory
                         {
-                            RequestGeneratorId = requestGeneratorExist.Id,
+                            RequestTransactionId = requestTransactionExist.Id,
                             RequestorBy = transferTicketList.First().AddedBy,
                             ApproverBy = command.Approver_By,
                             TransactionDate = DateTime.Now,

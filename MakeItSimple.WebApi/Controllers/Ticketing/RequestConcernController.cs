@@ -190,7 +190,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     command.Modified_By = userId;
                 }
 
-                command.RequestGeneratorId = id;
+                command.RequestTransactionId = id;
 
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -436,7 +436,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 var query = new GetTicketHistoryQuery
                 {
-                    TicketGeneratorId = id
+                    TicketTransactionId = id
                 };
 
                 var results = await _mediator.Send(query);

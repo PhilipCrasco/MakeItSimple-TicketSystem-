@@ -14,7 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public class CancelRequest
             {
                
-                public int? RequestGeneratorId { get; set; }
+                public int? RequestTransactionId { get; set; }
                 public List<RequestAttachment> RequestAttachments { get; set; }
 
                 public class RequestAttachment
@@ -37,10 +37,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 foreach(var cancelRequestTransaction in command.CancelRequests)
                 {
-                    var requestGenaratorExist = await _context.RequestGenerators
-                        .FirstOrDefaultAsync(x => x.Id == cancelRequestTransaction.RequestGeneratorId);
+                    var requestTransactionExist = await _context.RequestTransactions
+                        .FirstOrDefaultAsync(x => x.Id == cancelRequestTransaction.RequestTransactionId);
 
-                    if (requestGenaratorExist == null)
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
@@ -48,7 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if(cancelRequestTransaction.RequestAttachments.Count(x => x.TicketAttachmentId != null) <= 0)
                     {
                         var requestConcernList = await _context.RequestConcerns
-                            .Where(x => x.RequestGeneratorId == requestGenaratorExist.Id)
+                            .Where(x => x.RequestTransactionId == requestTransactionExist.Id)
                             .ToListAsync();
 
                         foreach(var cancelRequest in requestConcernList)
@@ -57,7 +57,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
 
                         var requestConcernAttachmentList = await _context.RequestConcerns
-                            .Where(x => x.RequestGeneratorId == requestGenaratorExist.Id)
+                            .Where(x => x.RequestTransactionId == requestTransactionExist.Id)
                             .ToListAsync();
 
                         foreach (var cancelAttachment in requestConcernAttachmentList)

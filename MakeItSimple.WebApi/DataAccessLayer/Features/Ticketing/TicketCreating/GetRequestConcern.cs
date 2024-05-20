@@ -14,7 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestConcernResult
         {
-            public int? RequestGeneratorId { get; set; }
+            public int? RequestTransactionId { get; set; }
             public int ? DepartmentId { get; set; }
             public string Department_Name { get; set; }
             public Guid? Requestor_By { get; set; }
@@ -59,13 +59,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 public Guid? UserId { get; set; }
                 public string Role { get; set; }
-                public string IssueHandler { get; set; }
+                //public string IssueHandler { get; set; }
+                public string UserType { get; set; }
                 public bool ? Approval { get; set; }
                 public string Search { get; set; }
                 public bool ? Status { get; set; }
                 public bool ? Reject { get; set; }
-                public string Approver { get; set; }
-                public string Requestor { get; set; }
+
+                //public string Approver { get; set; }
+                //public string Requestor { get; set; }
                 public bool? Ascending { get; set; }
 
             }
@@ -95,7 +97,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
                         var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                         var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                        var fillterApproval = ticketConcernQuery.Select(x => x.RequestGeneratorId);
+                        var fillterApproval = ticketConcernQuery.Select(x => x.RequestTransactionId);
 
                         var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -121,11 +123,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
                             if(request.Ascending is true)
                             {
-                                ticketConcernQuery = ticketConcernQuery.OrderBy(x => x.RequestGeneratorId);
+                                ticketConcernQuery = ticketConcernQuery.OrderBy(x => x.RequestTransactionId);
                             }
                             else
                             {
-                                ticketConcernQuery = ticketConcernQuery.OrderByDescending(x => x.RequestGeneratorId);
+                                ticketConcernQuery = ticketConcernQuery.OrderByDescending(x => x.RequestTransactionId);
                             }
 
                         }
@@ -145,75 +147,89 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.IsApprove == request.Approval);
                         }
 
-
-
-                        if (request.Approver == TicketingConString.Approver)
+                        if(!string.IsNullOrEmpty(request.UserType))
                         {
-                            if (receiverPermissionList.Any(x => x.Contains(request.Role))  && receiverList != null)
+                            if (request.UserType == TicketingConString.Approver)
                             {
-                                if (request.UserId == receiverList.UserId)
+                                if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                                 {
-                                    var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.RequestGeneratorId) && x.IsApprove == null).ToListAsync();
-
-                                    if (approverTransactList != null && approverTransactList.Any())
+                                    if (request.UserId == receiverList.UserId)
                                     {
-                                        var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestGeneratorId);
-                                        ticketConcernQuery = ticketConcernQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestGeneratorId));
-                                    }
-                                    var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
-                                    var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                    var requestorSelect = receiver.Select(x => x.RequestGeneratorId);
+                                        var approverTransactList = await _context.ApproverTicketings
+                                            .Where(x => fillterApproval.Contains(x.RequestTransactionId) && x.IsApprove == null)
+                                            .ToListAsync();
 
+                                        if (approverTransactList != null && approverTransactList.Any())
+                                        {
+                                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.RequestTransactionId);
+                                            ticketConcernQuery = ticketConcernQuery.Where(x => !generatedIdInApprovalList.Contains(x.RequestTransactionId));
+                                        }
+                                        var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
+                                            .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
+                                            .ToListAsync();
+
+                                        var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                        var requestorSelect = receiver.Select(x => x.RequestTransactionId);
+
+                                        ticketConcernQuery = ticketConcernQuery
+                                            .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestTransactionId));
+                                    }
+                                    else
+                                    {
+                                        ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
+                                    }
+
+                                }
+
+                                else if (approverPermissionList.Any(x => x.Contains(request.Role)))
+                                {
+                                    var approverTransactList = await _context.ApproverTicketings
+                                        .Where(x => x.UserId == userApprover.Id).ToListAsync();
+
+                                    var approvalLevelList = approverTransactList
+                                        .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
+                                        .ToList();
+
+                                    var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestTransactionId);
+
+                                    var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
                                     ticketConcernQuery = ticketConcernQuery
-                                        .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestGeneratorId));
+                                        .Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestTransactionId));
+
                                 }
                                 else
                                 {
-                                    ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
+                                    ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
                                 }
 
-                            }
+                                if (request.UserType == TicketingConString.Requestor)
+                                {
+                                    if (requestorPermissionList.Any(x => x.Contains(request.Role)))
+                                    {
+                                        var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
+                                        var requestConcernContains = requestConcernList.Select(x => x.UserId);
+                                        ticketConcernQuery = ticketConcernQuery.Where(x => requestConcernContains.Contains(x.RequestorBy));
+                                    }
+                                    else
+                                    {
+                                        ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
+                                    }
 
-                            else if (approverPermissionList.Any(x => x.Contains(request.Role)))
-                            {
-                                var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                                var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                                var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestGeneratorId);
-                                var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                                ticketConcernQuery = ticketConcernQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestGeneratorId));
+                                }
 
-                            }
-                            else
-                            {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
-                            }
+                                if (request.UserType == TicketingConString.IssueHandler)
+                                {
+                                    if (issueHandlerPermissionList.Any(x => x.Contains(request.Role)))
+                                    {
+                                        ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
+                                    }
+                                    else
+                                    {
+                                        ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
+                                    }
 
-                        }
+                                }
 
-                        if (request.Requestor == TicketingConString.Requestor)
-                        {
-                            if(requestorPermissionList.Any(x => x.Contains(request.Role)))
-                            {
-                                var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
-                                var requestConcernContains = requestConcernList.Select(x => x.UserId);
-                                ticketConcernQuery = ticketConcernQuery.Where(x => requestConcernContains.Contains(x.RequestorBy));
-                            }
-                            else
-                            {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
-                            }
-
-                        }
-
-                        if (request.IssueHandler == TicketingConString.IssueHandler)
-                        {
-                            if (issueHandlerPermissionList.Any(x => x.Contains(request.Role)))
-                            {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
-                            }
-                            else
-                            {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestGeneratorId == null);
                             }
 
                         }
@@ -224,7 +240,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .Where(x => x.RequestorByUser.UserRole.UserRoleName != TicketingConString.Requestor)
                         .GroupBy(x => new
                     {
-                        x.RequestGeneratorId,
+                        x.RequestTransactionId,
                         x.UserId,
                         IssueHandler = x.User.Fullname
                         
@@ -232,7 +248,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }).Select(x => new GetRequestConcernResult
                     {
 
-                        RequestGeneratorId = x.Key.RequestGeneratorId,
+                        RequestTransactionId = x.Key.RequestTransactionId,
                         UserId = x.Key.UserId,
                         Issue_Handler = x.Key.IssueHandler,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,

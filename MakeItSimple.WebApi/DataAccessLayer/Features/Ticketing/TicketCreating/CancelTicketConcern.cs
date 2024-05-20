@@ -11,10 +11,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class CancelTicketConcernCommand : IRequest<Result>
         {
-            public List<CancelTicketGenerator> CancelTicketGenerators { get; set; }
-            public class CancelTicketGenerator
+            public List<CancelRequestTransaction> CancelRequestTransactions { get; set; }
+            public class CancelRequestTransaction
             {
-                public int RequestGeneratorId { get; set; }
+                public int RequestTransactionId { get; set; }
                 public Guid ? Issue_Handler {  get; set; }
                 public ICollection<CancelTicketConcern> CancelTicketConcerns { get; set; }
                 public class CancelTicketConcern
@@ -38,17 +38,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 //var cancelList = new List<CancelTicketConcern>();
 
-                foreach (var ticketGenerator in command.CancelTicketGenerators)
+                foreach (var requestTransaction in command.CancelRequestTransactions)
                 {
 
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketGenerator.RequestGeneratorId, cancellationToken);
-                    if (requestGeneratorExist == null)
+                    var requestTransactionExist = await _context.RequestTransactions
+                        .FirstOrDefaultAsync(x => x.Id == requestTransaction.RequestTransactionId, cancellationToken);
+
+                    if (requestTransactionExist == null)
                     {
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-                    var issueHandlerExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
-                    && x.UserId == ticketGenerator.Issue_Handler).FirstOrDefaultAsync();
+                    var issueHandlerExist = await _context.TicketConcerns
+                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                    && x.UserId == requestTransaction.Issue_Handler)
+                        .FirstOrDefaultAsync();
 
                     if (issueHandlerExist == null)
                     {
@@ -56,9 +60,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var ticketConcernExist = await _context.TicketConcerns
-                        .Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId && x.UserId == ticketGenerator.Issue_Handler).ToListAsync();
+                        .Where(x => x.RequestTransactionId == requestTransaction.RequestTransactionId 
+                        && x.UserId == requestTransaction.Issue_Handler).ToListAsync();
 
-                    if (ticketGenerator.CancelTicketConcerns == null)
+                    if (requestTransaction.CancelTicketConcerns == null)
                     {
                         foreach (var cancelAll in ticketConcernExist)
                         {
@@ -66,7 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
                     }
 
-                    foreach (var ticketConcern in ticketGenerator.CancelTicketConcerns)
+                    foreach (var ticketConcern in requestTransaction.CancelTicketConcerns)
                     {
                         var ticketConcernById = ticketConcernExist.FirstOrDefault(x => x.Id == ticketConcern.TicketConcernId);
                         if (ticketConcernById != null)

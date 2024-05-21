@@ -43,7 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string Channel_Name { get; set; }
 
             public string Concern_Type { get; set; }
-
+            public bool Is_Transfer { get; set; }
             public List<OpenTicket> OpenTickets { get; set; }
             public class OpenTicket
             {
@@ -187,7 +187,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }
 
-                var results = ticketConcernQuery.Where(x => x.IsApprove != false && x.IsReTicket != true)
+                var results = ticketConcernQuery.Where(x => x.IsApprove != false 
+                && x.IsReTicket != true && x.IsTransfer != false)
                     .GroupBy(x => new
                     {
                         x.RequestTransactionId,

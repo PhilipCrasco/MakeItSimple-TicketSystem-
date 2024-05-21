@@ -22,7 +22,7 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-var connectionString = builder.Configuration.GetConnectionString("DevConnection");
+var connectionString = builder.Configuration.GetConnectionString("Testing");
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 builder.Services.AddDbContext<MisDbContext>(x =>
@@ -160,4 +160,4 @@ app.UseWebSockets();
 app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registration
 app.MapControllers(); 
 
-                                         app.Run();
+app.Run();

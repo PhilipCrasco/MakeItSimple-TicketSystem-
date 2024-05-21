@@ -255,9 +255,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
                     updated_At = x.UpdatedAt,
-                    TicketRequestConcerns = x.TicketConcerns.GroupBy(x => new
+                    TicketRequestConcerns = requestConcernsQuery.Count() > 0 ? x.TicketConcerns.GroupBy(x => new
                     {
-                        x.RequestTransactionId,
+                        RequestTransactionId = x.RequestTransactionId,
                         DepartmentId = x.User.DepartmentId,
                         Department_Name = x.User.Department.DepartmentName,
                         UnitId = x.User.UnitId,
@@ -318,7 +318,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }).ToList(),
 
 
-                    }).ToList(),
+                    }).ToList() : null,
 
                 });
 

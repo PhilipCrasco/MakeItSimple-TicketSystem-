@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <History>True|2024-05-09T02:01:10.0993685Z;True|2024-05-09T09:50:34.3158857+08:00;False|2024-04-29T15:43:01.2274519+08:00;False|2024-04-29T15:42:50.3165633+08:00;</History>
+    <LastFailureDetails />
+    <_PublishTargetUrl>C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\MakeItSimple.WebApi\bin\Release\net7.0\publish\</_PublishTargetUrl>
+  </PropertyGroup>
+</Project>

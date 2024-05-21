@@ -35,12 +35,12 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
-        run: dotnet restore ./RDF.Arcana.API/RDF.Arcana.API.csproj
+        run: dotnet restore ./MakeItSimple.WebApi/MakeItSimple.WebApi.csproj
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: dotnet publish ./RDF.Arcana.API/RDF.Arcana.API.csproj --configuration Release
+        run: dotnet publish ./MakeItSimple.WebApi/MakeItSimple.WebApi.csproj --configuration Release
 
       - name: Deploy
         id: deploy

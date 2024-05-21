@@ -8,7 +8,7 @@ namespace MakeItSimple.WebApi.Migrations
     /// <inheritdoc />
     public partial class UpdateRequestTransaction : Migration
     {
-        /// <inheritdoc />
+        /// <inheritdocs />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(

@@ -32,7 +32,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 _context = context;
             }
 
-
             public async Task<Result> Handle(ReturnRequestTicketCommand command, CancellationToken cancellationToken)
             {
                 foreach (var ticketConcern in command.ReturnTicketRequestByIds)

@@ -203,8 +203,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         Created_At = x.CreatedAt,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate
+                        //Start_Date = x.StartDate,
+                        //Target_Date = x.TargetDate
 
                     }).ToList()
 

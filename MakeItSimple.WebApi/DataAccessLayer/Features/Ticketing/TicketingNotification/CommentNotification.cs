@@ -62,7 +62,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     && x.UserId == request.UserId)
                     .ToListAsync();
 
-                var ticketCommentSelect = ticketComment.Select(x => x.Id);
+                var ticketCommentSelect = ticketComment.Select(x => x.TicketCommentId);
 
                 query = query.Where(x => !ticketCommentSelect.Contains(x.Id)).ToList();
 

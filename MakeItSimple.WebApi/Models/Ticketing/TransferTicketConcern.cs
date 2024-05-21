@@ -30,9 +30,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int ? SubCategoryId { get; set; }
         public virtual SubCategory SubCategory { get; set; }
 
-        public DateTime? StartDate { get; set; }
+        //public DateTime? StartDate { get; set; }
 
-        public DateTime? TargetDate { get; set; }
+        //public DateTime? TargetDate { get; set; }
 
         public Guid? UserId { get; set; }
         public virtual User User { get; set; }

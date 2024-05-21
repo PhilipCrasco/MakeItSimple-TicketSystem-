@@ -72,5 +72,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
      public static Error NoComment() =>
      new Error("TicketRequest.NoComment", "No comment has been made!");
+     
+     public static Error InvalidReturnTicket() =>
+     new Error("TicketRequest.InvalidReturnTicket", "Return ticket invalid!");
     }
 }

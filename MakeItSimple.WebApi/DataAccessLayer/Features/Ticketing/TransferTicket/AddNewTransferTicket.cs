@@ -122,7 +122,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         await _context.SaveChangesAsync(cancellationToken);
 
                         var getApproverUser = await _context.Approvers
-                            .Include(x => x.User).Where(x => x.SubUnitId == userExist.SubUnitId)
+                            .Include(x => x.User)
+                            .Where(x => x.SubUnitId == userExist.SubUnitId)
                             .ToListAsync();
                         
                         var getApproverUserId = getApproverUser.First(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
@@ -136,8 +137,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             ConcernDetails = ticketConcern.ConcernDetails,
                             TransferRemarks = command.TransferRemarks,
                             AddedBy = command.Added_By,
-                            StartDate = ticketConcern.StartDate,
-                            TargetDate = ticketConcern.TargetDate,
+                            //StartDate = ticketConcern.StartDate,
+                            //TargetDate = ticketConcern.TargetDate,
                             IsTransfer = false,
                             TicketApprover = getApproverUserId.UserId
 

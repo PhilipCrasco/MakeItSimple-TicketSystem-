@@ -172,8 +172,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             //SubCategoryId = ticketConcern.SubCategoryId,
                             TransferRemarks = command.TransferRemarks,
                             AddedBy = command.Added_By,
-                            StartDate = ticketConcern.StartDate,
-                            TargetDate = ticketConcern.TargetDate,
+                            //StartDate = ticketConcern.StartDate,
+                            //TargetDate = ticketConcern.TargetDate,
                             IsTransfer = false,
                             TicketApprover = requestGeneratorIdInTransfer.TicketApprover
 

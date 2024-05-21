@@ -57,7 +57,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                            Modified_By = x.ModifiedByUser.Fullname,
                            Updated_At = x.UpdatedAt
 
-
                        }).OrderByDescending(x => x.Created_At).ToList()
 
                     }).ToListAsync();

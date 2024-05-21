@@ -3,7 +3,7 @@ using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.RequestTicketNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {

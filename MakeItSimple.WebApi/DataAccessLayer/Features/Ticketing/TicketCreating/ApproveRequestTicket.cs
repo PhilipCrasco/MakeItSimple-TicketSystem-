@@ -22,7 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public class Concerns
             {
-                public int RequestTrasactionId { get; set; }
+                public int RequestTransactionId { get; set; }
                 public Guid ? IssueHandler { get; set; }
             }
 
@@ -50,7 +50,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 foreach (var ticketConcern in command.Concern)
                 {
                     var requestTransactionExist = await _context.RequestTransactions
-                        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTrasactionId, cancellationToken);
+                        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTransactionId, cancellationToken);
 
                     if (requestTransactionExist == null)
                     {
@@ -60,7 +60,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var requestTicketId = await _context.ApproverTicketings
                     .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsApprove == null).ToListAsync();
 
-                    var userExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId
+                    var userExist = await _context.TicketConcerns
+                        .FirstOrDefaultAsync(x => x.RequestTransactionId == ticketConcern.RequestTransactionId
                     && x.UserId == ticketConcern.IssueHandler && x.IsApprove != true);
 
                     if (userExist == null)
@@ -69,11 +70,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var ticketConcernExist = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId && x.UserId == userExist.UserId).ToListAsync();
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId && x.UserId == userExist.UserId)
+                        .ToListAsync();
 
                     var ticketConcernHandlerExist = await _context.TicketConcerns
                         .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTrasactionId 
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId 
                     && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
 
                     var requestTicketConcernId = await _context.ApproverTicketings
@@ -101,7 +103,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         foreach (var concernTicket in ticketConcernHandlerExist)
                         {
 
-                            var validateUserApprover = userApprovalId.FirstOrDefault(x => x.ApproverLevel == selectRequestTicketId.ApproverLevel + 1);
+                            var validateUserApprover = userApprovalId.
+                                FirstOrDefault(x => x.ApproverLevel == selectRequestTicketId.ApproverLevel + 1);
 
                             if (validateUserApprover != null)
                             {

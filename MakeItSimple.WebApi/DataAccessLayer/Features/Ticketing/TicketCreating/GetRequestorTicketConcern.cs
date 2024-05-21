@@ -150,8 +150,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if (!string.IsNullOrEmpty(request.Search))
                     {
-                        requestConcernsQuery = requestConcernsQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                        && x.Id.ToString().Contains(request.Search));
+                        requestConcernsQuery = requestConcernsQuery
+                            .Where(x => x.User.Fullname.Contains(request.Search)
+                        || x.RequestTransactionId.ToString().Contains(request.Search));
                     }
 
                     if (request.Ascending != null)

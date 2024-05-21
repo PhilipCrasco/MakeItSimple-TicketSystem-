@@ -9,7 +9,7 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.CommentNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.OpenTicketNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.RequestTicketNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ReTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;

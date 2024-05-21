@@ -183,10 +183,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             }
 
                         }
-                        else
-                        {
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.RequestTransactionId == null);
-                        }
                     }
 
                 }

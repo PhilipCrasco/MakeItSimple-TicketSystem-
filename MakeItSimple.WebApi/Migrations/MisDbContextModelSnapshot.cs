@@ -1868,17 +1868,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("request_transaction_id");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("start_date");
-
                     b.Property<int?>("SubCategoryId")
                         .HasColumnType("int")
                         .HasColumnName("sub_category_id");
-
-                    b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("target_date");
 
                     b.Property<Guid?>("TicketApprover")
                         .HasColumnType("char(36)")

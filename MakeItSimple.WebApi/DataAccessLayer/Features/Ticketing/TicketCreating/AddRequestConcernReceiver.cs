@@ -98,6 +98,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     var requestTransactionId = new RequestTransaction { IsActive = true };
                     await _context.RequestTransactions.AddAsync(requestTransactionId);
+
+
                     requestTransactionExist = requestTransactionId;
 
                 }
@@ -116,10 +118,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
                 else
                 {
-                     requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
-                        .ThenInclude(x => x.UserRole)
-                        .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.IssueHandler).ToListAsync();
+                    requestTicketConcernList = await _context.TicketConcerns
+                       .Include(x => x.AddedByUser)
+                       .ThenInclude(x => x.UserRole)
+                       .Include(x => x.RequestorByUser)
+                       .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.IssueHandler)
+                       .ToListAsync();
                 }
 
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
@@ -273,11 +277,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             hasChanged = true;
                         }
 
+                        if(upsertConcern.RequestConcernId != null)
+                        {
+                            var requestConcern = await _context.RequestConcerns
+                                .FirstOrDefaultAsync(x => x.RequestTransactionId == requestTransactionExist.Id, cancellationToken);
+
+                            requestConcern.Remarks = null;
+                        }
 
                         if (requestorPermissionList.Any(x => x.Contains(upsertConcern.RequestorByUser.UserRole.UserRoleName))
                             &&  !issueHandlerPermissionList.Any(x => x.Contains(upsertConcern.AddedByUser.UserRole.UserRoleName))) 
                         {
-                            var requestUpsertConcern = await _context.RequestConcerns.Where(x => x.Id == upsertConcern.RequestConcernId).ToListAsync();
+                            var requestUpsertConcern = await _context.RequestConcerns
+                                .Where(x => x.Id == upsertConcern.RequestConcernId)
+                                 .ToListAsync();
 
                             foreach(var request in requestUpsertConcern)
                             {
@@ -297,6 +310,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
                             upsertConcern.IsAssigned = true;
+                            upsertConcern.Remarks = null;
                         }
                         upsertConcern.TicketType = TicketingConString.Concern;
 

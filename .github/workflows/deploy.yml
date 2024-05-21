@@ -1,0 +1,73 @@
+name: create-release
+
+on:
+  push:
+    branches:
+      - 'Development'
+      - 'master'
+
+jobs:
+  build:
+    name: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Git Client
+        run: |
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          git config --global user.email "github-actions@doesnotmatter.dev"
+          git config --global user.name "GitHub Actions"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3.0.3
+        with:
+          dotnet-version: 7.0.400
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: dotnet restore ./RDF.Arcana.API/RDF.Arcana.API.csproj
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: dotnet publish ./RDF.Arcana.API/RDF.Arcana.API.csproj --configuration Release
+
+      - name: Deploy
+        id: deploy
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            # Deploy to 'deploy' folder for master branch changes
+            mkdir deploy
+            cp -R ./RDF.Arcana.API/bin/Release/net7.0/publish deploy/
+            cd deploy
+            git init
+            git add .
+            git commit -m "Update Artifacts for Master Branch"
+            git remote add origin git@github.com:aldrinvega/ARCANA.git
+            git push --force --quiet origin master:deploy
+          elif [ "${{ github.ref }}" = "refs/heads/Development" ]; then
+              # Deploy to 'deploy-dev' folder for development branch changes
+            mkdir deploy-dev
+            cp -R ./MakeItSimple-TicketSystem-/MakeItSimple.WebApi/bin/Release/net7.0/publish deploy-dev/
+            cd deploy-dev
+            git init
+            git add .
+            git commit -m "Update Artifacts for Development Branch"
+            git remote add origin git@github.com:PhilipCrasco/MakeItSimple-TicketSystem-.git
+            git push --force --quiet origin master:deploy-dev
+          else
+            echo "Skipping deployment for branch: ${{ github.ref }}"
+          fi
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

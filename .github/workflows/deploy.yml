@@ -58,7 +58,7 @@ jobs:
           elif [ "${{ github.ref }}" = "refs/heads/Development" ]; then
               # Deploy to 'deploy-dev' folder for development branch changes
             mkdir deploy-dev
-            cp -R ./MakeItSimple-TicketSystem-/MakeItSimple.WebApi/bin/Release/net7.0/publish deploy-dev/
+            cp -R ./MakeItSimple.WebApi/bin/Release/net7.0/publish deploy-dev/
             cd deploy-dev
             git init
             git add .

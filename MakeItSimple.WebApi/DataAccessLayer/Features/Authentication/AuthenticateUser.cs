@@ -32,6 +32,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public ICollection<string> Permissions { get; set; }
             public string Token { get; set; }
             public bool ? IsPasswordChanged { get; set; }
+            public string Message { get; set; }
 
 
             public AuthenticateUserResult(User user , string token)
@@ -50,7 +51,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
                 Permissions = user.UserRole?.Permissions;
                 IsPasswordChanged = user.IsPasswordChange;
                 Token = token;
-                
+                Message = "Yehey";
             }
 
         }

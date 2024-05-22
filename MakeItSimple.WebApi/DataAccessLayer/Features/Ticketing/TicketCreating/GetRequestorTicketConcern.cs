@@ -8,6 +8,7 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
@@ -109,7 +110,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns.Include(x => x.User)
+                    var requestConcernsQuery = _context.RequestConcerns
+                    .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
                      .Include(x => x.User)
@@ -120,9 +122,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .ThenInclude(x => x.RequestorByUser)
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
-                     .ThenInclude(x => x.ChannelUsers);
+                     .ThenInclude(x => x.ChannelUsers)
+                     .AsQueryable();
 
-                if (requestConcernsQuery.Count() > 0)
+                if (requestConcernsQuery.Any())
                 {
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
@@ -151,45 +154,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         requestConcernsQuery = requestConcernsQuery
-                            .Where(x => x.User.Fullname.Contains(request.Search)
-                        || x.RequestTransactionId.ToString().Contains(request.Search));
+                            .Where(x => x.User.Fullname.Contains(request.Search) || x.RequestTransactionId.ToString().Contains(request.Search));
                     }
 
                     if (request.Ascending != null)
                     {
-                        if (request.Ascending is true)
-                        {
-                            requestConcernsQuery = requestConcernsQuery.OrderBy(x => x.RequestTransactionId);
-                        }
-                        else
-                        {
-                            requestConcernsQuery = requestConcernsQuery.OrderByDescending(x => x.RequestTransactionId);
-                        }
-
+                        requestConcernsQuery = request.Ascending.Value
+                            ? requestConcernsQuery.OrderBy(x => x.RequestTransactionId)
+                            : requestConcernsQuery.OrderByDescending(x => x.RequestTransactionId);
                     }
 
                     if (request.Concern_Status != null)
                     {
-                        if (request.Concern_Status == TicketingConString.Approval)
+                        switch (request.Concern_Status)
                         {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket);
+                            case TicketingConString.Approval:
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket);
+                                break;
+                            case TicketingConString.OnGoing:
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
+                                break;
+                            case TicketingConString.Done:
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.Done);
+                                break;
+                            default:
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
+                                break;
                         }
-                        else if (request.Concern_Status == TicketingConString.OnGoing)
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
-                        }
-                        else if (request.Concern_Status == TicketingConString.Done)
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.Done);
-                        }
-                        else
-                        {
-                            requestConcernsQuery = requestConcernsQuery.Where(x => x.RequestTransactionId == null);
-                        }
-
                     }
 
-                    if(!string.IsNullOrEmpty(request.UserType))
+                    if (!string.IsNullOrEmpty(request.UserType))
                     {
                         if (request.UserType == TicketingConString.Requestor)
                         {
@@ -238,91 +232,105 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                var results = requestConcernsQuery.Select(x => new GetRequestorTicketConcernResult
-                {
-                    RequestTransactionId = x.RequestTransactionId,
-                    DepartmentId = x.User.DepartmentId,
-                    Department_Name = x.User.Department.DepartmentName,
-                    UserId = x.UserId,
-                    EmpId = x.User.EmpId,
-                    FullName = x.User.Fullname,
-                    Concern = x.Concern,
-                    RequestConcernId = x.Id,
-                    Concern_Status = x.ConcernStatus,
-                    Is_Done = x.IsDone,
-                    Remarks = x.Remarks,
-                    Added_By = x.AddedByUser.Fullname,
-                    Created_At = x.CreatedAt,
-                    Modified_By = x.ModifiedByUser.Fullname,
-                    updated_At = x.UpdatedAt,
-                    TicketRequestConcerns = requestConcernsQuery.Count() > 0 ? x.TicketConcerns.GroupBy(x => new
+                var results =  requestConcernsQuery
+                    .GroupBy(x => new
                     {
-                        RequestTransactionId = x.RequestTransactionId,
-                        DepartmentId = x.User.DepartmentId,
+                        x.RequestTransactionId,
+                        x.User.DepartmentId,
                         Department_Name = x.User.Department.DepartmentName,
-                        UnitId = x.User.UnitId,
-                        Unit_Name = x.User.Units.UnitName,
-                        ChannelId = x.ChannelId,
-                        Channel_Name = x.Channel.ChannelName,
-                        Concern_Description = x.ConcernDetails,
-                        CategoryId = x.CategoryId,
-                        Category_Description = x.Category.CategoryDescription,
-                        SubCategoryId = x.SubCategoryId,
-                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate,
-                        Remarks = x.Remarks,
-                        Concern_Type = x.TicketType,
-                        Ticket_Status = x.IsApprove == true ? "Ticket Approve" : x.IsReject == true ? "Rejected" :
-                         x.ConcernStatus != TicketingConString.ForApprovalTicket ? x.ConcernStatus : x.IsApprove == false
-                         && x.IsReject == false ? "For Approval" : "Unknown",
-                         x.IsAssigned
-
-
-                    }).Select(x => new TicketRequestConcern
+                        x.UserId,
+                        x.User.EmpId,
+                        FullName = x.User.Fullname,
+                        x.Concern,
+                        x.Id,
+                        x.ConcernStatus,
+                        x.IsDone,
+                        x.Remarks,
+                        Added_By = x.AddedByUser.Fullname,
+                        x.CreatedAt,
+                        Modified_By = x.ModifiedByUser.Fullname,
+                        x.UpdatedAt
+                    })
+                    .Select(g => new GetRequestorTicketConcernResult
                     {
-                        RequestTransactionId = x.Key.RequestTransactionId,
-                        DepartmentId = x.Key.DepartmentId,
-                        Department_Name = x.Key.Department_Name,
-                        UnitId = x.Key.UnitId,
-                        Unit_Name = x.Key.Unit_Name,
-                        //SubUnitId = x.Key.SubUnitId,
-                        //SubUnit_Name = x.Key.SubUnit_Name,
-                        ChannelId = x.Key.ChannelId,
-                        Channel_Name = x.Key.Channel_Name,
-                        Concern_Description = x.Key.Concern_Description,
-                        CategoryId = x.Key.CategoryId,
-                        Category_Description = x.Key.Category_Description,
-                        SubCategoryId = x.Key.SubCategoryId,
-                        SubCategory_Description = x.Key.SubCategory_Description,
-                        Start_Date = x.Key.Start_Date,
-                        Target_Date = x.Key.Target_Date,
-                        Ticket_Status = x.Key.Ticket_Status,
-                        Remarks = x.Key.Remarks,
-                        Concern_Type = x.Key.Concern_Type,
-                        Is_Assigned = x.Key.IsAssigned,
-                        TicketConcerns = x.Select(x => new TicketRequestConcern.TicketConcern
-                        {
-                            TicketConcernId = x.Id,
-                            //ChannelUserId = x.Channel,
-                            SubUnitId = x.User.SubUnitId,
-                            SubUnit_Name = x.User.SubUnit.SubUnitName,
-                            UserId = x.UserId,
-                            Issue_Handler = x.User.Fullname,
-                            Added_By = x.AddedByUser.Fullname,
-                            Created_At = x.CreatedAt,
-                            Modified_By = x.ModifiedByUser.Fullname,
-                            Updated_At = x.UpdatedAt,
-                            IsActive = x.IsActive,
+                        RequestTransactionId = g.Key.RequestTransactionId,
+                        DepartmentId = g.Key.DepartmentId,
+                        Department_Name = g.Key.Department_Name,
+                        UserId = g.Key.UserId,
+                        EmpId = g.Key.EmpId,
+                        FullName = g.Key.FullName,
+                        Concern = g.Key.Concern,
+                        RequestConcernId = g.Key.Id,
+                        Concern_Status = g.Key.ConcernStatus,
+                        Is_Done = g.Key.IsDone,
+                        Remarks = g.Key.Remarks,
+                        Added_By = g.Key.Added_By,
+                        Created_At = g.Key.CreatedAt,
+                        Modified_By = g.Key.Modified_By,
+                        updated_At = g.Key.UpdatedAt,
+                        TicketRequestConcerns = g.SelectMany(tc => tc.TicketConcerns)
+                            .GroupBy(tc => new
+                            {
+                                tc.RequestTransactionId,
+                                DepartmentId = tc.User.DepartmentId,
+                                Department_Name = tc.User.Department.DepartmentName,
+                                UnitId = tc.User.UnitId,
+                                Unit_Name = tc.User.Units.UnitName,
+                                ChannelId = tc.ChannelId,
+                                Channel_Name = tc.Channel.ChannelName,
+                                Concern_Description = tc.ConcernDetails,
+                                CategoryId = tc.CategoryId,
+                                Category_Description = tc.Category.CategoryDescription,
+                                SubCategoryId = tc.SubCategoryId,
+                                SubCategory_Description = tc.SubCategory.SubCategoryDescription,
+                                tc.StartDate,
+                                tc.TargetDate,
+                                tc.Remarks,
+                                tc.TicketType,
+                                Ticket_Status = tc.IsApprove == true ? "Ticket Approve" : tc.IsReject ? "Rejected" : tc.ConcernStatus != TicketingConString.ForApprovalTicket ? tc.ConcernStatus : tc.IsApprove == false && tc.IsReject == false ? "For Approval" : "Unknown",
+                                tc.IsAssigned
+                            })
+                            .Select(tc => new TicketRequestConcern
+                            {
+                                RequestTransactionId = tc.Key.RequestTransactionId,
+                                DepartmentId = tc.Key.DepartmentId,
+                                Department_Name = tc.Key.Department_Name,
+                                UnitId = tc.Key.UnitId,
+                                Unit_Name = tc.Key.Unit_Name,
+                                ChannelId = tc.Key.ChannelId,
+                                Channel_Name = tc.Key.Channel_Name,
+                                Concern_Description = tc.Key.Concern_Description,
+                                CategoryId = tc.Key.CategoryId,
+                                Category_Description = tc.Key.Category_Description,
+                                SubCategoryId = tc.Key.SubCategoryId,
+                                SubCategory_Description = tc.Key.SubCategory_Description,
+                                Start_Date = tc.Key.StartDate,
+                                Target_Date = tc.Key.TargetDate,
+                                Ticket_Status = tc.Key.Ticket_Status,
+                                Remarks = tc.Key.Remarks,
+                                Concern_Type = tc.Key.TicketType,
+                                Is_Assigned = tc.Key.IsAssigned,
+                                TicketConcerns = tc.Select(t => new TicketRequestConcern.TicketConcern
+                                {
+                                    TicketConcernId = t.Id,
+                                    SubUnitId = t.User.SubUnitId,
+                                    SubUnit_Name = t.User.SubUnit.SubUnitName,
+                                    UserId = t.UserId,
+                                    Issue_Handler = t.User.Fullname,
+                                    Added_By = t.AddedByUser.Fullname,
+                                    Created_At = t.CreatedAt,
+                                    Modified_By = t.ModifiedByUser.Fullname,
+                                    Updated_At = t.UpdatedAt,
+                                    IsActive = t.IsActive,
+                                }).ToList()
+                            }).ToList()
 
-                        }).ToList(),
+                    });
 
 
-                    }).ToList() : null,
+               return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
 
-                });
 
-                return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }
     }

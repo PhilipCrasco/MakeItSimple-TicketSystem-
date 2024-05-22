@@ -5,7 +5,9 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq.Extensions;
+using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
@@ -82,7 +84,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Handler(MisDbContext context)
             {
                 _context = context;
+
+
             }
+
+
 
             public async Task<PagedList<GetClosingTicketResults>> Handle(GetClosingTicketQuery request, CancellationToken cancellationToken)
             {
@@ -96,6 +102,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .ThenInclude(x => x.BusinessUnit)
                     .Include(x => x.RejectClosedByUser) 
                     .Include(x => x.ClosedByUser);
+
+
 
 
                 if(closingTicketsQuery.Count() > 0)
@@ -246,8 +254,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             SubCategoryDescription = x.SubCategory.SubCategoryDescription,
                             Start_Date = x.StartDate,
                             Target_Date = x.TargetDate,
-                            Delay_Days = x.TargetDate < dateToday && x.ClosingAt == null ? EF.Functions.DateDiffDay(x.TargetDate, dateToday)
-                            : x.TargetDate < x.ClosingAt && x.ClosingAt != null ? EF.Functions.DateDiffDay(x.TargetDate, x.ClosingAt) : 0,
+                            Delay_Days = x.TargetDate < dateToday && x.ClosingAt == null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions,x.TargetDate, dateToday)
+                            : x.TargetDate < x.ClosingAt && x.ClosingAt != null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions ,x.TargetDate, x.ClosingAt) : 0,
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
                             Updated_At = x.UpdatedAt,

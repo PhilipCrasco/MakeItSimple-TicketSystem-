@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
+using System.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,15 +23,37 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-var connectionString = builder.Configuration.GetConnectionString("Test");
+var connectionString = builder.Configuration.GetConnectionString("Testing");
+builder.Services.AddDbContext<MisDbContext>(x => 
+x.UseSqlServer(connectionString)
+    .UseSnakeCaseNamingConvention()
+    .EnableDetailedErrors()
+    .EnableSensitiveDataLogging()
 
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
-builder.Services.AddDbContext<MisDbContext>(x =>
-{
-    if (connectionString != null) x.UseMySql(connectionString, serverVersion)
-        .UseSnakeCaseNamingConvention()
-        .EnableSensitiveDataLogging();
-});
+    );
+
+//var connectionString = builder.Configuration.GetConnectionString("Testing");
+
+//var serverVersion = new MySqlServerVersion(new Version(8, 2, 17));
+//builder.Services.AddDbContext<MisDbContext>(x =>
+//{
+//    if (connectionString != null) x.UseMySql(connectionString, serverVersion)
+//        .UseSnakeCaseNamingConvention()
+//        .EnableDetailedErrors()
+//        .EnableSensitiveDataLogging();
+
+//});
+
+//var serverVersion = ServerVersion.AutoDetect(connectionString);
+
+//builder.Services.AddDbContext<MisDbContext>(x =>
+//{
+//    if (connectionString != null)
+//        x.UseMySql(connectionString, serverVersion)
+//         .UseSnakeCaseNamingConvention()
+//         .EnableSensitiveDataLogging();
+//});
+
 
 builder.Services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly);
 

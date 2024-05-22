@@ -41,7 +41,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
     public class MisDbContext : DbContext
     {
         public MisDbContext(DbContextOptions<MisDbContext> options) : base(options) { }
-       
+
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
 
@@ -54,9 +54,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<Unit> Units { get; set; }
         public virtual DbSet<SubUnit> SubUnits { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
-        public virtual DbSet<Channel> Channels {  get; set; }
+        public virtual DbSet<Channel> Channels { get; set; }
         public virtual DbSet<ChannelUser> ChannelUsers { get; set; }
-        public virtual DbSet<Category> Categories {  get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<Approver> Approvers { get; set; }
 
@@ -82,11 +82,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.EnableSensitiveDataLogging(); 
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
 
-       
+
         protected override async void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
@@ -107,7 +107,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
-            modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());  
+            modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());
             modelBuilder.ApplyConfiguration(new ReTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TicketHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());

@@ -73,6 +73,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public bool? Status { get; set; }
             public string Search { get; set; }
             public bool? IsClosedApprove { get; set; }
+
+            public bool ? Is_Approve { get; set; }
+            public bool ? Is_Transfer { get; set; }
+            public bool ? Is_ReTicket { get; set; }
             //public string Receiver { get; set; }
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
@@ -132,12 +136,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     if (request.Status != null)
                     {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == true);
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Status);
                     }
 
-                    if (request.IsClosedApprove == true)
+                    if(request.Is_Approve != null)
                     {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsApprove == request.Is_Approve);
+                    }
+
+                    if (request.Is_Transfer != null)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer == request.Is_Transfer);
+                    }
+
+                    if (request.Is_ReTicket != null)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Is_ReTicket);
+                    }
+
+                    if (request.IsClosedApprove != null)
+                    {
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == request.IsClosedApprove);
                     }
 
                     if (!string.IsNullOrEmpty(request.UserType))
@@ -187,8 +206,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }
 
-                var results = ticketConcernQuery.Where(x => x.IsApprove != false 
-                && x.IsReTicket != true && x.IsTransfer != false)
+                //var results = ticketConcernQuery.Where(x => x.IsApprove != false 
+                //&& x.IsReTicket != true && x.IsTransfer != false)
+                var results = ticketConcernQuery
                     .GroupBy(x => new
                     {
                         x.RequestTransactionId,

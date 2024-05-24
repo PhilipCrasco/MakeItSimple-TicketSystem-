@@ -21,6 +21,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -350,11 +351,48 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpPut("approve-request")]
-        public async Task<IActionResult> ApproveRequestTicket([FromBody] ApproveRequestTicketCommand command)
+        //[HttpPut("approve-request")]
+        //public async Task<IActionResult> ApproveRequestTicket([FromBody] ApproveRequestTicketCommand command)
+        //{
+        //    try
+        //    {
+        //        if (User.Identity is ClaimsIdentity identity)
+        //        {
+        //            var userRole = identity.FindFirst(ClaimTypes.Role);
+        //            if (userRole != null)
+        //            {
+        //                command.Role = userRole.Value;
+        //            }
+
+        //            if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+        //            {
+        //                command.UserId = userId;
+        //                command.Approved_By = userId;
+
+        //            }
+        //        }
+
+        //        var results = await _mediator.Send(command);
+        //        if (results.IsFailure)
+        //        {
+
+        //            return BadRequest(results);
+        //        }
+        //        return Ok(results);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
+
+        [HttpPut("approval-request-receiver/{id}")]
+        public async Task<IActionResult> RequestApprovalReceiver([FromBody] RequestApprovalReceiverCommand command ,[FromRoute] int id)
         {
             try
             {
+
+                command.RequestTransactionId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
                     var userRole = identity.FindFirst(ClaimTypes.Role);

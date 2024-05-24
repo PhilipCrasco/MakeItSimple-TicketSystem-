@@ -154,9 +154,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Is_ReTicket);
                     }
 
-                    if (request.IsClosedApprove != null)
+                    if (request.IsClosedApprove == true)
                     {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == request.IsClosedApprove);
+                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
                     }
 
                     if (!string.IsNullOrEmpty(request.UserType))
@@ -245,8 +245,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             RequestConcernId = x.RequestConcernId,
                             Concern_Description = x.ConcernDetails,
 
-                            //Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
-                            //        : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
+                            Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
+                                    : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
 
                             Category_Description = x.Category.CategoryDescription,
                             SubCategory_Description = x.SubCategory.SubCategoryDescription,

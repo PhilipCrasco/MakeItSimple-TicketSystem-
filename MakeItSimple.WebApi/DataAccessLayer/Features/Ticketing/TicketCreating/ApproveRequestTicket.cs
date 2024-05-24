@@ -75,7 +75,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var ticketConcernHandlerExist = await _context.TicketConcerns
                         .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId 
+                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId
                     && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
 
                     var requestTicketConcernId = await _context.ApproverTicketings

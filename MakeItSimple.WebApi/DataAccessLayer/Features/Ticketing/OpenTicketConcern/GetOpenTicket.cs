@@ -70,14 +70,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
         public class GetOpenTicketQuery : UserParams, IRequest<PagedList<GetOpenTicketResult>>
         {
-            public bool? Status { get; set; }
             public string Search { get; set; }
+            public bool? Status { get; set; }
             public bool? IsClosedApprove { get; set; }
 
             public bool ? Is_Approve { get; set; }
             public bool ? Is_Transfer { get; set; }
             public bool ? Is_ReTicket { get; set; }
-            //public string Receiver { get; set; }
+            //public string Receiver { get; set; } 
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
 

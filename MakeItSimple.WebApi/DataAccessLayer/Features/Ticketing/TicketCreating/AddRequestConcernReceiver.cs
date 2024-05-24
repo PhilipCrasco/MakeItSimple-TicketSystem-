@@ -1,12 +1,10 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Google.Protobuf.WellKnownTypes;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
-using MakeItSimple.WebApi.Migrations;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.CodeAnalysis.FlowAnalysis;
@@ -310,7 +308,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             upsertConcern.ModifiedBy = command.Modified_By;
                             upsertConcern.UpdatedAt = DateTime.Now;
                             upsertConcern.IsAssigned = true;
-                            upsertConcern.Remarks = null;
+                            //upsertConcern.Remarks = null;
                         }
                         upsertConcern.TicketType = TicketingConString.Concern;
 
@@ -358,9 +356,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             IsApprove = false,
                             ConcernStatus = TicketingConString.ForApprovalTicket,
                             IsAssigned = true,
-                          
+
+                           
                         };
 
+                        
                         var userList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
                         var addedList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
                         var concernAlreadyExist = await _context.RequestConcerns.FirstOrDefaultAsync(x => x.Concern == addnewTicketConcern.ConcernDetails && x.IsActive == true, cancellationToken);

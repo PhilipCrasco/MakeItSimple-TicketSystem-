@@ -53,7 +53,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TransferBy { get; set; }
         public virtual User TransferByUser { get; set; }
 
-        public bool ? IsApprove { get; set; } = false;
+        public bool ? IsApprove { get; set; } 
         public DateTime? ApprovedAt { get; set; }
         public Guid? ApprovedBy { get; set; }
         public virtual User ApprovedByUser { get; set; }
@@ -97,6 +97,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TicketApprover { get; set; }
 
         public bool ? IsAssigned { get; set; }
+
+        public string TicketNo { get; set; }
 
 
         //public ICollection<TicketComment> TicketComments { get; set; }

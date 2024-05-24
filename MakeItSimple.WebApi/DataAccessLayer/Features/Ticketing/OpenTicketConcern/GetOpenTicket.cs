@@ -225,8 +225,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             RequestConcernId = x.RequestConcernId,
                             Concern_Description = x.ConcernDetails,
 
-                            Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
-                                    : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
+                            //Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
+                            //        : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
 
                             Category_Description = x.Category.CategoryDescription,
                             SubCategory_Description = x.SubCategory.SubCategoryDescription,

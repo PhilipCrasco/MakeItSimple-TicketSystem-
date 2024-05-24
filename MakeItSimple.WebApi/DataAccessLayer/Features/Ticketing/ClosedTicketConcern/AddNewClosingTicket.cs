@@ -2,7 +2,6 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
-using MakeItSimple.WebApi.Migrations;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

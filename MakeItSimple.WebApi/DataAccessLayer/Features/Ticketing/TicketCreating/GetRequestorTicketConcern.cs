@@ -69,6 +69,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     public int? TicketConcernId { get; set; }
                     //public int ? ChannelUserId { get; set; }
+
+                    public string Ticket_No { get; set; }
                     
                     public Guid? UserId { get; set; }
                     public int? SubUnitId { get; set; }
@@ -110,7 +112,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                    var requestConcernsQuery = _context.RequestConcerns
+                    IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
                     .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
@@ -122,11 +124,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .ThenInclude(x => x.RequestorByUser)
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
-                     .ThenInclude(x => x.ChannelUsers)
-                     .AsQueryable();
+                     .ThenInclude(x => x.ChannelUsers);
 
-                if (requestConcernsQuery.Any())
-                {
+                 if (requestConcernsQuery.Count() > 0)
+                 {
                     var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
                     var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                     var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
@@ -154,7 +155,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         requestConcernsQuery = requestConcernsQuery
-                            .Where(x => x.User.Fullname.Contains(request.Search) || x.RequestTransactionId.ToString().Contains(request.Search));
+                            .Where(x => x.User.Fullname.Contains(request.Search)
+                            || x.RequestTransactionId.ToString().Contains(request.Search));
                     }
 
                     if (request.Ascending != null)
@@ -207,7 +209,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     //var ticketConcernApproveList = await _context.
 
                                     var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
+                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != null)
                                         .ToListAsync();
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
                                     var requestorSelect = receiver.Select(x => x.RequestTransactionId);
@@ -232,43 +234,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                var results =  requestConcernsQuery
-                    .GroupBy(x => new
+                var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                     {
-                        x.RequestTransactionId,
-                        x.User.DepartmentId,
-                        Department_Name = x.User.Department.DepartmentName,
-                        x.UserId,
-                        x.User.EmpId,
-                        FullName = x.User.Fullname,
-                        x.Concern,
-                        x.Id,
-                        x.ConcernStatus,
-                        x.IsDone,
-                        x.Remarks,
-                        Added_By = x.AddedByUser.Fullname,
-                        x.CreatedAt,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        x.UpdatedAt
-                    })
-                    .Select(g => new GetRequestorTicketConcernResult
-                    {
-                        RequestTransactionId = g.Key.RequestTransactionId,
-                        DepartmentId = g.Key.DepartmentId,
-                        Department_Name = g.Key.Department_Name,
-                        UserId = g.Key.UserId,
-                        EmpId = g.Key.EmpId,
-                        FullName = g.Key.FullName,
-                        Concern = g.Key.Concern,
-                        RequestConcernId = g.Key.Id,
-                        Concern_Status = g.Key.ConcernStatus,
-                        Is_Done = g.Key.IsDone,
-                        Remarks = g.Key.Remarks,
-                        Added_By = g.Key.Added_By,
-                        Created_At = g.Key.CreatedAt,
-                        Modified_By = g.Key.Modified_By,
-                        updated_At = g.Key.UpdatedAt,
-                        TicketRequestConcerns = g.SelectMany(tc => tc.TicketConcerns)
+                        RequestTransactionId = g.RequestTransactionId,
+                        DepartmentId = g.User.DepartmentId,
+                        Department_Name = g.User.Department.DepartmentName,
+                        UserId = g.UserId,
+                        EmpId = g.User.EmpId,
+                        FullName = g.User.Fullname,
+                        Concern = g.Concern,
+                        RequestConcernId = g.Id,
+                        Concern_Status = g.ConcernStatus,
+                        Is_Done = g.IsDone,
+                        Remarks = g.Remarks,
+                        Added_By = g.AddedByUser.Fullname,
+                        Created_At = g.CreatedAt,
+                        Modified_By = g.ModifiedByUser.Fullname,
+                        updated_At = g.UpdatedAt,
+                        TicketRequestConcerns = g.TicketConcerns
                             .GroupBy(tc => new
                             {
                                 tc.RequestTransactionId,
@@ -310,9 +293,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Remarks = tc.Key.Remarks,
                                 Concern_Type = tc.Key.TicketType,
                                 Is_Assigned = tc.Key.IsAssigned,
+
                                 TicketConcerns = tc.Select(t => new TicketRequestConcern.TicketConcern
                                 {
                                     TicketConcernId = t.Id,
+                                    Ticket_No = t.TicketNo,
                                     SubUnitId = t.User.SubUnitId,
                                     SubUnit_Name = t.User.SubUnit.SubUnitName,
                                     UserId = t.UserId,
@@ -323,9 +308,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     Updated_At = t.UpdatedAt,
                                     IsActive = t.IsActive,
                                 }).ToList()
+
                             }).ToList()
 
-                    });
+                    });;
 
 
                return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);

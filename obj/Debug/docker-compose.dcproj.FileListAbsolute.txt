@@ -44,7 +44,6 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebAp
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebApi.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MediatR.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Pomelo.EntityFrameworkCore.MySql.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\FluentValidation.dll
@@ -62,7 +61,6 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Swashbuckle.AspNet
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.OpenApi.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\BCrypt.Net-Next.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MySqlConnector.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Protocols.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Newtonsoft.Json.dll
@@ -77,3 +75,5 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFr
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\EFCore.NamingConventions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Data.SqlClient.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Identity.Client.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Pomelo.EntityFrameworkCore.MySql.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MySqlConnector.dll

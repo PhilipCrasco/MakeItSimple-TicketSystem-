@@ -61,6 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var requestTransactionList = new List<RequestTransaction>();
                 var requestConcernList = new List<RequestConcern>();
 
+                var yearSuffix = DateTime.Now.Year % 100;
 
                 var requestTransactionExist = await _context.RequestTransactions
                     .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
@@ -139,6 +140,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     };
 
                     await _context.TicketConcerns.AddAsync(addTicketConcern);
+
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
+
+                    ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
+
                     requestConcernList.Add(addRequestConcern);
                 }
 

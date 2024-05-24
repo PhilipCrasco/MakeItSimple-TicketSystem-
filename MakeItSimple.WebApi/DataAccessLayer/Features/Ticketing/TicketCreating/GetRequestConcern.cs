@@ -41,6 +41,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
 
                 public int? TicketConcernId { get; set; }
+                public string Ticket_No { get; set; }
                 public string Concern_Description { get; set; }
                 public string Category_Description { get; set; }
                 public string SubCategory_Description { get; set; }
@@ -59,16 +60,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 public Guid? UserId { get; set; }
                 public string Role { get; set; }
-                //public string IssueHandler { get; set; }
                 public string UserType { get; set; }
                 public bool ? Approval { get; set; }
                 public string Search { get; set; }
                 public bool ? Status { get; set; }
                 public bool ? Reject { get; set; }
-
-                //public string Approver { get; set; }
-                //public string Requestor { get; set; }
                 public bool? Ascending { get; set; }
+                
 
             }
             public class Handler : IRequestHandler<GetRequestConcernQuery, PagedList<GetRequestConcernResult>>
@@ -142,10 +140,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReject == request.Reject);
                         }
 
+
                         if (request.Approval != null)
                         {
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.IsApprove == request.Approval);
                         }
+
 
                         if(!string.IsNullOrEmpty(request.UserType))
                         {
@@ -156,7 +156,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     if (request.UserId == receiverList.UserId)
                                     {
                                         var approverTransactList = await _context.ApproverTicketings
-                                            .Where(x => fillterApproval.Contains(x.RequestTransactionId) && x.IsApprove == null)
+                                            .Where(x => fillterApproval.Contains(x.RequestTransactionId) && x.IsApprove != true)
                                             .ToListAsync();
 
                                         if (approverTransactList != null && approverTransactList.Any())
@@ -172,7 +172,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         var requestorSelect = receiver.Select(x => x.RequestTransactionId);
 
                                         ticketConcernQuery = ticketConcernQuery
-                                            .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) && requestorSelect.Contains(x.RequestTransactionId));
+                                            .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId) 
+                                            
+                                            && requestorSelect.Contains(x.RequestTransactionId) 
+                                            && x.RequestorByUser.UserRole.UserRoleName != TicketingConString.Requestor);
                                     }
                                     else
                                     {
@@ -187,14 +190,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         .Where(x => x.UserId == userApprover.Id).ToListAsync();
 
                                     var approvalLevelList = approverTransactList
-                                        .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
+                                        .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove != true)
                                         .ToList();
 
                                     var userRequestIdApprovalList = approvalLevelList.Select(x => x.RequestTransactionId);
 
                                     var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
                                     ticketConcernQuery = ticketConcernQuery
-                                        .Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.RequestTransactionId));
+                                        .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
+                                        && userRequestIdApprovalList.Contains(x.RequestTransactionId));
 
                                 }
                                 else
@@ -204,7 +208,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                                 if (request.UserType == TicketingConString.Requestor)
                                 {
-                                    if (requestorPermissionList.Any(x => x.Contains(request.Role)))
+                                     if (requestorPermissionList.Any(x => x.Contains(request.Role)))
                                     {
                                         var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
                                         var requestConcernContains = requestConcernList.Select(x => x.UserId);
@@ -237,14 +241,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     var result = ticketConcernQuery
-                        .Where(x => x.RequestorByUser.UserRole.UserRoleName != TicketingConString.Requestor)
+                        //.Where(x => x.RequestorByUser.UserRole.UserRoleName != TicketingConString.Requestor)
                         .GroupBy(x => new
                     {
+
                         x.RequestTransactionId,
                         x.UserId,
                         IssueHandler = x.User.Fullname
                         
-
                     }).Select(x => new GetRequestConcernResult
                     {
 
@@ -275,6 +279,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         GetRequestConcernByConcerns = x.Select(x => new GetRequestConcernResult.GetRequestConcernByConcern
                         {
                             TicketConcernId = x.Id,
+                            Ticket_No = x.TicketNo,
                             Concern_Description = x.ConcernDetails,
                             Category_Description = x.Category.CategoryDescription,
                             SubCategory_Description = x.SubCategory.SubCategoryDescription,

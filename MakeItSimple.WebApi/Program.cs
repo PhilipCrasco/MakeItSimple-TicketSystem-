@@ -24,7 +24,7 @@ var config = builder.Configuration;
 
 
 var connectionString = builder.Configuration.GetConnectionString("Testing");
-builder.Services.AddDbContext<MisDbContext>(x => 
+builder.Services.AddDbContext<MisDbContext>(x =>
 x.UseSqlServer(connectionString)
     .UseSnakeCaseNamingConvention()
     .EnableDetailedErrors()
@@ -32,7 +32,7 @@ x.UseSqlServer(connectionString)
 
     );
 
-//var connectionString = builder.Configuration.GetConnectionString("Testing");
+//var connectionString = builder.Configuration.GetConnectionString("DevConnection");
 
 //var serverVersion = new MySqlServerVersion(new Version(8, 2, 17));
 //builder.Services.AddDbContext<MisDbContext>(x =>
@@ -184,3 +184,4 @@ app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registr
 app.MapControllers(); 
 
 app.Run();
+//asd

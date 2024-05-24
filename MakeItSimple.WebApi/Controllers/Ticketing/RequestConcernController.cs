@@ -386,13 +386,11 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         //    }
         //}
 
-        [HttpPut("approval-request-receiver/{id}")]
-        public async Task<IActionResult> RequestApprovalReceiver([FromBody] RequestApprovalReceiverCommand command ,[FromRoute] int id)
+        [HttpPut("approval-request-receiver")]
+        public async Task<IActionResult> RequestApprovalReceiver([FromBody] RequestApprovalReceiverCommand command)
         {
             try
             {
-
-                command.RequestTransactionId = id;
                 if (User.Identity is ClaimsIdentity identity)
                 {
                     var userRole = identity.FindFirst(ClaimTypes.Role);

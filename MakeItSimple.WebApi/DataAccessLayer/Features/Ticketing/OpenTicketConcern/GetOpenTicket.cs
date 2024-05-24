@@ -203,7 +203,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                         }
                     }
-
+                    
                 }
 
                 //var results = ticketConcernQuery.Where(x => x.IsApprove != false 

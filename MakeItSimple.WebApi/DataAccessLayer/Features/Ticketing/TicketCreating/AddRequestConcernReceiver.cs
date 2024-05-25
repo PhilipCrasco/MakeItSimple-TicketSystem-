@@ -25,7 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public Guid? IssueHandler { get; set; }
+            //public Guid? IssueHandler { get; set; }
             public string Role { get; set; }
 
             public string Remarks { get; set; } 
@@ -105,11 +105,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 await _context.SaveChangesAsync(cancellationToken);
                 requestTransactionList.Add(requestTransactionExist);
 
+
+                
+
                 var requestTicketConcernList = await _context.TicketConcerns.ToListAsync();
 
-                if (command.IssueHandler == null)
+                if (!issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                 {
-                     requestTicketConcernList = await _context.TicketConcerns.Include(x => x.AddedByUser)
+                     requestTicketConcernList = await _context.TicketConcerns
+                        .Include(x => x.AddedByUser)
                         .ThenInclude(x => x.UserRole)
                         .Include(x => x.RequestorByUser)
                         .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
@@ -120,7 +124,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                        .Include(x => x.AddedByUser)
                        .ThenInclude(x => x.UserRole)
                        .Include(x => x.RequestorByUser)
-                       .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.IssueHandler)
+                       .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.Added_By)
                        .ToListAsync();
                 }
 
@@ -357,7 +361,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ConcernStatus = TicketingConString.ForApprovalTicket,
                             IsAssigned = true,
 
-                           
                         };
 
                         
@@ -365,8 +368,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var addedList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
                         var concernAlreadyExist = await _context.RequestConcerns.FirstOrDefaultAsync(x => x.Concern == addnewTicketConcern.ConcernDetails && x.IsActive == true, cancellationToken);
 
+                        var targetDateValidation = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.RequestTransactionId == requestTransactionExist.Id
+                            && x.Id == requestTicketConcernList.First().Id);
 
-                        if(requestorPermissionList.Any(x => x.Contains(userList.UserRole.UserRoleName))
+                        var targetDateDifference = Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions
+                            .DateDiffDay(EF.Functions, dateToday, addnewTicketConcern.TargetDate);
+
+                        if (issueHandlerPermissionList.Any(x => x.Contains(addedList.UserRole.UserRoleName)))
+                        {
+                            addnewTicketConcern.TicketType = TicketingConString.Concern;
+
+                            if(targetDateValidation.TargetDate >= addnewTicketConcern.TargetDate)
+                            {
+                                if (targetDateDifference > 1)
+                                {
+                                    ticketConcernList.Add(addnewTicketConcern);
+                                }
+                            }
+                            else
+                            {
+                                return Result.Failure(TicketRequestError.InvalidTargetDate());
+                            }
+
+                        }
+
+
+                        if (requestorPermissionList.Any(x => x.Contains(userList.UserRole.UserRoleName))
                             && issueHandlerPermissionList.Any(x => !x.Contains(addedList.UserRole.UserRoleName)))
                         {
 
@@ -399,13 +427,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
 
                         addnewTicketConcern.TicketType = TicketingConString.Concern;
-
-                        if (issueHandlerPermissionList.Any(x => x.Contains(addedList.UserRole.UserRoleName)))
-                        {
-                            addnewTicketConcern.TicketType = TicketingConString.Concern;
-
-                            ticketConcernList.Add(addnewTicketConcern);
-                        }
 
                         if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
                         {

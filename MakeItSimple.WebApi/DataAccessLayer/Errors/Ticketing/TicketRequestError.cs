@@ -75,5 +75,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
      
      public static Error InvalidReturnTicket() =>
      new Error("TicketRequest.InvalidReturnTicket", "Return ticket invalid!");
+
+     public static Error InvalidTargetDate() =>
+     new Error("TicketRequest.InvalidTargetDate", "Invalid target date!");
     }
 }

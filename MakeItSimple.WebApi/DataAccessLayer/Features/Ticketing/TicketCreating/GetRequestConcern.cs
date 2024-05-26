@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public int? RequestTransactionId { get; set; }
             public int ? DepartmentId { get; set; }
             public string Department_Name { get; set; }
+            public string Concern_Details { get; set; }
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
             public int ? ProjectId { get; set; }
@@ -87,7 +88,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .ThenInclude(x  => x.Project)
                         .Include(x => x.User)
                         .Include(x => x.RequestorByUser)
-                        .ThenInclude(x => x.UserRole); 
+                        .ThenInclude(x => x.UserRole)
+                        .Include(x => x.RequestConcern); 
 
 
                     if(ticketConcernQuery.Count() > 0)
@@ -257,6 +259,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Issue_Handler = x.Key.IssueHandler,
                         DepartmentId = x.First().RequestorByUser.DepartmentId,
                         Department_Name = x.First().RequestorByUser.Department.DepartmentName,
+                        Concern_Details = x.First().RequestConcern.Concern,
                         UnitId = x.First().User.UnitId,
                         Unit_Name = x.First().User.Units.UnitName,
                         SubUnitId = x.First().User.SubUnitId,

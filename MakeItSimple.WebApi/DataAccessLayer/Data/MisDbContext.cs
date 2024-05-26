@@ -76,6 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketTransaction> TicketTransactions { get; set; }
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
+        public virtual DbSet<TicketReDate> TicketReDates { get; set; }
 
         public virtual DbSet<Team> Teams { get; set; }
 
@@ -115,6 +116,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketReDateConfiguration());
 
 
             //DateTime time = DateTime.Parse("2024-10-08");

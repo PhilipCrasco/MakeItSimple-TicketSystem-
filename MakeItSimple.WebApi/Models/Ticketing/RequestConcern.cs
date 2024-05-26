@@ -31,5 +31,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public ICollection<TicketConcern> TicketConcerns { get; set; }
 
 
+
+
     }
 }

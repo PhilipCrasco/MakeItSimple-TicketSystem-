@@ -1849,6 +1849,130 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_histories", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketReDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("added_by");
+
+                    b.Property<string>("Concern_Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("concern_description");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool?>("IsReDate")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_re_date");
+
+                    b.Property<bool>("IsRejectReDate")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_reject_re_date");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("ReDateAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("re_date_at");
+
+                    b.Property<Guid?>("ReDateBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("re_date_by");
+
+                    b.Property<string>("ReDateRemarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("re_date_remarks");
+
+                    b.Property<DateTime?>("RejectReDateAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("reject_re_date_at");
+
+                    b.Property<Guid?>("RejectReDateBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("reject_re_date_by");
+
+                    b.Property<string>("RejectRemarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("reject_remarks");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("remarks");
+
+                    b.Property<int?>("RequestTransactionId")
+                        .HasColumnType("int")
+                        .HasColumnName("request_transaction_id");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
+
+                    b.Property<DateTime?>("TargetDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("target_date");
+
+                    b.Property<Guid?>("TicketApprover")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ticket_approver");
+
+                    b.Property<int?>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
+                    b.Property<int?>("TicketTransactionId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_transaction_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_re_dates");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_re_dates_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_ticket_re_dates_modified_by");
+
+                    b.HasIndex("ReDateBy")
+                        .HasDatabaseName("ix_ticket_re_dates_re_date_by");
+
+                    b.HasIndex("RejectReDateBy")
+                        .HasDatabaseName("ix_ticket_re_dates_reject_re_date_by");
+
+                    b.HasIndex("RequestTransactionId")
+                        .HasDatabaseName("ix_ticket_re_dates_request_transaction_id");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_re_dates_ticket_concern_id");
+
+                    b.HasIndex("TicketTransactionId")
+                        .HasDatabaseName("ix_ticket_re_dates_ticket_transaction_id");
+
+                    b.ToTable("ticket_re_dates", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -3082,6 +3206,62 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("RequestTransaction");
 
                     b.Navigation("RequestorByUser");
+
+                    b.Navigation("TicketTransaction");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketReDate", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_re_dates_users_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_re_dates_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReDateByUser")
+                        .WithMany()
+                        .HasForeignKey("ReDateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_re_dates_users_re_date_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "RejectReDateByUser")
+                        .WithMany()
+                        .HasForeignKey("RejectReDateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_re_dates_users_reject_re_date_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestTransaction", "RequestTransaction")
+                        .WithMany()
+                        .HasForeignKey("RequestTransactionId")
+                        .HasConstraintName("fk_ticket_re_dates_request_transactions_request_transaction_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
+                        .WithMany()
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_re_dates_ticket_concerns_ticket_concern_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
+                        .WithMany()
+                        .HasForeignKey("TicketTransactionId")
+                        .HasConstraintName("fk_ticket_re_dates_ticket_transactions_ticket_transaction_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("ReDateByUser");
+
+                    b.Navigation("RejectReDateByUser");
+
+                    b.Navigation("RequestTransaction");
+
+                    b.Navigation("TicketConcern");
 
                     b.Navigation("TicketTransaction");
                 });

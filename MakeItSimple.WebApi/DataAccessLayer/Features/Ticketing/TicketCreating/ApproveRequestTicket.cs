@@ -57,8 +57,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.TicketIdNotExist());
                     }
 
-                    var requestTicketId = await _context.ApproverTicketings
-                    .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsApprove == null).ToListAsync();
+                    //var requestTicketId = await _context.ApproverTicketings
+                    //.Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsApprove == null).ToListAsync();
 
                     var userExist = await _context.TicketConcerns
                         .FirstOrDefaultAsync(x => x.RequestTransactionId == ticketConcern.RequestTransactionId
@@ -76,7 +76,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var ticketConcernHandlerExist = await _context.TicketConcerns
                         .Include(x => x.RequestorByUser)
                         .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId
-                    && x.TicketApprover != null && x.UserId == userExist.UserId).ToListAsync();
+                    && x.TicketApprover != null && x.UserId == userExist.UserId)
+                        .ToListAsync();
 
                     var requestTicketConcernId = await _context.ApproverTicketings
                      .Where(x => x.RequestTransactionId == requestTransactionExist.Id
@@ -88,12 +89,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if(selectRequestTicketId != null)
                     {
-                        selectRequestTicketId.IsApprove = true;
 
                         if (ticketConcernHandlerExist.First().TicketApprover != command.UserId)
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
+
+                        selectRequestTicketId.IsApprove = true;
 
                         var userApprovalId = await _context.ApproverTicketings
                             .Include(x => x.User)
@@ -142,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 concerns.ApprovedBy = command.Approved_By;
                                 concerns.ApprovedAt = DateTime.Now;                                                                                       
                                 concerns.IsReject = false;
-                                concerns.Remarks = null;
+                                //concerns.Remarks = null;
                                 concerns.ConcernStatus = TicketingConString.CurrentlyFixing;
                                 ticketApproveList.Add(concerns);
 

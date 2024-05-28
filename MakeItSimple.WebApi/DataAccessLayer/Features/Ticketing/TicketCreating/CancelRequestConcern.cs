@@ -57,15 +57,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
 
-
-                if (requestAttachment == null)
-                {
-                    return Result.Failure(TicketRequestError.AttachmentNotExist());
-                }
-
-                requestAttachment.IsActive = false;
-
-
             
                 await _context.SaveChangesAsync(cancellationToken);  
                 return Result.Success();

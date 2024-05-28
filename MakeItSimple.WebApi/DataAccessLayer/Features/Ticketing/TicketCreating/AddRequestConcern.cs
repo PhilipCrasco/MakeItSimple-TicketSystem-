@@ -64,6 +64,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var yearSuffix = DateTime.Now.Year % 100;
 
+                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == x.AddedBy, cancellationToken);
+
                 //var requestTransactionExist = await _context.RequestTransactions
                 //    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
 
@@ -187,7 +189,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{requestConcernList.First().Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);

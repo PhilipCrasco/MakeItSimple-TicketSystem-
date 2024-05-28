@@ -68,6 +68,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var ticketConcernList = new List<TicketConcern>();
                 var removeTicketConcern = new List<TicketConcern>();
 
+                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == x.AddedBy, cancellationToken);
+
                 var allUserList = await _context.UserRoles.ToListAsync();
 
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
@@ -304,7 +306,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{upsertConcern.Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);

@@ -66,11 +66,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 var dateToday = DateTime.Today;
                 var ticketConcernList = new List<TicketConcern>();
-                var removeTicketConcern = new List<TicketConcern>();
+                var removeTicketConcern = new List<TicketConcern>(); 
 
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
 
-
-                var allUserList = await _context.UserRoles.ToListAsync();
+                var allUserList = await _context.UserRoles
+                    .ToListAsync();
 
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
@@ -201,6 +203,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             hasChanged = true;
                             request.ModifiedBy = command.Modified_By;
                             request.UpdatedAt = DateTime.Now;
+                            if(request.IsReject is true)
+                            {
+                                request.Remarks = null;
+                                request.IsReject = false;
+                            }
+
+
                         }
                     }
 
@@ -211,7 +220,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         upsertConcern.ModifiedBy = command.Modified_By;
                         upsertConcern.UpdatedAt = DateTime.Now;
                         upsertConcern.IsAssigned = true;
+                         
+                        if (upsertConcern.IsReject is true)
+                        {
+                            upsertConcern.IsReject = false;
+                            upsertConcern.Remarks = null;
+                        }
+
                     }
+
 
                     upsertConcern.TicketType = TicketingConString.Concern; 
 
@@ -272,7 +289,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+
                 var uploadTasks = new List<Task>();
 
                 if (command.ConcernAttachments.Count(x => x.Attachment != null) > 0)

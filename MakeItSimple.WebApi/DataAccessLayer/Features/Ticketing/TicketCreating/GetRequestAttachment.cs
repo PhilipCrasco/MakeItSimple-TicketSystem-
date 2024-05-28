@@ -11,7 +11,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestAttachmentResult
         {
-            public int RequestTransactionId { get; set; }
+            public int ? TicketConcernId { get; set; }
 
             public List<TicketAttachment> Attachments { get; set; }
 
@@ -51,33 +51,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(GetRequestAttachmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<RequestTransaction> requestTransactionQuery = _context.RequestTransactions
-                    .Include(x => x.TicketConcerns)
-                    .Include(x => x.TicketAttachments)
+                IQueryable<TicketAttachment>  ticketAttachmentQuery = _context.TicketAttachments
+                    .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.AddedByUser)
                     .ThenInclude(x => x.ModifiedByUser);
 
                 if (request.Id != null)
                 {
-                    requestTransactionQuery = requestTransactionQuery.Where(x => x.Id == request.Id);
+                    ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.Id == request.Id);
                 }
 
                 if(request.Status != null)
                 {
-                    requestTransactionQuery = requestTransactionQuery.Where(x => x.IsActive == request.Status);
+                    ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.IsActive == request.Status);
                 }
 
 
-                var results = await requestTransactionQuery.Select(x => new GetRequestAttachmentResult
+                var results = await ticketAttachmentQuery.GroupBy(x => x.TicketConcernId)
+                    .Select(x => new GetRequestAttachmentResult
                 {
-                    RequestTransactionId = x.Id,
-                    Attachments = x.TicketAttachments.Select(x => new GetRequestAttachmentResult.TicketAttachment
+                    TicketConcernId = x.Key,
+                    Attachments = x.Select(x => new GetRequestAttachmentResult.TicketAttachment
                     {
                         TicketAttachmentId = x.Id,
                         Attachment = x.Attachment,
                         FileName = x.FileName,
                         FileSize = x.FileSize,
-                        Added_By = x.AddedByUser.Fullname,
+                        Added_By = x.AddedByUser.Fullname, 
                         Created_At = x.CreatedAt,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt

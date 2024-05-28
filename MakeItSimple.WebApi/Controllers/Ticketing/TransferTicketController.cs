@@ -14,7 +14,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using MakeItSimple.WebApi.Models;
 using MoreLinq.Extensions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {

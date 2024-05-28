@@ -1,6 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,7 +16,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
@@ -90,11 +89,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.UserId = userId;
-
-                }
                 var result = await _mediator.Send(command);
                 if(result.IsFailure)
                 {
@@ -126,6 +120,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Added_By = userId;
                         command.Modified_By = userId;
+                        command.Requestor_By = userId;
                         //command.IssueHandler = userId;
 
                     }
@@ -500,30 +495,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
 
-        }
-
-
-        [HttpGet("history/{id}")]
-        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
-        {
-            try
-            {
-                var query = new GetTicketHistoryQuery
-                {
-                    TicketTransactionId = id
-                };
-
-                var results = await _mediator.Send(query);
-                if (results.IsFailure)
-                {
-                    return BadRequest(query);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
         }
 
         [HttpPost("add-comment")]

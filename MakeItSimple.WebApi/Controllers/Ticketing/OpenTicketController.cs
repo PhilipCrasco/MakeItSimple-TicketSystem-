@@ -7,6 +7,7 @@ using MediatR;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ReturnOpenTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -86,6 +87,30 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     return BadRequest(result);
                 }
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpGet("history/{id}")]
+        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
+        {
+            try
+            {
+                var query = new GetTicketHistoryQuery
+                {
+                    TicketTransactionId = id
+                };
+
+                var results = await _mediator.Send(query);
+                if (results.IsFailure)
+                {
+                    return BadRequest(query);
+                }
+                return Ok(results);
             }
             catch (Exception ex)
             {

@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket.ApproveRequestTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -19,30 +20,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class AddRequestConcernReceiverCommand : IRequest<Result>
         {
 
-            public int? RequestTransactionId { get; set; }
-            
+            //public int? RequestTransactionId { get; set; }
+            public int? TicketConcernId { get; set; }
             public int ? ChannelId { get; set; }
             public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            //public Guid? IssueHandler { get; set; }
+            public Guid? UserId { get; set; }
+            public string Concern_Details { get; set; }
+            public int CategoryId { get; set; }
+            public int SubCategoryId { get; set; }
+            public DateTime Start_Date { get; set; }
+            public DateTime Target_Date { get; set; }
             public string Role { get; set; }
-
             public string Remarks { get; set; } 
-
-            public List<AddRequestConcernbyConcern> AddRequestConcernbyConcerns { get; set; }
-            public class AddRequestConcernbyConcern
-            {
-
-                public int ? TicketConcernId { get; set; }
-                public Guid ? UserId { get; set; }    
-                public string Concern_Details { get; set; }
-                public int CategoryId { get; set; }
-                public int SubCategoryId { get; set; }
-                public DateTime Start_Date { get; set; }
-                public DateTime Target_Date { get; set; }
-
-            }
 
             public List<ConcernAttachment> ConcernAttachments {  get; set; }
 
@@ -74,7 +65,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddRequestConcernReceiverCommand command, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
-                var requestTransactionList = new List<RequestTransaction>();
                 var ticketConcernList = new List<TicketConcern>();
                 var removeTicketConcern = new List<TicketConcern>();
 
@@ -89,413 +79,194 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var requestorPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
 
-                var requestTransactionExist = await _context.RequestTransactions
-                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
-
-                if (requestTransactionExist == null)
-                {
-                    var requestTransactionId = new RequestTransaction { IsActive = true };
-                    await _context.RequestTransactions.AddAsync(requestTransactionId);
-
-
-                    requestTransactionExist = requestTransactionId;
-
-                }
-
-                await _context.SaveChangesAsync(cancellationToken);
-                requestTransactionList.Add(requestTransactionExist);
-
-
-                
-
-                var requestTicketConcernList = await _context.TicketConcerns.ToListAsync();
-
-                if (!issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
-                {
-                     requestTicketConcernList = await _context.TicketConcerns
-                        .Include(x => x.AddedByUser)
-                        .ThenInclude(x => x.UserRole)
-                        .Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
-                }
-                else
-                {
-                    requestTicketConcernList = await _context.TicketConcerns
-                       .Include(x => x.AddedByUser)
-                       .ThenInclude(x => x.UserRole)
-                       .Include(x => x.RequestorByUser)
-                       .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.UserId == command.Added_By)
-                       .ToListAsync();
-                }
-
                 var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
                 if(channelidExist == null)
                 {
                     return Result.Failure(TicketRequestError.ChannelNotExist());
                 }
 
-                var requestoridExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Requestor_By, cancellationToken);
-                if (requestoridExist == null)
+                switch (await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId))
                 {
-                    return Result.Failure(TicketRequestError.UserNotExist ());
+                    case null:
+                        return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                if(issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
+                switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId))
                 {
-                    var approverUserList = await _context.ApproverTicketings
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id 
-                        && x.IssueHandler == command.Added_By && x.ApproverLevel == 1)
-                        .ToListAsync();
-
-                    var approverUserValidation = approverUserList
-                        .FirstOrDefault(x => x.RequestTransactionId == requestTransactionExist.Id && x.IssueHandler == command.Added_By
-                        && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
-                        
-                    if (approverUserValidation != null)
-                    {
-
-                        var ticketConcernListApprover = await _context.TicketConcerns
-                            .Where(x => x.RequestTransactionId == command.RequestTransactionId && x.UserId == command.Added_By)
-                            .ToListAsync();
-
-                        var receiverValidation = ticketConcernListApprover
-                            .Where(x => x.RequestTransactionId == requestTransactionExist.Id 
-                            && x.UserId == command.Added_By && x.IsApprove != true 
-                            && x.Id == ticketConcernListApprover.Max(x => x.Id))
-                            .FirstOrDefault();
-
-                        if (receiverValidation != null)
-                        {
-                            return Result.Failure(TicketRequestError.ConcernWasInApproval());
-                        }
-                    }
+                    case null:
+                        return Result.Failure(TicketRequestError.CategoryNotExist());
+                }
+                switch (await _context.SubCategories.FirstOrDefaultAsync(x => x.Id == command.SubCategoryId))
+                {
+                    case null:
+                        return Result.Failure(TicketRequestError.SubCategoryNotExist());
                 }
 
-                foreach (var concerns in command.AddRequestConcernbyConcerns)
+                if (string.IsNullOrEmpty(command.Concern_Details))
                 {
-
-                    switch (await _context.Users.FirstOrDefaultAsync(x => x.Id == concerns.UserId))
-                    {
-                        case null:
-                            return Result.Failure(TicketRequestError.UserNotExist());
-                    }
-
-                    switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == concerns.CategoryId))
-                    {
-                        case null:
-                            return Result.Failure(TicketRequestError.CategoryNotExist());
-                    }
-                    switch (await _context.SubCategories.FirstOrDefaultAsync(x => x.Id == concerns.SubCategoryId))
-                    {
-                        case null:
-                            return Result.Failure(TicketRequestError.SubCategoryNotExist());
-                    }
-
-                    if (string.IsNullOrEmpty(concerns.Concern_Details))
-                    {
-                        return Result.Failure(TicketRequestError.ConcernDetailsNotNull());
-                    }
-
-                    if (concerns.Start_Date > concerns.Target_Date || dateToday > concerns.Target_Date)
-                    {
-                        return Result.Failure(TicketRequestError.DateTimeInvalid());
-                    }
-
-                    if (command.AddRequestConcernbyConcerns.Count(x => x.Concern_Details == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
-                    && x.SubCategoryId == concerns.SubCategoryId && x.UserId == concerns.UserId) > 1)
-                    {
-                        return Result.Failure(TicketRequestError.DuplicateConcern()); 
-                    }
-
-                    var getApproverSubUnit = await _context.Users.FirstOrDefaultAsync(x => x.Id == concerns.UserId, cancellationToken);
-                    var getApproverUser = await _context.Approvers.Where(x => x.SubUnitId == getApproverSubUnit.SubUnitId).ToListAsync();
-                    if (getApproverUser.Count() < 0)
-                    {
-                        return Result.Failure(ClosingTicketError.NoApproverHasSetup());
-                    }
-                    var getApproverUserId = getApproverUser.FirstOrDefault(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel)); 
-                    var upsertConcern = requestTicketConcernList
-                        .FirstOrDefault(x => x.Id == concerns.TicketConcernId);
-
-                    if (upsertConcern != null )
-                    {
-
-                        var duplicateConcern = requestTicketConcernList.FirstOrDefault(x => x.UserId == concerns.UserId && x.ConcernDetails == concerns.Concern_Details && concerns.CategoryId == concerns.CategoryId
-                           && x.SubCategoryId == concerns.SubCategoryId && (upsertConcern.ConcernDetails != concerns.Concern_Details
-                           && upsertConcern.CategoryId != concerns.CategoryId && upsertConcern.SubCategoryId != concerns.SubCategoryId && x.IsActive == true));
-
-                        if (duplicateConcern != null)
-                        {
-                            return Result.Failure(TicketRequestError.DuplicateConcern());
-                        }
-
-                        bool hasChanged = false;
-
-                        if (upsertConcern.ChannelId != command.ChannelId)
-                        {
-                            upsertConcern.ChannelId = command.ChannelId;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.RequestorBy != command.Requestor_By)
-                        {
-                            upsertConcern.RequestorBy = command.Requestor_By;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.UserId != concerns.UserId)
-                        {
-                            upsertConcern.UserId = concerns.UserId;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.ConcernDetails != concerns.Concern_Details)
-                        {
-                            upsertConcern.ConcernDetails = concerns.Concern_Details;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.CategoryId != concerns.CategoryId)
-                        {
-                            upsertConcern.CategoryId = concerns.CategoryId;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.SubCategoryId != concerns.SubCategoryId)
-                        {
-                            upsertConcern.SubCategoryId = concerns.SubCategoryId;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.StartDate != concerns.Start_Date)
-                        {
-                            upsertConcern.StartDate = concerns.Start_Date;
-                            hasChanged = true;
-                        }
-
-                        if (upsertConcern.TargetDate != concerns.Target_Date)
-                        {
-                            upsertConcern.TargetDate = concerns.Target_Date;
-                            hasChanged = true;
-                        }
-
-                        if(upsertConcern.RequestConcernId != null)
-                        {
-                            var requestConcern = await _context.RequestConcerns
-                                .FirstOrDefaultAsync(x => x.RequestTransactionId == requestTransactionExist.Id, cancellationToken);
-
-                            requestConcern.Remarks = null;
-                        }
-
-                        if (requestorPermissionList.Any(x => x.Contains(upsertConcern.RequestorByUser.UserRole.UserRoleName))
-                            &&  !issueHandlerPermissionList.Any(x => x.Contains(upsertConcern.AddedByUser.UserRole.UserRoleName))) 
-                        {
-                            var requestUpsertConcern = await _context.RequestConcerns
-                                .Where(x => x.Id == upsertConcern.RequestConcernId)
-                                 .ToListAsync();
-
-                            foreach(var request in requestUpsertConcern)
-                            {
-                                if (request.Concern != upsertConcern.ConcernDetails) 
-                                {
-                                    request.Concern = upsertConcern.ConcernDetails;
-                                    hasChanged = true;
-                                    request.ModifiedBy = command.Modified_By;
-                                    request.UpdatedAt = DateTime.Now;
-                                }
-                            }
-
-                        }
-
-                        if (hasChanged)
-                        {
-                            upsertConcern.ModifiedBy = command.Modified_By;
-                            upsertConcern.UpdatedAt = DateTime.Now;
-                            upsertConcern.IsAssigned = true;
-                            //upsertConcern.Remarks = null;
-                        }
-                        upsertConcern.TicketType = TicketingConString.Concern;
-
-                        if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
-                        {
-                            upsertConcern.TicketType = TicketingConString.Concern;
-                            upsertConcern.TicketApprover = getApproverUserId.UserId;
-
-                        }
-
-                        if(upsertConcern.IsReject is true)
-                        {
-                            upsertConcern.IsReject = false;
-                            upsertConcern.Remarks = command.Remarks;
-                        }
-
-                        removeTicketConcern.Add(upsertConcern);
-
-                        await _context.SaveChangesAsync(cancellationToken);
-                    }
-                    else
-                    {
-
-                        var duplicateConcern = requestTicketConcernList.FirstOrDefault(x => x.UserId == concerns.UserId && x.ConcernDetails == concerns.Concern_Details
-                        && concerns.CategoryId == concerns.CategoryId && x.SubCategoryId == concerns.SubCategoryId && x.IsActive == true);
-
-                        if (duplicateConcern != null)
-                        {
-                            return Result.Failure(TicketRequestError.DuplicateConcern());
-                        }
-
-                        var addnewTicketConcern = new TicketConcern
-                        {
-                            RequestTransactionId = requestTransactionExist.Id,
-                            RequestorBy = command.Requestor_By,
-                            ChannelId = command.ChannelId,
-                            UserId = concerns.UserId,
-                            ConcernDetails = concerns.Concern_Details,
-                            CategoryId = concerns.CategoryId,
-                            SubCategoryId = concerns.SubCategoryId,
-                            AddedBy = command.Added_By,
-                            CreatedAt = DateTime.Now,
-                            StartDate = concerns.Start_Date,
-                            TargetDate = concerns.Target_Date,
-                            IsApprove = false,
-                            ConcernStatus = TicketingConString.ForApprovalTicket,
-                            IsAssigned = true,
-
-                        };
-
-                        
-                        var userList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
-                        var addedList = await _context.Users.Include(x => x.UserRole).FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
-                        var concernAlreadyExist = await _context.RequestConcerns.FirstOrDefaultAsync(x => x.Concern == addnewTicketConcern.ConcernDetails && x.IsActive == true, cancellationToken);
-
-                        var targetDateValidation = await _context.TicketConcerns
-                            .FirstOrDefaultAsync(x => x.RequestTransactionId == requestTransactionExist.Id
-                            && x.Id == requestTicketConcernList.First().Id);
-
-                        var targetDateDifference = Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions
-                            .DateDiffDay(EF.Functions, dateToday, addnewTicketConcern.TargetDate);
-
-                        if (issueHandlerPermissionList.Any(x => x.Contains(addedList.UserRole.UserRoleName)))
-                        {
-                            addnewTicketConcern.TicketType = TicketingConString.Concern;
-
-                            if(targetDateValidation.TargetDate >= addnewTicketConcern.TargetDate)
-                            {
-                                if (targetDateDifference > 1)
-                                {
-                                    ticketConcernList.Add(addnewTicketConcern);
-                                }
-                            }
-                            else
-                            {
-                                return Result.Failure(TicketRequestError.InvalidTargetDate());
-                            }
-
-                        }
-
-
-                        if (requestorPermissionList.Any(x => x.Contains(userList.UserRole.UserRoleName))
-                            && issueHandlerPermissionList.Any(x => !x.Contains(addedList.UserRole.UserRoleName)))
-                        {
-
-                            var requestConcernExist = await _context.RequestConcerns
-                                .Where(x => x.Concern == addnewTicketConcern.ConcernDetails && x.IsActive)
-                                .FirstOrDefaultAsync();
-
-                            if (concernAlreadyExist == null)
-                            {
-                                var addRequestConcern = new RequestConcern
-                                {
-
-                                    RequestTransactionId = requestTransactionExist.Id,
-                                    UserId = addnewTicketConcern.RequestorBy,
-                                    Concern = concerns.Concern_Details,
-                                    AddedBy = command.Added_By,
-                                    ConcernStatus = TicketingConString.ForApprovalTicket,
-                                    IsDone = false,
-
-                                };
-
-                                await _context.RequestConcerns.AddAsync(addRequestConcern);
-                                await _context.SaveChangesAsync(cancellationToken);
-
-                                requestConcernExist = addRequestConcern;
-                            }
-
-                            addnewTicketConcern.TicketType = TicketingConString.Concern;
-                            addnewTicketConcern.RequestConcernId = requestConcernExist.Id;
-                        }
-
-                        addnewTicketConcern.TicketType = TicketingConString.Concern;
-
-                        if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
-                        {
-                            addnewTicketConcern.TicketApprover = getApproverUserId.UserId;
-                        }
-                        
-                        if(requestTransactionExist != null)
-                        {
-                            var rejectTicketConcern = await _context.TicketConcerns
-                                .Where(x => x.RequestTransactionId == requestTransactionExist.Id && x.IsReject == true 
-                                && x.UserId == command.Added_By).ToListAsync();
-
-                            foreach(var reject in rejectTicketConcern)
-                            {
-                                reject.IsReject = false;
-                                reject.Remarks = command.Remarks;
-                            }
-
-                        }
-
-                        var checkingList = await _context.TicketConcerns
-                            .FirstOrDefaultAsync(x => x.ConcernDetails == addnewTicketConcern.ConcernDetails
-                        && x.RequestConcernId != null, cancellationToken);
-                        if (checkingList != null)
-                        {
-                            addnewTicketConcern.RequestConcernId = checkingList.RequestConcernId;
-                        }                                                                                                                                                                                                                                                                                                                                                        
-
-                        await _context.TicketConcerns.AddAsync(addnewTicketConcern);
-
-                    }
-
+                    return Result.Failure(TicketRequestError.ConcernDetailsNotNull());
                 }
 
-                var selectRemoveConcern = removeTicketConcern.Select(x => x.Id);
-                var selectRemoveGenerator = removeTicketConcern.Select(x => x.RequestTransactionId);
-
-                var removeConcernList = await _context.TicketConcerns
-                    .Where(x => !selectRemoveConcern.Contains(x.Id) 
-                    && selectRemoveGenerator.Contains(x.RequestTransactionId) 
-                    && x.IsApprove != true && x.IsActive == true)
-                    .ToListAsync();
-
-                if (removeConcernList.Count() > 0)
+                if (command.Start_Date > command.Target_Date || dateToday > command.Target_Date)
                 {
-                    foreach (var removeConcern in removeConcernList)
+                    return Result.Failure(TicketRequestError.DateTimeInvalid());
+                }
+
+                //var duplicateConcern = await _context.TicketConcerns
+                //    .Where(x => x.ConcernDetails == command.Concern_Details && x.CategoryId == command.CategoryId 
+                //    && x.SubCategoryId == command.SubCategoryId && x.UserId == command.UserId)
+                //    .FirstOrDefaultAsync();
+
+                //if (duplicateConcern is not null)
+                //{
+                //    return Result.Failure(TicketRequestError.DuplicateConcern());
+                //}
+
+                var upsertConcern = await _context.TicketConcerns
+                .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId);
+
+                if (upsertConcern != null)
+                {
+
+                    bool hasChanged = false;
+
+                    if (upsertConcern.ChannelId != command.ChannelId)
                     {
-                        var concernList = await _context.TicketConcerns
-                             .Where(x => selectRemoveGenerator.Contains(x.RequestTransactionId)
-                             && x.IsApprove != true && x.IsActive == true)
-                             .ToListAsync();
+                        upsertConcern.ChannelId = command.ChannelId;
+                        hasChanged = true;
+                    }
 
-                        if (concernList.Count() > 1)
-                        {
-                            removeConcern.IsActive = false;
-                        }
+                    if (upsertConcern.RequestorBy != command.Requestor_By)
+                    {
+                        upsertConcern.RequestorBy = command.Requestor_By;
+                        hasChanged = true;
+                    }
 
-                        if (concernList.Count() == 1)
+                    if (upsertConcern.UserId != command.UserId)
+                    {
+                        upsertConcern.UserId = command.UserId;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.ConcernDetails != command.Concern_Details)
+                    {
+                        upsertConcern.ConcernDetails = command.Concern_Details;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.CategoryId != command.CategoryId)
+                    {
+                        upsertConcern.CategoryId = command.CategoryId;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.SubCategoryId != command.SubCategoryId)
+                    {
+                        upsertConcern.SubCategoryId = command.SubCategoryId;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.StartDate != command.Start_Date)
+                    {
+                        upsertConcern.StartDate = command.Start_Date;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.TargetDate != command.Target_Date)
+                    {
+                        upsertConcern.TargetDate = command.Target_Date;
+                        hasChanged = true;
+                    }
+
+                    if (upsertConcern.RequestConcernId != null)
+                    {
+                        var requestConcern = await _context.RequestConcerns
+                            .FirstOrDefaultAsync(x => x.Id == upsertConcern.RequestConcernId, cancellationToken);
+
+                        requestConcern.Remarks = null;
+                    }
+
+
+                    var requestUpsertConcern = await _context.RequestConcerns
+                        .Where(x => x.Id == upsertConcern.RequestConcernId)
+                         .ToListAsync();
+
+                    foreach (var request in requestUpsertConcern)
+                    {
+                        if (request.Concern != upsertConcern.ConcernDetails)
                         {
-                            removeConcern.UserId = null;
-                            removeConcern.CategoryId = null;
-                            removeConcern.SubCategoryId = null;
-                            removeConcern.StartDate = null;
-                            removeConcern.TargetDate = null;
-                            removeConcern.UpdatedAt = null;
-                            removeConcern.ModifiedBy = null;
-                            removeConcern.IsAssigned = false;
+                            request.Concern = upsertConcern.ConcernDetails;
+                            hasChanged = true;
+                            request.ModifiedBy = command.Modified_By;
+                            request.UpdatedAt = DateTime.Now;
                         }
                     }
+
+
+
+                    if (hasChanged)
+                    {
+                        upsertConcern.ModifiedBy = command.Modified_By;
+                        upsertConcern.UpdatedAt = DateTime.Now;
+                        upsertConcern.IsAssigned = true;
+                    }
+
+                    upsertConcern.TicketType = TicketingConString.Concern; 
+
+                    removeTicketConcern.Add(upsertConcern);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+                else
+                {
+
+                    var addnewTicketConcern = new TicketConcern
+                    {
+                        RequestorBy = command.Requestor_By,
+                        ChannelId = command.ChannelId,
+                        UserId = command.UserId,
+                        ConcernDetails = command.Concern_Details,
+                        CategoryId = command.CategoryId,
+                        SubCategoryId =command.SubCategoryId,
+                        AddedBy = command.Added_By,
+                        CreatedAt = DateTime.Now,
+                        StartDate = command.Start_Date,
+                        TargetDate = command.Target_Date,                      
+                        IsApprove = false,
+                        ConcernStatus = TicketingConString.ForApprovalTicket,
+                        IsAssigned = true,
+
+                    };
+
+                    var userList = await _context.Users.Include(x => x.UserRole)
+                        .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
+
+                    var addedList = await _context.Users
+                        .Include(x => x.UserRole)
+                        .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
+
+                    var concernAlreadyExist = await _context.RequestConcerns
+                        .FirstOrDefaultAsync(x => x.Concern == addnewTicketConcern.ConcernDetails 
+                        && x.IsActive == true, cancellationToken);
+
+                    addnewTicketConcern.TicketType = TicketingConString.Concern;
+
+                    var addRequestConcern = new RequestConcern
+                    {
+
+                        UserId = addnewTicketConcern.RequestorBy,
+                        Concern = command.Concern_Details,
+                        AddedBy = command.Added_By,
+                        ConcernStatus = TicketingConString.ForApprovalTicket,
+                        IsDone = false,
+
+                    };
+
+                    await _context.RequestConcerns.AddAsync(addRequestConcern);
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
+
+                    await _context.TicketConcerns.AddAsync(addnewTicketConcern);
 
                 }
 
@@ -505,9 +276,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     foreach (var attachments in command.ConcernAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {
-
-                        //var ticketAttachmentList = await _context.TicketAttachments.Include(x => x.RequestGenerator)
-                        //.Where(x => x.RequestGeneratorId == requestGeneratorList.First().Id).ToListAsync();
 
                         var ticketAttachment = await _context.TicketAttachments.FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
 
@@ -536,7 +304,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{requestTransactionList.First().Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Request/{upsertConcern.Id}/{attachments.Attachment.FileName}"
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -564,7 +332,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    RequestTransactionId = requestTransactionList.First().Id,
+                                    TicketConcernId = command.TicketConcernId,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
@@ -576,58 +344,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             }
 
                         }, cancellationToken));
-
                     }
                 }
 
                 await Task.WhenAll(uploadTasks);
-
-
-                if (ticketConcernList.Count() > 0)
-                {
-                    var getApprover = await _context.Approvers.Include(x => x.User)
-                  .Where(x => x.SubUnitId == ticketConcernList.First().User.SubUnitId).ToListAsync();
-
-                    if (getApprover == null)
-                    {
-                        return Result.Failure(TransferTicketError.NoApproverExist());
-                    }
-
-
-                    var approverValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
-                        && x.IssueHandler == command.Added_By && x.IsApprove == null)
-                        .FirstOrDefaultAsync();
-
-                    if (approverValidation == null)
-                    {
-                        foreach (var approver in getApprover)
-                        {
-
-                            var addNewApprover = new ApproverTicketing
-                            {
-                                RequestTransactionId = requestTransactionExist.Id,
-                                //ChannelId = approver.ChannelId,
-                                SubUnitId = approver.SubUnitId,
-                                UserId = approver.UserId,
-                                ApproverLevel = approver.ApproverLevel,
-                                AddedBy = command.Added_By,
-                                CreatedAt = DateTime.Now,
-                                Status = TicketingConString.RequestTicket,
-
-                            };
-
-                            foreach (var issueHandler in ticketConcernList)
-                            {
-                                addNewApprover.IssueHandler = issueHandler.UserId;
-                            }
-
-                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
-                            await _context.SaveChangesAsync(cancellationToken);
-                        }
-                    }
-                }
-
+                 
                 await _context.SaveChangesAsync(cancellationToken); 
                 return Result.Success();
             }

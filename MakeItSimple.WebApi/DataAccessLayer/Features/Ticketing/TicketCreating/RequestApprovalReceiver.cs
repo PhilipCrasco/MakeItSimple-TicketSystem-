@@ -16,13 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? Approved_By { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
-            public int? RequestTransactionId { get; set; }
-            public List<Concern> Concerns { get; set; }
-
-            public  class Concern
-            {
-                public Guid? IssueHandler { get; set; }
-            }
+            public int? TicketConcernId { get; set; }
+            
         }
 
 
@@ -44,63 +39,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
-                var requestTransactionExist = await _context.RequestTransactions
-                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
+                var ticketConcernExist = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId
+                    && x.IsApprove != true, cancellationToken);
 
-                if (requestTransactionExist == null)
+                if (ticketConcernExist == null)
                 {
-                    return Result.Failure(TicketRequestError.TicketIdNotExist());
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
                 }
 
-                foreach (var ticketConcern in command.Concerns)
+                var businessUnitList = await _context.BusinessUnits
+                .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestorByUser.BusinessUnitId);
+
+                var receiverList = await _context.Receivers
+                .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+                if (receiverList == null)
                 {
+                    return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
+                }
 
-                    var userExist = await _context.TicketConcerns
-                        .FirstOrDefaultAsync(x => x.RequestTransactionId == command.RequestTransactionId
-                    && x.UserId == ticketConcern.IssueHandler && x.IsApprove != true);
-
-                    if (userExist == null)
+                if (receiverList.UserId == command.UserId && receiverPermissionList.Contains(command.Role))
+                {
+                    if (ticketConcernExist.TargetDate < dateToday)
                     {
-                        return Result.Failure(TicketRequestError.UserNotExist());
+                        return Result.Failure(TicketRequestError.DateTimeInvalid());
                     }
 
-                    var ticketConcernExist = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                        .Where(x => x.RequestTransactionId == command.RequestTransactionId && x.UserId == userExist.UserId)
-                        .ToListAsync();
+                    ticketConcernExist.IsApprove = true;
+                    ticketConcernExist.ApprovedBy = command.Approved_By;
+                    ticketConcernExist.ApprovedAt = DateTime.Now;
+                    ticketConcernExist.IsReject = false;
+                    ticketConcernExist.ConcernStatus = TicketingConString.CurrentlyFixing;
 
-                    var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == ticketConcernExist.First().RequestorByUser.BusinessUnitId);
-                    var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-                    if (receiverList == null)
+                    if (ticketConcernExist.RequestConcernId != null)
                     {
-                        return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
-                    }
+                        var requestConcernList = await _context.RequestConcerns
+                        .Where(x => x.Id == ticketConcernExist.RequestConcernId)
+                        .FirstOrDefaultAsync();
 
-                    if (receiverList.UserId == command.UserId && receiverPermissionList.Contains(command.Role))
-                    {
-                        foreach (var concerns in ticketConcernExist)
-                        {
-                            if (concerns.TargetDate < dateToday)
-                            {
-                                return Result.Failure(TicketRequestError.DateTimeInvalid());
-                            }
-
-                            concerns.IsApprove = true;
-                            concerns.ApprovedBy = command.Approved_By;
-                            concerns.ApprovedAt = DateTime.Now;
-                            concerns.IsReject = false; 
-                            //concerns.Remarks = null;
-                            concerns.ConcernStatus = TicketingConString.CurrentlyFixing;
-
-                            if (concerns.RequestConcernId != null)
-                            {
-                                var requestConcernList = await _context.RequestConcerns.Where(x => x.Id == concerns.RequestConcernId).ToListAsync();
-                                foreach (var request in requestConcernList)
-                                {
-                                    request.ConcernStatus = TicketingConString.CurrentlyFixing;
-                                }
-                            }
-
-                        }
+                        requestConcernList.ConcernStatus = TicketingConString.CurrentlyFixing;
 
                     }
 

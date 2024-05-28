@@ -100,6 +100,17 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public string TicketNo { get; set; }
 
+        public bool? IsReDate { get; set; }
+        public DateTime? ReDateAt { get; set; }
+        public Guid? ReDateBy { get; set; }
+        public virtual User ReDateByUser { get; set; }
+
+        public ICollection<TicketAttachment> TicketAttachments { get; set; }    
+
+        public ICollection<TicketReDate> TicketReDates { get; set;}
+
+        //public ICollection<TicketConcern> TicketConcerns { get; set; }
+
 
         //public ICollection<TicketComment> TicketComments { get; set; }
 

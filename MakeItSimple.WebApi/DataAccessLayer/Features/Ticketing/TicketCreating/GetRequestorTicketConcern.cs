@@ -85,6 +85,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Search { get; set; }
             public bool? Status { get; set; }
             public bool ? Is_Reject { get; set; }
+            public bool ? Is_Approve { get; set; }
+
             public bool? Ascending { get; set; }
         }
 
@@ -147,6 +149,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
                     }
 
+                    if(request.Is_Approve != null)
+                    {
+                        var ticketStatusList = await _context.TicketConcerns
+                            .Where(x => x.IsApprove == request.Is_Approve)
+                            .Select(x => x.Id)
+                            .ToListAsync();
+
+                        requestConcernsQuery = requestConcernsQuery.Where(x => ticketStatusList.Contains(x.Id));
+                    }
+
+
                     if(request.Is_Reject != null)
                     {
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsReject == request.Is_Reject);
@@ -205,11 +218,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
                                         .ToListAsync();
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                    var requestorSelect = receiver.Select(x => x.RequestTransactionId);
+                                    var requestorSelect = receiver.Select(x => x.Id);
 
                                     requestConcernsQuery = requestConcernsQuery
                                         .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect
-                                             .Contains(x.RequestTransactionId));
+                                             .Contains(x.Id));
                                 }
                                 else
                                 {

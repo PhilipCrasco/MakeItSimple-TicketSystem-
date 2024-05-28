@@ -1,29 +1,25 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket.RejectRequestTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
-    public class RejectRequestTicket
+    public class CancelTicketConcern
     {
-
-        public class RejectRequestTicketCommand : IRequest<Result>
+        public class CancelTicketConcernCommand : IRequest<Result>
         {
             public int TicketConcernId { get; set; }
             public string Role { get; set; }
-            public string Remarks { get; set; }
 
         }
 
-
-        public class Handler : IRequestHandler<RejectRequestTicketCommand, Result>
+        public class Handler : IRequestHandler<CancelTicketConcernCommand, Result>
         {
-
             private readonly MisDbContext _context;
 
             public Handler(MisDbContext context)
@@ -31,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 _context = context;
             }
 
-            public async Task<Result> Handle(RejectRequestTicketCommand command, CancellationToken cancellationToken)
+            public async Task<Result> Handle(CancelTicketConcernCommand command, CancellationToken cancellationToken)
             {
 
 
@@ -40,7 +36,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (ticketConcernExist == null)
                 {
-                    return Result.Failure(TicketRequestError.TicketIdNotExist());
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
                 }
 
                 var userRoleList = await _context.UserRoles.ToListAsync();
@@ -49,21 +45,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 .Where(x => x.Permissions.Contains(TicketingConString.Receiver))
                 .Select(x => x.UserRoleName);
 
-                if (!receiverPermission.Any(x => x.Contains(command.Role)))
+                if(!receiverPermission.Any(x => x.Contains(command.Role)))
                 {
                     return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
                 }
 
-                ticketConcernExist.IsReject = true;
-                ticketConcernExist.Remarks = command.Remarks;      
+                ticketConcernExist.IsActive = false;
 
                 var requestConcernExist = await _context.RequestConcerns
-                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId,cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
-              
-                requestConcernExist.IsReject = true;
-                requestConcernExist.Remarks = command.Remarks;
-                
+                requestConcernExist.IsActive = false;
+
+                var ticketAttachmentList =  await _context.TicketAttachments
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id)
+                    .ToListAsync();
+
+                foreach (var ticketAttachment in ticketAttachmentList)
+                {
+                    ticketAttachment.IsActive = false;
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -60,21 +60,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
 
 
-                var requestConcernList = new List<RequestConcern>();
+                //var requestConcernList = new List<RequestConcern>();
+                var ticketConcernList = new List<TicketConcern>();
 
                 var yearSuffix = DateTime.Now.Year % 100;
 
-                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == x.AddedBy, cancellationToken);
+                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
 
-                //var requestTransactionExist = await _context.RequestTransactions
-                //    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
-
-                //if (requestTransactionExist == null)
-                //{
-                //    var requestTransactionId = new RequestTransaction { IsActive = true };
-                //    await _context.RequestTransactions.AddAsync(requestTransactionId);
-                //    requestTransactionExist = requestTransactionId;
-                //}
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
@@ -82,16 +74,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     return Result.Failure(UserError.UserNotExist());
                 }
 
-                //await _context.SaveChangesAsync(cancellationToken);
-                //requestTransactionList.Add(requestTransactionExist);
 
                 var requestConcernIdExist = await _context.RequestConcerns
-                    .Include(x => x.User).ThenInclude(x => x.Department)
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Department)
                     .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId, cancellationToken);
+
                 if (requestConcernIdExist != null)
                 {
 
-                    var ticketConcernExist = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.RequestConcernId == requestConcernIdExist.Id, cancellationToken);
+                    var ticketConcernExist = await _context.TicketConcerns
+                        .FirstOrDefaultAsync(x => x.RequestConcernId == requestConcernIdExist.Id, cancellationToken);
 
                     bool isChange = false;
 
@@ -104,10 +97,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (isChange)
                     {
                         requestConcernIdExist.ModifiedBy = command.Modified_By;
+                        requestConcernIdExist.UpdatedAt = DateTime.Now;
+                        ticketConcernExist.UpdatedAt = DateTime.Now;
+                        ticketConcernExist.ModifiedBy = command.Modified_By;
                         ticketConcernExist.ConcernDetails = requestConcernIdExist.Concern;
                     }
 
-                    requestConcernList.Add(requestConcernIdExist);
+                    ticketConcernList.Add(ticketConcernExist);
+
+
 
                 }
                 else
@@ -143,12 +141,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     await _context.TicketConcerns.AddAsync(addTicketConcern);
 
+                    ticketConcernList.Add(addTicketConcern);
+
                     await _context.SaveChangesAsync(cancellationToken);
 
 
                     var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
                     ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
-                    requestConcernList.Add(addRequestConcern);
 
 
                 }
@@ -217,14 +216,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    RequestTransactionId = requestConcernList.First().Id,
+                                    TicketConcernId = ticketConcernList.First().Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
                                 };
 
-                                await _context.AddAsync(addAttachment, cancellationToken);
+                                await _context.AddAsync(addAttachment);
 
                             }
                      
@@ -234,6 +233,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 await Task.WhenAll(uploadTasks);
+
+
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

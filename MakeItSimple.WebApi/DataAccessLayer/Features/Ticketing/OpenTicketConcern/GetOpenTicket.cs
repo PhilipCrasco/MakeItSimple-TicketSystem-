@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket.GetOpenTicketResult;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern
 {
     public class GetOpenTicket
@@ -200,7 +201,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             }
                             else
                             {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.Id == null);
+                                return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
                             }
 
                         }
@@ -226,7 +227,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             }
                             else
                             {
-                                ticketConcernQuery = ticketConcernQuery.Where(x => x.Id == null);
+                                return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
                             }
 
                         }

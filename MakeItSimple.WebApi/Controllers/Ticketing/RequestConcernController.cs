@@ -140,67 +140,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPost("add-development")]
-        public async Task<IActionResult> AddDevelopingTicket([FromForm] AddDevelopingTicketCommand command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.Added_By = userId;
-                        command.Modified_By = userId;
-                        //command.IssueHandler = userId;
-
-                    }
-                }
-                var result = await _mediator.Send(command);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-
-
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpPost("attachment/{id}")]
-        public async Task<IActionResult> AddNewTicketAttachment([FromForm] AddNewTicketAttachmentCommand command, [FromRoute] int id)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Added_By = userId;
-                    command.Modified_By = userId;
-                }
-
-                command.RequestTransactionId = id;
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
 
         [HttpGet("request-attachment")]
         public async Task<IActionResult> GetRequestAttachment([FromQuery] GetRequestAttachmentQuery query)
@@ -225,7 +164,17 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                var results = await _mediator.Send(command);
+
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+                }
+
+                    var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
                     return BadRequest(results);
@@ -293,95 +242,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpGet("page")]
-        public async Task<IActionResult> GetRequestConcern([FromQuery] GetRequestConcernQuery query)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        query.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-
-                    }
-                }
-
-                var requestConcern = await _mediator.Send(query);
-
-                Response.AddPaginationHeader(
-
-                requestConcern.CurrentPage,
-                requestConcern.PageSize,
-                requestConcern.TotalCount,
-                requestConcern.TotalPages,
-                requestConcern.HasPreviousPage,
-                requestConcern.HasNextPage
-
-                );
-
-                var result = new
-                {
-                    requestConcern,
-                    requestConcern.CurrentPage,
-                    requestConcern.PageSize,
-                    requestConcern.TotalCount,
-                    requestConcern.TotalPages,
-                    requestConcern.HasPreviousPage,
-                    requestConcern.HasNextPage
-                };
-
-                var successResult = Result.Success(result);
-                return Ok(successResult);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        //[HttpPut("approve-request")]
-        //public async Task<IActionResult> ApproveRequestTicket([FromBody] ApproveRequestTicketCommand command)
-        //{
-        //    try
-        //    {
-        //        if (User.Identity is ClaimsIdentity identity)
-        //        {
-        //            var userRole = identity.FindFirst(ClaimTypes.Role);
-        //            if (userRole != null)
-        //            {
-        //                command.Role = userRole.Value;
-        //            }
-
-        //            if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-        //            {
-        //                command.UserId = userId;
-        //                command.Approved_By = userId;
-
-        //            }
-        //        }
-
-        //        var results = await _mediator.Send(command);
-        //        if (results.IsFailure)
-        //        {
-
-        //            return BadRequest(results);
-        //        }
-        //        return Ok(results);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Conflict(ex.Message);
-        //    }
-        //}
-
         [HttpPut("approval-request-receiver")]
         public async Task<IActionResult> RequestApprovalReceiver([FromBody] RequestApprovalReceiverCommand command)
         {
@@ -415,42 +275,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 return Conflict(ex.Message);
             }
-        }
-
-        [HttpPut("approval-request-approver")]
-        public async Task<IActionResult> RequestApprovalApprover([FromBody] RequestApprovalApproverCommand command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.UserId = userId;
-                        command.Approved_By = userId;
-
-                    }
-                }
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
         }
 
 

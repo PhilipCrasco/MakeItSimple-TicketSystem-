@@ -54,10 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     cancelAttachment.IsActive = false;
                 }
-
-
-
-            
+        
                 await _context.SaveChangesAsync(cancellationToken);  
                 return Result.Success();
             }

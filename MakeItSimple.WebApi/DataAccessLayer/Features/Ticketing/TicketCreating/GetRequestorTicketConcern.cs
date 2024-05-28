@@ -8,6 +8,7 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Packaging.Core;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
 
@@ -65,7 +66,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; }
-                public bool IsActive { get; set; }
+                public bool Is_Active { get; set; }
+                public bool Is_Reject { get; set; }
 
             }
 
@@ -82,7 +84,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Concern_Status { get; set; }
             public string Search { get; set; }
             public bool? Status { get; set; }
-
+            public bool ? Is_Reject { get; set; }
             public bool? Ascending { get; set; }
         }
 
@@ -145,6 +147,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
                     }
 
+                    if(request.Is_Reject != null)
+                    {
+                        requestConcernsQuery = requestConcernsQuery.Where(x => x.IsReject == request.Is_Reject);
+                    }
+
                     if (request.Ascending != null)
                     {
                         requestConcernsQuery = request.Ascending.Value
@@ -166,7 +173,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.Done);
                                 break;
                             default:
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.Id == null);
+                                return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                                 break;
                         }
                     }
@@ -181,12 +188,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             }
                             else
                             {
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.Id == null);
+                                return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                             }
 
                         }
 
-                        if (request.UserType == TicketingConString.Approver)
+                        if (request.UserType == TicketingConString.Receiver )
                         {
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                             {
@@ -206,13 +213,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 }
                                 else
                                 {
-                                    requestConcernsQuery = requestConcernsQuery.Where(x => x.Id == null);
+                                    return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                                 }
 
                             }
                             else
                             {
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.Id == null);
+                               return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                             }
                         }
 
@@ -274,7 +281,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Created_At = tc.CreatedAt,
                                 Modified_By = tc.ModifiedByUser.Fullname,
                                 Updated_At = tc.UpdatedAt,
-                                IsActive = tc.IsActive,
+                                Is_Active = tc.IsActive,
+                                Is_Reject = tc.IsReject,
 
                             }).ToList()
 

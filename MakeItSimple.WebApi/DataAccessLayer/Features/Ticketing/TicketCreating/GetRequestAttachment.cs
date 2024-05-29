@@ -58,10 +58,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (request.Id != null)
                 {
-                    ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.Id == request.Id);
+                    ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.TicketConcernId == request.Id);
                 }
 
-                if(request.Status != null)
+
+                if (request.Status != null)
                 {
                     ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.IsActive == request.Status);
                 }

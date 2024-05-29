@@ -297,7 +297,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     foreach (var attachments in command.ConcernAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {
 
-                        var ticketAttachment = await _context.TicketAttachments.FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+                        var ticketAttachment = await _context.TicketAttachments
+                            .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
 
                         if (attachments.Attachment == null || attachments.Attachment.Length == 0)
                         {

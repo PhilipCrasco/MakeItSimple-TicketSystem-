@@ -19,19 +19,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketResult
         {
 
-            public int ? TicketTransactionId { get; set; }
+            public int ? TicketConcernId { get; set; }
+            public int ? TransferTicketId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
-            public string Unit_Code { get; set; }
-            public string Unit_Name { get; set; }
-            public string SubUnit_Code { get; set; }
-            public string SubUnit_Name { get; set; }
-            public int? ProjectId { get; set; }
-            public string Project_Name { get; set; }
             public int ? ChannelId { get; set; }
             public string Channel_Name { get; set; }
-            public string EmpId { get; set; }
+            public Guid ? UserId  { get; set; }
             public string Fullname { get; set; }
+            public string Concern_Details { get; set; }
+            public string Category_Description { get; set; }
+            public string SubCategory_Description { get; set; }
+            public DateTime? Start_Date { get; set; }
+            public DateTime? Target_Date { get; set; }
             public bool IsActive { get; set; }
             public string  Transfer_By { get; set; }
             public DateTime ? Transfer_At { get; set; }
@@ -40,29 +40,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string RejectTransfer_By { get; set; }
             public DateTime? RejectTransfer_At { get; set; }
             public string Reject_Remarks { get; set; }
-
-            public List<GetTransferTicketConcern> GetTransferTicketConcerns { get; set; }
-
-            public class GetTransferTicketConcern
-            {
-
-                public int TransferTicketConcernId { get; set; }
-                public int TicketConcernId { get; set; }
-                public string Concern_Details { get; set; }
-                public string Category_Description { get; set; }
-                public string SubCategoryDescription { get; set; }
-
-                public string Added_By { get; set; }
-                public DateTime Created_At { get; set; }
-
-                public string Modified_By { get; set; }
-                public DateTime? Updated_At { get; set; }
-
-                public DateTime ? Start_Date { get; set; }
-                public DateTime ? Target_Date { get; set; }
-
-            }
-
+            public string Remarks { get; set; }
 
         }
 
@@ -96,12 +74,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 IQueryable<TransferTicketConcern> transferTicketQuery = _context.TransferTicketConcerns
                     .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.User)
+                    .ThenInclude(x => x.Department)
+                    .Include(x => x.TicketConcern)
+                    .Include(x => x.Channel)
                     .Include(x => x.RequestTransaction)
                     .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
-                    .Include(x => x.User)
                     .Include(x => x.Channel)
-                    .ThenInclude(x => x.Project)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
 
@@ -167,46 +147,41 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId); 
                 }
 
-                var results = transferTicketQuery.GroupBy(x => x.TicketTransactionId).Select(x => new GetTransferTicketResult
+                var results = transferTicketQuery.Select(x => new GetTransferTicketResult
                 {
-                    TicketTransactionId = x.Key,
-                    Department_Code = x.First().User.Department.DepartmentCode,
-                    Department_Name = x.First().User.Department.DepartmentName,
-                    Unit_Code = x.First().User.Units.UnitCode,
-                    Unit_Name = x.First().User.Units.UnitName,
-                    SubUnit_Code = x.First().User.SubUnit.SubUnitCode,
-                    SubUnit_Name = x.First().User.SubUnit.SubUnitName,
-                    ProjectId = x.First().Channel.ProjectId,
-                    Project_Name = x.First().Channel.Project.ProjectName,
-                    ChannelId = x.First().ChannelId,
-                    Channel_Name = x.First().Channel.ChannelName,
-                    EmpId = x.First().User.EmpId,
-                    Fullname = x.First().User.Fullname,
-                    IsActive = x.First().IsActive,
-                    Transfer_By = x.First().TransferByUser.Fullname,
-                    Transfer_At = x.First().TransferAt,
-                    Transfer_Status = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
-                    && x.First().IsRejectTransfer == false ? "Transfer Approve" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
-                    Transfer_Remarks = x.First().TransferRemarks,
-                    RejectTransfer_By = x.First().RejectTransferByUser.Fullname,
-                    RejectTransfer_At = x.First().RejectTransferAt,
-                    Reject_Remarks = x.First().RejectRemarks,
+                    TicketConcernId = x.TicketConcernId,
+                    TransferTicketId = x.Id,
+                    Department_Code = x.TicketConcern.User.Department.DepartmentCode,
+                    Department_Name = x.TicketConcern.User.Department.DepartmentName,
+                    ChannelId = x.TicketConcern.ChannelId,
+                    Channel_Name = x.Channel.ChannelName,
+                    UserId = x.TicketConcern.UserId,
+                    Fullname = x.TicketConcern.User.Fullname,
+                    IsActive = x.IsActive,
+                    Transfer_By = x.TransferByUser.Fullname,
+                    Transfer_At = x.TransferAt,
+                    //Transfer_Status = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
+                    //&& x.First().IsRejectTransfer == false ? "Transfer Approve" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
+                    //Transfer_Remarks = x.First().TransferRemarks,
+                    //RejectTransfer_By = x.First().RejectTransferByUser.Fullname,
+                    //RejectTransfer_At = x.First().RejectTransferAt,
+                    //Reject_Remarks = x.First().RejectRemarks,
 
-                    GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
-                    {
-                        TransferTicketConcernId = x.Id,
-                        TicketConcernId = x.TicketConcernId,
-                        Concern_Details = x.ConcernDetails,
-                        Category_Description = x.Category.CategoryDescription,
-                        SubCategoryDescription = x.SubCategory.SubCategoryDescription,       
-                        Added_By = x.AddedByUser.Fullname,
-                        Created_At = x.CreatedAt,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        Updated_At = x.UpdatedAt,
-                        //Start_Date = x.StartDate,
-                        //Target_Date = x.TargetDate
+                    //GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
+                    //{
+                    //    TransferTicketConcernId = x.Id,
+                    //    TicketConcernId = x.TicketConcernId,
+                    //    Concern_Details = x.ConcernDetails,
+                    //    Category_Description = x.Category.CategoryDescription,
+                    //    SubCategoryDescription = x.SubCategory.SubCategoryDescription,       
+                    //    Added_By = x.AddedByUser.Fullname,
+                    //    Created_At = x.CreatedAt,
+                    //    Modified_By = x.ModifiedByUser.Fullname,
+                    //    Updated_At = x.UpdatedAt,
+                    //    //Start_Date = x.StartDate,
+                    //    //Target_Date = x.TargetDate
 
-                    }).ToList()
+                    //}).ToList()
 
                 });
 

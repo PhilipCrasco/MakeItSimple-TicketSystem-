@@ -181,7 +181,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         if (request.UserType == TicketingConString.IssueHandler)
                         {
                             
-
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId 
                             && x.ModifiedBy == request.UserId);
                         }
@@ -236,61 +235,64 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 }
 
                 var results = ticketConcernQuery.Select(x => new GetOpenTicketResult
-                    {
-                        CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
-                        RequestedTicketCount = ticketConcernQuery.Count(),
-                        OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
-                        DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
-                        TicketConcernId = x.Id, 
-                        RequestConcernId = x.RequestConcernId,
-                        Concern_Description= x.ConcernDetails,
-                        Requestor_By = x.RequestorBy,
-                        Requestor_Name = x.RequestorByUser.Fullname,
+                {
+                    CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
+                    RequestedTicketCount = ticketConcernQuery.Count(),
+                    OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
+                    DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
+                    TicketConcernId = x.Id,
+                    RequestConcernId = x.RequestConcernId,
+                    Concern_Description = x.ConcernDetails,
+                    Requestor_By = x.RequestorBy,
+                    Requestor_Name = x.RequestorByUser.Fullname,
 
-                        DepartmentId = x.RequestorByUser.DepartmentId,
-                        Department_Name = x.RequestorByUser.Department.DepartmentName,
+                    DepartmentId = x.RequestorByUser.DepartmentId,
+                    Department_Name = x.RequestorByUser.Department.DepartmentName,
 
-                        UnitId = x.User.UnitId,
-                        Unit_Name = x.User.Units.UnitName,
-                        SubUnitId = x.User.SubUnitId,
-                        SubUnit_Name = x.User.SubUnit.SubUnitName,
-                        ChannelId = x.ChannelId,
-                        Channel_Name = x.Channel.ChannelName,
+                    UnitId = x.User.UnitId,
+                    Unit_Name = x.User.Units.UnitName,
+                    SubUnitId = x.User.SubUnitId,
+                    SubUnit_Name = x.User.SubUnit.SubUnitName,
+                    ChannelId = x.ChannelId,
+                    Channel_Name = x.Channel.ChannelName,
 
-                        UserId = x.UserId,
-                        Issue_Handler = x.User.Fullname,
+                    UserId = x.UserId,
+                    Issue_Handler = x.User.Fullname,
 
+                    CategoryId = x.CategoryId,
+                    Category_Description = x.Category.CategoryDescription,
 
-                        CategoryId = x.CategoryId,
-                        Category_Description = x.Category.CategoryDescription,
+                    SubCategoryId = x.SubCategoryId,
+                    SubCategory_Description = x.SubCategory.SubCategoryDescription,
 
-                        SubCategoryId = x.SubCategoryId,
-                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
-
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate,
-
-
-                        Ticket_Status = x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsClosedApprove != false ? TicketingConString.OpenTicket
-                                        : x.IsTransfer == false ? TicketingConString.ForTransfer : x.IsReTicket == false ? TicketingConString.ForReticket 
-                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing : "Unknown",
-
-                        Concern_Type = x.TicketType,
-                        Added_By = x.AddedByUser.Fullname,
-                        Created_At = x.CreatedAt,
-                        Remarks = x.Remarks,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        Updated_At = x.UpdatedAt,
-                        IsActive = x.IsActive,
-
-                        Is_Closed = x.IsClosedApprove,
-                        Is_ReDate = x.IsReDate,
-                        Is_ReTicket = x.IsReTicket,
-                        Is_Transfer = x.IsTransfer,
+                    Start_Date = x.StartDate,
+                    Target_Date = x.TargetDate,
 
 
+                    Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
+                                        : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == false ? TicketingConString.OpenTicket
+                                        : x.IsTransfer == false ? TicketingConString.ForTransfer
+                                        : x.IsReTicket == false ? TicketingConString.ForReticket
+                                        : x.IsReDate == false ? TicketingConString.ForReDate
+                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing 
+                                        : "Unknown",
 
-                });
+                    Concern_Type = x.TicketType,
+                    Added_By = x.AddedByUser.Fullname,
+                    Created_At = x.CreatedAt,
+                    Remarks = x.Remarks,
+                    Modified_By = x.ModifiedByUser.Fullname,
+                    Updated_At = x.UpdatedAt,
+                    IsActive = x.IsActive,
+
+                    Is_Closed = x.IsClosedApprove,
+                    Is_ReDate = x.IsReDate,
+                    Is_ReTicket = x.IsReTicket,
+                    Is_Transfer = x.IsTransfer,
+
+
+
+                }); ;
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

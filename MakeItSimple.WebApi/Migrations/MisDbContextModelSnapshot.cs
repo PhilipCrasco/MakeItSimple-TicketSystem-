@@ -969,6 +969,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("sub_unit_id");
 
+                    b.Property<int?>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
                     b.Property<int?>("TicketTransactionId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_transaction_id");
@@ -991,6 +995,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("SubUnitId")
                         .HasDatabaseName("ix_approver_ticketings_sub_unit_id");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_approver_ticketings_ticket_concern_id");
 
                     b.HasIndex("TicketTransactionId")
                         .HasDatabaseName("ix_approver_ticketings_ticket_transaction_id");
@@ -1845,6 +1852,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
+                    b.Property<int?>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
                     b.Property<int?>("TicketTransactionId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_transaction_id");
@@ -1864,6 +1875,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("RequestorBy")
                         .HasDatabaseName("ix_ticket_histories_requestor_by");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_histories_ticket_concern_id");
 
                     b.HasIndex("TicketTransactionId")
                         .HasDatabaseName("ix_ticket_histories_ticket_transaction_id");
@@ -2771,6 +2785,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("SubUnitId")
                         .HasConstraintName("fk_approver_ticketings_sub_units_sub_unit_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
+                        .WithMany()
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_approver_ticketings_ticket_concerns_ticket_concern_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
                         .WithMany("ApproverTicketings")
                         .HasForeignKey("TicketTransactionId")
@@ -2788,6 +2807,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("RequestTransaction");
 
                     b.Navigation("SubUnit");
+
+                    b.Navigation("TicketConcern");
 
                     b.Navigation("TicketTransaction");
 
@@ -3233,6 +3254,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_histories_users_requestor_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
+                        .WithMany()
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_histories_ticket_concerns_ticket_concern_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", "TicketTransaction")
                         .WithMany("TicketHistories")
                         .HasForeignKey("TicketTransactionId")
@@ -3243,6 +3269,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("RequestTransaction");
 
                     b.Navigation("RequestorByUser");
+
+                    b.Navigation("TicketConcern");
 
                     b.Navigation("TicketTransaction");
                 });
@@ -3344,7 +3372,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_transfer_ticket_concerns_sub_categories_sub_category_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
-                        .WithMany()
+                        .WithMany("TransferTicketConcerns")
                         .HasForeignKey("TicketConcernId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -3560,6 +3588,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("TicketAttachments");
 
                     b.Navigation("TicketReDates");
+
+                    b.Navigation("TransferTicketConcerns");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", b =>

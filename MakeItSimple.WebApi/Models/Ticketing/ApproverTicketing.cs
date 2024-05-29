@@ -34,9 +34,11 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public string Status { get; set; }
 
-
-
         public int ? TicketTransactionId { get; set; }
         public virtual TicketTransaction TicketTransaction { get; set; }
+
+        public int ? TicketConcernId { get; set; }
+        public virtual TicketConcern TicketConcern { get; set; }
+
     }
 }

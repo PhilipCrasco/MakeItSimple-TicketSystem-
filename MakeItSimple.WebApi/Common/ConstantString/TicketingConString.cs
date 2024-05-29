@@ -10,12 +10,6 @@
 
 
         public const string Users = "Users";
-
-        public const string Transfer = "Transfer Ticket";
-        public const string ReTicket = "Re-Ticket";
-        public const string CloseTicket = "Closing Ticket";
-        public const string Open = "Open Ticket";
-
         public const string ApproverTransfer = "Admin";
 
         // Ticketing Role
@@ -52,6 +46,23 @@
         public const string ForClosing = "For Closing Ticket";
         public const string ForTransfer = "For Transfer Ticket";
         public const string OpenTicket = "Open Ticket";
+        public const string PendingRequest = "Pending Request";
+        public const string ForReDate = "For Re-Date";
+
+        public const string ClosedTicket = "ClosedTicket";
+        public const string TransferTicket = "Transfer Ticket";
+        public const string CloseTicket = "Closing Ticket";
+
+        public const string Open = "Open Ticket";
+
+        public const string ReTicket = "Re-Ticket";
+        public const string ReDate = "Re-Date";
+        public const string Closed = "Closed";
+        public const string Transfer = "Transfer";
+
+
+
+
 
         public const string RequestApproval = "For approval by ";
 

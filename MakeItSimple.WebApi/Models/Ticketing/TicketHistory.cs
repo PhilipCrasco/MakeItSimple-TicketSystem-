@@ -15,6 +15,9 @@
         public string Status { get; set; }
         public DateTime ? TransactionDate { get; set; }
 
+        public int ? TicketConcernId { get; set; }
+        public virtual TicketConcern TicketConcern { get; set; }
+
     }
 
 }

@@ -9,7 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferTicket;
+//using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferAttachment;
 using MakeItSimple.WebApi.Models;
 using MoreLinq.Extensions;
@@ -77,44 +77,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
             }
             catch(Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpPost("UpsertTransferTicket")]
-        public async Task<IActionResult> UpsertTransferTicket([FromBody] UpsertTransferTicketCommand command)
-        {
-            try
-            {
-
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.Added_By = userId;
-                        command.Modified_By = userId;
-                        command.Transfer_By = userId;
-                        command.Requestor_By = userId;
-                    }
-                }
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-
-            }
-            catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }

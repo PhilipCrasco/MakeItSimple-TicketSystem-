@@ -35,6 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
+
                 var allUserList = await _context.UserRoles.ToListAsync();
 
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
@@ -74,30 +75,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
 
                     var userApprovalId = await _context.ApproverTicketings
-                        .Where(x => x.TicketTransactionId == selectTransferRequestId.TicketTransactionId)
+                        .Where(x => x.TransferTicketConcernId == selectTransferRequestId.TransferTicketConcernId)
                         .ToListAsync();
 
-                    //foreach (var concernTicket in userTranferTicket)
-                    //{
+                    var validateUserApprover = userApprovalId
+                        .FirstOrDefault(x => x.ApproverLevel == selectTransferRequestId.ApproverLevel + 1);
 
-                    //    var validateUserApprover = userApprovalId
-                    //        .FirstOrDefault(x => x.ApproverLevel == selectTransferRequestId.ApproverLevel + 1);
+                    if (validateUserApprover != null)
+                    {
+                        transferTicketExist.TicketApprover = validateUserApprover.UserId;
+                    }
+                    else
+                    {
+                        transferTicketExist.TicketApprover = null;
 
-                    //    if (validateUserApprover != null)
-                    //    {
-                    //        concernTicket.TicketApprover = validateUserApprover.UserId;
-                    //    }
-                    //    else
-                    //    {
-                    //        concernTicket.TicketApprover = null;
-                    //    }
+                        transferTicketExist.IsTransfer = true;
+                        transferTicketExist.TransferBy = command.Transfer_By;
+                        transferTicketExist.TransferAt = DateTime.Now;
 
-                    //}
 
-                    //var approverLevel = selectTransferRequestId.ApproverLevel == 1 ? $"{selectTransferRequestId.ApproverLevel}st"
-                    //    : selectTransferRequestId.ApproverLevel == 2 ? $"{selectTransferRequestId.ApproverLevel}nd"
-                    //    : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
-                    //    : $"{selectTransferRequestId.ApproverLevel}th";
+                    }
+                
+                  
+                    var approverLevel = selectTransferRequestId.ApproverLevel == 1 ? $"{selectTransferRequestId.ApproverLevel}st"
+                        : selectTransferRequestId.ApproverLevel == 2 ? $"{selectTransferRequestId.ApproverLevel}nd"
+                        : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
+                        : $"{selectTransferRequestId.ApproverLevel}th";
 
                     //var addTicketHistory = new TicketHistory
                     //{

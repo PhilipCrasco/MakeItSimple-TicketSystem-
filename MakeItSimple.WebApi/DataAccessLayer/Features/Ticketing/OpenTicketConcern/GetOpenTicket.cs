@@ -269,7 +269,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
 
                     Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
-                                        : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == false ? TicketingConString.OpenTicket
+                                        : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
                                         : x.IsTransfer == false ? TicketingConString.ForTransfer
                                         : x.IsReTicket == false ? TicketingConString.ForReticket
                                         : x.IsReDate == false ? TicketingConString.ForReDate

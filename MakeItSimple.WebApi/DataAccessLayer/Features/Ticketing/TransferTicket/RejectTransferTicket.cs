@@ -18,7 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid ? Requestor_By { get; set; }
             public Guid ? Approver_By { get; set; }
             public string Role { get; set; }
-            public int RequestTransactionId { get; set; }
+            public int TransferTicketId { get; set; }
 
             public string Reject_Remarks { get; set; }
         }
@@ -36,59 +36,55 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(RejectTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
-                    //var requestTransactionExist= await _context.RequestTransactions.
-                    //    FirstOrDefaultAsync(x => x.Id == transferTicket.RequestTransactionId, cancellationToken);
+                var transferTicketExist = await _context.TransferTicketConcerns.
+                    FirstOrDefaultAsync(x => x.Id == command.TransferTicketId, cancellationToken);
 
-                    //if (requestTransactionExist == null) 
-                    //{
-                    //    return Result.Failure(TransferTicketError.TicketIdNotExist());
-                    //}
+                if (transferTicketExist == null)
+                {
+                    return Result.Failure(TransferTicketError.TransferTicketConcernIdNotExist());
+                }
 
-                    //var transferTicketList = await _context.TransferTicketConcerns
-                    //    .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
+                var userRoleList = await _context.UserRoles.ToListAsync();
 
-                    //var approverUserList = await _context.ApproverTicketings
-                    //    .Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
+                var receiverPermission = userRoleList
+                .Where(x => x.Permissions.Contains(TicketingConString.Receiver))
+                .Select(x => x.UserRoleName);
 
-                    //var approverLevelValidation =  approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
+                if (!receiverPermission.Any(x => x.Contains(command.Role)))
+                {
+                    return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
+                }
 
-                    //var ticketHistoryList = await _context.TicketHistories
-                    //    .Where(x => x.RequestTransactionId == x.RequestTransactionId)
-                    //    .ToListAsync();
+                var approverUserList = await _context.ApproverTicketings
+                    .Where(x => x.TransferTicketConcernId == transferTicketExist.Id)              
+                    .ToListAsync();
 
-                    //var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
+                foreach (var approverUserId in approverUserList)
+                {
+                    approverUserId.IsApprove = null;
+                }
 
-                    //foreach (var approverUserId in approverUserList)
-                    //{
-                    //    approverUserId.IsApprove = null;
-                    //}
+                var approverLevelValidation = approverUserList
+                    .FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
+
+                transferTicketExist.RejectTransferAt = DateTime.Now;
+                transferTicketExist.IsRejectTransfer = true;
+                transferTicketExist.RejectTransferBy = command.RejectTransfer_By;
+                transferTicketExist.TicketApprover = approverLevelValidation.UserId;
 
 
-                    //foreach (var perTicketId in transferTicketList)
-                    //{
-                    //    perTicketId.RejectTransferAt = DateTime.Now;
-                    //    perTicketId.IsRejectTransfer = true;
-                    //    perTicketId.RejectTransferBy = command.RejectTransfer_By;
-                    //    perTicketId.TicketApprover = approverLevelValidation.UserId;
-                    //    //perTicketId.RejectRemarks = transferTicket.Reject_Remarks;
-                    //}
+                var addTicketHistory = new TicketHistory
+                {
+                    TicketConcernId = transferTicketExist.TicketConcernId,
+                    RequestorBy = transferTicketExist.AddedBy,
+                    ApproverBy = command.Approver_By,
+                    TransactionDate = DateTime.Now,
+                    Request = TicketingConString.Transfer,
+                    Status = TicketingConString.RejectedBy
+                };
 
-                    //if (ticketHistoryId.Status != TicketingConString.RejectedBy)
-                    //{
-                    //    var addTicketHistory = new TicketHistory
-                    //    {
-                    //        RequestTransactionId = requestTransactionExist.Id,
-                    //        RequestorBy = transferTicketList.First().AddedBy,
-                    //        ApproverBy = command.Approver_By,
-                    //        TransactionDate = DateTime.Now,
-                    //        Request = TicketingConString.Transfer,
-                    //        Status = TicketingConString.RejectedBy
-                    //    };
+                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                    //    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-                    //}
-
-                
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

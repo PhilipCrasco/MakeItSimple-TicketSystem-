@@ -153,7 +153,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         var ticketStatusList = await _context.TicketConcerns
                             .Where(x => x.IsApprove == request.Is_Approve)
-                            .Select(x => x.Id)
+                            .Select(x => x.RequestConcernId)
                             .ToListAsync();
 
                         requestConcernsQuery = requestConcernsQuery.Where(x => ticketStatusList.Contains(x.Id));
@@ -299,7 +299,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             }).ToList()
 
-                    });;
+                    });
 
 
                return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);

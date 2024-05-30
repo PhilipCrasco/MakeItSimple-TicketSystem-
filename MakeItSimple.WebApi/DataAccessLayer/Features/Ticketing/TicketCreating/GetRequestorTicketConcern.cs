@@ -150,7 +150,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                     if(request.Is_Approve != null)
-                    {
+                    { 
                         var ticketStatusList = await _context.TicketConcerns
                             .Where(x => x.IsApprove == request.Is_Approve)
                             .Select(x => x.RequestConcernId)
@@ -206,7 +206,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-                        if (request.UserType == TicketingConString.Receiver )
+                         if (request.UserType == TicketingConString.Receiver )
                         {
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                             {
@@ -215,7 +215,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     //var ticketConcernApproveList = await _context.
 
                                     var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId && x.IsApprove != true)
+                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
                                         .ToListAsync();
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
                                     var requestorSelect = receiver.Select(x => x.Id);

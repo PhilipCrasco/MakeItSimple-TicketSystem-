@@ -9,7 +9,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
@@ -20,7 +19,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketCo
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalApprover;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;

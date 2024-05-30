@@ -181,8 +181,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         if (request.UserType == TicketingConString.IssueHandler)
                         {
                             
-                            ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId 
-                            && x.ModifiedBy == request.UserId);
+                            ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
                         }
 
                         if (request.UserType == TicketingConString.Support)

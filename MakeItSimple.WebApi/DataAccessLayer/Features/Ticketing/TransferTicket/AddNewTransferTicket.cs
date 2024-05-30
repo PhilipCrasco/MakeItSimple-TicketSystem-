@@ -76,7 +76,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TransferTicketError.TransferInvalid());
                     }
                 }
-                
+
+
+                var approverList = await _context.Approvers
+               .Include(x => x.User)
+               .Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
+               .ToListAsync();
+
+                if (approverList == null)
+                {
+                    return Result.Failure(TransferTicketError.NoApproverExist());
+                }
 
                 var transferTicketExist = await _context.TransferTicketConcerns
                         .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId, cancellationToken);
@@ -106,32 +116,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 else
                 {
 
+                    var approverUser = approverList
+                        .FirstOrDefault(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
+
+
                     var addTransferTicket = new TransferTicketConcern
                     {
                         TicketConcernId = ticketConcernExist.Id,
                         RejectRemarks = command.TransferRemarks,
                         TransferBy = command.Transfer_By,
                         IsTransfer = false,
-                        AddedBy = command.Added_By
+                        AddedBy = command.Added_By,
+                        TicketApprover = approverUser.UserId,
+
                     };
 
                     await _context.TransferTicketConcerns.AddAsync(addTransferTicket);
 
-                    var getApprover = await _context.Approvers
-                        .Include(x => x.User)
-                        .Where(x => x.SubUnitId == userDetails.SubUnitId)
-                        .ToListAsync();
-
-                    if (getApprover == null)
-                    {
-                        return Result.Failure(TransferTicketError.NoApproverExist());
-                    }
-
-                    foreach (var approver in getApprover)
+                    foreach (var approver in approverList)
                     {
                         var addNewApprover = new ApproverTicketing
                         {
-                            TicketConcernId = addTransferTicket.Id,
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransferTicketConcernId = addTransferTicket.Id,
                             SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,

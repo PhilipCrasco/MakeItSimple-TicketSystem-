@@ -150,6 +150,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
 
 
+                    var addTicketHistory = new TicketHistory
+                    {
+                        TicketConcernId = addTicketConcern.Id,
+                        RequestorBy = command.Added_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Request,
+                        Status = TicketingConString.RequestCreated
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+
                 }
 
 
@@ -225,6 +237,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                                 await _context.AddAsync(addAttachment);
 
+
+
                             }
                      
                         }, cancellationToken));
@@ -233,8 +247,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 await Task.WhenAll(uploadTasks);
-
-
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

@@ -4,7 +4,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket.ApproveRequestTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {

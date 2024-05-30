@@ -62,6 +62,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string Remarks { get; set; }
         public string TicketNo { get; set; }
 
+        public ICollection<ApproverTicketing> ApproverTickets { get; set; }
+
     }
 
 

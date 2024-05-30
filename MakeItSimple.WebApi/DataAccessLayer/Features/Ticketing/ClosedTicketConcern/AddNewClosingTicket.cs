@@ -113,7 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             TicketTransactionId = ticketTransactionId.Id,
                             //ChannelId = approver.ChannelId,
-                            SubUnitId = approver.SubUnitId,
+                            //SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

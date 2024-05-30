@@ -41,28 +41,28 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         query.UserId = userId;
                     }
                 }
-                var closingTicket = await _mediator.Send(query);
+                var openTicket = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
 
-                closingTicket.CurrentPage,
-                closingTicket.PageSize,
-                closingTicket.TotalCount,
-                closingTicket.TotalPages,
-                closingTicket.HasPreviousPage,
-                closingTicket.HasNextPage
+                openTicket.CurrentPage,
+                openTicket.PageSize,
+                openTicket.TotalCount,
+                openTicket.TotalPages,
+                openTicket.HasPreviousPage,
+                openTicket.HasNextPage
 
                 );
 
                 var result = new
                 {
-                    closingTicket,
-                    closingTicket.CurrentPage,
-                    closingTicket.PageSize,
-                    closingTicket.TotalCount,
-                    closingTicket.TotalPages,
-                    closingTicket.HasPreviousPage,
-                    closingTicket.HasNextPage
+                    openTicket,
+                    openTicket.CurrentPage,
+                    openTicket.PageSize,
+                    openTicket.TotalCount,
+                    openTicket.TotalPages,
+                    openTicket.HasPreviousPage,
+                    openTicket.HasNextPage
                 };
 
                 var successResult = Result.Success(result);

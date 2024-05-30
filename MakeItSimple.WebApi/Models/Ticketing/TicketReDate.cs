@@ -41,8 +41,9 @@
         public virtual User RejectReDateByUser { get; set; }
         public string RejectRemarks { get; set; }
         public string Remarks { get; set; }
-
         public Guid? TicketApprover { get; set; }
+
+        public ICollection<ApproverTicketing> ApproverTickets { get; set; }
 
 
 

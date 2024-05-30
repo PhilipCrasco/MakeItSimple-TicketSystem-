@@ -20,6 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         {
 
             public int ? TicketConcernId { get; set; }
+            public string Ticket_No { get; set; }
             public int ? TransferTicketId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
@@ -41,6 +42,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public DateTime? RejectTransfer_At { get; set; }
             public string Reject_Remarks { get; set; }
             public string Remarks { get; set; }
+            public string Added_By { get; set; }
+            public DateTime Created_At { get; set; }
+            public string Modified_By { get; set; }
+            public DateTime ? Updated_At { get; set; }
 
         }
 
@@ -78,6 +83,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .ThenInclude(x => x.Department)
                     .Include(x => x.TicketConcern)
                     .Include(x => x.Channel)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.Category)
+                    .ThenInclude(x => x.SubCategories)
                     .Include(x => x.RequestTransaction)
                     .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
@@ -150,6 +158,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var results = transferTicketQuery.Select(x => new GetTransferTicketResult
                 {
                     TicketConcernId = x.TicketConcernId,
+                    Ticket_No = x.TicketConcern.TicketNo,
                     TransferTicketId = x.Id,
                     Department_Code = x.TicketConcern.User.Department.DepartmentCode,
                     Department_Name = x.TicketConcern.User.Department.DepartmentName,
@@ -157,34 +166,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     Channel_Name = x.Channel.ChannelName,
                     UserId = x.TicketConcern.UserId,
                     Fullname = x.TicketConcern.User.Fullname,
+                    Concern_Details = x.TicketConcern.ConcernDetails,
+                    Category_Description = x.TicketConcern.Category.CategoryDescription,
+                    SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
                     IsActive = x.IsActive,
                     Transfer_By = x.TransferByUser.Fullname,
                     Transfer_At = x.TransferAt,
-                    //Transfer_Status = x.First().IsTransfer == false && x.First().IsRejectTransfer == false ? "For Transfer Approval" : x.First().IsTransfer == true 
-                    //&& x.First().IsRejectTransfer == false ? "Transfer Approve" : x.First().IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
-                    //Transfer_Remarks = x.First().TransferRemarks,
-                    //RejectTransfer_By = x.First().RejectTransferByUser.Fullname,
-                    //RejectTransfer_At = x.First().RejectTransferAt,
-                    //Reject_Remarks = x.First().RejectRemarks,
+                    Transfer_Status = x.IsTransfer == false && x.IsRejectTransfer == false ? "For Transfer Approval" 
+                                    : x.IsTransfer == true && x.IsRejectTransfer == false ? "Transfer Approve" 
+                                    : x.IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
 
-                    //GetTransferTicketConcerns = x.Select(x => new GetTransferTicketResult.GetTransferTicketConcern
-                    //{
-                    //    TransferTicketConcernId = x.Id,
-                    //    TicketConcernId = x.TicketConcernId,
-                    //    Concern_Details = x.ConcernDetails,
-                    //    Category_Description = x.Category.CategoryDescription,
-                    //    SubCategoryDescription = x.SubCategory.SubCategoryDescription,       
-                    //    Added_By = x.AddedByUser.Fullname,
-                    //    Created_At = x.CreatedAt,
-                    //    Modified_By = x.ModifiedByUser.Fullname,
-                    //    Updated_At = x.UpdatedAt,
-                    //    //Start_Date = x.StartDate,
-                    //    //Target_Date = x.TargetDate
-
-                    //}).ToList()
+                    Transfer_Remarks = x.TransferRemarks,
+                    RejectTransfer_By = x.RejectTransferByUser.Fullname,
+                    RejectTransfer_At = x.RejectTransferAt,
+                    Reject_Remarks = x.RejectRemarks,
+                    Remarks = x.Remarks,
+                    Added_By = x.AddedByUser.Fullname,
+                    Created_At = x.CreatedAt,
+                    Modified_By = x.ModifiedByUser.Fullname,
+                    Updated_At = x.UpdatedAt
 
                 });
-
 
                 return await PagedList<GetTransferTicketResult>.CreateAsync(results, request.PageNumber , request.PageSize);
             }

@@ -30,6 +30,7 @@
         public const string ApproveBy = "Request approve by";
         public const string ReceiverApproveBy = "Request has been approved by Receiver";
         public const string Returned = "Request was returned";
+        public const string Cancel = "Request was cancel";
 
 
         // Concern Status 
@@ -59,6 +60,7 @@
         public const string ReDate = "Re-Date";
         public const string Closed = "Closed";
         public const string Transfer = "Transfer";
+        public const string Request = "Request Concern";
 
 
 

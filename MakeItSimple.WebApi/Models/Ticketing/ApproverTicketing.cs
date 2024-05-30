@@ -18,16 +18,12 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int ? SubUnitId { get; set; }
         public virtual SubUnit SubUnit { get; set; }
 
-        //public int? TeamId { get; set; }
-        //public virtual Team Team { get; set; }
-
-
-        public Guid ? UserId { get; set; }
+        public Guid? UserId { get; set; }
         public virtual User User { get; set; }
         public bool ? IsApprove { get; set; }
         public int? ApproverLevel { get; set; }
 
-        public Guid ? IssueHandler { get; set; }
+        //public Guid? IssueHandler { get; set; }
 
         public int ? RequestTransactionId { get; set; }
         public virtual RequestTransaction RequestTransaction { get; set; }
@@ -39,6 +35,17 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public int ? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
+
+        public int ? TransferTicketConcernId { get; set; }
+        public virtual TransferTicketConcern TransferTicketConcern { get; set; }
+
+        public int ? TicketReDateId { get; set; }
+        public virtual TicketReDate TicketReDate { get; set; }
+
+        public int? ReTicketConcernId { get; set; }
+        public virtual ReTicketConcern ReTicketConcern { get; set; }
+
+
 
     }
 }

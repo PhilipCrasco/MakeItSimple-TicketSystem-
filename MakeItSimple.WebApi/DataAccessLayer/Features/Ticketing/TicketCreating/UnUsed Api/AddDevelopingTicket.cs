@@ -117,35 +117,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
-                {
-                    var approverUserList = await _context.ApproverTicketings
-                        .Where(x => x.RequestTransactionId == command.RequestTransactionId
-                        && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
+                //if (issueHandlerPermissionList.Any(x => x.Contains(command.Role)))
+                //{
+                //    var approverUserList = await _context.ApproverTicketings
+                //        .Where(x => x.RequestTransactionId == command.RequestTransactionId
+                //        && x.IssueHandler == command.Added_By && x.ApproverLevel == 1).ToListAsync();
 
-                    var approverUserValidation = approverUserList
-                        .FirstOrDefault(x => x.RequestTransactionId == command.RequestTransactionId && x.IssueHandler == command.Added_By
-                        && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
+                //    var approverUserValidation = approverUserList
+                //        .FirstOrDefault(x => x.RequestTransactionId == command.RequestTransactionId && x.IssueHandler == command.Added_By
+                //        && x.IsApprove != null && x.Id == approverUserList.Max(x => x.Id) && x.ApproverLevel == 1);
 
 
-                    if (approverUserValidation != null)
-                    {
+                //    if (approverUserValidation != null)
+                //    {
 
-                        var ticketConcernListApprover = await _context.TicketConcerns.Where(x => x.RequestTransactionId
-                        == command.RequestTransactionId && x.UserId == command.Added_By).ToListAsync();
+                //        var ticketConcernListApprover = await _context.TicketConcerns.Where(x => x.RequestTransactionId
+                //        == command.RequestTransactionId && x.UserId == command.Added_By).ToListAsync();
 
-                        var receiverValidation = ticketConcernListApprover 
-                            .Where(x => x.RequestTransactionId == requestTransactionExist.Id
-                            && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
-                            .FirstOrDefault();
+                //        var receiverValidation = ticketConcernListApprover 
+                //            .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                //            && x.UserId == command.Added_By && x.IsApprove != true && x.Id == ticketConcernListApprover.Max(x => x.Id))
+                //            .FirstOrDefault();
 
-                        if (receiverValidation != null)
-                        {
-                            return Result.Failure(TicketRequestError.ConcernWasInApproval());
-                        }
+                //        if (receiverValidation != null)
+                //        {
+                //            return Result.Failure(TicketRequestError.ConcernWasInApproval());
+                //        }
 
-                    }
-                }
+                //    }
+                //}
 
                 foreach (var concerns in command.AddDevelopingTicketByConcerns)
                 {
@@ -449,36 +449,36 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TransferTicketError.NoApproverExist());
                     }
 
-                    var approverValidation = await _context.ApproverTicketings
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
-                        && x.IssueHandler == command.Added_By && x.IsApprove == null)
-                        .FirstOrDefaultAsync();
+                    //var approverValidation = await _context.ApproverTicketings
+                    //    .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                    //    && x.IssueHandler == command.Added_By && x.IsApprove == null)
+                    //    .FirstOrDefaultAsync();
 
-                    if (approverValidation == null)
-                    {
-                        foreach (var approver in getApprover)
-                        {
-                            var addNewApprover = new ApproverTicketing
-                            {
-                                RequestTransactionId = requestTransactionExist.Id,
-                                //ChannelId = approver.ChannelId,
-                                SubUnitId = approver.SubUnitId,
-                                UserId = approver.UserId,
-                                ApproverLevel = approver.ApproverLevel,
-                                AddedBy = command.Added_By,
-                                CreatedAt = DateTime.Now,
-                                Status = TicketingConString.RequestTicket,
-                            };
+                    //if (approverValidation == null)
+                    //{
+                    //    foreach (var approver in getApprover)
+                    //    {
+                    //        var addNewApprover = new ApproverTicketing
+                    //        {
+                    //            RequestTransactionId = requestTransactionExist.Id,
+                    //            //ChannelId = approver.ChannelId,
+                    //            SubUnitId = approver.SubUnitId,
+                    //            UserId = approver.UserId,
+                    //            ApproverLevel = approver.ApproverLevel,
+                    //            AddedBy = command.Added_By,
+                    //            CreatedAt = DateTime.Now,
+                    //            Status = TicketingConString.RequestTicket,
+                    //        };
 
 
-                            foreach (var issueHandler in ticketConcernList)
-                            {
-                                addNewApprover.IssueHandler = issueHandler.UserId;
-                            }
+                    //        foreach (var issueHandler in ticketConcernList)
+                    //        {
+                    //            addNewApprover.IssueHandler = issueHandler.UserId;
+                    //        }
 
-                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
-                        }
-                    }
+                    //        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                    //    }
+                    //}
 
                 }
 

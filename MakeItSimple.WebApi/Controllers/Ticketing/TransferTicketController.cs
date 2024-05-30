@@ -9,8 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
-//using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.UpsertTransferAttachment;
+
 using MakeItSimple.WebApi.Models;
 using MoreLinq.Extensions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -29,7 +28,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             _mediator = mediator;    
         }
 
-        [HttpPost("AddNewTransferTicket")]
+        [HttpPost("add-transfer")]
         public async Task<IActionResult> AddNewTransferTicket([FromForm] AddNewTransferTicketCommand command)
         {
             try
@@ -39,6 +38,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     command.Added_By = userId;
                     command.Transfer_By = userId;
                     command.Requestor_By = userId;
+                    command.Modified_By = userId;   
                 }
 
                 var results = await _mediator.Send(command);
@@ -55,40 +55,17 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPost("UpsertTransferAttachment/{id}")]
-        public async Task<IActionResult> UpsertTransferAttachment([FromForm] UpserTransferAttachmentCommand command , [FromRoute] int id)
-        {
-            try
-            {
-
-                command.RequestTransactionId = id;
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Added_By = userId;
-                    command.Modified_By = userId;
-                    command.Requestor_By= userId;
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-
-            }
-            catch(Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
 
 
-
-        [HttpDelete("CancelTransferTicket")]
+        [HttpDelete("cancel")]
         public async Task<IActionResult> CancelTransferTicket([FromBody] CancelTransferTicketCommand command)
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.Requestor_By = userId;
+                }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

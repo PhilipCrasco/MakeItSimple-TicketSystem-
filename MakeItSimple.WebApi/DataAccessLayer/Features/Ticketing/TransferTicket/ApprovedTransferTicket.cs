@@ -93,6 +93,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         transferTicketExist.TransferBy = command.Transfer_By;
                         transferTicketExist.TransferAt = DateTime.Now;
 
+                        var ticketConcernExist = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.Id == transferTicketExist.TicketConcernId);
+
+                        ticketConcernExist.Remarks = transferTicketExist.RejectRemarks;
+
 
                     }
                 

@@ -241,6 +241,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
                     TicketConcernId = x.Id,
                     RequestConcernId = x.RequestConcernId,
+                    Ticket_No = x.TicketNo,
                     Concern_Description = x.ConcernDetails,
                     Requestor_By = x.RequestorBy,
                     Requestor_Name = x.RequestorByUser.Fullname,
@@ -259,7 +260,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Issue_Handler = x.User.Fullname,
 
                     CategoryId = x.CategoryId,
-                    Category_Description = x.Category.CategoryDescription,
+                    Category_Description = x.Category.CategoryDescription, 
 
                     SubCategoryId = x.SubCategoryId,
                     SubCategory_Description = x.SubCategory.SubCategoryDescription,

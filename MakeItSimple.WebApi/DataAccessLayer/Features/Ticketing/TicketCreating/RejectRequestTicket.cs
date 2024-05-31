@@ -16,6 +16,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             public int TicketConcernId { get; set; }
             public string Role { get; set; }
+            public Guid? Reject_By { get; set; }
             public string Remarks { get; set; }
 
         }
@@ -63,7 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
               
                 requestConcernExist.IsReject = true;
                 requestConcernExist.Remarks = command.Remarks;
-                
+                requestConcernExist.RejectBy = command.Reject_By;
 
                 await _context.SaveChangesAsync(cancellationToken);
 

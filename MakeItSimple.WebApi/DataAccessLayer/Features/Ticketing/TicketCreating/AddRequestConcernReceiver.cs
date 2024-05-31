@@ -190,14 +190,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
-                    if(upsertConcern.IsTransfer is true)
-                    {
-                        upsertConcern.IsTransfer = null;
-                        upsertConcern.TransferAt = null;
-                        upsertConcern.TransferBy =  null;
-                        upsertConcern.Remarks = null;
+                    //if(upsertConcern.IsTransfer is true)
+                    //{
+                    //    upsertConcern.IsTransfer = null;
+                    //    upsertConcern.TransferAt = null;
+                    //    upsertConcern.TransferBy =  null;
+                    //    upsertConcern.Remarks = null;
 
-                    }
+                    //}
 
 
                     var requestUpsertConcern = await _context.RequestConcerns
@@ -295,6 +295,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
 
                     await _context.TicketConcerns.AddAsync(addnewTicketConcern);
+
+                    if(receiverPermissionList.Any(x => x.Contains(command.Role)))
+                    {
+                        addnewTicketConcern.IsApprove = true;
+                    }
 
                 }
 

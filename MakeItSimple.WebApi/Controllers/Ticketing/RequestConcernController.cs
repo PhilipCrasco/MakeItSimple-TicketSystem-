@@ -281,9 +281,22 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
 
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Reject_By = userId;
 
-                var results = await _mediator.Send(command);
+                    }
+                }
+
+                    var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
                     return BadRequest(results);

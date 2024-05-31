@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
 
                 var transferTicketExist = await _context.TransferTicketConcerns
-                .FirstOrDefaultAsync(x => x.RequestTransactionId == command.TransferTicketId);
+                .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId);
 
                 if (transferTicketExist == null)
                 {

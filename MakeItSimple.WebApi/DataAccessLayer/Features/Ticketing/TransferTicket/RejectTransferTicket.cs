@@ -46,11 +46,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 var userRoleList = await _context.UserRoles.ToListAsync();
 
-                var receiverPermission = userRoleList
-                .Where(x => x.Permissions.Contains(TicketingConString.Receiver))
+                var approverPermission = userRoleList
+                .Where(x => x.Permissions.Contains(TicketingConString.Approver))
                 .Select(x => x.UserRoleName);
 
-                if (!receiverPermission.Any(x => x.Contains(command.Role)))
+                if (!approverPermission.Any(x => x.Contains(command.Role)))
                 {
                     return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
                 }
@@ -58,6 +58,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var approverUserList = await _context.ApproverTicketings
                     .Where(x => x.TransferTicketConcernId == transferTicketExist.Id)              
                     .ToListAsync();
+
+                if(!approverUserList.Any())
+                {
+                    return Result.Failure(TransferTicketError.NoApproverExist());
+                }
 
                 foreach (var approverUserId in approverUserList)
                 {

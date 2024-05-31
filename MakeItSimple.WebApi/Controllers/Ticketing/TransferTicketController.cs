@@ -17,7 +17,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketCo
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
-    [Route("api/TransferTicket")]
+    [Route("api/transfer-ticket")]
     [ApiController]
     public class TransferTicketController : ControllerBase
     {
@@ -81,7 +81,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpGet("GetTransferTicket")]
+        [HttpGet("page")]
         public async Task<IActionResult> GetTransferTicket([FromQuery] GetTransferTicketQuery query)
         {
             try
@@ -135,7 +135,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPut("ApprovedTransferTicket")]
+        [HttpPut("approval")]
         public async Task<IActionResult> ApprovedTransferTicket([FromBody] ApprovedTransferTicketCommand command)
         {
             try
@@ -172,7 +172,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPut("RejectTransferTicket")]
+        [HttpPut("reject")]
         public async Task<IActionResult> RejectTransferTicket([FromBody] RejectTransferTicketCommand command)
         {
             try

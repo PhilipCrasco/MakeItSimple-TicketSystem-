@@ -12,11 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
 
             public int? RequestConcernId { get; set; }
-            public List<RequestAttachment> RequestAttachments { get; set; }
-            public class RequestAttachment
-            {
-                public int? TicketAttachmentId { get; set; }
-            }
+
 
         }
         public class Handler : IRequestHandler<CancelRequestConcernCommand, Result>

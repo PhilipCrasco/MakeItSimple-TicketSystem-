@@ -70,7 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.TicketCommentNotExist", "Comment not Exist!");
 
      public static Error UnAuthorizedReceiver() =>
-     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized to approve concern!");
+     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized!");
 
      public static Error NoComment() =>
      new Error("TicketRequest.NoComment", "No comment has been made!");

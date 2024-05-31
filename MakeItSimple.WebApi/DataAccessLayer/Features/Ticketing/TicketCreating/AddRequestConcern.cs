@@ -27,6 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid ? UserId { get; set; }
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
+            public string Remarks { get; set; }
 
             public List<RequestAttachmentsFile> RequestAttachmentsFiles {  get; set; }
 
@@ -63,6 +64,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                 //var requestConcernList = new List<RequestConcern>();
+                var updateRequestList = new List<RequestConcern>();
+                var updateRequestAttachmentList = new List<TicketAttachment>();
                 var ticketConcernList = new List<TicketConcern>();
 
                 var yearSuffix = DateTime.Now.Year % 100;
@@ -105,9 +108,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         ticketConcernExist.ConcernDetails = requestConcernIdExist.Concern;
                     }
 
+                    if (ticketConcernExist.IsReject is true)
+                    {
+                        ticketConcernExist.IsReject = false;
+                        ticketConcernExist.Remarks = null;
+
+                        updateRequestList.Add(requestConcernIdExist);
+                    }
+
                     ticketConcernList.Add(ticketConcernExist);
-
-
 
                 }
                 else
@@ -151,7 +160,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
                     ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
 
-
                     var addTicketHistory = new TicketHistory
                     {
                         TicketConcernId = addTicketConcern.Id,
@@ -165,7 +173,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
 
                 }
-
 
                 var uploadTasks = new List<Task>();
 
@@ -227,6 +234,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     ticketAttachment.FileName = attachments.Attachment.FileName;
                                     ticketAttachment.FileSize = attachments.Attachment.Length;
                                     ticketAttachment.UpdatedAt = DateTime.Now;
+
+                                    if(ticketAttachment != null)
+                                    {
+                                        if (requestConcernIdExist.IsReject is true)
+                                        {
+                                            updateRequestAttachmentList.Add(ticketAttachment);
+                                        }
+                                    }
+
+                                    
                                 }
 
                             }
@@ -239,9 +256,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
+
+
                                 };
 
-                                await _context.AddAsync(addAttachment);
+                                await _context.TicketAttachments.AddAsync(addAttachment);
+
+                                if(requestConcernIdExist != null)
+                                {
+                                    if (requestConcernIdExist.IsReject is true)
+                                    {
+                                        updateRequestAttachmentList.Add(ticketAttachment);
+                                    }
+                                }
+
 
                             }
                      
@@ -249,8 +277,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
                 }
-
                 await Task.WhenAll(uploadTasks);
+
+                if(updateRequestList.Any() || updateRequestAttachmentList.Any())
+                {
+                    requestConcernIdExist.Remarks = command.Remarks;
+                    requestConcernIdExist.IsReject = false;
+                    requestConcernIdExist.RejectBy = null;
+
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

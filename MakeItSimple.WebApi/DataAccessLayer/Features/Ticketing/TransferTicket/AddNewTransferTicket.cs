@@ -68,7 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                 }
 
-                if (ticketConcernExist.IsTransfer is null)
+                if (ticketConcernExist.IsTransfer is not null)
                 {
                     if (ticketConcernExist.IsReDate is false || ticketConcernExist.IsReTicket is false
                         || ticketConcernExist.IsClosedApprove is not null)
@@ -119,6 +119,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var approverUser = approverList
                         .FirstOrDefault(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
 
+                    ticketConcernExist.IsTransfer = false;
 
                     var addTransferTicket = new TransferTicketConcern
                     {
@@ -132,6 +133,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     };
 
                     await _context.TransferTicketConcerns.AddAsync(addTransferTicket);
+
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     foreach (var approver in approverList)
                     {
@@ -245,6 +248,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                 };
 
                                 await _context.AddAsync(addAttachment, cancellationToken);
+
+                                if (transferTicketExist is not null &&transferTicketExist.IsRejectTransfer is true )
+                                {
+                                    updateTicketAttachmentList.Add(ticketAttachment);
+                                }
                             }
 
 

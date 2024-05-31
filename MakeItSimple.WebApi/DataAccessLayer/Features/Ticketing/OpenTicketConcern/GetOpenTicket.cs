@@ -140,7 +140,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     {
                         ticketConcernQuery = ticketConcernQuery
                             .Where(x => x.User.Fullname.Contains(request.Search)
-                        || x.User.SubUnit.SubUnitName.Contains(request.Search));
+                        || x.User.SubUnit.SubUnitName.Contains(request.Search)
+                        || x.TicketNo.Contains(request.Search));
 
                     }
 

@@ -190,6 +190,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
+                    if(upsertConcern.IsTransfer is true)
+                    {
+                        upsertConcern.IsTransfer = null;
+                        upsertConcern.TransferAt = null;
+                        upsertConcern.TransferBy =  null;
+                        upsertConcern.Remarks = null;
+
+                    }
+
+
                     var requestUpsertConcern = await _context.RequestConcerns
                         .Where(x => x.Id == upsertConcern.RequestConcernId)
                          .ToListAsync();

@@ -101,8 +101,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
-                    transferTicketQuery = transferTicketQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                    || x.User.EmpId.Contains(request.Search));
+                    transferTicketQuery = transferTicketQuery
+                        .Where(x => x.User.Fullname.Contains(request.Search)
+                    || x.User.EmpId.Contains(request.Search)
+                    || x.TicketNo.Contains(request.Search));
                 }
 
                 if (request.Status != null)

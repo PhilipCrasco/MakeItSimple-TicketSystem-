@@ -18,7 +18,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestorTicketConcernResult
         {
-            //public int? RequestTransactionId { get; set; }
+            
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
             public int? DepartmentId { get; set; }
@@ -37,7 +37,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public List<TicketRequestConcern> TicketRequestConcerns { get; set; }
             public class TicketRequestConcern
             {
-                //public int? RequestTransactionId { get; set; }
+               
                 public int? TicketConcernId { get; set; }
                 public string Ticket_No { get; set; }
                 public string Concern_Description { get; set; }
@@ -253,7 +253,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                     {
-                        //RequestTransactionId = g.RequestTransactionId,
+                        
                         RequestConcernId = g.Id,
                         Concern = g.Concern,
                         DepartmentId = g.User.DepartmentId,
@@ -271,7 +271,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         TicketRequestConcerns = g.TicketConcerns
                             .Select(tc => new TicketRequestConcern
                             {
-                                //tc.RequestTransactionId,
+                                
                                 TicketConcernId = tc.Id,
                                 Ticket_No = tc.TicketNo,
                                 Concern_Description = tc.ConcernDetails,
@@ -289,6 +289,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Category_Description = tc.Category.CategoryDescription,
                                 SubCategoryId = tc.SubCategoryId,
                                 SubCategory_Description = tc.SubCategory.SubCategoryDescription,
+                                Start_Date = tc.StartDate,
                                 Target_Date = tc.TargetDate,
                                 Remarks = tc.Remarks,
 

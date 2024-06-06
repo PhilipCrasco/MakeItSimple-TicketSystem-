@@ -5,8 +5,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketCo
 using System.Security.Claims;
 using MediatR;
 using MakeItSimple.WebApi.Common;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ReturnOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -67,26 +65,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                 var successResult = Result.Success(result);
                 return Ok(successResult);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpPut("return/{id}")]
-        public async Task<IActionResult> ReturnOpenTicket([FromBody]ReturnOpenTicketCommand command , [FromRoute] int id)
-        {
-            try
-            {
-                command.RequestTransactionId = id;
-
-                var result = await _mediator.Send(command); 
-                if(result.IsFailure) 
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
             }
             catch (Exception ex)
             {

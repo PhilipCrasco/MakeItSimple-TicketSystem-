@@ -7,11 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnedClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicket;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -205,55 +203,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
-
-        [HttpPut("returned")]
-        public async Task<IActionResult> ReturnedClosingTicket([FromBody] ReturnedClosingTicketCommand command)
-        {
-            try
-            {
-
-                if (User.Identity is ClaimsIdentity identity)
-                {
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.UserId = userId;
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpDelete("cancel")]
-        public async Task<IActionResult> CancelClosingTicket([FromBody] CancelClosingTicketCommand command)
-        {
-            try
-            {
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
 
 
     }

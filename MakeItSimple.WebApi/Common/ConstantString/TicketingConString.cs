@@ -64,7 +64,7 @@
 
 
 
-
+        public const string TicketClosed = "Ticket Closed";
 
         public const string RequestApproval = "For approval by ";
 

@@ -30,7 +30,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(CancelTicketConcernCommand command, CancellationToken cancellationToken)
             {
 
-
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 

@@ -208,15 +208,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             var attachmentsParams = new RawUploadParams
                             {
-                                File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}"
+                                File = new FileDescription(attachments.Attachment.FileName , stream),
+                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}",
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
 
                             string attachmentUrl = attachmentResult.SecureUrl.ToString();
                             string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
-
 
                             if (ticketAttachment != null)
                             {
@@ -242,8 +241,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                             updateRequestAttachmentList.Add(ticketAttachment);
                                         }
                                     }
-
-                                    
                                 }
 
                             }
@@ -277,7 +274,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
                 }
-                await Task.WhenAll(uploadTasks);
+
 
                 if(updateRequestList.Any() || updateRequestAttachmentList.Any())
                 {
@@ -286,6 +283,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     requestConcernIdExist.RejectBy = null;
 
                 }
+
+                await Task.WhenAll(uploadTasks);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

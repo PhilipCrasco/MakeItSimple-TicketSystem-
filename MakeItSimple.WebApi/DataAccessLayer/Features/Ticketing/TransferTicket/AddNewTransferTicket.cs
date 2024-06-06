@@ -39,8 +39,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         {
             private readonly MisDbContext _context;
             private readonly Cloudinary _cloudinary;
+            private readonly TransformUrl _url;
 
-            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options, TransformUrl url)
             {
                 _context = context;
                 var account = new Account(
@@ -49,6 +50,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     options.Value.ApiSecret
                     );
                 _cloudinary = new Cloudinary(account);
+                _url = url;
             }
 
             public async Task<Result> Handle(AddNewTransferTicketCommand command, CancellationToken cancellationToken)
@@ -209,6 +211,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+                            string attachmentUrl = attachmentResult.SecureUrl.ToString();
+                            string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
 
                             if (ticketAttachment is not null)
                             {

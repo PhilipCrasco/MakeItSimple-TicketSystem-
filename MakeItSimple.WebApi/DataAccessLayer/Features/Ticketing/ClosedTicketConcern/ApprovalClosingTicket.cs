@@ -20,11 +20,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public List<ApproveClosingRequest> ApproveClosingRequests { get; set; }
 
            public class ApproveClosingRequest
-            {
+           {
                 public int? TicketTransactionId { get; set; }
-            }
-        }
+           }
 
+        }
         public class Handler : IRequestHandler<ApproveClosingTicketCommand, Result>
         {
             private readonly MisDbContext _context;
@@ -43,9 +43,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
-                var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
-
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
@@ -58,13 +55,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     {
                         return Result.Failure(ClosingTicketError.TicketIdNotExist());
                     }
-
-                    var ticketHistoryList = await _context.TicketHistories
-                        .Where(x => x.TicketTransactionId == close.TicketTransactionId)
-                        .ToListAsync();
-
-                    var ticketHistoryId = ticketHistoryList
-                        .FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     var userClosedTicket = await _context.ClosingTickets
                         .Include(x => x.User)
@@ -80,18 +70,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     if (selectClosedRequestId != null)
                     {
-                        selectClosedRequestId.IsApprove = true;
 
-                        if (!approverPermissionList.Any(x => x.Contains(command.Role)))
+                        if (userClosedTicket.First().TicketApprover != command.Users 
+                            || !approverPermissionList.Any(x => x.Contains(command.Role)))
                         {
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                         }
 
-                      if ( userClosedTicket.First().TicketApprover != command.Users)
-                      {
-                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                      }
-
+                        selectClosedRequestId.IsApprove = true;
 
                         var userApprovalId = await _context.ApproverTicketings
                             .Where(x => x.TicketTransactionId == selectClosedRequestId.TicketTransactionId)
@@ -100,7 +86,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         foreach( var concernTicket in userClosedTicket)
                         {
 
-                            var validateUserApprover = userApprovalId.FirstOrDefault(x => x.ApproverLevel == selectClosedRequestId.ApproverLevel + 1);
+                            var validateUserApprover = userApprovalId
+                                .FirstOrDefault(x => x.ApproverLevel == selectClosedRequestId.ApproverLevel + 1);
 
                             if (validateUserApprover != null)
                             {
@@ -110,24 +97,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             {
                                 concernTicket.TicketApprover = null;
                             }
+
+                            var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st"
+                                : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd"
+                                : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
+                                : $"{selectClosedRequestId.ApproverLevel}th";
+
+                            var addTicketHistory = new TicketHistory
+                            {
+                                TicketConcernId = concernTicket.TicketConcernId,
+                                ApproverBy = command.Approver_By,
+                                RequestorBy = userClosedTicket.First().AddedBy,
+                                TransactionDate = DateTime.Now,
+                                Request = TicketingConString.CloseTicket,
+                                Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
+                            };
+
+                            await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
                         }
 
-                        var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st" 
-                            : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd" 
-                            : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
-                            : $"{selectClosedRequestId.ApproverLevel}th";
-
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketTransactionId = requestTicketExist.Id,
-                            ApproverBy = command.Approver_By,
-                            RequestorBy = userClosedTicket.First().AddedBy,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.CloseTicket,
-                            Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
-                        };
-
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
                     }
                     else
                     {
@@ -143,47 +132,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 concernTicket.ClosingAt = DateTime.Now;
                                 concernTicket.ClosedBy = command.Closed_By;
 
-                                var concernTicketById = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == concernTicket.TicketConcernId, cancellationToken);
+                                var ticketConcernExist = await _context.TicketConcerns
+                                    .FirstOrDefaultAsync(x => x.Id == concernTicket.TicketConcernId, cancellationToken);
 
-                                concernTicketById.IsClosedApprove = true;
-                                concernTicketById.Closed_At = DateTime.Now;
-                                concernTicketById.ClosedApproveBy = command.Closed_By;
-                                concernTicketById.IsDone = true;
-                                concernTicketById.Remarks = TicketingConString.CloseTicket;
-                                concernTicketById.ConcernStatus = TicketingConString.Done;
+                                ticketConcernExist.IsClosedApprove = true;
+                                ticketConcernExist.Closed_At = DateTime.Now;
+                                ticketConcernExist.ClosedApproveBy = command.Closed_By;
+                                ticketConcernExist.IsDone = true;
+                                ticketConcernExist.Remarks = TicketingConString.TicketClosed;
+                                ticketConcernExist.ConcernStatus = TicketingConString.Done;
 
-                                var requestConcernCloseList = await _context.TicketConcerns
-                                    .Where(x => x.RequestTransactionId == concernTicketById.RequestTransactionId 
-                                    && x.IsClosedApprove == true && x.RequestConcernId != null)
-                                    .ToListAsync();
+                                var requestConcernExist = await _context.RequestConcerns
+                                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
-                                var requestConcernList = await _context.TicketConcerns
-                                    .Where(x => x.RequestTransactionId == concernTicketById.RequestTransactionId 
-                                    && x.RequestConcernId != null).ToListAsync();
-
-                                if (requestConcernCloseList.Count() == requestConcernList.Count())
-                                {
-
-                                    var requestConcernSelect = requestConcernCloseList.Select(x => x.RequestConcernId);
-                                    var requestConcern = await _context.RequestConcerns.Where(x => requestConcernSelect.Contains(x.Id)).ToListAsync();
-                                    
-                                    foreach ( var request in requestConcern)
-                                    {
-                                        request.ConcernStatus = TicketingConString.Done;
-                                        request.IsDone = true;
-                                       
-                                    }
-
-                                }
+                                requestConcernExist.IsDone = false;
+                                requestConcernExist.ConcernStatus = TicketingConString.Done;
 
                             }
 
-                            if (ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
+                            foreach(var concernTicket in userClosedTicket)
                             {
 
                                 var addTicketHistory = new TicketHistory
                                 {
-                                    TicketTransactionId = requestTicketExist.Id,
+                                    TicketConcernId = concernTicket.TicketConcernId,
                                     ApproverBy = command.Approver_By,
                                     RequestorBy = userClosedTicket.First().AddedBy,
                                     TransactionDate = DateTime.Now,
@@ -192,7 +164,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 };
 
                                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
                             }
+
                         }
                         else
                         {

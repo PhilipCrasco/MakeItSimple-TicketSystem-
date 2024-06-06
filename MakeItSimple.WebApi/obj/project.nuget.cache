@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "rAW7dnWuRHd54q171xMHEAddGKw9VeDztlcydb+E0v7/jAvK0pm8BUDKRhUYjr26Yuu5PbAPoVvaz2pDqjrjFg==",
+  "dgSpecHash": "dcod2NVt3ozl9kVLG+JawKdP2WOUTpyMkUEANL2ItDLo5mmOALTjP004fmPxJE3P/ojFl9AKcuAq9l9lbdAqLQ==",
   "success": true,
   "projectFilePath": "C:\\PhilipCrasco\\Projects\\MakeItSimple-TicketSystem-\\MakeItSimple.WebApi\\MakeItSimple.WebApi.csproj",
   "expectedPackageFiles": [
@@ -147,7 +147,7 @@
     "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.visualstudio.web.codegeneration.utils\\7.0.11\\microsoft.visualstudio.web.codegeneration.utils.7.0.11.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.visualstudio.web.codegenerators.mvc\\7.0.11\\microsoft.visualstudio.web.codegenerators.mvc.7.0.11.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.win32.primitives\\4.3.0\\microsoft.win32.primitives.4.3.0.nupkg.sha512",
-    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\morelinq\\4.1.0\\morelinq.4.1.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\mysql.data\\8.0.11\\mysql.data.8.0.11.nupkg.sha512",
@@ -205,7 +205,7 @@
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.diagnostics.diagnosticsource\\6.0.0\\system.diagnostics.diagnosticsource.6.0.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.diagnostics.tools\\4.3.0\\system.diagnostics.tools.4.3.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.diagnostics.tracing\\4.3.0\\system.diagnostics.tracing.4.3.0.nupkg.sha512",
-    "C:\\Users\\pcrasco\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.formats.asn1\\5.0.0\\system.formats.asn1.5.0.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.globalization\\4.3.0\\system.globalization.4.3.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.globalization.calendars\\4.3.0\\system.globalization.calendars.4.3.0.nupkg.sha512",
@@ -270,7 +270,11 @@
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.threading.timer\\4.3.0\\system.threading.timer.4.3.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\pcrasco\\.nuget\\packages\\system.xml.readerwriter\\4.3.0\\system.xml.readerwriter.4.3.0.nupkg.sha512",
-    "C:\\Users\\pcrasco\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512"
+    "C:\\Users\\pcrasco\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.18\\microsoft.windowsdesktop.app.ref.7.0.18.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.18\\microsoft.netcore.app.ref.7.0.18.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.18\\microsoft.aspnetcore.app.ref.7.0.18.nupkg.sha512",
+    "C:\\Users\\pcrasco\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\7.0.18\\microsoft.netcore.app.host.win-x64.7.0.18.nupkg.sha512"
   ],
   "logs": [
     {

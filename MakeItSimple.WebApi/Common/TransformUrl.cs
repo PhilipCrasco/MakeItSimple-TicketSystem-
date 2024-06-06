@@ -4,6 +4,9 @@ using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace MakeItSimple.WebApi.Common
 {
@@ -39,6 +42,9 @@ namespace MakeItSimple.WebApi.Common
             return url;
 
         }
+
+
+
 
 
 

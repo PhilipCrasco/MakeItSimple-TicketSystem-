@@ -245,7 +245,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         }
                     }
-
+ 
 
                     await Task.WhenAll(uploadTasks);
 

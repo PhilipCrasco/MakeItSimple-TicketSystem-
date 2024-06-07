@@ -45,122 +45,119 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
-                //foreach (var close in command.ApproveClosingRequests)
-                //{
+                foreach (var close in command.ApproveClosingRequests)
+                {
 
-                //    var closingTicketExist = await _context.ClosingTickets
-                //        .FirstOrDefaultAsync(x => x.Id == close.ClosingTicketId);
+                    var closingTicketExist = await _context.ClosingTickets
+                        .Include(x =>  x.TicketConcern)
+                        .ThenInclude(x => x.User)
+                        .FirstOrDefaultAsync(x => x.Id == close.ClosingTicketId);  
 
-                //    var closedRequestId = await _context.ApproverTicketings
-                //        .Where(x => x.ClosingTicketId == closingTicketExist.Id && x.IsApprove == null)
-                //        .ToListAsync();
+                    var closedRequestId = await _context.ApproverTicketings
+                        .Where(x => x.ClosingTicketId == closingTicketExist.Id && x.IsApprove == null)
+                        .ToListAsync();
 
-                //    var selectClosedRequestId = closedRequestId
-                //        .FirstOrDefault(x => x.ApproverLevel == closedRequestId.Min(x => x.ApproverLevel));
+                    var selectClosedRequestId = closedRequestId
+                        .FirstOrDefault(x => x.ApproverLevel == closedRequestId.Min(x => x.ApproverLevel));
 
-                //    if (selectClosedRequestId != null)
-                //    {
+                    if (selectClosedRequestId != null)
+                    {
 
-                //        if (closingTicketExist.TicketApprover != command.Users 
-                //            || !approverPermissionList.Any(x => x.Contains(command.Role)))
-                //        {
-                //            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                //        }
+                        if (closingTicketExist.TicketApprover != command.Users
+                            || !approverPermissionList.Any(x => x.Contains(command.Role)))
+                        {
+                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                        }
 
-                //        selectClosedRequestId.IsApprove = true;
+                        selectClosedRequestId.IsApprove = true;
 
-                //        var userApprovalId = await _context.ApproverTicketings
-                //            .Where(x => x.ClosingTicketId == selectClosedRequestId.ClosingTicketId)
-                //            .ToListAsync();
+                        var userApprovalId = await _context.ApproverTicketings
+                            .Where(x => x.ClosingTicketId == selectClosedRequestId.ClosingTicketId)
+                            .ToListAsync();
 
-                //        var validateUserApprover = userApprovalId
-                //            .FirstOrDefault(x => x.ApproverLevel == selectClosedRequestId.ApproverLevel + 1);
+                        var validateUserApprover = userApprovalId
+                            .FirstOrDefault(x => x.ApproverLevel == selectClosedRequestId.ApproverLevel + 1);
 
-                //        if (validateUserApprover != null)
-                //        {
-                //            concernTicket.TicketApprover = validateUserApprover.UserId;
-                //        }
-                //        else
-                //        {
-                //            concernTicket.TicketApprover = null;
-                //        }
+                        if (validateUserApprover != null)
+                        {
+                            closingTicketExist.TicketApprover = validateUserApprover.UserId;
+                        }
+                        else
+                        {
+                            closingTicketExist.TicketApprover = null;
+                        }
 
-                //        var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st"
-                //            : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd"
-                //            : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
-                //            : $"{selectClosedRequestId.ApproverLevel}th";
+                        var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st"
+                            : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd"
+                            : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
+                            : $"{selectClosedRequestId.ApproverLevel}th";
 
-                //        var addTicketHistory = new TicketHistory
-                //        {
-                //            TicketConcernId = concernTicket.TicketConcernId,
-                //            ApproverBy = command.Approver_By,
-                //            RequestorBy = userClosedTicket.First().AddedBy,
-                //            TransactionDate = DateTime.Now,
-                //            Request = TicketingConString.CloseTicket,
-                //            Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
-                //        };
+                        var addTicketHistory = new TicketHistory
+                        {
+                            TicketConcernId = closingTicketExist.TicketConcernId,
+                            ApproverBy = command.Approver_By,
+                            RequestorBy = closingTicketExist.AddedBy,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.CloseTicket,
+                            Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
+                        };
 
-                //        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                //    }
-                //    else
-                //    {
-                //        var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == userClosedTicket.First().User.BusinessUnitId);
-                //        var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
+                    }
+                    else
+                    {
+                        var businessUnitList = await _context.BusinessUnits
+                            .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcern.User.BusinessUnitId);
 
-                //        if (receiverList.UserId == command.Users && receiverPermissionList.Any(x => x.Contains(command.Role)))
-                //        {
+                        var receiverList = await _context.Receivers
+                            .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
 
-                //            foreach (var concernTicket in userClosedTicket)
-                //            {
-                //                concernTicket.IsClosing = true;
-                //                concernTicket.ClosingAt = DateTime.Now;
-                //                concernTicket.ClosedBy = command.Closed_By;
+                        if (receiverList.UserId == command.Users && receiverPermissionList.Any(x => x.Contains(command.Role)))
+                        {
 
-                //                var ticketConcernExist = await _context.TicketConcerns
-                //                    .FirstOrDefaultAsync(x => x.Id == concernTicket.TicketConcernId, cancellationToken);
+                            closingTicketExist.IsClosing = true;
+                            closingTicketExist.ClosingAt = DateTime.Now;
+                            closingTicketExist.ClosedBy = command.Closed_By;
 
-                //                ticketConcernExist.IsClosedApprove = true;
-                //                ticketConcernExist.Closed_At = DateTime.Now;
-                //                ticketConcernExist.ClosedApproveBy = command.Closed_By;
-                //                ticketConcernExist.IsDone = true;
-                //                ticketConcernExist.Remarks = TicketingConString.TicketClosed;
-                //                ticketConcernExist.ConcernStatus = TicketingConString.Done;
+                            var ticketConcernExist = await _context.TicketConcerns
+                                .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcernId, cancellationToken);
 
-                //                var requestConcernExist = await _context.RequestConcerns
-                //                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
+                            ticketConcernExist.IsClosedApprove = true;
+                            ticketConcernExist.Closed_At = DateTime.Now;
+                            ticketConcernExist.ClosedApproveBy = command.Closed_By;
+                            ticketConcernExist.IsDone = true;
+                            ticketConcernExist.Remarks = TicketingConString.TicketClosed;
+                            ticketConcernExist.ConcernStatus = TicketingConString.Done;
 
-                //                requestConcernExist.IsDone = false;
-                //                requestConcernExist.ConcernStatus = TicketingConString.Done;
+                            var requestConcernExist = await _context.RequestConcerns
+                                .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
-                //            }
+                            requestConcernExist.IsDone = false;
+                            requestConcernExist.ConcernStatus = TicketingConString.Done;
 
-                //            foreach (var concernTicket in userClosedTicket)
-                //            {
 
-                //                var addTicketHistory = new TicketHistory
-                //                {
-                //                    TicketConcernId = concernTicket.TicketConcernId,
-                //                    ApproverBy = command.Approver_By,
-                //                    RequestorBy = userClosedTicket.First().AddedBy,
-                //                    TransactionDate = DateTime.Now,
-                //                    Request = TicketingConString.CloseTicket,
-                //                    Status = TicketingConString.ReceiverApproveBy
-                //                };
+                            var addTicketHistory = new TicketHistory
+                            {
+                                TicketConcernId = closingTicketExist.TicketConcernId,
+                                ApproverBy = command.Approver_By,
+                                RequestorBy = closingTicketExist.AddedBy,
+                                TransactionDate = DateTime.Now,
+                                Request = TicketingConString.CloseTicket,
+                                Status = TicketingConString.ReceiverApproveBy
+                            };
 
-                //                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                            await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                //            }
+                        }
+                        else
+                        {
+                            return Result.Failure(ClosingTicketError.ApproverUnAuthorized());
+                        }
 
-                //        }
-                //        else
-                //        {
-                //            return Result.Failure(ClosingTicketError.ApproverUnAuthorized());
-                //        }
-                         
-                //    }
-                 
-                //}
+                    }
+
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

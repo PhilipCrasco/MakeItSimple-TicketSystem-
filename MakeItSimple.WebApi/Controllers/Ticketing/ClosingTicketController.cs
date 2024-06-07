@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
 
@@ -138,7 +139,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 return Conflict(ex.Message);
             }
-        } 
+        }
 
         [HttpPut("reject")]
         public async Task<IActionResult> RejectClosingTicket([FromBody] RejectClosingTicketCommand command)
@@ -162,6 +163,34 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 }
                 return Ok(results);
 
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+
+        [HttpDelete("cancel")]
+        public async Task<IActionResult> CancelClosingTicket([FromBody] CancelClosingTicketCommand command)
+        {
+            try
+            {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Requestor_By = userId;
+                    }
+                }
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
             }
             catch (Exception ex)
             {

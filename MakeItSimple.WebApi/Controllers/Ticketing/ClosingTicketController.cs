@@ -8,9 +8,7 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.UpsertClosingTicket;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -38,6 +36,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
                     command.Added_By = userId;
                     command.Requestor_By = userId;
+                    command.Modified_By = userId;
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -47,40 +46,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Ok(results);
             }
             catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpPost("upsert/{id}")]
-        public async Task<IActionResult> UpsertClosingTicket([FromBody] UpsertClosingTicketCommand command , [FromRoute] int id)
-        {
-            try
-            {
-                command.TicketTransactionId = id;
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.Modified_By = userId;
-                        command.Added_By = userId;
-                        command.Requestor_By = userId;
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch(Exception ex)
             {
                 return Conflict(ex.Message);
             }

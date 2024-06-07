@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnedClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.ApproveReTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.CancelReTicket;

@@ -44,6 +44,7 @@
         public Guid? TicketApprover { get; set; }
 
         public ICollection<ApproverTicketing> ApproverTickets { get; set; }
+        public ICollection<TicketAttachment> TicketAttachments { get; set; }
 
 
 

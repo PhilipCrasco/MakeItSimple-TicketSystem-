@@ -145,7 +145,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
                             .ToList();
 
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.Id);
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TransferTicketConcernId);
 
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
 

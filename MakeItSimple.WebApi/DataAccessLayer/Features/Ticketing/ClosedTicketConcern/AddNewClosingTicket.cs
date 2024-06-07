@@ -18,16 +18,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         public class AddNewClosingTicketCommand : IRequest<Result>
         {
             public string Closed_Remarks { get; set; }
+            public  Guid ? Modified_By { get; set; }
             public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
-
-            public List<AddClosingTicketConcern> AddClosingTicketConcerns { get; set; }
+            public int ? TicketConcernId { get; set; }
+            public int? ClosingTicketId { get; set; }
+            public string Resolution { get; set; } 
             public List<AddClosingAttachment> AddClosingAttachments { get; set; }
-
-            public class AddClosingTicketConcern
-            {
-                public int TicketConcernId { get; set; }
-            }
 
             public class AddClosingAttachment
             {
@@ -57,54 +54,97 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 public async Task<Result> Handle(AddNewClosingTicketCommand command, CancellationToken cancellationToken)
                 {
 
-                    var ticketConcernList = new List<TicketConcern>();
-                    var ticketTransactionExist = new TicketTransaction { IsActive = true };
+                    var userDetails = await _context.Users
+                       .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
 
-                    await _context.TicketTransactions.AddAsync(ticketTransactionExist, cancellationToken);
+                    var ticketConcernExist = await _context.TicketConcerns
+                        .Include(x => x.User)
+                        .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 
-                     var userDetails = await _context.Users
-                        .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
-
-                    foreach (var close in command.AddClosingTicketConcerns)
+                    if (ticketConcernExist == null)
                     {
-                        var ticketConcernExist = await _context.TicketConcerns
-                            .Include(x => x.User)
-                            .FirstOrDefaultAsync(x => x.Id == close.TicketConcernId, cancellationToken);
+                        return Result.Failure(ClosingTicketError.TicketConcernIdNotExist());
+                    }
 
-                        if (ticketConcernExist == null)
+                    var closingTicketExist = await _context.ClosingTickets
+                        .FirstOrDefaultAsync(x => x.Id == command.ClosingTicketId);
+
+                    if (closingTicketExist is not null)
+                    {
+
+                        bool IsChanged = false;
+
+                        if(closingTicketExist.Resolution != command.Resolution)
                         {
-                            return Result.Failure(ClosingTicketError.TicketConcernIdNotExist());
+                            closingTicketExist.Resolution = command.Resolution;
+                            IsChanged = true;
                         }
 
+                        if(IsChanged)
+                        {
+                            closingTicketExist.ModifiedBy  = command.Modified_By;
+                            closingTicketExist.UpdatedAt = DateTime.Now;
+                        }
+
+
+                    }
+                    else
+                    {
+
                         var approverByUser = await _context.Users
-                            .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.UserId, cancellationToken);
+                                .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.UserId, cancellationToken);
 
                         var approverList = await _context.Approvers
                             .Where(x => x.SubUnitId == approverByUser.SubUnitId)
                             .ToListAsync();
-                        
-                        if(approverList.Count() < 0)
+
+                        if (approverList.Count() < 0)
                         {
                             return Result.Failure(ClosingTicketError.NoApproverHasSetup());
                         }
-
-                        ticketConcernList.Add(ticketConcernExist);
-                        await _context.SaveChangesAsync(cancellationToken);
 
                         var approverUser = approverList.First(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
 
                         var addNewClosingConcern = new ClosingTicket
                         {
                             TicketConcernId = ticketConcernExist.Id,
-                            TicketTransactionId = ticketTransactionExist.Id,
+                            Resolution = command.Resolution,
                             IsClosing = false,
                             TicketApprover = approverUser.UserId,
                             AddedBy = command.Added_By
                         };
 
                         await _context.ClosingTickets.AddAsync(addNewClosingConcern);
+                        await _context.SaveChangesAsync(cancellationToken);
 
                         ticketConcernExist.IsClosedApprove = false;
+                        closingTicketExist = addNewClosingConcern;
+
+                        var getApprover = await _context.Approvers
+                        .Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
+                        .ToListAsync();
+
+                        if (getApprover == null)
+                        {
+                            return Result.Failure(TransferTicketError.NoApproverExist());
+                        }
+
+                        foreach (var approver in getApprover)
+                        {
+                            var addNewApprover = new ApproverTicketing
+                            {
+                                TicketConcernId = ticketConcernExist.Id,
+                                ClosingTicketId = addNewClosingConcern.Id,
+                                UserId = approver.UserId,
+                                ApproverLevel = approver.ApproverLevel,
+                                AddedBy = command.Added_By,
+                                CreatedAt = DateTime.Now,
+                                Status = TicketingConString.CloseTicket,
+
+                            };
+
+                            await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                        }
 
                         var addTicketHistory = new TicketHistory
                         {
@@ -116,7 +156,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
                     }
+
+
 
                     var uploadTasks = new List<Task>();
 
@@ -161,46 +204,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 string attachmentUrl = attachmentResult.SecureUrl.ToString();
                                 string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
 
-                                var addAttachment = new TicketAttachment
+                                if (ticketAttachment != null)
                                 {
-                                    TicketTransactionId = ticketTransactionExist.Id,
-                                    Attachment = attachmentResult.SecureUrl.ToString(),
-                                    FileName = attachments.Attachment.FileName,
-                                    FileSize = attachments.Attachment.Length,
-                                    AddedBy = command.Added_By,
-                                };
+                                    var hasChanged = false;
 
-                                await _context.AddAsync(addAttachment, cancellationToken);
+                                    if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
+                                    {
+                                        ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
+                                        hasChanged = true;
+                                    }
+
+                                    if (hasChanged)
+                                    {
+                                        ticketAttachment.ModifiedBy = command.Modified_By;
+                                        ticketAttachment.FileName = attachments.Attachment.FileName;
+                                        ticketAttachment.FileSize = attachments.Attachment.Length;
+                                        ticketAttachment.UpdatedAt = DateTime.Now;
+
+                                    }
+
+                                }
+                                else
+                                {
+                                    var addAttachment = new TicketAttachment
+                                    {
+                                        ClosingTicketId = closingTicketExist.Id,
+                                        Attachment = attachmentResult.SecureUrl.ToString(),
+                                        FileName = attachments.Attachment.FileName,
+                                        FileSize = attachments.Attachment.Length,
+                                        AddedBy = command.Added_By,
+
+                                    };
+
+                                    await _context.TicketAttachments.AddAsync(addAttachment);
+
+                                }
 
 
                             }, cancellationToken));
 
                         }
-                    }
-
-                    var getApprover = await _context.Approvers
-                    .Where(x => x.SubUnitId == ticketConcernList.First().User.SubUnitId)
-                    .ToListAsync();
-
-                    if (getApprover == null)
-                    {
-                        return Result.Failure(TransferTicketError.NoApproverExist());
-                    }
-
-                    foreach (var approver in getApprover)
-                    {
-                        var addNewApprover = new ApproverTicketing
-                        {
-                            TicketTransactionId = ticketTransactionExist.Id,
-                            UserId = approver.UserId,
-                            ApproverLevel = approver.ApproverLevel,
-                            AddedBy = command.Added_By,
-                            CreatedAt = DateTime.Now,
-                            Status = TicketingConString.CloseTicket,
-
-                        };
-
-                        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                     }
 
 

@@ -56,7 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public int? SubCategoryId { get; set; }
                 public string SubCategory_Description { get; set; }
                 public DateTime? Start_Date { get; set; }
-                public DateTime? Target_Date { get; set; }
+                public DateTime ? Target_Date { get; set; }
                 public string Ticket_Status { get; set; }
                 public bool ? Is_Assigned { get; set; }
                 //public string Concern_Status {  get; set; }
@@ -137,7 +137,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         requestConcernsQuery = requestConcernsQuery
                             .Where(x => x.User.Fullname.Contains(request.Search)
-                            || x.Id .ToString().Contains(request.Search));
+                            || x.Id.ToString().Contains(request.Search));
                     }
 
                     if (request.Status != null)

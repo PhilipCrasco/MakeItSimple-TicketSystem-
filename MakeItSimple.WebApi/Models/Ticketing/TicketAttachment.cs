@@ -15,7 +15,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string Attachment { get; set; }
 
         public string FileName { get; set; }
-        public decimal ? FileSize { get; set; }
+        public decimal? FileSize { get; set; }
 
         public int? RequestTransactionId { get; set; }
         public virtual RequestTransaction RequestTransaction { get; set; }
@@ -23,8 +23,21 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int? TicketTransactionId { get; set; }
         public virtual TicketTransaction TicketTransaction { get; set; }
 
-        public int ?  TicketConcernId { get; set; }
+        public int? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
+
+        public int? ClosingTicketId { get; set; }
+        public virtual ClosingTicket ClosingTicket { get; }
+
+        public int? TransferTicketConcernId { get; set; }
+        public virtual TransferTicketConcern TransferTicketConcern { get; set; }
+
+        public int? TicketReDateId { get; set; }
+        public virtual TicketReDate TicketReDate { get; set; }
+
+        public int ? ReTicketConcernId { get; set; }
+        public virtual  ReTicketConcern ReTicketConcern { get; set; }
+
 
     }
 }

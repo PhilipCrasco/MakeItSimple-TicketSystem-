@@ -122,22 +122,6 @@
           }
         }
       },
-      "Google.Protobuf/3.5.1": {
-        "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        },
-        "compile": {
-          "lib/netstandard1.0/Google.Protobuf.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard1.0/Google.Protobuf.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "Humanizer/2.14.1": {
         "type": "package",
         "dependencies": {
@@ -2053,24 +2037,6 @@
           "buildTransitive/net6.0/Microsoft.Extensions.Logging.Abstractions.targets": {}
         }
       },
-      "Microsoft.Extensions.Logging.Console/1.1.1": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "1.1.1",
-          "Microsoft.Extensions.Logging.Abstractions": "1.1.1",
-          "NETStandard.Library": "1.6.1"
-        },
-        "compile": {
-          "lib/netstandard1.3/Microsoft.Extensions.Logging.Console.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard1.3/Microsoft.Extensions.Logging.Console.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "Microsoft.Extensions.Options/7.0.1": {
         "type": "package",
         "dependencies": {
@@ -2296,13 +2262,6 @@
           }
         }
       },
-      "Microsoft.VisualStudio.Azure.Containers.Tools.Targets/1.19.5": {
-        "type": "package",
-        "build": {
-          "build/Microsoft.VisualStudio.Azure.Containers.Tools.Targets.props": {},
-          "build/Microsoft.VisualStudio.Azure.Containers.Tools.Targets.targets": {}
-        }
-      },
       "Microsoft.VisualStudio.Web.CodeGeneration/7.0.11": {
         "type": "package",
         "dependencies": {
@@ -2440,23 +2399,23 @@
           }
         }
       },
-      "Microsoft.Win32.SystemEvents/7.0.0": {
+      "Microsoft.Win32.SystemEvents/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/net7.0/Microsoft.Win32.SystemEvents.dll": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/Microsoft.Win32.SystemEvents.dll": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "related": ".xml"
           }
         },
         "build": {
-          "buildTransitive/net6.0/_._": {}
+          "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/net7.0/Microsoft.Win32.SystemEvents.dll": {
+          "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2472,69 +2431,6 @@
         },
         "runtime": {
           "lib/netstandard2.0/Mono.TextTemplating.dll": {}
-        }
-      },
-      "morelinq/4.1.0": {
-        "type": "package",
-        "compile": {
-          "lib/net6.0/MoreLinq.dll": {
-            "related": ".pdb;.xml"
-          }
-        },
-        "runtime": {
-          "lib/net6.0/MoreLinq.dll": {
-            "related": ".pdb;.xml"
-          }
-        }
-      },
-      "MySql.Data/8.0.11": {
-        "type": "package",
-        "dependencies": {
-          "Google.Protobuf": "3.5.1",
-          "System.Configuration.ConfigurationManager": "4.4.0",
-          "System.Security.Permissions": "4.4.0",
-          "System.Text.Encoding.CodePages": "4.0.1"
-        },
-        "compile": {
-          "lib/netcoreapp2.0/MySql.Data.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netcoreapp2.0/MySql.Data.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "MySql.EntityFrameworkCore/7.0.10": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "7.0.10",
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.10",
-          "MySql.Data": "7.0.10"
-        },
-        "compile": {
-          "lib/net7.0/MySql.EntityFrameworkCore.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net7.0/MySql.EntityFrameworkCore.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "MySqlConnector/2.2.5": {
-        "type": "package",
-        "compile": {
-          "lib/net7.0/MySqlConnector.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net7.0/MySqlConnector.dll": {
-            "related": ".xml"
-          }
         }
       },
       "NETStandard.Library/1.6.1": {
@@ -2707,40 +2603,6 @@
         },
         "runtime": {
           "lib/netstandard2.0/NuGet.Versioning.dll": {}
-        }
-      },
-      "Pomelo.EntityFrameworkCore.MySql/7.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.2",
-          "MySqlConnector": "2.2.5"
-        },
-        "compile": {
-          "lib/net7.0/Pomelo.EntityFrameworkCore.MySql.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net7.0/Pomelo.EntityFrameworkCore.MySql.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Pomelo.EntityFrameworkCore.MySql.Design/1.1.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational.Design": "1.1.1",
-          "Microsoft.Extensions.DependencyInjection": "1.1.0",
-          "Microsoft.Extensions.Logging.Console": "1.1.1",
-          "MySqlConnector": "0.19.2",
-          "NETStandard.Library": "1.6.1",
-          "Pomelo.EntityFrameworkCore.MySql": "1.1.2"
-        },
-        "compile": {
-          "lib/netstandard1.3/Pomelo.EntityFrameworkCore.MySql.Design.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.3/Pomelo.EntityFrameworkCore.MySql.Design.dll": {}
         }
       },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {
@@ -3279,26 +3141,30 @@
           }
         }
       },
-      "System.Drawing.Common/7.0.0": {
+      "System.Drawing.Common/6.0.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Win32.SystemEvents": "7.0.0"
+          "Microsoft.Win32.SystemEvents": "6.0.0"
         },
         "compile": {
-          "lib/net7.0/System.Drawing.Common.dll": {
+          "lib/net6.0/System.Drawing.Common.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/System.Drawing.Common.dll": {
+          "lib/net6.0/System.Drawing.Common.dll": {
             "related": ".xml"
           }
         },
         "build": {
-          "buildTransitive/net6.0/_._": {}
+          "buildTransitive/netcoreapp3.1/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/net7.0/System.Drawing.Common.dll": {
+          "runtimes/unix/lib/net6.0/System.Drawing.Common.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/net6.0/System.Drawing.Common.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -4709,21 +4575,6 @@
         "lib/netstandard2.0/FluentValidation.DependencyInjectionExtensions.xml",
         "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll",
         "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.xml"
-      ]
-    },
-    "Google.Protobuf/3.5.1": {
-      "sha512": "f2k1VNaB9bfvEsvARzzEL1TZiIpL33KKK3JMH7UANlPlJVptuvsk4qpBZEnz0pORWZOdUHlVwMQuUzFqjJYCxA==",
-      "type": "package",
-      "path": "google.protobuf/3.5.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "google.protobuf.3.5.1.nupkg.sha512",
-        "google.protobuf.nuspec",
-        "lib/net45/Google.Protobuf.dll",
-        "lib/net45/Google.Protobuf.xml",
-        "lib/netstandard1.0/Google.Protobuf.dll",
-        "lib/netstandard1.0/Google.Protobuf.xml"
       ]
     },
     "Humanizer/2.14.1": {
@@ -7329,21 +7180,6 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Logging.Console/1.1.1": {
-      "sha512": "oKfmQdH7c89QyFvolNhwIU3AME0LXOo89DTNbu0c3+b42/0UkJi3fT4Jz6Pg8AY38yYYP7lH/MFVxmbRqiUmhw==",
-      "type": "package",
-      "path": "microsoft.extensions.logging.console/1.1.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net451/Microsoft.Extensions.Logging.Console.dll",
-        "lib/net451/Microsoft.Extensions.Logging.Console.xml",
-        "lib/netstandard1.3/Microsoft.Extensions.Logging.Console.dll",
-        "lib/netstandard1.3/Microsoft.Extensions.Logging.Console.xml",
-        "microsoft.extensions.logging.console.1.1.1.nupkg.sha512",
-        "microsoft.extensions.logging.console.nuspec"
-      ]
-    },
     "Microsoft.Extensions.Options/7.0.1": {
       "sha512": "pZRDYdN1FpepOIfHU62QoBQ6zdAoTvnjxFfqAzEd9Jhb2dfhA5i6jeTdgGgcgTWFRC7oT0+3XrbQu4LjvgX1Nw==",
       "type": "package",
@@ -7678,87 +7514,6 @@
         "lib/netstandard2.0/Microsoft.SqlServer.Server.xml",
         "microsoft.sqlserver.server.1.0.0.nupkg.sha512",
         "microsoft.sqlserver.server.nuspec"
-      ]
-    },
-    "Microsoft.VisualStudio.Azure.Containers.Tools.Targets/1.19.5": {
-      "sha512": "Kaa1rBZdJFq5A0qgAcl6Bmk/UqLXTq9acEqxUlPEBA8oscmakLfkvuSXfG7Wa9t1/keaT85EuuDNgOo+Z9VYOQ==",
-      "type": "package",
-      "path": "microsoft.visualstudio.azure.containers.tools.targets/1.19.5",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "CHANGELOG.md",
-        "EULA.md",
-        "ThirdPartyNotices.txt",
-        "build/Container.props",
-        "build/Container.targets",
-        "build/Microsoft.VisualStudio.Azure.Containers.Tools.Targets.props",
-        "build/Microsoft.VisualStudio.Azure.Containers.Tools.Targets.targets",
-        "build/Rules/GeneralBrowseObject.xaml",
-        "build/Rules/cs-CZ/GeneralBrowseObject.xaml",
-        "build/Rules/de-DE/GeneralBrowseObject.xaml",
-        "build/Rules/es-ES/GeneralBrowseObject.xaml",
-        "build/Rules/fr-FR/GeneralBrowseObject.xaml",
-        "build/Rules/it-IT/GeneralBrowseObject.xaml",
-        "build/Rules/ja-JP/GeneralBrowseObject.xaml",
-        "build/Rules/ko-KR/GeneralBrowseObject.xaml",
-        "build/Rules/pl-PL/GeneralBrowseObject.xaml",
-        "build/Rules/pt-BR/GeneralBrowseObject.xaml",
-        "build/Rules/ru-RU/GeneralBrowseObject.xaml",
-        "build/Rules/tr-TR/GeneralBrowseObject.xaml",
-        "build/Rules/zh-CN/GeneralBrowseObject.xaml",
-        "build/Rules/zh-TW/GeneralBrowseObject.xaml",
-        "build/ToolsTarget.props",
-        "build/ToolsTarget.targets",
-        "icon.png",
-        "microsoft.visualstudio.azure.containers.tools.targets.1.19.5.nupkg.sha512",
-        "microsoft.visualstudio.azure.containers.tools.targets.nuspec",
-        "tools/Microsoft.VisualStudio.Containers.Tools.Common.dll",
-        "tools/Microsoft.VisualStudio.Containers.Tools.Shared.dll",
-        "tools/Microsoft.VisualStudio.Containers.Tools.Tasks.dll",
-        "tools/Newtonsoft.Json.dll",
-        "tools/System.Security.Principal.Windows.dll",
-        "tools/cs/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/cs/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/cs/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/de/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/de/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/de/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/es/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/es/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/es/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/fr/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/fr/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/fr/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/it/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/it/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/it/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/ja/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/ja/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/ja/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/ko/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/ko/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/ko/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/pl/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/pl/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/pl/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/pt-BR/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/pt-BR/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/pt-BR/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/ru/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/ru/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/ru/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/tr/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/tr/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/tr/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/utils/KillProcess.exe",
-        "tools/zh-Hans/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/zh-Hans/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/zh-Hans/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll",
-        "tools/zh-Hant/Microsoft.VisualStudio.Containers.Tools.Common.resources.dll",
-        "tools/zh-Hant/Microsoft.VisualStudio.Containers.Tools.Shared.resources.dll",
-        "tools/zh-Hant/Microsoft.VisualStudio.Containers.Tools.Tasks.resources.dll"
       ]
     },
     "Microsoft.VisualStudio.Web.CodeGeneration/7.0.11": {
@@ -8360,34 +8115,32 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "Microsoft.Win32.SystemEvents/7.0.0": {
-      "sha512": "2nXPrhdAyAzir0gLl8Yy8S5Mnm/uBSQQA7jEsILOS1MTyS7DbmV1NgViMtvV1sfCD1ebITpNwb1NIinKeJgUVQ==",
+    "Microsoft.Win32.SystemEvents/6.0.0": {
+      "sha512": "hqTM5628jSsQiv+HGpiq3WKBl2c8v1KZfby2J6Pr7pEPlK9waPdgEO6b8A/+/xn/yZ9ulv8HuqK71ONy2tg67A==",
       "type": "package",
-      "path": "microsoft.win32.systemevents/7.0.0",
+      "path": "microsoft.win32.systemevents/6.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Win32.SystemEvents.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
         "buildTransitive/netcoreapp2.0/Microsoft.Win32.SystemEvents.targets",
-        "lib/net462/Microsoft.Win32.SystemEvents.dll",
-        "lib/net462/Microsoft.Win32.SystemEvents.xml",
+        "buildTransitive/netcoreapp3.1/_._",
+        "lib/net461/Microsoft.Win32.SystemEvents.dll",
+        "lib/net461/Microsoft.Win32.SystemEvents.xml",
         "lib/net6.0/Microsoft.Win32.SystemEvents.dll",
         "lib/net6.0/Microsoft.Win32.SystemEvents.xml",
-        "lib/net7.0/Microsoft.Win32.SystemEvents.dll",
-        "lib/net7.0/Microsoft.Win32.SystemEvents.xml",
+        "lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll",
+        "lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.xml",
         "lib/netstandard2.0/Microsoft.Win32.SystemEvents.dll",
         "lib/netstandard2.0/Microsoft.Win32.SystemEvents.xml",
-        "microsoft.win32.systemevents.7.0.0.nupkg.sha512",
+        "microsoft.win32.systemevents.6.0.0.nupkg.sha512",
         "microsoft.win32.systemevents.nuspec",
         "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll",
         "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.xml",
-        "runtimes/win/lib/net7.0/Microsoft.Win32.SystemEvents.dll",
-        "runtimes/win/lib/net7.0/Microsoft.Win32.SystemEvents.xml",
+        "runtimes/win/lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll",
+        "runtimes/win/lib/netcoreapp3.1/Microsoft.Win32.SystemEvents.xml",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -8402,90 +8155,6 @@
         "lib/netstandard2.0/Mono.TextTemplating.dll",
         "mono.texttemplating.2.2.1.nupkg.sha512",
         "mono.texttemplating.nuspec"
-      ]
-    },
-    "morelinq/4.1.0": {
-      "sha512": "tkUeXp5dWNVP47MIhVEsIQk4DaN2oM/owIAnHblNOiwDQ5RB7oKreqZ7a+z+AEdyNgzLSkj6Pv0D0rY6Gh1/Ng==",
-      "type": "package",
-      "path": "morelinq/4.1.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "COPYING.txt",
-        "README.md",
-        "lib/net6.0/MoreLinq.dll",
-        "lib/net6.0/MoreLinq.pdb",
-        "lib/net6.0/MoreLinq.xml",
-        "lib/net8.0/MoreLinq.dll",
-        "lib/net8.0/MoreLinq.pdb",
-        "lib/net8.0/MoreLinq.xml",
-        "lib/netstandard2.0/MoreLinq.dll",
-        "lib/netstandard2.0/MoreLinq.pdb",
-        "lib/netstandard2.0/MoreLinq.xml",
-        "lib/netstandard2.1/MoreLinq.dll",
-        "lib/netstandard2.1/MoreLinq.pdb",
-        "lib/netstandard2.1/MoreLinq.xml",
-        "morelinq.4.1.0.nupkg.sha512",
-        "morelinq.nuspec"
-      ]
-    },
-    "MySql.Data/8.0.11": {
-      "sha512": "P5zKcnM2SVtdHD6gfReymJguIYLhNL5Og8Qm5TC9MEsSupsAYrRu4AB4nsbalrjqqv8VHBqVREWsXg9lY+q03A==",
-      "type": "package",
-      "path": "mysql.data/8.0.11",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net452/MySql.Data.dll",
-        "lib/net452/MySql.Data.xml",
-        "lib/netcoreapp2.0/MySql.Data.dll",
-        "lib/netcoreapp2.0/MySql.Data.xml",
-        "lib/netstandard1.6/MySql.Data.dll",
-        "lib/netstandard1.6/MySql.Data.xml",
-        "lib/netstandard2.0/MySql.Data.dll",
-        "lib/netstandard2.0/MySql.Data.xml",
-        "mysql.data.8.0.11.nupkg.sha512",
-        "mysql.data.nuspec"
-      ]
-    },
-    "MySql.EntityFrameworkCore/7.0.10": {
-      "sha512": "PuAFmYC8Fuf14TkOiw/8dydBN6rW5xj6ZFneSvJ3GzpuBbpoP09pN5/U5If9IjjirxIpJNT4LCCvZOKAqEa3qg==",
-      "type": "package",
-      "path": "mysql.entityframeworkcore/7.0.10",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net7.0/MySql.EntityFrameworkCore.dll",
-        "lib/net7.0/MySql.EntityFrameworkCore.xml",
-        "mysql.entityframeworkcore.7.0.10.nupkg.sha512",
-        "mysql.entityframeworkcore.nuspec"
-      ]
-    },
-    "MySqlConnector/2.2.5": {
-      "sha512": "6sinY78RvryhHwpup3awdjYO7d5hhWahb5p/1VDODJhSxJggV/sBbYuKK5IQF9TuzXABiddqUbmRfM884tqA3Q==",
-      "type": "package",
-      "path": "mysqlconnector/2.2.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "lib/net461/MySqlConnector.dll",
-        "lib/net461/MySqlConnector.xml",
-        "lib/net471/MySqlConnector.dll",
-        "lib/net471/MySqlConnector.xml",
-        "lib/net6.0/MySqlConnector.dll",
-        "lib/net6.0/MySqlConnector.xml",
-        "lib/net7.0/MySqlConnector.dll",
-        "lib/net7.0/MySqlConnector.xml",
-        "lib/netcoreapp3.1/MySqlConnector.dll",
-        "lib/netcoreapp3.1/MySqlConnector.xml",
-        "lib/netstandard2.0/MySqlConnector.dll",
-        "lib/netstandard2.0/MySqlConnector.xml",
-        "lib/netstandard2.1/MySqlConnector.dll",
-        "lib/netstandard2.1/MySqlConnector.xml",
-        "logo.png",
-        "mysqlconnector.2.2.5.nupkg.sha512",
-        "mysqlconnector.nuspec"
       ]
     },
     "NETStandard.Library/1.6.1": {
@@ -8668,36 +8337,6 @@
         "lib/netstandard2.0/NuGet.Versioning.dll",
         "nuget.versioning.6.6.1.nupkg.sha512",
         "nuget.versioning.nuspec"
-      ]
-    },
-    "Pomelo.EntityFrameworkCore.MySql/7.0.0": {
-      "sha512": "Qk5WB/skSZet5Yrz6AN2ywjZaB1pxfAmvQ+5I4khTkLwwIamI4QJoH2NphCWLFQL+2ar8HvsNCTmwYk0qhqL0w==",
-      "type": "package",
-      "path": "pomelo.entityframeworkcore.mysql/7.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "icon.png",
-        "lib/net6.0/Pomelo.EntityFrameworkCore.MySql.dll",
-        "lib/net6.0/Pomelo.EntityFrameworkCore.MySql.xml",
-        "lib/net7.0/Pomelo.EntityFrameworkCore.MySql.dll",
-        "lib/net7.0/Pomelo.EntityFrameworkCore.MySql.xml",
-        "pomelo.entityframeworkcore.mysql.7.0.0.nupkg.sha512",
-        "pomelo.entityframeworkcore.mysql.nuspec"
-      ]
-    },
-    "Pomelo.EntityFrameworkCore.MySql.Design/1.1.2": {
-      "sha512": "Hzq1gPtZ3+1zuNhOAQea8Q7j6iX0FjRwNp5S30+X0jBdATiLEJvlfQi4wuVQDS5Y2ClYICGynNqAJUR3EtgA5g==",
-      "type": "package",
-      "path": "pomelo.entityframeworkcore.mysql.design/1.1.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net451/Pomelo.EntityFrameworkCore.MySql.Design.dll",
-        "lib/netstandard1.3/Pomelo.EntityFrameworkCore.MySql.Design.dll",
-        "pomelo.entityframeworkcore.mysql.design.1.1.2.nupkg.sha512",
-        "pomelo.entityframeworkcore.mysql.design.nuspec"
       ]
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {
@@ -9718,39 +9357,41 @@
         "system.diagnostics.tracing.nuspec"
       ]
     },
-    "System.Drawing.Common/7.0.0": {
-      "sha512": "KIX+oBU38pxkKPxvLcLfIkOV5Ien8ReN78wro7OF5/erwcmortzeFx+iBswlh2Vz6gVne0khocQudGwaO1Ey6A==",
+    "System.Drawing.Common/6.0.0": {
+      "sha512": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
       "type": "package",
-      "path": "system.drawing.common/7.0.0",
+      "path": "system.drawing.common/6.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/System.Drawing.Common.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
         "buildTransitive/netcoreapp2.0/System.Drawing.Common.targets",
+        "buildTransitive/netcoreapp3.1/_._",
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
-        "lib/net462/System.Drawing.Common.dll",
-        "lib/net462/System.Drawing.Common.xml",
+        "lib/net461/System.Drawing.Common.dll",
+        "lib/net461/System.Drawing.Common.xml",
         "lib/net6.0/System.Drawing.Common.dll",
         "lib/net6.0/System.Drawing.Common.xml",
-        "lib/net7.0/System.Drawing.Common.dll",
-        "lib/net7.0/System.Drawing.Common.xml",
+        "lib/netcoreapp3.1/System.Drawing.Common.dll",
+        "lib/netcoreapp3.1/System.Drawing.Common.xml",
         "lib/netstandard2.0/System.Drawing.Common.dll",
         "lib/netstandard2.0/System.Drawing.Common.xml",
         "lib/xamarinios10/_._",
         "lib/xamarinmac20/_._",
         "lib/xamarintvos10/_._",
         "lib/xamarinwatchos10/_._",
+        "runtimes/unix/lib/net6.0/System.Drawing.Common.dll",
+        "runtimes/unix/lib/net6.0/System.Drawing.Common.xml",
+        "runtimes/unix/lib/netcoreapp3.1/System.Drawing.Common.dll",
+        "runtimes/unix/lib/netcoreapp3.1/System.Drawing.Common.xml",
         "runtimes/win/lib/net6.0/System.Drawing.Common.dll",
         "runtimes/win/lib/net6.0/System.Drawing.Common.xml",
-        "runtimes/win/lib/net7.0/System.Drawing.Common.dll",
-        "runtimes/win/lib/net7.0/System.Drawing.Common.xml",
-        "system.drawing.common.7.0.0.nupkg.sha512",
+        "runtimes/win/lib/netcoreapp3.1/System.Drawing.Common.dll",
+        "runtimes/win/lib/netcoreapp3.1/System.Drawing.Common.xml",
+        "system.drawing.common.6.0.0.nupkg.sha512",
         "system.drawing.common.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -12978,15 +12619,9 @@
       "Microsoft.EntityFrameworkCore.Tools >= 7.0.14",
       "Microsoft.Extensions.Caching.SqlServer >= 7.0.14",
       "Microsoft.Extensions.DependencyInjection >= 8.0.0",
-      "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.19.5",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 7.0.11",
-      "MySql.EntityFrameworkCore >= 7.0.10",
-      "Pomelo.EntityFrameworkCore.MySql >= 7.0.0",
-      "Pomelo.EntityFrameworkCore.MySql.Design >= 1.1.2",
       "Swashbuckle.AspNetCore >= 6.5.0",
-      "System.Drawing.Common >= 7.0.0",
-      "System.IdentityModel.Tokens.Jwt >= 7.0.3",
-      "morelinq >= 4.1.0"
+      "System.IdentityModel.Tokens.Jwt >= 7.0.3"
     ]
   },
   "packageFolders": {
@@ -13113,41 +12748,17 @@
             "target": "Package",
             "version": "[8.0.0, )"
           },
-          "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
-            "target": "Package",
-            "version": "[1.19.5, )"
-          },
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[7.0.11, )"
-          },
-          "MySql.EntityFrameworkCore": {
-            "target": "Package",
-            "version": "[7.0.10, )"
-          },
-          "Pomelo.EntityFrameworkCore.MySql": {
-            "target": "Package",
-            "version": "[7.0.0, )"
-          },
-          "Pomelo.EntityFrameworkCore.MySql.Design": {
-            "target": "Package",
-            "version": "[1.1.2, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[6.5.0, )"
           },
-          "System.Drawing.Common": {
-            "target": "Package",
-            "version": "[7.0.0, )"
-          },
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
             "version": "[7.0.3, )"
-          },
-          "morelinq": {
-            "target": "Package",
-            "version": "[4.1.0, )"
           }
         },
         "imports": [
@@ -13192,16 +12803,6 @@
     }
   },
   "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "MySql.EntityFrameworkCore 7.0.10 depends on MySql.Data (>= 7.0.10) but MySql.Data 7.0.10 was not found. An approximate best match of MySql.Data 8.0.11 was resolved.",
-      "libraryId": "MySql.Data",
-      "targetGraphs": [
-        "net7.0"
-      ]
-    },
     {
       "code": "NU1902",
       "level": "Warning",

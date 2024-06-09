@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Packaging.Core;
+using System.Configuration;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
 
@@ -21,6 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
+            public string Resolution { get; set; }
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
             public Guid? RequestorId { get; set; }
@@ -33,6 +35,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
             public DateTime? updated_At { get; set; }
+            public bool? Is_Confirmed { get; set; }
+            public DateTime ? Confirmed_At { get; set; }
 
             public List<TicketRequestConcern> TicketRequestConcerns { get; set; }
             public class TicketRequestConcern
@@ -68,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime? Updated_At { get; set; }
                 public bool Is_Active { get; set; }
                 public bool Is_Reject { get; set; }
+                public DateTime ? Closed_At { get; set; }
 
             }
 
@@ -78,7 +83,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             //public string Requestor { get; set; }
             //public string Approver { get; set; }
             public string UserType {  get; set; }
-
             public string Role { get; set; }
             public Guid? UserId { get; set; }
             public string Concern_Status { get; set; }
@@ -86,7 +90,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public bool? Status { get; set; }
             public bool ? Is_Reject { get; set; }
             public bool ? Is_Approve { get; set; }
-
             public bool? Ascending { get; set; }
         }
 
@@ -101,7 +104,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                    IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
+                int daysDif = 7;
+                var dateToday = DateTime.Today;
+
+                IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
                     .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
@@ -249,29 +255,31 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
-                }
+                 }
 
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
-                    {
-                        
-                        RequestConcernId = g.Id,
-                        Concern = g.Concern,
-                        DepartmentId = g.User.DepartmentId,
-                        Department_Name = g.User.Department.DepartmentName,
-                        RequestorId = g.UserId,
-                        EmpId = g.User.EmpId,
-                        FullName = g.User.Fullname,
-                        Concern_Status = g.ConcernStatus,
-                        Is_Done = g.IsDone,
-                        Remarks = g.Remarks,
-                        Added_By = g.AddedByUser.Fullname,
-                        Created_At = g.CreatedAt,
-                        Modified_By = g.ModifiedByUser.Fullname,
-                        updated_At = g.UpdatedAt,
-                        TicketRequestConcerns = g.TicketConcerns
+                {
+                    RequestConcernId = g.Id,
+                    Concern = g.Concern,
+                    Resolution = g.Resolution,
+                    DepartmentId = g.User.DepartmentId,
+                    Department_Name = g.User.Department.DepartmentName,
+                    RequestorId = g.UserId,
+                    EmpId = g.User.EmpId,
+                    FullName = g.User.Fullname,
+                    Concern_Status = g.ConcernStatus,
+                    Is_Done = g.IsDone,
+                    Remarks = g.Remarks,
+                    Added_By = g.AddedByUser.Fullname,
+                    Created_At = g.CreatedAt,
+                    Modified_By = g.ModifiedByUser.Fullname,
+                    updated_At = g.UpdatedAt,
+                    Is_Confirmed = g.Is_Confirm,
+                    Confirmed_At = g.Confirm_At,
+                    TicketRequestConcerns = g.TicketConcerns
                             .Select(tc => new TicketRequestConcern
                             {
-                                
+
                                 TicketConcernId = tc.Id,
                                 Ticket_No = tc.TicketNo,
                                 Concern_Description = tc.ConcernDetails,
@@ -296,7 +304,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Concern_Type = tc.TicketType,
 
                                 Ticket_Status = tc.IsApprove == true ? "Ticket Approve" : tc.IsReject ? "Rejected" :
-                                tc.ConcernStatus != TicketingConString.ForApprovalTicket ? tc.ConcernStatus 
+                                tc.ConcernStatus != TicketingConString.ForApprovalTicket ? tc.ConcernStatus
                                 : tc.IsApprove == false && tc.IsReject == false ? "For Approval" : "Unknown",
 
                                 Is_Assigned = tc.IsAssigned,
@@ -306,15 +314,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Updated_At = tc.UpdatedAt,
                                 Is_Active = tc.IsActive,
                                 Is_Reject = tc.IsReject,
+                                Closed_At = tc.Closed_At,
 
                             }).ToList()
 
-                    });
+                });
+
+                var confirmConcernList = results.Where(x => x.Is_Confirmed == null && x.Is_Done == true)
+                    .ToList();
+
+                foreach(var confirmConcern in confirmConcernList)
+                {
+                    var daysClose = EF.Functions.DateDiffDay(confirmConcern.TicketRequestConcerns.First().Closed_At.Value, dateToday);
+
+                    if (daysClose == daysDif)
+                    {
+                        confirmConcern.Is_Confirmed = true;
+                        confirmConcern.Confirmed_At = DateTime.Today ;
+                    }
+
+                }
 
 
-               return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
-
-
+                return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }
     }

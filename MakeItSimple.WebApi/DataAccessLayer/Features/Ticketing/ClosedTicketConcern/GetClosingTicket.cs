@@ -4,11 +4,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq.Extensions;
-using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {

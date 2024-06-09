@@ -1,16 +1,9 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using MakeItSimple.WebApi.Common.ConstantString;
+﻿using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Any;
-using MoreLinq;
-using System.Transactions;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket.GetTransferTicketResult;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {

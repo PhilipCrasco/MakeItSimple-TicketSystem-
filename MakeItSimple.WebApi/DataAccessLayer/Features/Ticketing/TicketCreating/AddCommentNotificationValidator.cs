@@ -4,7 +4,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq.Experimental;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {

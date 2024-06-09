@@ -136,7 +136,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             requestConcernExist.IsDone = false;
                             requestConcernExist.ConcernStatus = TicketingConString.Done;
 
-
                             var addTicketHistory = new TicketHistory
                             {
                                 TicketConcernId = closingTicketExist.TicketConcernId,

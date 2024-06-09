@@ -3,8 +3,6 @@ using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq.Experimental;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {

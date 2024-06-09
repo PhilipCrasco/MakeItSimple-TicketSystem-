@@ -26,6 +26,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public string Remarks { get; set; }
 
+        public string Resolution { get; set; }
+        public bool ? Is_Confirm { get; set; }
+        public DateTime ? Confirm_At { get; set; }
+
         public int? RequestTransactionId { get; set; }
         public virtual RequestTransaction RequestTransaction { get; set; }
         public ICollection<TicketConcern> TicketConcerns { get; set; }

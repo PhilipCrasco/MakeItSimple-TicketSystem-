@@ -32,7 +32,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 public IFormFile Attachment { get; set; }
 
             }
-
+             
             public class Handler : IRequestHandler<AddNewClosingTicketCommand, Result>
             {
                 private readonly MisDbContext _context;
@@ -80,12 +80,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             IsChanged = true;
                         }
 
-                        if(IsChanged)
+                        if (IsChanged)
                         {
-                            closingTicketExist.ModifiedBy  = command.Modified_By;
+                            closingTicketExist.ModifiedBy = command.Modified_By;
                             closingTicketExist.UpdatedAt = DateTime.Now;
                         }
-
 
                     }
                     else
@@ -158,7 +157,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                     }
-
 
 
                     var uploadTasks = new List<Task>();

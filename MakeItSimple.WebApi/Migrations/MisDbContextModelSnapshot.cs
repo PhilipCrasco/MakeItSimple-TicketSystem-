@@ -1369,6 +1369,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern_status");
 
+                    b.Property<DateTime?>("Confirm_At")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("confirm_at");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
@@ -1385,6 +1389,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_reject");
 
+                    b.Property<bool?>("Is_Confirm")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_confirm");
+
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
@@ -1400,6 +1408,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<int?>("RequestTransactionId")
                         .HasColumnType("int")
                         .HasColumnName("request_transaction_id");
+
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("resolution");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
@@ -1523,6 +1535,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_ticket_attachments_added_by");
+
+                    b.HasIndex("ClosingTicketId")
+                        .HasDatabaseName("ix_ticket_attachments_closing_ticket_id");
 
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_ticket_attachments_modified_by");
@@ -2829,7 +2844,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_approver_ticketings_channels_channel_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", "ClosingTicket")
-                        .WithMany()
+                        .WithMany("ApproverTickets")
                         .HasForeignKey("ClosingTicketId")
                         .HasConstraintName("fk_approver_ticketings_closing_tickets_closing_ticket_id");
 
@@ -3117,6 +3132,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_attachments_users_added_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", null)
+                        .WithMany("TicketAttachments")
+                        .HasForeignKey("ClosingTicketId")
+                        .HasConstraintName("fk_ticket_attachments_closing_tickets_closing_ticket_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
@@ -3124,7 +3144,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_ticket_attachments_users_modified_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", "ReTicketConcern")
-                        .WithMany()
+                        .WithMany("TicketAttachments")
                         .HasForeignKey("ReTicketConcernId")
                         .HasConstraintName("fk_ticket_attachments_re_ticket_concerns_re_ticket_concern_id");
 
@@ -3139,7 +3159,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_ticket_attachments_ticket_concerns_ticket_concern_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketReDate", "TicketReDate")
-                        .WithMany()
+                        .WithMany("TicketAttachments")
                         .HasForeignKey("TicketReDateId")
                         .HasConstraintName("fk_ticket_attachments_ticket_re_dates_ticket_re_date_id");
 
@@ -3149,7 +3169,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_ticket_attachments_ticket_transactions_ticket_transaction_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", "TransferTicketConcern")
-                        .WithMany()
+                        .WithMany("TicketAttachments")
                         .HasForeignKey("TransferTicketConcernId")
                         .HasConstraintName("fk_ticket_attachments_transfer_ticket_concerns_transfer_ticket_concern_id");
 
@@ -3658,9 +3678,18 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", b =>
+                {
+                    b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", b =>
                 {
                     b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", b =>
@@ -3702,6 +3731,8 @@ namespace MakeItSimple.WebApi.Migrations
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketReDate", b =>
                 {
                     b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransaction", b =>
@@ -3722,6 +3753,8 @@ namespace MakeItSimple.WebApi.Migrations
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
                 {
                     b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>

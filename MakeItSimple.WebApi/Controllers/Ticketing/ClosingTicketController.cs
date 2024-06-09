@@ -29,7 +29,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddNewClosingTicket([FromBody] AddNewClosingTicketCommand command)
+        public async Task<IActionResult> AddNewClosingTicket([FromForm] AddNewClosingTicketCommand command)
         {
             try
             {

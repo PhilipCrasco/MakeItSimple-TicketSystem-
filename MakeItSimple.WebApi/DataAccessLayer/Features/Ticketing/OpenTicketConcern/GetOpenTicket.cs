@@ -4,14 +4,10 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket.GetOpenTicketResult;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern
 {
     public class GetOpenTicket
     {
-
         public class GetOpenTicketResult
         {
 
@@ -75,15 +71,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
         {
             public string Search { get; set; }
             public bool? Status { get; set; }
-            //public bool? IsClosedApprove { get; set; }
-            //public bool ? Is_Approve { get; set; }
-            //public bool ? Is_Transfer { get; set; }
-            //public bool ? Is_ReTicket { get; set; }
-            //public bool ? Is_ReDate { get; set; }
-
             public string Concern_Status { get; set; }
-
-
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
@@ -191,16 +179,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                             case TicketingConString.NotConfirm:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null );
                                 break;
 
                             case TicketingConString.Closed:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
+                                    .Where(x => x.IsClosedApprove == true && 
+                                    (x.RequestConcern.Is_Confirm == null || x.RequestConcern.Is_Confirm == true));
                                 break;
+
                             default:
                                 return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
-
 
                         }
                     }

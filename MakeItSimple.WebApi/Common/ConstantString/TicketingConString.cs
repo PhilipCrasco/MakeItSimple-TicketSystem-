@@ -41,7 +41,7 @@
 
         public const string Concern = "Concern";
         public const string Manual = "Manual";
-        public const string RequestTicket = "Request Ticket";
+        public const string RequestTicket = "Request Ticket";  
 
         public const string ForReticket = "For Re-Ticket";
         public const string ForClosing = "For Closing Ticket";
@@ -61,6 +61,7 @@
         public const string Closed = "Closed";
         public const string Transfer = "Transfer";
         public const string Request = "Request Concern";
+        public const string NotConfirm = "Closed/Not Confirmed";
 
 
 

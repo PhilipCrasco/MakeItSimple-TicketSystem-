@@ -9,7 +9,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketCo
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
-    [Route("api/open-Ticket")]
+    [Route("api/open-ticket")]
     [ApiController]
     public class OpenTicketController : ControllerBase
     {

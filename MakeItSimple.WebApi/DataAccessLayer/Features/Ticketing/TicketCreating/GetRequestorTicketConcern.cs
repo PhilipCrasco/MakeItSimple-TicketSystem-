@@ -104,7 +104,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                int daysDif = 7;
+                int daysDif = 1; 
                 var dateToday = DateTime.Today;
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
@@ -121,7 +121,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .ThenInclude(x => x.Channel)
                      .ThenInclude(x => x.ChannelUsers);
 
-                 if (requestConcernsQuery.Count() > 0)
+                 if (requestConcernsQuery.Any())
                  {
 
                     var allUserList = await _context.UserRoles.ToListAsync();
@@ -129,7 +129,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var receiverPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
-                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                     var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
 
                     var requestorPermissionList = allUserList.Where(x => x.Permissions
@@ -176,10 +176,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if (request.Concern_Status != null)
                     {
-                        var ticketStatusList = await _context.TicketConcerns
-                            .Where(x => x.IsApprove == false)
-                            .Select(x => x.RequestConcernId)
-                            .ToListAsync();
+                        //var ticketStatusList = await _context.TicketConcerns
+                        //    .Where(x => x.IsApprove == false)
+                        //    .Select(x => x.RequestConcernId)
+                        //    .ToListAsync();
 
                         switch (request.Concern_Status)
                         {
@@ -187,7 +187,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         
                             case TicketingConString.Approval:
                                 requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket 
-                                || ticketStatusList.Contains(x.Id));
+                                /*|| ticketStatusList.Contains(x.Id)*/);
                                 break;
                             case TicketingConString.OnGoing:
                                 requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
@@ -197,7 +197,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 break;
                             default:
                                 return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
-                                break;
+                                
                         }
                     }
 
@@ -216,7 +216,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         }
 
-                         if (request.UserType == TicketingConString.Receiver )
+                         if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
                          {
 
                             var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
@@ -312,6 +312,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Created_At = tc.CreatedAt,
                                 Modified_By = tc.ModifiedByUser.Fullname,
                                 Updated_At = tc.UpdatedAt,
+
                                 Is_Active = tc.IsActive,
                                 Is_Reject = tc.IsReject,
                                 Closed_At = tc.Closed_At,

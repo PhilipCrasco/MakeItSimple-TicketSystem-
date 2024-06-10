@@ -75,12 +75,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
         {
             public string Search { get; set; }
             public bool? Status { get; set; }
-            public bool? IsClosedApprove { get; set; }
-            public bool ? Is_Approve { get; set; }
-            public bool ? Is_Transfer { get; set; }
-            public bool ? Is_ReTicket { get; set; }
+            //public bool? IsClosedApprove { get; set; }
+            //public bool ? Is_Approve { get; set; }
+            //public bool ? Is_Transfer { get; set; }
+            //public bool ? Is_ReTicket { get; set; }
+            //public bool ? Is_ReDate { get; set; }
 
-            public bool ? Is_ReDate { get; set; }
+            public string Concern_Status { get; set; }
+
+
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
@@ -98,7 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public async Task<PagedList<GetOpenTicketResult>> Handle(GetOpenTicketQuery request, CancellationToken cancellationToken)
             {
-                var dateToday = DateTime.UtcNow;
+                var dateToday = DateTime.Today;
 
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
                     .Include(x => x.AddedByUser)
@@ -110,7 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .ThenInclude(x => x.SubUnit);
 
 
-                if (ticketConcernQuery.Count() > 0)
+                if (ticketConcernQuery.Any())
                 {
                     var businessUnitList = await _context.BusinessUnits
                         .FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
@@ -150,42 +153,66 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Status);
                     }
 
-                    if(request.Is_Approve != null)
+                    if(!string.IsNullOrEmpty(request.Concern_Status))
                     {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsApprove == request.Is_Approve);
+                        switch(request.Concern_Status)
+                        {
+                            case TicketingConString.PendingRequest :
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsApprove == false);
+                                break;
+
+                            case TicketingConString.Open:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
+                                    && x.IsReTicket != false && x.IsClosedApprove == null);
+                                break;
+
+                            case TicketingConString.ForTransfer:
+
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsTransfer == false);
+                                break;
+
+                            case TicketingConString.ForReticket:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsReTicket == false);
+                                break;
+
+                            case TicketingConString.ForReDate:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsReDate == false);
+                                break;
+
+                            case TicketingConString.ForClosing:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == false);
+                                break;
+
+                            case TicketingConString.NotConfirm:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                break;
+
+                            case TicketingConString.Closed:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
+                                break;
+                            default:
+                                return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
+
+
+                        }
                     }
-
-                    if(request.Is_ReDate != null)
-                    {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsReDate == request.Is_ReDate);
-                    }
-
-                    if (request.Is_Transfer != null)
-                    {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsTransfer == request.Is_Transfer);
-                    }
-
-                    if (request.Is_ReTicket != null)
-                    {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Is_ReTicket);
-                    }
-
-                    if (request.IsClosedApprove == true)
-                    {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsClosedApprove == true);
-                    }
-
-
 
                     if (!string.IsNullOrEmpty(request.UserType))
                     {
+
                         if (request.UserType == TicketingConString.IssueHandler)
                         {
-                            
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
                         }
-
-                        if (request.UserType == TicketingConString.Support)
+                        else if (request.UserType == TicketingConString.Support)
                         {
                             if (supportPermissionList.Any(x => x.Contains(request.Role)))
                             {
@@ -204,9 +231,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             }
 
                         }
-
-
-                        if (request.UserType == TicketingConString.Receiver && receiverList != null)
+                        else if (request.UserType == TicketingConString.Receiver && receiverList != null)
                         {
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && request.UserId == receiverList.UserId)
                             {
@@ -222,13 +247,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId)
                                     && requestorSelect.Contains(x.Id));
-
                             }
                             else
                             {
                                 return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
                             }
 
+                        }
+                        else
+                        {
+                            return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
                         }
                     }
                     
@@ -269,13 +297,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Start_Date = x.StartDate,
                     Target_Date = x.TargetDate,
 
-
                     Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
                                         : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
                                         : x.IsTransfer == false ? TicketingConString.ForTransfer
                                         : x.IsReTicket == false ? TicketingConString.ForReticket
                                         : x.IsReDate == false ? TicketingConString.ForReDate
-                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing 
+                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing
+                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
+                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true? TicketingConString.Closed
                                         : "Unknown",
 
                     Concern_Type = x.TicketType,
@@ -290,8 +319,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Is_ReDate = x.IsReDate,
                     Is_ReTicket = x.IsReTicket,
                     Is_Transfer = x.IsTransfer,
-
-
 
                 }); ;
 

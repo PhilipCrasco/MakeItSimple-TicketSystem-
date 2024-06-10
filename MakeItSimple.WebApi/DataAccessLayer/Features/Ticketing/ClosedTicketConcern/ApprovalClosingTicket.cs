@@ -134,6 +134,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
                             requestConcernExist.IsDone = false;
+                            requestConcernExist.Resolution  = closingTicketExist.Resolution;
                             requestConcernExist.ConcernStatus = TicketingConString.Done;
 
                             var addTicketHistory = new TicketHistory

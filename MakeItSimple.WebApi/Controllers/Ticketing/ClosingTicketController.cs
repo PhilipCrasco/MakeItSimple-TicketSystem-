@@ -12,7 +12,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ConfirmClosedTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
-
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnClosedTicket;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
@@ -205,6 +205,34 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("return")]
+        public async Task<IActionResult> ReturnClosedTicket([FromForm] ReturnClosedTicketCommand command)
+        {
+            try
+            {
+
+                if (User.Identity is ClaimsIdentity identity)
+                {
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Added_By = userId;
+                    }
+                }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

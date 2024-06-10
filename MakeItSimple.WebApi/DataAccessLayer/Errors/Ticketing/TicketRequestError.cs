@@ -80,5 +80,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
      public static Error InvalidTargetDate() =>
      new Error("TicketRequest.InvalidTargetDate", "Invalid target date!");
+
+     public static Error ConfirmAlready() =>
+     new Error("TicketRequest.ConfirmAlready", "Concern already been confirm!");
     }
 }

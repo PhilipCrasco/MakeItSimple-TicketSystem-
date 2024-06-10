@@ -1,7 +1,10 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
@@ -21,10 +24,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 _context = context;
             }
 
-            public async Task<Result> Handle(ConfirmClosedTicketCommand request, CancellationToken cancellationToken)
+            public async Task<Result> Handle(ConfirmClosedTicketCommand command, CancellationToken cancellationToken)
             {
 
+                var requestConcernId = await _context.RequestConcerns
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId, cancellationToken);
+                
+                if (requestConcernId is null)
+                {
+                    return Result.Failure(TicketRequestError.RequestConcernIdNotExist());
+                }
+                if (requestConcernId.Is_Confirm is true)
+                {
+                    return Result.Failure(TicketRequestError.ConfirmAlready());
+                }
 
+                requestConcernId.Is_Confirm = true; 
+                requestConcernId.Confirm_At = DateTime.Today;
+
+                var ticketConcernExist = await _context.TicketConcerns
+                    .FirstOrDefaultAsync(x => x.RequestConcernId == command.RequestConcernId, cancellationToken);
+
+                var addTicketHistory = new TicketHistory
+                {
+
+                };
+
+                await _context.TicketHistories.AddAsync(addTicketHistory);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

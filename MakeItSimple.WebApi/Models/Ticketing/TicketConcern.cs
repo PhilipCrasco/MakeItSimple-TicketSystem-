@@ -97,6 +97,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
         public ICollection<TicketReDate> TicketReDates { get; set;}
 
+        public ICollection<ClosingTicket> ClosingTickets { get; set; }
+
 
     }
 }

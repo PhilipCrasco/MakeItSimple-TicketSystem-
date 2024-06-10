@@ -31,7 +31,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public int? UnitId { get; set; }
             public string Unit_Name { get; set; }
-
             public int? SubUnitId { get; set; }
             public string SubUnit_Name { get; set; }
             public int? ChannelId { get; set; }
@@ -59,11 +58,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string Remarks { get; set; }
             public bool? Done { get; set; }
 
-
             public bool ? Is_Transfer { get; set; }
             public bool ? Is_Closed { get; set; }
             public bool ? Is_ReTicket { get; set; }
             public bool ? Is_ReDate {  get; set; }  
+
+            public List<GetForClosingTicket> GetForClosingTickets { get; set; }
+
+
+            public class GetForClosingTicket
+            {
+                public int ? ClosingTicketId { get; set; }
+                public string Resolution { get; set; }
+                     
+                public List<GetAttachmentForClosingTicket> GetAttachmentForClosingTickets { get; set; }
+                public class GetAttachmentForClosingTicket
+                {
+                    public int? TicketAttachmentId { get; set; }
+                    public string Attachment { get; set; }
+                    public string FileName { get; set; }
+                    public decimal? FileSize { get; set; }
+                }
+
+            }
 
         }
 
@@ -75,6 +92,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
+            //public DateTime ? Date_From { get; set; }
+            //public DateTime ? Date_To { get; set; }
         }
 
         public class Handler : IRequestHandler<GetOpenTicketQuery, PagedList<GetOpenTicketResult>>
@@ -98,8 +117,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.Channel)
                     .ThenInclude(x => x.Project)
                     .Include(x => x.User)
-                    .ThenInclude(x => x.SubUnit);
-
+                    .ThenInclude(x => x.SubUnit)
+                    .Include(x => x.ClosingTickets)
+                    .ThenInclude(x => x.TicketAttachments);
+                    
 
                 if (ticketConcernQuery.Any())
                 {
@@ -179,13 +200,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                             case TicketingConString.NotConfirm:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null );
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
                                 break;
 
                             case TicketingConString.Closed:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && 
-                                    (x.RequestConcern.Is_Confirm == null || x.RequestConcern.Is_Confirm == true));
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
                                 break;
 
                             default:
@@ -193,6 +213,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                         }
                     }
+
+                    //if(request.Date_From is not null && request.Date_From is not null)
+                    //{
+                    //    if(string.IsNullOrEmpty(request.Concern_Status) || request.Concern_Status.Contains(TicketingConString.Open))
+                    //    {
+                    //        ticketConcernQuery = ticketConcernQuery
+                    //            .Where(x => x.CreatedAt <= request.Date_From.Value && x.CreatedAt >= request.Date_From.Value);
+                    //    }
+                    //    else if (request.Concern_Status.Contains(TicketingConString.ForClosing))
+                    //    {
+
+
+                    //    }
+
+                    //}
 
                     if (!string.IsNullOrEmpty(request.UserType))
                     {
@@ -308,6 +343,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Is_ReDate = x.IsReDate,
                     Is_ReTicket = x.IsReTicket,
                     Is_Transfer = x.IsTransfer,
+                    GetForClosingTickets = x.ClosingTickets
+                    .Where(x => x.IsActive != false && x.IsClosing == false)
+                    .Select(x => new GetOpenTicketResult.GetForClosingTicket
+                    {
+                        ClosingTicketId = x.Id,
+                        Resolution = x.Resolution, 
+                        GetAttachmentForClosingTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForClosingTicket.GetAttachmentForClosingTicket
+                        {
+                            TicketAttachmentId = x.Id,
+                            Attachment = x.Attachment,
+                            FileName = x.FileName,
+                            FileSize = x.FileSize,
+
+                        }).ToList(),
+                        
+
+                    }).ToList(),
 
                 }); ;
 

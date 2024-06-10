@@ -61,7 +61,7 @@
         public const string Closed = "Closed";
         public const string Transfer = "Transfer";
         public const string Request = "Request Concern";
-        public const string NotConfirm = "Closed/Not Confirmed";
+        public const string NotConfirm = "Closed/For Confirmation";
 
 
 

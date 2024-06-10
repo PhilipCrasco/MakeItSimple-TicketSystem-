@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ConfirmClosedTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
 
@@ -191,6 +193,25 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     return BadRequest(results);
                 }
                 return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPut("confirmation")]
+        public async Task<IActionResult> ConfirmClosedTicket([FromBody] ConfirmClosedTicketCommand command)
+        {
+            try
+            {
+                var results = await _mediator.Send(command);
+                if (results.IsFailure)
+                {
+                    return BadRequest(results);
+                }
+                return Ok(results);
+
             }
             catch (Exception ex)
             {

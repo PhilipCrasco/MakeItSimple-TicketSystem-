@@ -2,6 +2,7 @@
 using CloudinaryDotNet.Actions;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Cloudinary;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -68,6 +69,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.Closed_At = null;
                 ticketConcernExist.ClosedApproveBy = null;
 
+                var addTicketHistory = new TicketHistory
+                {
+                    TicketConcernId = ticketConcernExist.Id,
+                    TransactedBy = command.Added_By,
+                    TransactionDate = DateTime.Now,
+                    Request = TicketingConString.CloseTicket,
+                    Status = TicketingConString.CloseReturn,
+                };
+
+                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 var uploadTasks = new List<Task>();
 
@@ -128,6 +139,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
                 }
+
+
 
                 await Task.WhenAll(uploadTasks);
 

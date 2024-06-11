@@ -1,4 +1,6 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using Azure.Core;
+using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -13,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         public class ConfirmClosedTicketCommand : IRequest<Result>
         {
             public int? RequestConcernId { get; set; }
+            public Guid ? Transacted_By { get; set; }   
         }
 
         public class Hanler : IRequestHandler<ConfirmClosedTicketCommand, Result>
@@ -47,10 +50,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 var addTicketHistory = new TicketHistory
                 {
-
+                    TicketConcernId = ticketConcernExist.Id,
+                    TransactedBy = command.Transacted_By,
+                    TransactionDate = DateTime.Now,
+                    Request = TicketingConString.CloseTicket,
+                    Status = TicketingConString.CloseConfirm,
                 };
 
-                await _context.TicketHistories.AddAsync(addTicketHistory);
+                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

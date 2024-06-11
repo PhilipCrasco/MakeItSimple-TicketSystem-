@@ -56,11 +56,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     var approverLevelValidation = approverUserList
                         .FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
 
-                    var ticketHistoryList = await _context.TicketHistories
-                        .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
-                        .ToListAsync();
+                    //var ticketHistoryList = await _context.TicketHistories
+                    //    .Where(x => x.TicketTransactionId == requestTransactionExist.Id)
+                    //    .ToListAsync();
 
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
+                    //var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     foreach (var approverUserId in approverUserList)
                     {
@@ -77,21 +77,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         perTicketId.RejectRemarks = command.Reject_Remarks;
                     }
 
-                    if (ticketHistoryId.Status != TicketingConString.RejectedBy)
-                    {
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketTransactionId = requestTransactionExist.Id,
-                            RequestorBy = reTicketList.First().AddedBy,
-                            ApproverBy = command.Approver_By,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.ReTicket,
-                            Status = TicketingConString.RejectedBy
-                        };
+                    //if (ticketHistoryId.Status != TicketingConString.RejectedBy)
+                    //{
+                    //    var addTicketHistory = new TicketHistory
+                    //    {
+                    //        TicketTransactionId = requestTransactionExist.Id,
+                    //        RequestorBy = reTicketList.First().AddedBy,
+                    //        ApproverBy = command.Approver_By,
+                    //        TransactionDate = DateTime.Now,
+                    //        Request = TicketingConString.ReTicket,
+                    //        Status = TicketingConString.RejectedBy
+                    //    };
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    //    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                    }
+                    //}
 
 
                 }

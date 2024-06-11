@@ -15,8 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public Guid? Closed_By { get; set; }public string Role { get; set; }
             public Guid? Users { get; set; }
-            public Guid? Requestor_By { get; set; }
-            public Guid? Approver_By { get; set; }
+            public Guid? Transacted_By { get; set; }
             public List<ApproveClosingRequest> ApproveClosingRequests { get; set; }
            public class ApproveClosingRequest
            {
@@ -37,7 +36,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             {
                 var dateToday = DateTime.Today;
 
-                var allUserList = await _context.UserRoles.ToListAsync();
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
+
+                var allUserList = await _context.UserRoles
+                    .ToListAsync();
 
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
@@ -87,19 +90,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             closingTicketExist.TicketApprover = null;
                         }
 
-                        var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st"
-                            : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd"
-                            : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
-                            : $"{selectClosedRequestId.ApproverLevel}th";
+                        //var approverLevel = selectClosedRequestId.ApproverLevel == 1 ? $"{selectClosedRequestId.ApproverLevel}st"
+                        //    : selectClosedRequestId.ApproverLevel == 2 ? $"{selectClosedRequestId.ApproverLevel}nd"
+                        //    : selectClosedRequestId.ApproverLevel == 3 ? $"{selectClosedRequestId.ApproverLevel}rd"
+                        //    : $"{selectClosedRequestId.ApproverLevel}th";
 
                         var addTicketHistory = new TicketHistory
                         {
                             TicketConcernId = closingTicketExist.TicketConcernId,
-                            ApproverBy = command.Approver_By,
-                            RequestorBy = closingTicketExist.AddedBy,
+                            TransactedBy = command.Transacted_By,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,
-                            Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
+                            Status = $"{TicketingConString.CloseApprove} {command.Users}"
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
@@ -140,11 +142,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             var addTicketHistory = new TicketHistory
                             {
                                 TicketConcernId = closingTicketExist.TicketConcernId,
-                                ApproverBy = command.Approver_By,
-                                RequestorBy = closingTicketExist.AddedBy,
+                                TransactedBy = command.Transacted_By,
                                 TransactionDate = DateTime.Now,
                                 Request = TicketingConString.CloseTicket,
-                                Status = TicketingConString.ReceiverApproveBy
+                                Status = TicketingConString.CloseApproveReceiver,
                             };
 
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

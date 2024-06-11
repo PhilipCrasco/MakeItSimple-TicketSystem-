@@ -127,16 +127,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                     await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                 }
 
-                var addTicketHistory = new TicketHistory
-                {
-                    TicketTransactionId = ticketTransactionId.Id,
-                    RequestorBy = command.Requestor_By,
-                    TransactionDate = DateTime.Now,
-                    Request = TicketingConString.ReTicket,
-                    Status = TicketingConString.RequestCreated
-                };
+                //var addTicketHistory = new TicketHistory
+                //{
+                //    TicketTransactionId = ticketTransactionId.Id,
+                //    RequestorBy = command.Requestor_By,
+                //    TransactionDate = DateTime.Now,
+                //    Request = TicketingConString.ReTicket,
+                //    Status = TicketingConString.RequestCreated
+                //};
 
-                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -156,18 +156,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                     }
 
-                    var addTicketHistory = new TicketHistory
-                    {
+                    //var addTicketHistory = new TicketHistory
+                    //{
 
-                        TicketConcernId = ticketConcernExist.Id,
-                        RequestorBy = command.Requestor_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Transfer,
-                        Status = TicketingConString.RequestCreated
+                    //    TicketConcernId = ticketConcernExist.Id,
+                    //    RequestorBy = command.Requestor_By,
+                    //    TransactionDate = DateTime.Now,
+                    //    Request = TicketingConString.Transfer,
+                    //    Status = TicketingConString.RequestCreated
 
-                    };
+                    //};
 
-                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
 
@@ -275,17 +275,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     transferTicketExist.RejectTransferAt = null;
 
 
-                    var addTicketHistory = new TicketHistory
-                    {
-                        TicketConcernId = ticketConcernExist.Id,
-                        RequestorBy = command.Requestor_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Transfer,
-                        Status = TicketingConString.RequestUpdate,
+                    //var addTicketHistory = new TicketHistory
+                    //{
+                    //    TicketConcernId = ticketConcernExist.Id,
+                    //    RequestorBy = command.Requestor_By,
+                    //    TransactionDate = DateTime.Now,
+                    //    Request = TicketingConString.Transfer,
+                    //    Status = TicketingConString.RequestUpdate,
 
-                    };
+                    //};
 
-                    await _context.TicketHistories.AddAsync(addTicketHistory);
+                    //await _context.TicketHistories.AddAsync(addTicketHistory);
 
                 }
 

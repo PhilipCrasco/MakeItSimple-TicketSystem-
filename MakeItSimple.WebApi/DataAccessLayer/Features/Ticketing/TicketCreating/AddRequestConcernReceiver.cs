@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket.AddNewReTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -191,7 +192,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcern.Remarks = null;
                     }
 
-
                     //if(upsertConcern.IsTransfer is true)
                     //{
                     //    upsertConcern.IsTransfer = null;
@@ -200,7 +200,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     //    upsertConcern.Remarks = null;
 
                     //}
-
 
                     var requestUpsertConcern = await _context.RequestConcerns
                         .Where(x => x.Id == upsertConcern.RequestConcernId)
@@ -220,11 +219,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 request.IsReject = false;
                             }
 
-
                         }
                     }
-
-
 
                     if (hasChanged)
                     {
@@ -264,21 +260,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         IsApprove = false,
                         ConcernStatus = TicketingConString.ForApprovalTicket,
                         IsAssigned = true,
-
+                        TicketType = TicketingConString.Concern
                     };
 
-                    var userList = await _context.Users.Include(x => x.UserRole)
-                        .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.RequestorBy, cancellationToken);
+                    await _context.TicketConcerns.AddAsync(addnewTicketConcern);
+                    await _context.SaveChangesAsync(cancellationToken);
 
-                    var addedList = await _context.Users
-                        .Include(x => x.UserRole)
-                        .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.AddedBy, cancellationToken);
+                    var addTicketHistory = new TicketHistory
+                    {
+                        TicketConcernId = addnewTicketConcern.Id,
+                        TransactedBy = command.Added_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Request,
+                        Status = $"{TicketingConString.RequestCreated} {userDetails.Fullname}"
+                    };
 
-                    var concernAlreadyExist = await _context.RequestConcerns
-                        .FirstOrDefaultAsync(x => x.Concern == addnewTicketConcern.ConcernDetails 
-                        && x.IsActive == true, cancellationToken);
-
-                    addnewTicketConcern.TicketType = TicketingConString.Concern;
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                     var addRequestConcern = new RequestConcern
                     {
@@ -296,15 +293,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
 
-                    await _context.TicketConcerns.AddAsync(addnewTicketConcern);
-
-                    if(receiverPermissionList.Any(x => x.Contains(command.Role)))
+                    if (receiverPermissionList.Any(x => x.Contains(command.Role)))
                     {
                         addnewTicketConcern.IsApprove = true;
+
+                        var userExist = await _context.Users
+                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.UserId);
+
+                        var addAssignHistory = new TicketHistory
+                        {
+                            TicketConcernId = addnewTicketConcern.Id,
+                            TransactedBy = command.UserId,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Request,
+                            Status = $"{TicketingConString.RequestAssign} {userExist.Fullname}"
+                        };
+
+                        await _context.TicketHistories.AddAsync(addAssignHistory, cancellationToken);
                     }
 
                 }
-
 
                 var uploadTasks = new List<Task>();
 
@@ -365,7 +373,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     ticketAttachment.FileSize = attachments.Attachment.Length;
                                     ticketAttachment.UpdatedAt = DateTime.Now;
                                 }
-
                             }
                             else
                             {

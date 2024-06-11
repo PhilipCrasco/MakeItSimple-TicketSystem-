@@ -78,17 +78,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 transferTicketExist.TicketApprover = approverLevelValidation.UserId;
 
 
-                var addTicketHistory = new TicketHistory
-                {
-                    TicketConcernId = transferTicketExist.TicketConcernId,
-                    RequestorBy = transferTicketExist.AddedBy,
-                    ApproverBy = command.Approver_By,
-                    TransactionDate = DateTime.Now,
-                    Request = TicketingConString.Transfer,
-                    Status = TicketingConString.RejectedBy
-                };
+                //var addTicketHistory = new TicketHistory
+                //{
+                //    TicketConcernId = transferTicketExist.TicketConcernId,
+                //    RequestorBy = transferTicketExist.AddedBy,
+                //    ApproverBy = command.Approver_By,
+                //    TransactionDate = DateTime.Now,
+                //    Request = TicketingConString.Transfer,
+                //    Status = TicketingConString.RejectedBy
+                //};
 
-                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

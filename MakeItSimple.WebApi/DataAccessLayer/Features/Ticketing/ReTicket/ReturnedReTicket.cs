@@ -48,11 +48,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories
-                        .Where(x => x.TicketTransactionId == reTicketExist.Id)
-                        .ToListAsync();
+                    //var ticketHistoryList = await _context.TicketHistories
+                    //    .Where(x => x.TicketTransactionId == reTicketExist.Id)
+                    //    .ToListAsync();
 
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
+                    //var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     var reticketList = await _context.ReTicketConcerns
                         .Where(x => x.TicketTransactionId == reTicket.TicketGeneratorId)
@@ -66,19 +66,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         ticket.RejectReTicketBy = null;
                     }
 
-                    if (ticketHistoryId.Status != TicketingConString.Returned)
-                    {
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketTransactionId = reTicketExist.Id,
-                            RequestorBy = command.UserId,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.ReTicket,
-                            Status = TicketingConString.Returned
-                        };
+                    //if (ticketHistoryId.Status != TicketingConString.Returned)
+                    //{
+                    //    var addTicketHistory = new TicketHistory
+                    //    {
+                    //        TicketTransactionId = reTicketExist.Id,
+                    //        RequestorBy = command.UserId,
+                    //        TransactionDate = DateTime.Now,
+                    //        Request = TicketingConString.ReTicket,
+                    //        Status = TicketingConString.Returned
+                    //    };
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-                    }
+                    //    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    //}
                 }
 
                 await _context.SaveChangesAsync();

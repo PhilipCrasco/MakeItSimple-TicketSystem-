@@ -12,6 +12,7 @@ using NuGet.Packaging.Core;
 using System.Configuration;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -104,8 +105,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                int daysDif = 1; 
-                var dateToday = DateTime.Today;
+                int hoursDiff = 24; 
+                var dateToday = DateTime.Now;
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
                     .Include(x => x.User)
@@ -143,7 +144,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         requestConcernsQuery = requestConcernsQuery
                             .Where(x => x.User.Fullname.Contains(request.Search)
-                            || x.Id.ToString().Contains(request.Search));
+                            || x.Id.ToString().Contains(request.Search)
+                            || x.Concern.Contains(request.Search));
                     }
 
                     if (request.Status != null)
@@ -326,12 +328,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 foreach(var confirmConcern in confirmConcernList)
                 {
-                    var daysClose = EF.Functions.DateDiffDay(confirmConcern.TicketRequestConcerns.First().Closed_At.Value, dateToday);
+                    var daysClose = EF.Functions.DateDiffHour(confirmConcern.TicketRequestConcerns.First().Closed_At.Value, dateToday);
 
-                    if (daysClose == daysDif)
+                    if (daysClose == hoursDiff)
                     {
                         confirmConcern.Is_Confirmed = true;
-                        confirmConcern.Confirmed_At = DateTime.Today ;
+                        confirmConcern.Confirmed_At = DateTime.Today;
+
+                        var ticketConcernExist = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.RequestConcernId);
+
+                        var addTicketHistory = new TicketHistory
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransactedBy = request.UserId,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.CloseTicket,
+                            Status = TicketingConString.CloseConfirm,
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
 
                 }

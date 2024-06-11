@@ -11,23 +11,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
     {
         public class GetTicketHistoryResult
         {
-            public int? TicketTransactionId { get; set; }
-            public string Requestor_Name { get; set; }
+            public int? TicketConcernId { get; set; }
             public List<GetTicketHistoryConcern> GetTicketHistoryConcerns { get; set; }
             public class GetTicketHistoryConcern
             {
                 public int TicketHistoryId { get; set; }
-                public string Approver_Name { get; set; }
                 public string Request { get; set; }
                 public string Status { get; set; }
+                public string Transacted_By { get; set; }
                 public DateTime? Transaction_Date { get; set; }
+
+
             }
         }
 
 
         public class GetTicketHistoryQuery : IRequest<Result>
         {
-            public int TicketTransactionId { get; set; }
+            public int TicketConcernId { get; set; }
         }
 
         public class Handler : IRequestHandler<GetTicketHistoryQuery, Result>
@@ -41,15 +42,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public async Task<Result> Handle(GetTicketHistoryQuery request, CancellationToken cancellationToken)
             {
-                var requestGenerator = await _context.TicketHistories.Where(x => x.TicketTransactionId == request.TicketTransactionId)
-                    .GroupBy(x => x.TicketTransactionId).Select(x => new GetTicketHistoryResult
+                var ticketHistory = await _context.TicketHistories
+                    .Include(x => x.TransactedByUser)
+                    .Where(x => x.TicketConcernId == request.TicketConcernId)
+                    .GroupBy(x => x.TicketConcernId).Select(x => new GetTicketHistoryResult
                     {
-                        TicketTransactionId = x.Key,
-                        Requestor_Name = x.First().RequestorByUser.Fullname,
-                        GetTicketHistoryConcerns = x.OrderByDescending(x => x.Id).Select(x => new GetTicketHistoryConcern
+                       TicketConcernId = x.Key,
+                        GetTicketHistoryConcerns = x.OrderByDescending(x => x.Id)
+                        .Select(x => new GetTicketHistoryConcern
                         {
                             TicketHistoryId = x.Id,
-                            Approver_Name = x.ApproverByUser.Fullname,
+                            Transacted_By = x.TransactedByUser.Fullname,
                             Request = x.Request,
                             Status = x.Status,
                             Transaction_Date = x.TransactionDate,
@@ -58,7 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }).ToListAsync();
 
-                return Result.Success(requestGenerator);
+                return Result.Success(/*requestGenerator*/);
             }
         }
 

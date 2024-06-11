@@ -2,8 +2,10 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.AddNewReTicket.AddNewReTicketCommand;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -40,6 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var ticketConcernExist = await _context.TicketConcerns
                     .Include(x => x.RequestorByUser)
+                    .Include(x => x.User)
                     .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId
                     && x.IsApprove != true, cancellationToken);
 
@@ -80,6 +83,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcernList.ConcernStatus = TicketingConString.CurrentlyFixing;
 
                     }
+
+                    var addTicketHistory = new TicketHistory
+                    {
+                        TicketConcernId = ticketConcernExist.Id,
+                        TransactedBy = command.UserId,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Request,
+                        Status = $"{TicketingConString.RequestAssign} {ticketConcernExist.User.Fullname}"
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
 

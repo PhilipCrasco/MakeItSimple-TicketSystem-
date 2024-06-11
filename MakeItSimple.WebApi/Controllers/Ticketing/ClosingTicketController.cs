@@ -38,7 +38,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
                     command.Added_By = userId;
-                    command.Requestor_By = userId;
                     command.Modified_By = userId;
                 }
                 var results = await _mediator.Send(command);
@@ -125,8 +124,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Closed_By = userId;
                         command.Users = userId;
-                        command.Approver_By = userId;
-                        command.Requestor_By = userId;
+                        command.Transacted_By = userId;
                     }
                 }
                 var results = await _mediator.Send(command);
@@ -155,7 +153,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
                         command.RejectClosed_By = userId;
-                        command.Approver_By = userId;
+                        command.Transacted_By = userId;
                     }
                 }
                 var results = await _mediator.Send(command);
@@ -184,7 +182,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
-                        command.Requestor_By = userId;
+                        command. Transacted_By = userId;
                     }
                 }
                 var results = await _mediator.Send(command);
@@ -205,6 +203,14 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Transacted_By = userId;
+                    }
+                }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

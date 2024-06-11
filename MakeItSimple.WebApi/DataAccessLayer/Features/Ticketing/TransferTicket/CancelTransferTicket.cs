@@ -57,16 +57,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     _context.Remove(transferTicket);
                 }
 
-                var addTicketHistory = new TicketHistory
-                {
-                    TicketConcernId = ticketConcernExist.Id,
-                    RequestorBy = command.Requestor_By,
-                    TransactionDate = DateTime.Now,
-                    Request = TicketingConString.Transfer,
-                    Status = TicketingConString.Cancel
-                };
+                //var addTicketHistory = new TicketHistory
+                //{
+                //    TicketConcernId = ticketConcernExist.Id,
+                //    RequestorBy = command.Requestor_By,
+                //    TransactionDate = DateTime.Now,
+                //    Request = TicketingConString.Transfer,
+                //    Status = TicketingConString.Cancel
+                //};
 
-                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

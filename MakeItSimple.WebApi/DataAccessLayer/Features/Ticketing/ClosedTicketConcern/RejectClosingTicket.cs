@@ -14,8 +14,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         public class RejectClosingTicketCommand : IRequest<Result>
         {
             public Guid? RejectClosed_By { get; set; }
-            public Guid? Requestor_By { get; set; }
-            public Guid? Approver_By { get; set; }
+            public Guid? Transacted_By { get; set; }
             public string Reject_Remarks { get; set; }
             public int ? ClosingTicketId { get; set; }
 
@@ -32,6 +31,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public async Task<Result> Handle(RejectClosingTicketCommand command, CancellationToken cancellationToken)
             {
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
                 var closedTicketExist = await _context.ClosingTickets
                         .FirstOrDefaultAsync(x => x.Id == command.ClosingTicketId);
@@ -65,11 +66,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var addTicketHistory = new TicketHistory
                 {
                     TicketConcernId = closedTicketExist.TicketConcernId,
-                    RequestorBy = closedTicketExist.AddedBy,
-                    ApproverBy = command.Approver_By,
+                    TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.CloseTicket,
-                    Status = TicketingConString.RejectedBy
+                    Status = $"{TicketingConString.CloseReject} {userDetails.Fullname}"
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

@@ -54,11 +54,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                         return Result.Failure(ReTicketConcernError.TicketIdNotExist());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories
-                        .Where(x => x.TicketTransactionId == x.TicketTransactionId)
-                        .ToListAsync();
+                    //var ticketHistoryList = await _context.TicketHistories
+                    //    .Where(x => x.TicketTransactionId == x.TicketTransactionId)
+                    //    .ToListAsync();
 
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
+                    //var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                     var userReTicket = await _context.ReTicketConcerns
                         .Where(x => x.TicketTransactionId == requestTicketExist.Id)
@@ -150,17 +150,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
                             : $"{selectTransferRequestId.ApproverLevel}th";
 
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketTransactionId  = requestTicketExist.Id,
-                            ApproverBy = command.Approver_By,
-                            RequestorBy = userReTicket.First().AddedBy,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.ReTicket,
-                            Status = $"{ TicketingConString.ApproveBy} {approverLevel} approver"
-                        };
+                        //var addTicketHistory = new TicketHistory
+                        //{
+                        //    TicketTransactionId  = requestTicketExist.Id,
+                        //    ApproverBy = command.Approver_By,
+                        //    RequestorBy = userReTicket.First().AddedBy,
+                        //    TransactionDate = DateTime.Now,
+                        //    Request = TicketingConString.ReTicket,
+                        //    Status = $"{ TicketingConString.ApproveBy} {approverLevel} approver"
+                        //};
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                        //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                     }
                     else

@@ -19,7 +19,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public string Closed_Remarks { get; set; }
             public  Guid ? Modified_By { get; set; }
-            public Guid ? Requestor_By { get; set; }
             public Guid ? Added_By { get; set; }
             public int ? TicketConcernId { get; set; }
             public int? ClosingTicketId { get; set; }
@@ -148,14 +147,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var addTicketHistory = new TicketHistory
                         {
                             TicketConcernId = ticketConcernExist.Id,
-                            RequestorBy = command.Requestor_By,
+                            TransactedBy = command.Added_By,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,
-                            Status = TicketingConString.RequestCreated
+                            Status = TicketingConString.CloseRequest
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
                     }
 
 

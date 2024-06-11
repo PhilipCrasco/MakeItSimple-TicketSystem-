@@ -1,4 +1,6 @@
-﻿namespace MakeItSimple.WebApi.Common.ConstantString
+﻿using System.Reflection.Metadata;
+
+namespace MakeItSimple.WebApi.Common.ConstantString
 {
     public class TicketingConString
     {
@@ -24,7 +26,19 @@
 
         //TicketHistory
 
-        public const string RequestCreated = "Request was created";
+        public const string RequestCreated = "A concern was created by ";
+        public const string RequestAssign = "A concern was assigned to ";
+
+        public const string CloseRequest = "Ticket closure requested";
+        public const string CloseCancel = "Ticket closure request canceled";
+        public const string CloseReject = "Ticket closure request rejected by";
+        public const string CloseApprove = "Ticket closure request approved by";
+        public const string CloseApproveReceiver = "Receiver approved the ticket closure request";
+        public const string CloseConfirm = "Ticket confirmed as resolved";
+        public const string CloseReturn = "Ticket remains open due to unresolved issues";
+
+
+
         public const string RejectedBy = "Request was rejected";
         public const string RequestUpdate = "Request Updated";
         public const string ApproveBy = "Request approve by";

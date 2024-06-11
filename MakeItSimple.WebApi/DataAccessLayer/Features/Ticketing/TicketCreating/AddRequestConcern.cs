@@ -68,6 +68,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var updateRequestAttachmentList = new List<TicketAttachment>();
                 var ticketConcernList = new List<TicketConcern>();
 
+                
+
                 var yearSuffix = DateTime.Now.Year % 100;
 
                 var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
@@ -157,16 +159,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     await _context.SaveChangesAsync(cancellationToken);
 
 
-                    var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
-                    ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
+                    //var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
+                    //ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
+
+                   
 
                     var addTicketHistory = new TicketHistory
                     {
                         TicketConcernId = addTicketConcern.Id,
-                        RequestorBy = command.Added_By,
+                        TransactedBy = command.Added_By,
                         TransactionDate = DateTime.Now,
                         Request = TicketingConString.Request,
-                        Status = TicketingConString.RequestCreated
+                        Status = $"{TicketingConString.RequestCreated} {userId.Fullname}" 
                     };
 
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
@@ -253,8 +257,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
-
-
                                 };
 
                                 await _context.TicketAttachments.AddAsync(addAttachment);

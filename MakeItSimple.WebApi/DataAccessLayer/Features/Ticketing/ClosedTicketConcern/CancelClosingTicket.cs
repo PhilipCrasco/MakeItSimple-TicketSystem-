@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
     {
         public class CancelClosingTicketCommand : IRequest<Result>
         {
-            public Guid ? Requestor_By {  get; set; }
+            public Guid ? Transacted_By {  get; set; }
             public int? ClosingTicketId { get; set; }
         }
 
@@ -57,10 +57,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var addTicketHistory = new TicketHistory
                 {
                     TicketConcernId = closingTicketExist.Id,
-                    RequestorBy = command.Requestor_By,
+                    TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.CloseTicket,
-                    Status = TicketingConString.Cancel
+                    Status = TicketingConString.CloseCancel,
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

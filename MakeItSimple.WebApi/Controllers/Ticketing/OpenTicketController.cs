@@ -80,7 +80,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 var query = new GetTicketHistoryQuery
                 {
-                    TicketTransactionId = id
+                    TicketConcernId = id
                 };
 
                 var results = await _mediator.Send(query);

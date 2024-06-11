@@ -232,16 +232,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
                             reTicket.RejectReTicketAt = null;
                         }
 
-                    var addTicketHistory = new TicketHistory
-                    {
-                        TicketTransactionId = reTicketHistoryList.First().TicketTransactionId,
-                        RequestorBy = command.Requestor_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.ReTicket,
-                        Status = TicketingConString.RequestUpdate
-                    };
+                    //var addTicketHistory = new TicketHistory
+                    //{
+                    //    TicketTransactionId = reTicketHistoryList.First().TicketTransactionId,
+                    //    RequestorBy = command.Requestor_By,
+                    //    TransactionDate = DateTime.Now,
+                    //    Request = TicketingConString.ReTicket,
+                    //    Status = TicketingConString.RequestUpdate
+                    //};
 
-                    await _context.TicketHistories.AddAsync(addTicketHistory,cancellationToken);
+                    //await _context.TicketHistories.AddAsync(addTicketHistory,cancellationToken);
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

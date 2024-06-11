@@ -68,7 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 var dateToday = DateTime.Today;
                 var ticketConcernList = new List<TicketConcern>();
-                var removeTicketConcern = new List<TicketConcern>(); 
+                var removeTicketConcern = new List<TicketConcern>();
 
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
@@ -263,10 +263,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         TicketType = TicketingConString.Concern
                     };
 
+
                     await _context.TicketConcerns.AddAsync(addnewTicketConcern);
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    var addTicketHistory = new TicketHistory
+                    upsertConcern = addnewTicketConcern;
+
+                   var addTicketHistory = new TicketHistory
                     {
                         TicketConcernId = addnewTicketConcern.Id,
                         TransactedBy = command.Added_By,
@@ -375,14 +378,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    TicketConcernId = command.TicketConcernId,
+                                    TicketConcernId = upsertConcern.Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
                                 };
 
-                                await _context.AddAsync(addAttachment, cancellationToken);
+                                await _context.TicketAttachments.AddAsync(addAttachment, cancellationToken);
 
                             }
 

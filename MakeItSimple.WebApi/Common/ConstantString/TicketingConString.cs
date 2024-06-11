@@ -9,8 +9,6 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string OnGoing = "Ongoing";
         public const string Done = "Done";
 
-
-
         public const string Users = "Users";
         public const string ApproverTransfer = "Admin";
 
@@ -24,10 +22,12 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string IssueHandler = "Issue Handler";
         public const string Support = "Support";
 
-        //TicketHistory
+        //Request History
 
         public const string RequestCreated = "A concern was created by ";
         public const string RequestAssign = "A concern was assigned to ";
+
+        //Close History
 
         public const string CloseRequest = "Ticket closure requested";
         public const string CloseCancel = "Ticket closure request canceled";
@@ -36,6 +36,13 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string CloseApproveReceiver = "Receiver approved the ticket closure request";
         public const string CloseConfirm = "Ticket confirmed as resolved";
         public const string CloseReturn = "Ticket remains open due to unresolved issues";
+
+        //Transfer History
+
+        public const string TransferRequest = "Ticket transfer requested";
+        public const string TransferCancel = "Ticket transfer request canceled";
+        public const string TransferReject = "Ticket transfer request rejected by";
+        public const string TransferApprove = "Ticket transfer request approved by";
 
 
 

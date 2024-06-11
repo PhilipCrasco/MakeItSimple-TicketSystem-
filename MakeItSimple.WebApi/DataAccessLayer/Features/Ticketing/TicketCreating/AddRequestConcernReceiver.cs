@@ -297,16 +297,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         addnewTicketConcern.IsApprove = true;
 
-                        var userExist = await _context.Users
-                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.UserId);
-
                         var addAssignHistory = new TicketHistory
                         {
                             TicketConcernId = addnewTicketConcern.Id,
                             TransactedBy = command.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.Request,
-                            Status = $"{TicketingConString.RequestAssign} {userExist.Fullname}"
+                            Status = $"{TicketingConString.RequestAssign} {userDetails.Fullname}"
                         };
 
                         await _context.TicketHistories.AddAsync(addAssignHistory, cancellationToken);

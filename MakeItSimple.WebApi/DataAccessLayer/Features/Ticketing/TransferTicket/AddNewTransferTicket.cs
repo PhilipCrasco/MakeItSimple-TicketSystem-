@@ -20,7 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         {
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public Guid ? Requestor_By { get; set; }
+            public Guid ? Transacted_By { get; set; }
             public Guid ? Transfer_By { get; set; }
             public string Remarks { get; set; }
             public int? TransferTicketId { get; set; }
@@ -56,9 +56,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public async Task<Result> Handle(AddNewTransferTicketCommand command, CancellationToken cancellationToken)
             {
 
-                var updateTransferList = new List<TransferTicketConcern>();
-                var updateTicketAttachmentList = new List<TicketAttachment>();
-
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
                
@@ -78,7 +75,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         return Result.Failure(TransferTicketError.TransferInvalid());
                     }
                 }
-
 
                 var approverList = await _context.Approvers
                .Include(x => x.User)
@@ -106,12 +102,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         transferTicketExist.ModifiedBy = command.Modified_By;
                         transferTicketExist.UpdatedAt = DateTime.Now;
-                    }
-
-                    if (transferTicketExist.IsRejectTransfer is true)
-                    {
-                        transferTicketExist.Remarks = command.Remarks;
-                        updateTransferList.Add(transferTicketExist);
                     }
 
                 }
@@ -156,18 +146,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                     }
 
-                    //var addTicketHistory = new TicketHistory
-                    //{
+                    var addTicketHistory = new TicketHistory
+                    {
 
-                    //    TicketConcernId = ticketConcernExist.Id,
-                    //    RequestorBy = command.Requestor_By,
-                    //    TransactionDate = DateTime.Now,
-                    //    Request = TicketingConString.Transfer,
-                    //    Status = TicketingConString.RequestCreated
+                        TicketConcernId = ticketConcernExist.Id,
+                        TransactedBy = command.Transacted_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Transfer,
+                        Status = TicketingConString.RequestCreated
 
-                    //};
+                    };
 
-                    //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
 
@@ -233,15 +223,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                     ticketAttachment.UpdatedAt = DateTime.Now;
                                 }
 
-                                if(transferTicketExist.IsRejectTransfer is true)
-                                {
-                                    updateTicketAttachmentList.Add(ticketAttachment);
-                                }
-
                             }
                             else
                             {
-
                                 var addAttachment = new TicketAttachment
                                 {
                                     TicketConcernId = ticketConcernExist.Id,
@@ -252,11 +236,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                 };
 
                                 await _context.AddAsync(addAttachment, cancellationToken);
-
-                                if (transferTicketExist is not null &&transferTicketExist.IsRejectTransfer is true )
-                                {
-                                    updateTicketAttachmentList.Add(ticketAttachment);
-                                }
                             }
 
 
@@ -265,28 +244,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     }
 
                     await Task.WhenAll(uploadTasks);
-                }
-
-
-                if(updateTransferList.Any() || updateTicketAttachmentList.Any())
-                {
-                    transferTicketExist.IsRejectTransfer = false;
-                    transferTicketExist.RejectRemarks = null;
-                    transferTicketExist.RejectTransferAt = null;
-
-
-                    //var addTicketHistory = new TicketHistory
-                    //{
-                    //    TicketConcernId = ticketConcernExist.Id,
-                    //    RequestorBy = command.Requestor_By,
-                    //    TransactionDate = DateTime.Now,
-                    //    Request = TicketingConString.Transfer,
-                    //    Status = TicketingConString.RequestUpdate,
-
-                    //};
-
-                    //await _context.TicketHistories.AddAsync(addTicketHistory);
-
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

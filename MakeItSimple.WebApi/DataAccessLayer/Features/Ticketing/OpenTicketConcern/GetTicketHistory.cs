@@ -61,7 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }).ToListAsync();
 
-                return Result.Success(/*requestGenerator*/);
+                return Result.Success(ticketHistory);
             }
         }
 

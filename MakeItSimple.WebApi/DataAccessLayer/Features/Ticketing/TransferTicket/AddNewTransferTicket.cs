@@ -125,8 +125,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     };
 
                     await _context.TransferTicketConcerns.AddAsync(addTransferTicket);
-
                     await _context.SaveChangesAsync(cancellationToken);
+
+                    transferTicketExist = addTransferTicket;
 
                     foreach (var approver in approverList)
                     {
@@ -228,7 +229,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    TicketConcernId = ticketConcernExist.Id,
+                                    TransferTicketConcernId = transferTicketExist.Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
@@ -237,7 +238,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                                 await _context.AddAsync(addAttachment, cancellationToken);
                             }
-
 
                         }, cancellationToken));
 

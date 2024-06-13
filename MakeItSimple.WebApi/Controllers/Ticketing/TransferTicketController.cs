@@ -64,7 +64,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             {
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
-                    command.Requestor_By = userId;
+                    command.Transacted_By = userId;
                 }
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
@@ -189,7 +189,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
                         command.RejectTransfer_By = userId;
-                        command.Approver_By = userId;
+                        command.Transacted_By = userId;
                     }
                 }
 

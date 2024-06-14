@@ -153,8 +153,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Transfer_By = userId;
                         command.Users = userId;
-                        command.Approver_By = userId;
-                        command.Requestor_By = userId;
+                        command.Transacted_By = userId;
                     }
                 }
 

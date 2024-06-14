@@ -217,7 +217,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-
                             string attachmentUrl = attachmentResult.SecureUrl.ToString();
                             string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
 

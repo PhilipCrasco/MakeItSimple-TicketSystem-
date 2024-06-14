@@ -17,8 +17,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid? Transfer_By { get; set; }
             public string Role { get; set; }
             public Guid? Users { get; set; }
-            public Guid? Requestor_By { get; set; }
-            public Guid? Approver_By { get; set; }
+            public Guid? Transacted_By { get; set; }
+            //public Guid? Approver_By { get; set; }
             public int TransferTicketId { get; set; }
 
         }
@@ -34,7 +34,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
             {
-
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
@@ -85,24 +86,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         transferTicketExist.TicketApprover = validateUserApprover.UserId;
 
-                        var approverLevel = selectTransferRequestId.ApproverLevel == 1 ? $"{selectTransferRequestId.ApproverLevel}st"
-                            : selectTransferRequestId.ApproverLevel == 2 ? $"{selectTransferRequestId.ApproverLevel}nd"
-                            : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
-                            : $"{selectTransferRequestId.ApproverLevel}th";
-
-                        //var addTicketHistory = new TicketHistory
-                        //{
-                        //    TicketConcernId = transferTicketExist.TicketConcernId,
-                        //    ApproverBy = command.Approver_By,
-                        //    RequestorBy = transferTicketExist.AddedBy,
-                        //    TransactionDate = DateTime.Now,
-                        //    Request = TicketingConString.Transfer,
-                        //    Status = $"{TicketingConString.ApproveBy} {approverLevel} approver"
-                        //};
-
-                        //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
-
                     }
                     else
                     {
@@ -129,25 +112,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketConcernExist.StartDate = null;
                         ticketConcernExist.TargetDate = null;
 
-
-
-                        //var addTicketHistory = new TicketHistory
-                        //{
-                        //    TicketConcernId = transferTicketExist.TicketConcernId,
-                        //    ApproverBy = command.Approver_By,
-                        //    RequestorBy = transferTicketExist.AddedBy,
-                        //    TransactionDate = DateTime.Now,
-                        //    Request = TicketingConString.Transfer,
-                        //    Status = TicketingConString.ReceiverApproveBy
-                        //};
-
-                        //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
                     }
+
+                    var addTicketHistory = new TicketHistory
+                    {
+                        TicketConcernId = transferTicketExist.TicketConcernId,
+                        TransactedBy = command.Transacted_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Transfer,
+                        Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}"
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
                 else
                 {
-
                     return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                 }
 

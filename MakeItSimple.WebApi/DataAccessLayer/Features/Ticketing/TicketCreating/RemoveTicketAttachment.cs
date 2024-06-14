@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.AttachmentNotExist());
                     }
 
-                    attachmentExist.IsActive = false;
+                    _context.Remove(attachmentExist);
                 
 
                 await _context.SaveChangesAsync(cancellationToken);

@@ -29,7 +29,6 @@ x.UseSqlServer(connectionString)
     .UseSnakeCaseNamingConvention()
     .EnableDetailedErrors()
     .EnableSensitiveDataLogging()
-
     );
 
 //var connectionString = builder.Configuration.GetConnectionString("DevConnection");

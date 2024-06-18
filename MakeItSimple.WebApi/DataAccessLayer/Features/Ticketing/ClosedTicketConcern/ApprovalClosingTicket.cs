@@ -101,7 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             TransactedBy = command.Transacted_By,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.CloseTicket,
-                            Status = $"{TicketingConString.CloseApprove} {command.Users}"
+                            Status = $"{TicketingConString.CloseApprove} {userDetails.Fullname}"
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

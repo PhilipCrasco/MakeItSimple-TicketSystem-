@@ -44,12 +44,19 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string TransferReject = "Ticket transfer request rejected by";
         public const string TransferApprove = "Ticket transfer request approved by";
 
+        // ReDate History
+
+        public const string ReDateRequest = "Ticket re-date requested";
+        public const string ReDateCancel = "Ticket re-date request canceled";
+        public const string ReDateReject = "Ticket re-date request rejected by";
+        public const string ReDateApprove = "Ticket re-date request approved by";
+
 
 
         public const string RejectedBy = "Request was rejected";
-        public const string RequestUpdate = "Request Updated";
+        public const string RequestUpdate = "Request updated";
         public const string ApproveBy = "Request approve by";
-        public const string ReceiverApproveBy = "Request has been approved by Receiver";
+        public const string ReceiverApproveBy = "Request has been approved by receiver";
         public const string Returned = "Request was returned";
         public const string Cancel = "Request was cancel";
 

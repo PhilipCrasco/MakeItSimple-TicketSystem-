@@ -14,7 +14,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         {
 
             public int ? TicketConcernId { get; set; }
-            public string Ticket_No { get; set; }
             public int ? TransferTicketId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
@@ -76,14 +75,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .ThenInclude(x => x.User)
                     .ThenInclude(x => x.Department)
                     .Include(x => x.TicketConcern)
-                    .Include(x => x.Channel)
+                    .ThenInclude(x => x.Channel)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.Category)
                     .ThenInclude(x => x.SubCategories)
                     .Include(x => x.RequestTransaction)
                     .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
-                    .Include(x => x.Channel)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
 
@@ -101,9 +99,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 if (!string.IsNullOrEmpty(request.Search))
                 {
                     transferTicketQuery = transferTicketQuery
-                        .Where(x => x.User.Fullname.Contains(request.Search)
-                    || x.User.EmpId.Contains(request.Search)
-                    || x.TicketNo.Contains(request.Search));
+                        .Where(x => x.TicketConcern.User.Fullname.Contains(request.Search)
+                    || x.TicketConcernId.ToString().Contains(request.Search));
                 }
 
                 if (request.Status != null)
@@ -161,17 +158,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var results = transferTicketQuery.Select(x => new GetTransferTicketResult
                 {
                     TicketConcernId = x.TicketConcernId,
-                    Ticket_No = x.TicketConcern.TicketNo,
                     TransferTicketId = x.Id,
                     Department_Code = x.TicketConcern.User.Department.DepartmentCode,
                     Department_Name = x.TicketConcern.User.Department.DepartmentName,
                     ChannelId = x.TicketConcern.ChannelId,
-                    Channel_Name = x.Channel.ChannelName,
+                    Channel_Name = x.TicketConcern.Channel.ChannelName,
                     UserId = x.TicketConcern.UserId,
                     Fullname = x.TicketConcern.User.Fullname,
                     Concern_Details = x.TicketConcern.ConcernDetails,
                     Category_Description = x.TicketConcern.Category.CategoryDescription,
                     SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
+                    Start_Date = x.TicketConcern.StartDate,
+                    Target_Date = x.TicketConcern.TargetDate,
                     IsActive = x.IsActive,
                     Transfer_By = x.TransferByUser.Fullname,
                     Transfer_At = x.TransferAt,

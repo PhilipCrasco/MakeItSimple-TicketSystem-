@@ -323,6 +323,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 });
 
+
                 var confirmConcernList = results.Where(x => x.Is_Confirmed == null && x.Is_Done == true)
                     .ToList();
 
@@ -330,7 +331,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     var daysClose = EF.Functions.DateDiffHour(confirmConcern.TicketRequestConcerns.First().Closed_At.Value, dateToday);
 
-                    if (daysClose == hoursDiff)
+                    if (daysClose <= hoursDiff)
                     {
                         confirmConcern.Is_Confirmed = true;
                         confirmConcern.Confirmed_At = DateTime.Today;

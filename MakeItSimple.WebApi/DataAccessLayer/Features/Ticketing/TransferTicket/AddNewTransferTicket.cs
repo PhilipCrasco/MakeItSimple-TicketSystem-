@@ -116,7 +116,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var addTransferTicket = new TransferTicketConcern
                     {
                         TicketConcernId = ticketConcernExist.Id,
-                        RejectRemarks = command.TransferRemarks,
+                        TransferRemarks = command.TransferRemarks,
                         TransferBy = command.Transfer_By,
                         IsTransfer = false,
                         AddedBy = command.Added_By,

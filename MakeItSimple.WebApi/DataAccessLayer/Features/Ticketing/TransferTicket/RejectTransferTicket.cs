@@ -62,7 +62,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if (!approverPermission.Any(x => x.Contains(command.Role)))
                 {
-                    return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
+                    return Result.Failure(TicketRequestError.NotAutorize());
                 }
 
                 transferTicketExist.IsActive = false;

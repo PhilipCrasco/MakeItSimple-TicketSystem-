@@ -28,8 +28,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
             public DateTime ? Start_Date {  get; set; }
 
             public DateTime? Target_Date { get; set; }
-
-            public string Remarks { get; set; }
             public List<AddReDateAttachment> AddReDateAttachments { get; set; }
 
             public class AddReDateAttachment
@@ -97,7 +95,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                 if (reDateExist is not null)
                 {
 
-                
+                    bool isChange = false;
+
+                    if(reDateExist.StartDate != command.Start_Date)
+                    {
+                        reDateExist.StartDate = command.Start_Date;
+                        isChange = true;
+                    }
+
+                    if (reDateExist.TargetDate != command.Target_Date)
+                    {
+                        reDateExist.TargetDate = command.Target_Date;
+                        isChange = true;
+                    }
+
+                    if (reDateExist.ReDateRemarks != command.ReDate_Remarks)
+                    {
+                        reDateExist.ReDateRemarks = command.ReDate_Remarks;
+                        isChange = true;
+                    }
+
+                    if(isChange)
+                    {
+                        reDateExist.ModifiedBy = command.Modified_By;
+                        reDateExist.UpdatedAt = DateTime.Now;
+                    }
+
                 }
                 else
                 {
@@ -109,7 +132,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
 
                     var addReDate = new TicketReDate
                     {
-                        Remarks = command.Remarks,
+                        ReDateRemarks = command.ReDate_Remarks,
                         StartDate = command.Start_Date,
                         TargetDate = command.Target_Date,
                         AddedBy = command.Added_By,
@@ -223,7 +246,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                             {
                                 var addAttachment = new TicketAttachment
                                 {
-                                    TransferTicketConcernId = reDateExist.Id,
+                                    TicketReDateId = reDateExist.Id,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,

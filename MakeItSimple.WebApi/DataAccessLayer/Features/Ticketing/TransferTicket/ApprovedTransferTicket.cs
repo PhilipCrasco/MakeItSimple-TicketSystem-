@@ -39,9 +39,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 var allUserList = await _context.UserRoles.ToListAsync();
 
-                var receiverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
-
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
@@ -63,8 +60,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 if (selectTransferRequestId != null)
                 {
 
-                    selectTransferRequestId.IsApprove = true;
-
                     if (!approverPermissionList.Any(x => x.Contains(command.Role)))
                     {
                         return Result.Failure(TransferTicketError.ApproverUnAuthorized());
@@ -74,6 +69,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                     }
+
+                    selectTransferRequestId.IsApprove = true;
 
                     var userApprovalId = await _context.ApproverTicketings
                         .Where(x => x.TransferTicketConcernId == selectTransferRequestId.TransferTicketConcernId)
@@ -104,7 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         ticketConcernExist.IsApprove = false;
                         ticketConcernExist.IsTransfer = true;
-                        ticketConcernExist.Remarks = transferTicketExist.RejectRemarks;
+                        ticketConcernExist.Remarks = transferTicketExist.TransferRemarks;
                         ticketConcernExist.ChannelId = null;
                         ticketConcernExist.UserId = null;
                         ticketConcernExist.CategoryId = null;

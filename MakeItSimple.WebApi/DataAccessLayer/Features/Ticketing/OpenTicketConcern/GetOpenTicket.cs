@@ -64,7 +64,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public bool ? Is_ReDate {  get; set; }  
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
+            public List<GetForTransferTicket> GetForTransferTickets { get; set; }
 
+            public List<GetForReDateTicket> GetForReDateTickets { get; set; }
 
             public class GetForClosingTicket
             {
@@ -82,6 +84,45 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 }
 
             }
+
+            public class GetForTransferTicket
+            {
+                public int? TransferTicketConcernId { get; set; }
+                public string Transfer_Remarks { get; set; }
+                public bool? IsApprove { get; set; }
+
+                public List<GetAttachmentForTransferTicket> GetAttachmentForTransferTickets { get; set; }
+                public class GetAttachmentForTransferTicket
+                {
+                    public int? TicketAttachmentId { get; set; }
+                    public string Attachment { get; set; }
+                    public string FileName { get; set; }
+                    public decimal? FileSize { get; set; }
+                }
+
+            }
+
+            public class GetForReDateTicket
+            {
+                public int? TicketReDateId { get; set; }
+                public string ReDate_Remarks { get; set; }
+                public DateTime ? Start_Date { get; set; }
+                public DateTime? Target_Date { get; set; }
+
+                public bool? IsApprove { get; set; }
+
+                public List<GetAttachmentForReDateTicket> GetAttachmentForReDateTickets { get; set; }
+                public class GetAttachmentForReDateTicket
+                {
+                    public int? TicketAttachmentId { get; set; }
+                    public string Attachment { get; set; }
+                    public string FileName { get; set; }
+                    public decimal? FileSize { get; set; }
+                }
+
+            }
+
+
 
         }
 
@@ -323,7 +364,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Issue_Handler = x.User.Fullname,
 
                     CategoryId = x.CategoryId,
-                    Category_Description = x.Category.CategoryDescription, 
+                    Category_Description = x.Category.CategoryDescription,
 
                     SubCategoryId = x.SubCategoryId,
                     SubCategory_Description = x.SubCategory.SubCategoryDescription,
@@ -338,7 +379,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                         : x.IsReDate == false ? TicketingConString.ForReDate
                                         : x.IsClosedApprove == false ? TicketingConString.ForClosing
                                         : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
-                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true? TicketingConString.Closed
+                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true ? TicketingConString.Closed
                                         : "Unknown",
 
                     Concern_Type = x.TicketType,
@@ -360,7 +401,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ClosingTicketId = x.Id,
                         Resolution = x.Resolution,
                         IsApprove = x.ApproverTickets.Any(x => x.IsApprove != null) ? true : false,
-                        
+
                         GetAttachmentForClosingTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForClosingTicket.GetAttachmentForClosingTicket
                         {
                             TicketAttachmentId = x.Id,
@@ -369,11 +410,52 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             FileSize = x.FileSize,
 
                         }).ToList(),
-                        
+
 
                     }).ToList(),
 
-                }); ;
+                    GetForTransferTickets = x.TransferTicketConcerns
+                    .Where(x => x.IsActive == true && x.IsTransfer == false || x.IsRejectTransfer != true)
+                    .Select(x => new GetOpenTicketResult.GetForTransferTicket
+                    {
+                        TransferTicketConcernId = x.Id,
+                        Transfer_Remarks = x.TransferRemarks,
+                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false, 
+                        GetAttachmentForTransferTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForTransferTicket.GetAttachmentForTransferTicket 
+                        {
+                            TicketAttachmentId = x.Id,
+                            Attachment = x.Attachment,
+                            FileName = x.FileName,
+                            FileSize = x.FileSize,
+
+                        }).ToList(),
+                        
+                    }).ToList(),
+
+                    GetForReDateTickets = x.TicketReDates
+                    .Where(x => x.IsActive == true && x.IsReDate == true || x.IsRejectReDate != true)
+                    .Select(x => new GetOpenTicketResult.GetForReDateTicket
+                    {
+                        TicketReDateId = x.Id,
+                        Start_Date = x.StartDate,
+                        Target_Date = x.TargetDate,
+                        ReDate_Remarks = x.ReDateRemarks,
+                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true: false,
+                        GetAttachmentForReDateTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForReDateTicket.GetAttachmentForReDateTicket
+                        {
+                            TicketAttachmentId = x.Id,
+                            Attachment = x.Attachment,
+                            FileName = x.FileName,
+                            FileSize = x.FileSize,
+
+                        }).ToList(),
+
+                    }).ToList(),
+
+
+
+
+                });
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

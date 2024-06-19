@@ -16,20 +16,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class AddTicketCommentCommand : IRequest<Result>
         {
-            public int ? RequestTransactionId { get; set; }
-
+            public int ? TicketConcernId { get; set; }
             public Guid ? UserId { get; set; }
             public Guid ? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
-            public List<RequestComment> RequestComments { get; set; }
+            public int? TicketCommentId { get; set; }
+            public string Comment { get; set; }
             public List<CommentAttachment> CommentAttachments { get; set; }
-
-            public class RequestComment
-            {
-                public int ?  TicketCommentId { get; set; }
-                public string Comment {  get; set; }
-
-            }
 
             public class CommentAttachment
             {
@@ -43,8 +36,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             private readonly MisDbContext _context;
             private readonly Cloudinary _cloudinary;
+            private readonly TransformUrl _url;
 
-            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options, TransformUrl url)
             {
                 _context = context;
                 var account = new Account(
@@ -53,89 +47,91 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     options.Value.ApiSecret
                     );
                 _cloudinary = new Cloudinary(account);
+                _url = url;
             }
 
             public async Task<Result> Handle(AddTicketCommentCommand command, CancellationToken cancellationToken)
             {
                 var prohibitedList = new List<string>();
 
-                var requestTransactionExist = await _context.RequestTransactions
-                    .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId);
-
-                if (requestTransactionExist is null)
-                {
-                    return Result.Failure(TicketRequestError.TicketIdNotExist());
-                }
-
                 var uploadTasks = new List<Task>();
 
-                if (command.RequestComments.Count(x => x.Comment != null) > 0)
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+
+                var ticketConcernExist = await _context.TicketConcerns
+                    .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId);
+
+                if (ticketConcernExist is null)
                 {
-                    foreach (var comment in command.RequestComments)
-                    {
-
-                        var commentExist = await _context.TicketComments
-                            .Where(x => x.Id == comment.TicketCommentId).FirstOrDefaultAsync(cancellationToken);
-
-                        var contains = ProhibitedInumerable.Prohibited.FirstOrDefault(word => comment.Comment.ToLower().Contains(word));
-
-                        if (commentExist != null)
-                        {
-                            if (commentExist.AddedBy != command.UserId)
-                            {
-                                return Result.Failure(TicketRequestError.NotAutorizeToEdit());
-                            }
-
-                            bool IsChange = false;
-
-                            if (commentExist.Comment != comment.Comment)
-                            {
-                                commentExist.Comment = comment.Comment;
-                            }
-
-                            if (contains != null)
-                            {
-                                return Result.Failure(TicketRequestError.ProhibitedWord(contains));
-                            }
-
-                            if (IsChange)
-                            {
-                                commentExist.ModifiedBy = command.Modified_By;
-                            }
-
-                        }
-                        else
-                        {
-
-                            var addComment = new TicketComment
-                            {
-                                RequestTransactionId = command.RequestTransactionId,
-                                Comment = comment.Comment,
-                                AddedBy = command.Added_By,
-                                IsClicked = false
-                            };
-
-
-                            if (contains != null)
-                            {
-                                return Result.Failure(TicketRequestError.ProhibitedWord(contains));
-                            }
-
-                            await _context.TicketComments.AddAsync(addComment);
-
-                        }
-                    }
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
                 }
 
-                else if(command.CommentAttachments.Count(x => x.Attachment != null) > 0)
+                if(command.Comment is not null)
                 {
 
+                    var commentExist = await _context.TicketComments
+                        .Where(x => x.Id == command.TicketCommentId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    var contains = ProhibitedInumerable.Prohibited
+                        .FirstOrDefault(word => command.Comment.ToLower().Contains(word));
+
+                    if (commentExist != null)
+                    {
+                        if (commentExist.AddedBy != command.UserId)
+                        {
+                            return Result.Failure(TicketRequestError.NotAutorizeToEdit());
+                        }
+
+                        bool IsChange = false;
+
+                        if (commentExist.Comment != command.Comment)
+                        {
+                            commentExist.Comment = command.Comment;
+                        }
+
+                        if (contains != null)
+                        {
+                            return Result.Failure(TicketRequestError.ProhibitedWord(contains));
+                        }
+
+                        if (IsChange)
+                        {
+                            commentExist.ModifiedBy = command.Modified_By;
+                        }
+
+                    }
+                    else
+                    {
+
+                        var addComment = new TicketComment
+                        {
+                            TicketConcernId = command.TicketConcernId,
+                            Comment = command.Comment,
+                            AddedBy = command.Added_By,
+                            IsClicked = false
+                        };
+
+                        if (contains != null)
+                        {
+                            return Result.Failure(TicketRequestError.ProhibitedWord(contains));
+                        }
+
+                        await _context.TicketComments.AddAsync(addComment);
+                        await _context.SaveChangesAsync(cancellationToken);
+
+                        commentExist = addComment;
+                    }
+
+                }
+                else if(command.CommentAttachments.Any())
+                {
                     foreach (var attachments in command.CommentAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {
 
-                        var ticketAttachmentList = await _context.TicketComments.Where(x => x.RequestTransactionId == requestTransactionExist.Id).ToListAsync();
-
-                        var ticketAttachment = ticketAttachmentList.FirstOrDefault(x => x.Id == attachments.TicketCommentId);
+                        var ticketAttachment = await _context.TicketComments
+                            .FirstOrDefaultAsync(x => x.Id == attachments.TicketCommentId, cancellationToken);
 
                         if (attachments.Attachment == null || attachments.Attachment.Length == 0)
                         {
@@ -163,7 +159,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var attachmentsParams = new RawUploadParams
                             {
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Ticket Comment/{requestTransactionExist.Id}/{attachments.Attachment.FileName}"
+                                PublicId = $"MakeITSimple/Ticketing/Ticket Comment/{userDetails.Fullname}/{attachments.Attachment.FileName}",
                             };
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
@@ -173,7 +169,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 var hasChanged = false;
 
                                 if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
-                                { 
+                                {
                                     ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
                                     hasChanged = true;
                                 }
@@ -192,7 +188,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 var addAttachment = new TicketComment
                                 {
-                                    RequestTransactionId = command.RequestTransactionId,
+                                    TicketConcernId = command.TicketConcernId,
                                     Attachment = attachmentResult.SecureUrl.ToString(),
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
@@ -206,13 +202,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }, cancellationToken));
 
                     }
-                    
-                    await Task.WhenAll(uploadTasks);
                 }
                 else
                 {
                     return Result.Failure(TicketRequestError.NoComment());
                 }
+
+                await Task.WhenAll(uploadTasks);
 
                 await _context.SaveChangesAsync();
                 return Result.Success();

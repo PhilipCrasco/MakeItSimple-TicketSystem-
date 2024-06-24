@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             public Guid? UserId { get; set; }
             public Guid Added_By { get; set; }
-            public int? RequestTransactionId { get; set; }
+            public int? TicketConcernId { get; set; }
 
         }
 
@@ -30,22 +30,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddCommentNotificationValidatorCommand command, CancellationToken cancellationToken)
             {
 
-                var requestTransactionExist = await _context.RequestTransactions
-                .FirstOrDefaultAsync(x => x.Id == command.RequestTransactionId, cancellationToken);
+                var ticketConcernExist = await _context.TicketConcerns
+                .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 
-                if (requestTransactionExist == null)
+                if (ticketConcernExist == null)
                 {
-                    return Result.Failure(TicketRequestError.TicketIdNotExist());
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
                 }
 
                 var commentViewList = await _context.TicketCommentViews
-                    .Where(x => x.RequestTransactionId == command.RequestTransactionId && x.UserId == command.Added_By)
+                    .Where(x => x.TicketConcernId == command.TicketConcernId && x.UserId == command.Added_By)
                     .ToListAsync();
 
-                var commentViewSelect =  commentViewList.Select(x => x.RequestTransactionId);
+                var commentViewSelect =  commentViewList.Select(x => x.TicketCommentId);
 
                 var commentExist = await _context.TicketComments
-                .Where(x =>!commentViewSelect.Contains( x.RequestTransactionId) && x.IsActive == true)
+                .Where(x =>!commentViewSelect.Contains( x.Id) && x.IsActive == true && x.TicketConcernId == command.TicketConcernId)
                 .ToListAsync();
 
                 foreach (var comment in commentExist)
@@ -54,7 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     {
                         TicketCommentId = comment.Id,
                         UserId = command.UserId,
-                        RequestTransactionId = comment.RequestTransactionId,
+                        TicketConcernId = comment.TicketConcernId,
                         IsClicked = true,
                         AddedBy = command.Added_By     
                     };

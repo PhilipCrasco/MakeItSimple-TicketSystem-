@@ -38,6 +38,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                     return Result.Failure(ReDateError.ReDateIdNotExist());
                 }
 
+                reDateExist.IsActive = false;
+
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == reDateExist.TicketConcernId);
 

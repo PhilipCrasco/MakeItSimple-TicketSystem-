@@ -74,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                     return Result.Failure(ReDateError.TicketConcernIdNotExist());
                 }
 
-                if(command.Start_Date > command.Target_Date || command.Target_Date > dateNow)
+                if(command.Start_Date > command.Target_Date || command.Target_Date < dateNow)
                 {
                     return Result.Failure(ReDateError.DateTimeInvalid());         
                 }
@@ -132,6 +132,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
 
                     var addReDate = new TicketReDate
                     {
+                        TicketConcernId = ticketConcernExist.Id,
                         ReDateRemarks = command.ReDate_Remarks,
                         StartDate = command.Start_Date,
                         TargetDate = command.Target_Date,

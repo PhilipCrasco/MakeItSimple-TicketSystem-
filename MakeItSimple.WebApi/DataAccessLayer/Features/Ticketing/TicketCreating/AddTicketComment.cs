@@ -125,7 +125,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                 }
-                else if(command.CommentAttachments.Any())
+
+                if(command.CommentAttachments.Any())
                 {
                     foreach (var attachments in command.CommentAttachments.Where(attachments => attachments.Attachment.Length > 0))
                     {
@@ -203,7 +204,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
                 }
-                else
+
+                if(command.Comment is null && !command.CommentAttachments.Any())
                 {
                     return Result.Failure(TicketRequestError.NoComment());
                 }

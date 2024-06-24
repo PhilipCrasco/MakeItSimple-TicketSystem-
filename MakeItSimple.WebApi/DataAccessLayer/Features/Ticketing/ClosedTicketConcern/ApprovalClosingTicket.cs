@@ -135,7 +135,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             var requestConcernExist = await _context.RequestConcerns
                                 .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
-                            requestConcernExist.IsDone = false;
+                            requestConcernExist.IsDone = true;
                             requestConcernExist.Resolution  = closingTicketExist.Resolution;
                             requestConcernExist.ConcernStatus = TicketingConString.Done;
 

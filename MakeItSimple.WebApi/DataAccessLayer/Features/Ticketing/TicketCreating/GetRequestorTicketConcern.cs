@@ -324,17 +324,31 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 });
 
 
-                var confirmConcernList = results.Where(x => x.Is_Confirmed == null && x.Is_Done == true)
+                var confirmConcernList = results
+                    .Where(x => x.Is_Confirmed == null && x.Is_Done == true)
                     .ToList();
 
-                foreach(var confirmConcern in confirmConcernList)
-                {
-                    var daysClose = EF.Functions.DateDiffHour(confirmConcern.TicketRequestConcerns.First().Closed_At.Value, dateToday);
+               foreach(var confirmConcern in confirmConcernList)
+               {
 
-                    if (daysClose <= hoursDiff)
+                    var daysClose =  confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Day - dateToday.Day;
+
+                    daysClose = Math.Abs(daysClose) * (1);
+
+                    if (daysClose >= 1)
                     {
-                        confirmConcern.Is_Confirmed = true;
-                        confirmConcern.Confirmed_At = DateTime.Today;
+                       daysClose = daysClose * 24;
+                    }
+
+                    var hourConvert = (daysClose + confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
+
+                    if (hourConvert >= hoursDiff)
+                    {
+                        var requestConcern = await _context.RequestConcerns
+                            .FirstOrDefaultAsync(x => x.Id == confirmConcern.RequestConcernId);
+
+                        requestConcern.Is_Confirm = true;
+                        requestConcern.Confirm_At = DateTime.Today;
 
                         var ticketConcernExist = await _context.TicketConcerns
                             .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.RequestConcernId);
@@ -353,7 +367,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         await _context.SaveChangesAsync(cancellationToken);
                     }
 
-                }
+               }
 
 
                 return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);

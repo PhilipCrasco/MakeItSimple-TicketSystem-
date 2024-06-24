@@ -10,7 +10,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetTicketCommentResult
         {
-            public int? RequestTransactionId { get; set; }
+            public int? TicketConcernId { get; set; }
             public List<GetComment> GetComments { get; set; }
 
             public class GetComment
@@ -27,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class GetTicketCommentQuery : IRequest<Result>
         {
-            public int? RequestTransactionId { get; set; }
+            public int? TicketConcernId { get; set; }
         }
 
 
@@ -42,12 +42,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(GetTicketCommentQuery request, CancellationToken cancellationToken)
             {
-                var result = await _context.TicketComments.Include(x => x.AddedByUser).Include(x => x.ModifiedByUser)
-                    .Where(x => x.IsActive == true && x.RequestTransactionId == request.RequestTransactionId)
-                    .GroupBy(x => x.RequestTransactionId)
+                var result = await _context.TicketComments
+                    .Include(x => x.AddedByUser)
+                    .Include(x => x.ModifiedByUser)
+                    .Where(x => x.IsActive == true && x.TicketConcernId == request.TicketConcernId)
+                    .GroupBy(x => x.TicketConcernId)
                     .Select(x => new GetTicketCommentResult
                     {
-                       RequestTransactionId = x.Key,
+                       TicketConcernId = x.Key,
                        GetComments = x.Select(x => new GetComment
                        {
                            TicketCommentId = x.Id,
@@ -57,7 +59,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                            Modified_By = x.ModifiedByUser.Fullname,
                            Updated_At = x.UpdatedAt
 
-                       }).OrderByDescending(x => x.Created_At).ToList()
+                       }).OrderByDescending(x => x.Created_At)
+                       .ToList()
 
                     }).ToListAsync();
 

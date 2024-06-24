@@ -62,6 +62,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public bool ? Is_Closed { get; set; }
             public bool ? Is_ReTicket { get; set; }
             public bool ? Is_ReDate {  get; set; }  
+            public DateTime ? Closed_At { get; set; }
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
@@ -151,6 +152,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public async Task<PagedList<GetOpenTicketResult>> Handle(GetOpenTicketQuery request, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
+                int hoursDiff = 24;
 
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
                     .Include(x => x.AddedByUser)
@@ -161,7 +163,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
-                    .ThenInclude(x => x.TicketAttachments);
+                    .ThenInclude(x => x.TicketAttachments)
+                    .Include(x => x.RequestConcern);
                     
 
                 if (ticketConcernQuery.Any())
@@ -394,8 +397,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Is_ReDate = x.IsReDate,
                     Is_ReTicket = x.IsReTicket,
                     Is_Transfer = x.IsTransfer,
+                    
                     GetForClosingTickets = x.ClosingTickets
-                    .Where(x => x.IsActive != false && x.IsClosing == false || x.IsRejectClosed != true)
+                    .Where(x => x.IsActive == true && x.IsClosing == false )
                     .Select(x => new GetOpenTicketResult.GetForClosingTicket
                     {
                         ClosingTicketId = x.Id,
@@ -415,7 +419,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     }).ToList(),
 
                     GetForTransferTickets = x.TransferTicketConcerns
-                    .Where(x => x.IsActive == true && x.IsTransfer == false || x.IsRejectTransfer != true)
+                    .Where(x => x.IsActive == true && x.IsTransfer == false )
                     .Select(x => new GetOpenTicketResult.GetForTransferTicket
                     {
                         TransferTicketConcernId = x.Id,
@@ -433,7 +437,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     }).ToList(),
 
                     GetForReDateTickets = x.TicketReDates
-                    .Where(x => x.IsActive == true && x.IsReDate == true || x.IsRejectReDate != true)
+                    .Where(x => x.IsActive == true && x.IsReDate == false)
                     .Select(x => new GetOpenTicketResult.GetForReDateTicket
                     {
                         TicketReDateId = x.Id,
@@ -452,10 +456,57 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }).ToList(),
 
-
-
-
                 });
+
+                var ticketConcernList = results
+                    .Where(x => x.Ticket_Status.Contains(TicketingConString.NotConfirm))
+                    .Select(x => x.RequestConcernId); 
+
+
+                var confirmConcernList = await _context.RequestConcerns
+                    .Where(x => ticketConcernList.Contains(x.Id) && x.Is_Confirm == null && x.IsDone == true)
+                    .ToListAsync();
+
+                foreach (var confirmConcern in confirmConcernList)
+                {
+
+                    var daysClose = confirmConcern.TicketConcerns.First().Closed_At.Value.Day - dateToday.Day;
+
+                    daysClose = Math.Abs(daysClose) * (1);
+
+                    if (daysClose >= 1)
+                    {
+                        daysClose = daysClose * 24;
+                    }
+
+                    var hourConvert = (daysClose + confirmConcern.TicketConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
+
+                    if (hourConvert >= hoursDiff)
+                    {
+                        var requestConcern = await _context.RequestConcerns
+                            .FirstOrDefaultAsync(x => x.Id == confirmConcern.Id);
+
+                        requestConcern.Is_Confirm = true;
+                        requestConcern.Confirm_At = DateTime.Today;
+
+                        var ticketConcernExist = await _context.TicketConcerns
+                            .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.Id);
+
+                        var addTicketHistory = new TicketHistory
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransactedBy = request.UserId,
+                            TransactionDate = DateTime.Now, 
+                            Request = TicketingConString.CloseTicket,
+                            Status = TicketingConString.CloseConfirm,
+                        };
+
+                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                        await _context.SaveChangesAsync(cancellationToken);
+                    }
+
+                }
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

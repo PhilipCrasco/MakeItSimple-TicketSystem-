@@ -30,7 +30,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
 
         [HttpPost]
-        public async Task<IActionResult> AddTicketReDate([FromBody] AddTicketReDateCommand command)
+        public async Task<IActionResult> AddTicketReDate([FromForm] AddTicketReDateCommand command)
         {
             try
             {

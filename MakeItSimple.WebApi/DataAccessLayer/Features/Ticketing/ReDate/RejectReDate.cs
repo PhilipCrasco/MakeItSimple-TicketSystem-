@@ -38,6 +38,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                 var reDateExist = await _context.TicketReDates.
                     FirstOrDefaultAsync(x => x.Id == command.TicketReDateId, cancellationToken);
 
+                
+
                 if (reDateExist == null)
                 {
                     return Result.Failure(ReDateError.ReDateIdNotExist());
@@ -72,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == reDateExist.TicketConcernId);
 
-                ticketConcernExist.IsTransfer = null;
+                ticketConcernExist.IsReDate = null;
                 ticketConcernExist.Remarks = command.Reject_Remarks;
 
                 foreach (var approverUserId in approverUserList)

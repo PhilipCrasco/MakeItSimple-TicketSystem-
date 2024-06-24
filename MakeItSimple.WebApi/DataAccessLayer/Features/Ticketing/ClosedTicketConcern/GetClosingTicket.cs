@@ -130,15 +130,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     if (!string.IsNullOrEmpty(request.UserType))
                     {
+
+                        var closingTicket = closingTicketsQuery
+                            .Select(x => x.TicketConcern.User.BusinessUnitId);
+
+                        var receiverList = await _context.Receivers
+                            .Include(x => x.User)
+                            .FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
+
                         if (request.UserType == TicketingConString.Approver)
                         {
-
-                            var closingTicket = closingTicketsQuery
-                                .Select(x => x.TicketConcern.User.BusinessUnitId);
-
-                            var receiverList = await _context.Receivers
-                                .Include(x => x.User)
-                                .FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
 
                             if (approverPermissionList.Any(x => x.Contains(request.Role)))
                             {
@@ -162,8 +163,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                     && userRequestIdApprovalList.Contains(x.Id));
 
                             }
+                        }
 
-                            else if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
+                        else if(request.UserType == TicketingConString.Receiver)
+                        {
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                             {
                                 if (request.UserId == receiverList.UserId)
                                 {
@@ -199,17 +203,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 }
 
                             }
-                            else
-                            {
-                                return new PagedList<GetClosingTicketResults>(new List<GetClosingTicketResults>(), 0, request.PageNumber, request.PageSize);
-                            }
 
                         }
-
-                        if (request.UserType == TicketingConString.Users)
+                        else if (request.UserType == TicketingConString.Users)
                         {
                             closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                         }
+                        else
+                        {
+                            return new PagedList<GetClosingTicketResults>(new List<GetClosingTicketResults>(), 0, request.PageNumber, request.PageSize);
+                        }
+
                     }
 
                 }

@@ -70,7 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.ClosedApproveBy = null;
 
                 var addTicketHistory = new TicketHistory
-                {
+                { 
                     TicketConcernId = ticketConcernExist.Id,
                     TransactedBy = command.Added_By,
                     TransactionDate = DateTime.Now,
@@ -103,7 +103,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
                         var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
-
+                        
                         if (extension == null || !allowedFileTypes.Contains(extension))
                         {
                             return Result.Failure(TicketRequestError.InvalidAttachmentType());
@@ -139,9 +139,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
                 }
-
-
-
+ 
                 await Task.WhenAll(uploadTasks);
 
                 await _context.SaveChangesAsync(cancellationToken);

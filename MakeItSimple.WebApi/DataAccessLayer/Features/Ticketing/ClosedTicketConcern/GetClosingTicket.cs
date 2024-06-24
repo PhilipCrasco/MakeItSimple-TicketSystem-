@@ -164,26 +164,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             }
                         }
-
                         else if(request.UserType == TicketingConString.Receiver)
                         {
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
                             {
                                 if (request.UserId == receiverList.UserId)
-                                {
+                                {  
                                     var fillterApproval = closingTicketsQuery.Select(x => x.Id);
-
+                                     
                                     var approverTransactList = await _context.ApproverTicketings
-                                        .Where(x => fillterApproval.Contains(x.Id) && x.IsApprove == null)
+                                        .Where(x => fillterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
                                         .ToListAsync();
 
-                                    if (approverTransactList != null && approverTransactList.Any())
+                                    if (approverTransactList.Any())
                                     {
                                         var generatedIdInApprovalList = approverTransactList
-                                            .Select(approval => approval.Id);
+                                            .Select(approval => approval.ClosingTicketId);
 
                                         closingTicketsQuery = closingTicketsQuery
                                             .Where(x => !generatedIdInApprovalList.Contains(x.Id));
+
+                                        
                                     }
 
                                     var receiver = await _context.TicketConcerns
@@ -192,10 +193,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                         .ToListAsync();
 
                                     var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                    var requestorSelect = receiver.Select(x => x.Id);
 
                                     closingTicketsQuery = closingTicketsQuery
-                                        .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect.Contains(x.TicketConcernId));
+                                        .Where(x => receiverContains.Contains(x.TicketConcern.User.BusinessUnitId));
                                 }
                                 else
                                 {

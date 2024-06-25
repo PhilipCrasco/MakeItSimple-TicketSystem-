@@ -15,11 +15,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public int? OpenTicketCount { get; set; }
             public int? CloseTicketCount { get; set; }
             public int? DelayedTicketCount { get; set; }
-
+            public int ? ForClosingTicketCount { get; set; }
             public int? TicketConcernId { get; set; }
             public int? RequestConcernId { get; set; }
-
-            public string Ticket_No {  get; set; } 
 
             public string Concern_Description { get; set; }
 
@@ -346,9 +344,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     RequestedTicketCount = ticketConcernQuery.Count(),
                     OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
                     DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
+                    ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
+
                     TicketConcernId = x.Id,
                     RequestConcernId = x.RequestConcernId,
-                    Ticket_No = x.TicketNo,
                     Concern_Description = x.ConcernDetails,
                     Requestor_By = x.RequestorBy,
                     Requestor_Name = x.RequestorByUser.Fullname,
@@ -397,9 +396,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Is_ReDate = x.IsReDate,
                     Is_ReTicket = x.IsReTicket,
                     Is_Transfer = x.IsTransfer,
-                    
+
                     GetForClosingTickets = x.ClosingTickets
-                    .Where(x => x.IsActive == true && x.IsClosing == false )
+                    .Where(x => x.IsActive == true && x.IsClosing == false)
                     .Select(x => new GetOpenTicketResult.GetForClosingTicket
                     {
                         ClosingTicketId = x.Id,
@@ -419,13 +418,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     }).ToList(),
 
                     GetForTransferTickets = x.TransferTicketConcerns
-                    .Where(x => x.IsActive == true && x.IsTransfer == false )
+                    .Where(x => x.IsActive == true && x.IsTransfer == false)
                     .Select(x => new GetOpenTicketResult.GetForTransferTicket
                     {
                         TransferTicketConcernId = x.Id,
                         Transfer_Remarks = x.TransferRemarks,
-                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false, 
-                        GetAttachmentForTransferTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForTransferTicket.GetAttachmentForTransferTicket 
+                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false,
+                        GetAttachmentForTransferTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForTransferTicket.GetAttachmentForTransferTicket
                         {
                             TicketAttachmentId = x.Id,
                             Attachment = x.Attachment,
@@ -433,7 +432,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             FileSize = x.FileSize,
 
                         }).ToList(),
-                        
+
                     }).ToList(),
 
                     GetForReDateTickets = x.TicketReDates
@@ -444,7 +443,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         Start_Date = x.StartDate,
                         Target_Date = x.TargetDate,
                         ReDate_Remarks = x.ReDateRemarks,
-                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true: false,
+                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false,
                         GetAttachmentForReDateTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForReDateTicket.GetAttachmentForReDateTicket
                         {
                             TicketAttachmentId = x.Id,
@@ -456,7 +455,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }).ToList(),
 
-                });
+                }) ;
 
                 var ticketConcernList = results
                     .Where(x => x.Ticket_Status.Contains(TicketingConString.NotConfirm))

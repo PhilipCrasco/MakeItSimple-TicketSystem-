@@ -86,7 +86,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.RejectClosedByUser)
                     .Include(x => x.ClosedByUser)
                     .Include(x => x.TicketConcern)
-                    .ThenInclude(x => x.User)
+                    .ThenInclude(x => x.User) 
                     .ThenInclude(x => x.Department)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.User)
@@ -170,10 +170,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             {
                                 if (request.UserId == receiverList.UserId)
                                 {  
-                                    var fillterApproval = closingTicketsQuery.Select(x => x.Id);
+                                    var filterApproval = closingTicketsQuery.Select(x => x.Id);
                                      
                                     var approverTransactList = await _context.ApproverTicketings
-                                        .Where(x => fillterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
+                                        .Where(x => filterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
                                         .ToListAsync();
 
                                     if (approverTransactList.Any())
@@ -262,6 +262,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             Updated_At = x.UpdatedAt,
 
                         }).ToList(),
+
 
                     });
 

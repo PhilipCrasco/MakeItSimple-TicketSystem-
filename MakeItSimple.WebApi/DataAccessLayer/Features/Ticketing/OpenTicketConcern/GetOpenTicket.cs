@@ -457,55 +457,55 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }) ;
 
-                var ticketConcernList = results
-                    .Where(x => x.Ticket_Status.Contains(TicketingConString.NotConfirm))
-                    .Select(x => x.RequestConcernId); 
+                //var ticketConcernList = results
+                //    .Where(x => x.Ticket_Status.Contains(TicketingConString.NotConfirm))
+                //    .Select(x => x.RequestConcernId); 
 
 
-                var confirmConcernList = await _context.RequestConcerns
-                    .Where(x => ticketConcernList.Contains(x.Id) && x.Is_Confirm == null && x.IsDone == true)
-                    .ToListAsync();
+                //var confirmConcernList = await _context.RequestConcerns
+                //    .Where(x => ticketConcernList.Contains(x.Id) && x.Is_Confirm == null && x.IsDone == true)
+                //    .ToListAsync();
 
-                foreach (var confirmConcern in confirmConcernList)
-                {
+                //foreach (var confirmConcern in confirmConcernList)
+                //{
 
-                    var daysClose = confirmConcern.TicketConcerns.First().Closed_At.Value.Day - dateToday.Day;
+                //    var daysClose = confirmConcern.TicketConcerns.First().Closed_At.Value.Day - dateToday.Day;
 
-                    daysClose = Math.Abs(daysClose) * (1);
+                //    daysClose = Math.Abs(daysClose) * (1);
 
-                    if (daysClose >= 1)
-                    {
-                        daysClose = daysClose * 24;
-                    }
+                //    if (daysClose >= 1)
+                //    {
+                //        daysClose = daysClose * 24;
+                //    }
 
-                    var hourConvert = (daysClose + confirmConcern.TicketConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
+                //    var hourConvert = (daysClose + confirmConcern.TicketConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
 
-                    if (hourConvert >= hoursDiff)
-                    {
-                        var requestConcern = await _context.RequestConcerns
-                            .FirstOrDefaultAsync(x => x.Id == confirmConcern.Id);
+                //    if (hourConvert >= hoursDiff)
+                //    {
+                //        var requestConcern = await _context.RequestConcerns
+                //            .FirstOrDefaultAsync(x => x.Id == confirmConcern.Id);
 
-                        requestConcern.Is_Confirm = true;
-                        requestConcern.Confirm_At = DateTime.Today;
+                //        requestConcern.Is_Confirm = true;
+                //        requestConcern.Confirm_At = DateTime.Today;
 
-                        var ticketConcernExist = await _context.TicketConcerns
-                            .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.Id);
+                //        var ticketConcernExist = await _context.TicketConcerns
+                //            .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.Id);
 
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketConcernId = ticketConcernExist.Id,
-                            TransactedBy = request.UserId,
-                            TransactionDate = DateTime.Now, 
-                            Request = TicketingConString.CloseTicket,
-                            Status = TicketingConString.CloseConfirm,
-                        };
+                //        var addTicketHistory = new TicketHistory
+                //        {
+                //            TicketConcernId = ticketConcernExist.Id,
+                //            TransactedBy = request.UserId,
+                //            TransactionDate = DateTime.Now, 
+                //            Request = TicketingConString.CloseTicket,
+                //            Status = TicketingConString.CloseConfirm,
+                //        };
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                //        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                        await _context.SaveChangesAsync(cancellationToken);
-                    }
+                //        await _context.SaveChangesAsync(cancellationToken);
+                //    }
 
-                }
+                //}
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

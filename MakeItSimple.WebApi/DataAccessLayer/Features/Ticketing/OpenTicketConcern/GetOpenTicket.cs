@@ -398,7 +398,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     Is_Transfer = x.IsTransfer,
 
                     GetForClosingTickets = x.ClosingTickets
-                    .Where(x => x.IsActive == true && x.IsClosing == false)
+                    .Where(x => x.IsClosing == true ? x.IsClosing == true : x.IsActive == true && x.IsClosing == false)
                     .Select(x => new GetOpenTicketResult.GetForClosingTicket
                     {
                         ClosingTicketId = x.Id,

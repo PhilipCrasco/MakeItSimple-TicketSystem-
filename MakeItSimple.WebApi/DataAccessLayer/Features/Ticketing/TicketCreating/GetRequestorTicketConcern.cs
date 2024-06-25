@@ -349,6 +349,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         requestConcern.Is_Confirm = true;
                         requestConcern.Confirm_At = DateTime.Today;
+                        requestConcern.ConcernStatus = TicketingConString.Done;
 
                         var ticketConcernExist = await _context.TicketConcerns
                             .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.RequestConcernId);

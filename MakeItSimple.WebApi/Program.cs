@@ -31,6 +31,7 @@ x.UseSqlServer(connectionString)
     .EnableSensitiveDataLogging()
     );
 
+
 //var connectionString = builder.Configuration.GetConnectionString("DevConnection");
 
 //var serverVersion = new MySqlServerVersion(new Version(8, 2, 17));

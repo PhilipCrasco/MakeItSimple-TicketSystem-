@@ -100,7 +100,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             TicketConcernId = closingTicketExist.TicketConcernId,
                             TransactedBy = command.Transacted_By,
                             TransactionDate = DateTime.Now,
-                            Request = TicketingConString.CloseTicket,
+                            Request = TicketingConString.ForClosing,
                             Status = $"{TicketingConString.CloseApprove} {userDetails.Fullname}"
                         };
 
@@ -144,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 TicketConcernId = closingTicketExist.TicketConcernId,
                                 TransactedBy = command.Transacted_By,
                                 TransactionDate = DateTime.Now,
-                                Request = TicketingConString.CloseTicket,
+                                Request = TicketingConString.TicketClosed,
                                 Status = TicketingConString.CloseApproveReceiver,
                             };
 

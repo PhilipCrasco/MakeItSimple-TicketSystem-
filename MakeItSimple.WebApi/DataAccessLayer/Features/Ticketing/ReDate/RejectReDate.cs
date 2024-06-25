@@ -88,7 +88,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                     TransactedBy = reDateExist.ReDateBy,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.ReDate,
-                    Status = $"{TicketingConString.ReDateReject} {userDetails.Fullname}"
+                    Status = $"{TicketingConString.ReDateReject} {userDetails.Fullname}",
+                    Remarks = command.Reject_Remarks,
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

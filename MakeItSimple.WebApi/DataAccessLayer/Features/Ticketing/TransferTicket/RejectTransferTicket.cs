@@ -87,8 +87,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     TicketConcernId = transferTicketExist.TicketConcernId,
                     TransactedBy = transferTicketExist.TransferBy,
                     TransactionDate = DateTime.Now,
-                    Request = TicketingConString.Transfer,
-                    Status = $"{TicketingConString.TransferReject} {userDetails.Fullname}"
+                    Request = TicketingConString.ForTransfer,
+                    Status = $"{TicketingConString.TransferReject} {userDetails.Fullname}",
+                    Remarks = command.Reject_Remarks
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

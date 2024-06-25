@@ -171,7 +171,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                         TicketConcernId = ticketConcernExist.Id,
                         TransactedBy = command.Transacted_By,
                         TransactionDate = DateTime.Now,
-                        Request = TicketingConString.ReDate,
+                        Request = TicketingConString.ForReDate,
                         Status = TicketingConString.ReDateRequest
 
                     };

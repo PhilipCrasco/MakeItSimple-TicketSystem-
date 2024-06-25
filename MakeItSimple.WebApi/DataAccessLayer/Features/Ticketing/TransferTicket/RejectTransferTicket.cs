@@ -87,7 +87,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     TicketConcernId = transferTicketExist.TicketConcernId,
                     TransactedBy = transferTicketExist.TransferBy,
                     TransactionDate = DateTime.Now,
-                    Request = TicketingConString.ForTransfer,
+                    Request = TicketingConString.Reject,
                     Status = $"{TicketingConString.TransferReject} {userDetails.Fullname}",
                     Remarks = command.Reject_Remarks
                 };

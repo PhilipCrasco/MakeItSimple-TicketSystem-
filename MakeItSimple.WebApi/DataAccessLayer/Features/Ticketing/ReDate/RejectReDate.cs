@@ -87,7 +87,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReDate
                     TicketConcernId = reDateExist.TicketConcernId,
                     TransactedBy = reDateExist.ReDateBy,
                     TransactionDate = DateTime.Now,
-                    Request = TicketingConString.ReDate,
+                    Request = TicketingConString.Reject,
                     Status = $"{TicketingConString.ReDateReject} {userDetails.Fullname}",
                     Remarks = command.Reject_Remarks,
                 };

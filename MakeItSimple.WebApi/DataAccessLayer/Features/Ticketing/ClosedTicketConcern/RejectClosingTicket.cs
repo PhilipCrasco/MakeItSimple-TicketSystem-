@@ -68,7 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     TicketConcernId = closedTicketExist.TicketConcernId,
                     TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
-                    Request = TicketingConString.ForClosing,
+                    Request = TicketingConString.Reject,
                     Status = $"{TicketingConString.CloseReject} {userDetails.Fullname}",
                     Remarks = command.Reject_Remarks,
                     

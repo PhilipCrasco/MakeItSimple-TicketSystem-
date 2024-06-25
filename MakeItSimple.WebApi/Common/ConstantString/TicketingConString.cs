@@ -58,10 +58,14 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string ApproveBy = "Request approve by";
         public const string ReceiverApproveBy = "Request has been approved by receiver";
         public const string Returned = "Request was returned";
-        public const string Cancel = "Request was cancel";
 
 
         // Concern Status 
+        public const string ConcernAssign = "Assign";
+        public const string Reject = "Rejected";
+        public const string Cancel = "Cancel";
+        public const string Confirm = "Confirm";
+        public const string Disapprove = "Disapprove";
 
         public const string ForApprovalTicket = "For Approval";
         public const string CurrentlyFixing = "Ongoing";

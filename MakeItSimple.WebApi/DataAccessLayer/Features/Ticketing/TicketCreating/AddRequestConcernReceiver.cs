@@ -308,7 +308,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             TicketConcernId = addnewTicketConcern.Id,
                             TransactedBy = command.UserId,
                             TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Request,
+                            Request = TicketingConString.ConcernAssign,
                             Status = $"{TicketingConString.RequestAssign} {issueHandlerDetails.Fullname}"
                         };
 

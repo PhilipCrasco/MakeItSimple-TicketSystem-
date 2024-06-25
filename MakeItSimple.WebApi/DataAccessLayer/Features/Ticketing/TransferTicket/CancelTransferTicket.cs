@@ -62,7 +62,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     TicketConcernId = ticketConcernExist.Id,
                     TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
-                    Request = TicketingConString.ForTransfer,
+                    Request = TicketingConString.Cancel,
                     Status = TicketingConString.TransferCancel
                 };
 

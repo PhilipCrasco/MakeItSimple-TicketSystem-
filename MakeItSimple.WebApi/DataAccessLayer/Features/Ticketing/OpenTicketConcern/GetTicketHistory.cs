@@ -20,6 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 public string Status { get; set; }
                 public string Transacted_By { get; set; }
                 public DateTime? Transaction_Date { get; set; }
+                public string Remarks { get; set; }
 
 
             }
@@ -56,6 +57,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             Request = x.Request,
                             Status = x.Status,
                             Transaction_Date = x.TransactionDate,
+                            Remarks = x.Remarks
 
                         }).ToList()
 

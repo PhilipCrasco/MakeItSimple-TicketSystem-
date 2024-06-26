@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public int? TicketConcernId { get; set; }
             public int? RequestConcernId { get; set; }
 
+            public string Closed_Status { get; set; }
+
             public string Concern_Description { get; set; }
 
             public Guid? Requestor_By { get; set; }
@@ -241,15 +243,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                     .Where(x => x.IsClosedApprove == false);
                                 break;
 
-                            //case TicketingConString.NotConfirm:
-                            //    ticketConcernQuery = ticketConcernQuery
-                            //        .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
-                            //    break;
+                            case TicketingConString.NotConfirm:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                break;
 
                             case TicketingConString.Closed:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true &&
-                                    ( x.RequestConcern.Is_Confirm == true || x.RequestConcern.Is_Confirm == null));
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
                                 break;
 
                             default:
@@ -345,7 +346,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
                     DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
                     ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
-
+                    Closed_Status = x.TargetDate >= x.Closed_At ? TicketingConString.OnTime : TicketingConString.Delay,
                     TicketConcernId = x.Id,
                     RequestConcernId = x.RequestConcernId,
                     Concern_Description = x.ConcernDetails,

@@ -93,13 +93,17 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string Closed = "Closed";
         public const string Transfer = "Transfer";
         public const string Request = "Request Concern";
-        public const string NotConfirm = "Closed/For Confirmation";
+        public const string NotConfirm = "For Confirmation";
 
 
 
         public const string TicketClosed = "Ticket Closed";
 
         public const string RequestApproval = "For approval by ";
+
+
+        public const string OnTime = "On-Time";
+        public const string Delay = "Delay";
 
 
     }

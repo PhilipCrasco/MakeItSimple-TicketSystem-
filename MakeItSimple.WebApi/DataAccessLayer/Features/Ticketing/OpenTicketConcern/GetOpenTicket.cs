@@ -13,6 +13,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public int? RequestedTicketCount { get; set; }
             public int? OpenTicketCount { get; set; }
+            public int? ForConfirmationCount { get; set; }
             public int? CloseTicketCount { get; set; }
             public int? DelayedTicketCount { get; set; }
             public int ? ForClosingTicketCount { get; set; }
@@ -341,9 +342,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 var results = ticketConcernQuery.Select(x => new GetOpenTicketResult
                 {
-                    CloseTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == true),
+                    CloseTicketCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true),
                     RequestedTicketCount = ticketConcernQuery.Count(),
                     OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
+                    ForConfirmationCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == null && x.IsClosedApprove == true),
                     DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
                     ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
                     Closed_Status = x.TargetDate >= x.Closed_At ? TicketingConString.OnTime : TicketingConString.Delay,

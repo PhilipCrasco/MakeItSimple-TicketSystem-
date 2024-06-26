@@ -56,6 +56,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors
         public static Error InvalidDefaultPassword() =>
         new Error("User.InvalidDefaultPassword", "New password should not be equal to default password!");
 
+        public static Error ProfilePicNull() =>
+        new Error("User.ProfilePicNull", "Profile picture is empty!");    
+
 
 
     }

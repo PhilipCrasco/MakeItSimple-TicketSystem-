@@ -170,7 +170,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-
         [HttpDelete("cancel")]
         public async Task<IActionResult> CancelClosingTicket([FromBody] CancelClosingTicketCommand command)
         {

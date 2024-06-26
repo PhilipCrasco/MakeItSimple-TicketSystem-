@@ -23,6 +23,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string Modified_By { get; set; }
             public DateTime ? Update_At { get; set;}
 
+            public string Profile_Pic { get; set; }
+            public string FileName { get; set; }
+            public decimal? FileSize { get; set; }
+
             public int? UserRoleId { get; set; }
             public string User_Role_Name { get; set; }
 
@@ -45,6 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public int ? UnitId { get; set; }
             public string Unit_Code { get; set; }
             public string Unit_Name {  get; set; }
+
             
 
             public int ? SubUnitId { get; set; }
@@ -108,6 +113,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Created_At = x.CreatedAt,
                     Is_Active = x.IsActive,
                     Modified_By = x.ModifiedByUser.Fullname,
+                    Profile_Pic = x.ProfilePic,
+                    FileName = x.FileName,
+                    FileSize = x.FileSize,
                     Update_At = x.UpdatedAt,
                     UserRoleId = x.UserRoleId,
                     User_Role_Name = x.UserRole.UserRoleName,

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures.GetUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateProfilePic;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateUserStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserResetPassword;
@@ -199,7 +200,30 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         }
 
 
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfilePic([FromForm] UpdateProfilePicCommand command)
+        {
+            try
+            {
 
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.UserId = userId;
+                }
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
 
 
 

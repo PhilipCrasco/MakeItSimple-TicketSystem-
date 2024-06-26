@@ -24,6 +24,8 @@ namespace MakeItSimple.WebApi.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime ? UpdatedAt { get; set;}
 
+        
+
 
         [ForeignKey("AddedByUser")]
         public Guid ? AddedBy { get; set; }
@@ -63,10 +65,9 @@ namespace MakeItSimple.WebApi.Models
         public virtual Location Location { get; set; }
 
 
-
-
-
-
+        public string ProfilePic { get; set; }
+        public string FileName { get; set; }
+        public decimal? FileSize { get; set; }
 
 
     }

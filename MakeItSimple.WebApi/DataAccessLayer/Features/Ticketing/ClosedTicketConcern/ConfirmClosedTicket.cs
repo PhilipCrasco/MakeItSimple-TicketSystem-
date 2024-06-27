@@ -44,6 +44,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 requestConcernId.Is_Confirm = true; 
                 requestConcernId.Confirm_At = DateTime.Today;
+                requestConcernId.ConcernStatus = TicketingConString.Done;
+                
 
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.RequestConcernId == command.RequestConcernId, cancellationToken);

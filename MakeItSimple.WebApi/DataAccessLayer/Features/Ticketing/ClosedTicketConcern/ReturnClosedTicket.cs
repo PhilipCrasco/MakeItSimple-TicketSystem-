@@ -62,12 +62,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     return Result.Failure(TicketRequestError.RequestConcernIdNotExist());
                 }
 
+                requestConcernExist.ConcernStatus = TicketingConString.OnGoing;
+                requestConcernExist.IsDone = false;
+
                 var ticketConcernExist = await _context.TicketConcerns
                      .FirstOrDefaultAsync(x => x.RequestConcernId == requestConcernExist.Id, cancellationToken);
 
                 ticketConcernExist.IsClosedApprove = null;
                 ticketConcernExist.Closed_At = null;
                 ticketConcernExist.ClosedApproveBy = null;
+                ticketConcernExist.ConcernStatus = TicketingConString.OnGoing;
 
                 var addTicketHistory = new TicketHistory
                 { 

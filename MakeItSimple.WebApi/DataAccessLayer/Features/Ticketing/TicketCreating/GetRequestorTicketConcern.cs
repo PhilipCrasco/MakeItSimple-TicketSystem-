@@ -264,6 +264,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                  }
 
+
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {
                     RequestConcernId = g.Id,

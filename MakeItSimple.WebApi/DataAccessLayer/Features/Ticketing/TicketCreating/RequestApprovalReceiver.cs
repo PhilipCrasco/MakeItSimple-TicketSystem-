@@ -35,6 +35,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 var dateToday = DateTime.Today;
 
+                var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId, cancellationToken);
+
                 var allUserList = await _context.UserRoles.ToListAsync();
 
                 var receiverPermissionList = allUserList.Where(x => x.Permissions
@@ -89,8 +91,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         TicketConcernId = ticketConcernExist.Id,
                         TransactedBy = command.UserId,
                         TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Request,
-                        Status = $"{TicketingConString.RequestAssign} {ticketConcernExist.User.Fullname}"
+                        Request = TicketingConString.ConcernAssign,
+                        Status = $"{TicketingConString.RequestAssign} {userDetails.Fullname}"
                     };
 
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

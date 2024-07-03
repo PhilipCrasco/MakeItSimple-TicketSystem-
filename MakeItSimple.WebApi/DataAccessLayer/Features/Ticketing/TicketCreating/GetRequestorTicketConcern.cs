@@ -21,6 +21,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestorTicketConcernResult
         {
             
+            public int ? RequestConcernCount { get; set; }
+            public int ? ForApprovalCount { get; set; }
+            public int ? OnGoingCount { get; set; }
+            public int ? ForConfirmationCount { get; set; }
+            public int ? DoneCount { get; set; }
+
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
             public string Resolution { get; set; }
@@ -264,9 +270,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                  }
 
+                var requestConcerCount = requestConcernsQuery.Count();
+                var forApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket));
+                var onGoingCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.CurrentlyFixing));
+                var forConfirmationCount = requestConcernsQuery.Count(x => x.Is_Confirm == null && x.ConcernStatus.Contains(TicketingConString.NotConfirm));
+                var doneCount = requestConcernsQuery.Count(x => x.Is_Confirm == true && x.ConcernStatus.Contains(TicketingConString.Done));
+
+
 
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {
+                    RequestConcernCount = requestConcerCount,
+                    ForApprovalCount = forApprovalCount,
+                    OnGoingCount = onGoingCount,
+                    ForConfirmationCount = forConfirmationCount,
+                    DoneCount = doneCount,
                     RequestConcernId = g.Id,
                     Concern = g.Concern,
                     Resolution = g.Resolution,

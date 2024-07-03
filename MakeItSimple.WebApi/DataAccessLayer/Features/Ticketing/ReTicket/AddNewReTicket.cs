@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket
             }
 
             public async Task<Result> Handle(AddNewReTicketCommand command, CancellationToken cancellationToken)
-            {
+            { 
                 var dateToday = DateTime.Today;
                 var reTicketList = new List<ReTicketConcern>();
                 var ticketTransactionId = new TicketTransaction { IsActive = true };

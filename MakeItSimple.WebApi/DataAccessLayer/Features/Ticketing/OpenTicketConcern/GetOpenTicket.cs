@@ -348,7 +348,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     ForConfirmationCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == null && x.IsClosedApprove == true),
                     DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
                     ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
-                    Closed_Status = x.TargetDate >= x.Closed_At ? TicketingConString.OnTime : TicketingConString.Delay,
+                    Closed_Status = x.TargetDate.Value.Day >= x.Closed_At.Value.Day ? TicketingConString.OnTime : TicketingConString.Delay,
                     TicketConcernId = x.Id,
                     RequestConcernId = x.RequestConcernId,
                     Concern_Description = x.ConcernDetails,

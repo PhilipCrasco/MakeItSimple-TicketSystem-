@@ -1,5 +1,4 @@
-﻿using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification;
+﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

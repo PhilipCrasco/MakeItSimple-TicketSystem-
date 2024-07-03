@@ -13,8 +13,8 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
-using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
 using System.Configuration;
+using MakeItSimple.WebApi;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -181,7 +181,7 @@ app.UseAuthorization();
 app.UseWebSockets();
 
 
-app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registration
+app.MapHub<NotificationHub>("/notification-hub"); 
 app.MapControllers(); 
 
 app.Run();

@@ -31,7 +31,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
 
         public const string CloseRequest = "Ticket closure requested";
 
-        public const string CloseForApproval = "Ticket closure request pending approval from";
+        public const string CloseForApproval = "Ticket closure pending approval from";
 
         public const string CloseCancel = "Ticket closure request canceled";
         public const string CloseReject = "Ticket closure request rejected by";

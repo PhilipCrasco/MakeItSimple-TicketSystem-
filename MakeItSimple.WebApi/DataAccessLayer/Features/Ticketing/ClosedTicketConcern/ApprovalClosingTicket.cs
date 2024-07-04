@@ -180,17 +180,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                            var addApproverHistory = new TicketHistory
-                            {
-                                TicketConcernId = closingTicketExist.TicketConcernId,
-                                TransactedBy = receiverList.UserId,
-                                TransactionDate = DateTime.Now,
-                                Request = TicketingConString.Approval,
-                                Status = $"{TicketingConString.CloseForApproval} {TicketingConString.Receiver}"
-                            };
-
-                            await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
-
                         }
                         else
                         {

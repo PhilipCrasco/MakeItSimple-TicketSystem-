@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MakeItSimple.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc51cf5f31e7d871fe048888a2631b99e01b3ce2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+992877ef021647ae19294d6ce4c3ac3eb5148be1")]
 [assembly: System.Reflection.AssemblyProductAttribute("MakeItSimple.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MakeItSimple.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

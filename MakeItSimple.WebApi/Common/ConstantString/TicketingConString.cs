@@ -99,6 +99,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string Transfer = "Transfer";
         public const string Request = "Request Concern";
         public const string NotConfirm = "For Confirmation";
+        public const string Approve = "Approve";
 
 
 

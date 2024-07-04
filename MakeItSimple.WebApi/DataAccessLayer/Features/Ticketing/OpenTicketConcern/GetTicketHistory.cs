@@ -12,6 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
         public class GetTicketHistoryResult
         {
             public int? TicketConcernId { get; set; }
+
             public List<GetTicketHistoryConcern> GetTicketHistoryConcerns { get; set; }
             public class GetTicketHistoryConcern
             {
@@ -21,8 +22,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 public string Transacted_By { get; set; }
                 public DateTime? Transaction_Date { get; set; }
                 public string Remarks { get; set; }
-
-
             }
         }
 
@@ -45,6 +44,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             {
                 var ticketHistory = await _context.TicketHistories
                     .Include(x => x.TransactedByUser)
+                    .Include(x => x.TicketConcern)
                     .Where(x => x.TicketConcernId == request.TicketConcernId)
                     .GroupBy(x => x.TicketConcernId).Select(x => new GetTicketHistoryResult
                     {

@@ -30,12 +30,17 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         //Close History
 
         public const string CloseRequest = "Ticket closure requested";
+
+        public const string CloseForApproval = "Ticket closure request pending approval from";
+
         public const string CloseCancel = "Ticket closure request canceled";
         public const string CloseReject = "Ticket closure request rejected by";
         public const string CloseApprove = "Ticket closure request approved by";
         public const string CloseApproveReceiver = "Receiver approved the ticket closure request";
         public const string CloseConfirm = "Ticket confirmed as resolved";
         public const string CloseReturn = "Ticket remains open due to unresolved issues";
+
+
 
         //Transfer History
 
@@ -100,6 +105,8 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string TicketClosed = "Ticket Closed";
 
         public const string RequestApproval = "For approval by ";
+
+        public const string ApprovalHistory = "For Approval of";
 
 
         public const string OnTime = "On-Time";

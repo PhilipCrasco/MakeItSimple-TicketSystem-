@@ -22,6 +22,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using MakeItSimple.WebApi.Common.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -31,10 +33,14 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     public class RequestConcernController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly TimerControl _timerControl;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public RequestConcernController(IMediator mediator)
+        public RequestConcernController(IMediator mediator , TimerControl timerControl , IHubContext<NotificationHub> client)
         {
             _mediator = mediator;
+            _timerControl = timerControl;
+            _client = client;
         }
 
 
@@ -231,6 +237,23 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 };
 
                 var successResult = Result.Success(result);
+
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(query);
+                        await clientsAll.SendAsync("PrepareConcernData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
                 return Ok(successResult);
             }
             catch (Exception ex)

@@ -12,6 +12,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAcc
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateUserStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserResetPassword;
+using static NuGet.Packaging.PackagingConstants;
 
 
 namespace MakeItSimple.WebApi.Controllers.UserController
@@ -21,7 +22,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
     public class UserController : ControllerBase
     {
 
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator; 
         private readonly ValidatorHandler _validatorHandler;
 
 
@@ -29,9 +30,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         {
             _mediator = mediator;
             _validatorHandler = validatorHandler;
-
         }
-
 
         [HttpGet("GetUser")]
         public async Task<IActionResult> GetUser([FromQuery] GetUsersQuery query)
@@ -64,6 +63,11 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                 };
 
                 var successResult = Result.Success(result);
+
+
+
+
+
                 return Ok(successResult);
             }
             catch (Exception ex)

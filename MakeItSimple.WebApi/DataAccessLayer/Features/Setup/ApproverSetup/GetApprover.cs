@@ -56,6 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                     approverQuery = approverQuery.Where(x => x.Channel.ChannelName.Contains(request.Search));
                 }
 
+
                 if(request.Status != null)
                 {
                     approverQuery = approverQuery.Where(x => x.IsActive == request.Status);

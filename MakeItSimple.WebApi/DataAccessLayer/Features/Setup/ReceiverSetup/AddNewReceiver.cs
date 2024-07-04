@@ -105,7 +105,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         else
                         {
 
-
                             var addNewReceiver = new Receiver
                             {
                                 UserId = command.UserId,
@@ -125,7 +124,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                     else
                     {
 
-
                         var addNewReceiver = new Receiver
                         {
                             UserId = command.UserId,
@@ -139,9 +137,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         receiverList.Add(addNewReceiver);
 
                     }
-
-
-
 
                 }
 

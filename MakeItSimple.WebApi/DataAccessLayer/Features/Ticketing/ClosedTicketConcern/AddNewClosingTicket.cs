@@ -73,7 +73,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         bool IsChanged = false;
 
-                        if(closingTicketExist.Resolution != command.Resolution)
+                        if (closingTicketExist.Resolution != command.Resolution)
                         {
                             closingTicketExist.Resolution = command.Resolution;
                             IsChanged = true;
@@ -93,6 +93,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.UserId, cancellationToken);
 
                         var approverList = await _context.Approvers
+                            .Include(x => x.User)
                             .Where(x => x.SubUnitId == approverByUser.SubUnitId)
                             .ToListAsync();
 
@@ -154,8 +155,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         };
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-                    }
 
+                        var approverLevel = approverUser.ApproverLevel == 1 ? $"{approverUser.ApproverLevel}st"
+                            : approverUser.ApproverLevel == 2 ? $"{approverUser.ApproverLevel}nd"
+                            : approverUser.ApproverLevel == 3 ? $"{approverUser.ApproverLevel}rd"
+                            : $"{approverUser.ApproverLevel}th";
+
+
+                        var addApproverHistory = new TicketHistory
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransactedBy = command.Added_By,
+                            TransactionDate = DateTime.Now,
+                            Request = $"{TicketingConString.ApprovalHistory} {approverLevel} Approver",
+                            Status = $"{TicketingConString.CloseForApproval} {approverUser.User.Fullname}"
+                        };
+
+                        await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
+
+                    }
 
                     var uploadTasks = new List<Task>();
 
@@ -244,6 +262,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
  
 
                     await Task.WhenAll(uploadTasks);
+
 
                     await _context.SaveChangesAsync(cancellationToken);
 

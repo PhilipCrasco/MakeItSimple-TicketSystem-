@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using System.Configuration;
 using MakeItSimple.WebApi;
+using MakeItSimple.WebApi.Common.SignalR;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,10 +75,11 @@ builder.Services.AddControllers( options =>
 }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 
-builder.Services.AddControllers();
+
 builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddScoped<TransformUrl>();
+builder.Services.AddSingleton<TimerControl>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -153,6 +155,7 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddSignalR();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -181,8 +184,11 @@ app.UseAuthorization();
 app.UseWebSockets();
 
 
-app.MapHub<NotificationHub>("/notification-hub"); 
-app.MapControllers(); 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notification-hub");
+});
+//app.MapControllers(); 
 
 app.Run();
-//asd

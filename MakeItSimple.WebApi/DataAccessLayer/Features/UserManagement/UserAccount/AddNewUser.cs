@@ -133,17 +133,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 }
 
 
-                //if(command.TeamId != null)
-                //{
-                //    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
-                //    if (teamNotExist == null)
-                //    {
-                //        return Result.Failure(UserError.TeamNotExist());
-                //    }
-
-                //}
-                
-
                 var users = new User
                 {
 

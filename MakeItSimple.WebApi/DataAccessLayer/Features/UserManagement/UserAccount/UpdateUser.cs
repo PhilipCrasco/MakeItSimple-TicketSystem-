@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
@@ -139,7 +140,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 //    return Result.Failure(UserError.UserIsUse(user.Fullname));
                 //}
 
-                var usernameAlreadyExist = await _context.Users.FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
+                var usernameAlreadyExist = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Username == command.UserName, cancellationToken);
+
                 if (usernameAlreadyExist != null && user.Username != command.UserName)
                 {
                     return Result.Failure(UserError.UsernameAlreadyExist(command.UserName));
@@ -151,7 +154,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.UserNoChanges());
                 }
 
-                user.UserRoleId = command.UserRoleId;
                 user.DepartmentId = command.DepartmentId;
                 user.SubUnitId = command.SubUnitId;
                 user.CompanyId  = command.CompanyId;
@@ -163,6 +165,51 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.ModifiedBy = command.Modified_By;
                 user.Username = command.UserName;
                 //user.ReceiverId = receiverExist.Id;
+
+
+                if(user.UserRoleId != command.UserRoleId)
+                {
+
+                    var allUserRole = await _context.UserRoles.ToListAsync();
+
+                    var approverList = allUserRole
+                        .Where(x => x.Permissions.Contains(TicketingConString.Approver))
+                        .Select(x => x.Id.ToString());
+
+                    var receiverList = allUserRole
+                        .Where(x => x.Permissions.Contains(TicketingConString.Receiver))
+                        .Select(x => x.Id.ToString());
+
+
+                    if(!approverList.Any(x => x.Contains(command.UserRoleId.ToString()) ))
+                    {
+                        var userApproverList = await _context.Approvers
+                            .Where(x => x.UserId == command.Id)
+                            .ToListAsync();
+
+                        foreach( var approver in userApproverList )
+                        {
+                            _context.Approvers.Remove(approver);
+                        }
+
+                    }
+
+                    if (!receiverList.Any(x => x.Contains(command.UserRoleId.ToString())))
+                    {
+                        var userReceiverList = await _context.Receivers
+                            .Where(x => x.UserId == command.Id)
+                            .ToListAsync();
+
+                        foreach (var receiver in userReceiverList)
+                        {
+                            _context.Receivers.Remove(receiver);
+                        }
+
+                    }
+
+                    user.UserRoleId = command.UserRoleId;
+
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

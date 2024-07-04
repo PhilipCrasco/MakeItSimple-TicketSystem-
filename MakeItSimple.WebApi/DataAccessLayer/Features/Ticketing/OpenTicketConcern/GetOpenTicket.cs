@@ -460,6 +460,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }) ;
 
+
+
+
                 //var ticketConcernList = results
                 //    .Where(x => x.Ticket_Status.Contains(TicketingConString.NotConfirm))
                 //    .Select(x => x.RequestConcernId); 

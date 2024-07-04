@@ -164,6 +164,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             }
                         }
+
                         else if(request.UserType == TicketingConString.Receiver)
                         {
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)

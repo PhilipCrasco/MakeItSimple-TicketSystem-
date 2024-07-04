@@ -106,7 +106,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
 
         public const string RequestApproval = "For approval by ";
 
-        public const string ApprovalHistory = "For Approval of";
+        //public const string ApprovalHistory = "For Approval of";
 
 
         public const string OnTime = "On-Time";

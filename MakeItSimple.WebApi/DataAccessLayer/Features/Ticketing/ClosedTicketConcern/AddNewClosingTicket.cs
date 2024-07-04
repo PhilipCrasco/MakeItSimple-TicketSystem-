@@ -165,10 +165,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var addApproverHistory = new TicketHistory
                         {
                             TicketConcernId = ticketConcernExist.Id,
-                            TransactedBy = command.Added_By,
+                            TransactedBy = approverUser.UserId,
                             TransactionDate = DateTime.Now,
-                            Request = $"{TicketingConString.ApprovalHistory} {approverLevel} Approver",
-                            Status = $"{TicketingConString.CloseForApproval} {approverUser.User.Fullname}"
+                            Request = TicketingConString.Approval,
+                            Status = $"{TicketingConString.CloseForApproval} {approverLevel} Approver"
                         };
 
                         await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);

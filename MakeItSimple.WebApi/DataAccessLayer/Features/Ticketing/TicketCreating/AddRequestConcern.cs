@@ -62,18 +62,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddRequestConcernCommand command, CancellationToken cancellationToken)
             {
 
-
-                //var requestConcernList = new List<RequestConcern>();
                 var updateRequestList = new List<RequestConcern>();
                 var updateRequestAttachmentList = new List<TicketAttachment>();
                 var ticketConcernList = new List<TicketConcern>();
 
-                
-
-                var yearSuffix = DateTime.Now.Year % 100;
+                //var yearSuffix = DateTime.Now.Year % 100;
 
                 var userDetails = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
-
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
@@ -157,12 +152,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     ticketConcernList.Add(addTicketConcern);
 
                     await _context.SaveChangesAsync(cancellationToken);
-
-
-                    //var ticketConcern = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == addTicketConcern.Id);
-                    //ticketConcern.TicketNo = $"{yearSuffix}{ticketConcern.Id:D8}";
-
-                   
 
                     var addTicketHistory = new TicketHistory
                     {

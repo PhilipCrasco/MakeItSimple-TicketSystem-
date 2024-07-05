@@ -29,6 +29,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             {
                 public int ? ChannelId { get; set; }
                 public int ? DepartmentId { get; set; }
+                public string Department_Code { get; set; }
                 public string Department_Name { get; set; }
                 public int ChannelUserId {  get; set; }
                 public Guid ? UserId { get; set; }
@@ -90,6 +91,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         ChannelId = x.ChannelId,
                         ChannelUserId = x.Id,
                         DepartmentId = x.Id,
+                        Department_Code = x.User.Department.DepartmentCode,
                         Department_Name = x.User.Department.DepartmentName,
                         UserId = x.UserId,
                         Fullname = x.User.Fullname,

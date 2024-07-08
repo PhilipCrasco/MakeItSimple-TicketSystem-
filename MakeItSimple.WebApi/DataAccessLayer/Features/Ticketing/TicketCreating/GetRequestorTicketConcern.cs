@@ -302,7 +302,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             .Select(tc => new TicketRequestConcern
                             {
 
-                                TicketConcernId = tc.ConcernStatus.Contains(TicketingConString.Approval) ? null : tc.Id,
+                                TicketConcernId = tc.Id,
                                 Ticket_No = tc.TicketNo,
                                 Concern_Description = tc.ConcernDetails,
                                 DepartmentId = tc.User.DepartmentId,

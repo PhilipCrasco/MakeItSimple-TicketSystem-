@@ -176,7 +176,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             ticketConcernExist.Closed_At = DateTime.Now;
                             ticketConcernExist.ClosedApproveBy = command.Closed_By;
                             ticketConcernExist.IsDone = true;
-                            ticketConcernExist.Remarks = TicketingConString.TicketClosed;
+                            //ticketConcernExist.Remarks = TicketingConString.TicketClosed;
                             ticketConcernExist.ConcernStatus = TicketingConString.Done;
 
                             var requestConcernExist = await _context.RequestConcerns

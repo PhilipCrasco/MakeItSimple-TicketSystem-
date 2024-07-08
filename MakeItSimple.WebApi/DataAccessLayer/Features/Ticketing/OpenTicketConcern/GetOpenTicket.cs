@@ -141,6 +141,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
                     .ThenInclude(x => x.TicketAttachments)
+                    .Include(x => x.TransferTicketConcerns)
+                    .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
                     
 
@@ -205,15 +207,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                     .Where(x => x.IsTransfer == false);
                                 break;
 
-                            case TicketingConString.ForReticket:
-                                ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsReTicket == false);
-                                break;
-
-                            case TicketingConString.ForReDate:
-                                ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsReDate == false);
-                                break;
 
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
@@ -247,11 +240,31 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         {
                             ticketConcernQuery = ticketConcernQuery
                                 .Where(x => x.ClosingTickets
-                                .First(x => x.IsClosing == false).CreatedAt >= request.Date_From.Value
-                                && x.ClosingTickets.First(x => x.IsClosing == false).CreatedAt
-                                <= request.Date_To.Value && x.ClosingTickets.First().IsActive == true); 
+                                .First(x => x.IsClosing == false).CreatedAt.Date >= request.Date_From.Value.Date
+                                && x.ClosingTickets.First(x => x.IsClosing == false).CreatedAt.Date
+                                <= request.Date_To.Value.Date && x.ClosingTickets.First().IsActive == true); 
                         }
-                        
+                        else if(request.Concern_Status.Contains(TicketingConString.NotConfirm))
+                        {
+                            ticketConcernQuery = ticketConcernQuery
+                                .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null
+                                && (x.CreatedAt.Date >= request.Date_From.Value.Date && x.CreatedAt.Date <= request.Date_To.Value.Date));
+                        }
+                        else if (request.Concern_Status.Contains(TicketingConString.Closed))
+                        {
+                            ticketConcernQuery = ticketConcernQuery
+                                .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true
+                                && (x.Closed_At.Value.Date >= request.Date_From.Value.Date && x.Closed_At.Value.Date <= request.Date_To.Value.Date));
+                        }
+
+                        else if (request.Concern_Status.Contains(TicketingConString.ForTransfer))
+                        {
+                            ticketConcernQuery = ticketConcernQuery
+                                .Where(x => x.TransferTicketConcerns
+                                .First(x => x.IsTransfer == false).CreatedAt.Date >= request.Date_From.Value.Date
+                                && x.TransferTicketConcerns.First(x => x.IsTransfer == false).CreatedAt.Date
+                                <= request.Date_To.Value.Date && x.TransferTicketConcerns.First().IsActive == true);
+                        }
 
                         else
                         {

@@ -68,8 +68,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
 
-            public List<GetForReDateTicket> GetForReDateTickets { get; set; }
-
             public class GetForClosingTicket
             {
                 public int ? ClosingTicketId { get; set; }
@@ -102,29 +100,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     public decimal? FileSize { get; set; }
                 }
 
-            }
-
-            public class GetForReDateTicket
-            {
-                public int? TicketReDateId { get; set; }
-                public string ReDate_Remarks { get; set; }
-                public DateTime ? Start_Date { get; set; }
-                public DateTime? Target_Date { get; set; }
-
-                public bool? IsApprove { get; set; }
-
-                public List<GetAttachmentForReDateTicket> GetAttachmentForReDateTickets { get; set; }
-                public class GetAttachmentForReDateTicket
-                {
-                    public int? TicketAttachmentId { get; set; }
-                    public string Attachment { get; set; }
-                    public string FileName { get; set; }
-                    public decimal? FileSize { get; set; }
-                }
-
-            }
-
-
+            } 
 
         }
 
@@ -428,26 +404,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         Transfer_Remarks = x.TransferRemarks,
                         IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false,
                         GetAttachmentForTransferTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForTransferTicket.GetAttachmentForTransferTicket
-                        {
-                            TicketAttachmentId = x.Id,
-                            Attachment = x.Attachment,
-                            FileName = x.FileName,
-                            FileSize = x.FileSize,
-
-                        }).ToList(),
-
-                    }).ToList(),
-
-                    GetForReDateTickets = x.TicketReDates
-                    .Where(x => x.IsActive == true && x.IsReDate == false)
-                    .Select(x => new GetOpenTicketResult.GetForReDateTicket
-                    {
-                        TicketReDateId = x.Id,
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate,
-                        ReDate_Remarks = x.ReDateRemarks,
-                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == true) ? true : false,
-                        GetAttachmentForReDateTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForReDateTicket.GetAttachmentForReDateTicket
                         {
                             TicketAttachmentId = x.Id,
                             Attachment = x.Attachment,

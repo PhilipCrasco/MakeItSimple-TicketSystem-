@@ -36,34 +36,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 foreach (var ticketConcern in command.ReturnTicketRequestByIds)
                 {
-                    var requestTransactionExist = await _context.RequestTransactions
-                        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTransactionId, cancellationToken);
+                    //    var requestTransactionExist = await _context.RequestTransactions
+                    //        .FirstOrDefaultAsync(x => x.Id == ticketConcern.RequestTransactionId, cancellationToken);
 
-                    if (requestTransactionExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.TicketIdNotExist());
-                    }
+                    //    if (requestTransactionExist == null)
+                    //    {
+                    //        return Result.Failure(TicketRequestError.TicketIdNotExist());
+                    //    }
 
-                    var issueHandlerExist = await _context.TicketConcerns
-                        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
-                    && x.UserId == ticketConcern.Issue_Handler)
-                        .FirstOrDefaultAsync();
+                    //    var issueHandlerExist = await _context.TicketConcerns
+                    //        .Where(x => x.RequestTransactionId == requestTransactionExist.Id
+                    //    && x.UserId == ticketConcern.Issue_Handler)
+                    //        .FirstOrDefaultAsync();
 
-                    if (issueHandlerExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.UserNotExist());   
-                    }
+                    //    if (issueHandlerExist == null)
+                    //    {
+                    //        return Result.Failure(TicketRequestError.UserNotExist());   
+                    //    }
 
-                    var ticketConcernExist = await _context.TicketConcerns
-                        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId && x.UserId == ticketConcern.Issue_Handler).ToListAsync();
+                    //    var ticketConcernExist = await _context.TicketConcerns
+                    //        .Where(x => x.RequestTransactionId == ticketConcern.RequestTransactionId && x.UserId == ticketConcern.Issue_Handler).ToListAsync();
 
-                    foreach (var concerns in ticketConcernExist)
-                    {
-                        concerns.IsReject = false;
-                        concerns.IsApprove = false;
-                        concerns.Remarks = command.Remarks;
-                    }
+                    //    foreach (var concerns in ticketConcernExist)
+                    //    {
+                    //        concerns.IsReject = false;
+                    //        concerns.IsApprove = false;
+                    //        concerns.Remarks = command.Remarks;
+                    //    }
 
+                    //}
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);

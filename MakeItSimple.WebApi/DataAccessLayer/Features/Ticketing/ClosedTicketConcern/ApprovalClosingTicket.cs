@@ -2,7 +2,6 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +53,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     var closingTicketExist = await _context.ClosingTickets
                         .Include(x =>  x.TicketConcern)
                         .ThenInclude(x => x.User)
+                        .Include(x => x.TicketConcern)
+                        .ThenInclude(x => x.RequestorByUser)
                         .FirstOrDefaultAsync(x => x.Id == close.ClosingTicketId);  
 
                     var closedRequestId = await _context.ApproverTicketings
@@ -200,6 +201,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             ticketHistory.TransactionDate = DateTime.Now;
                             ticketHistory.Request = TicketingConString.TicketClosed;
                             ticketHistory.Status = TicketingConString.CloseApproveReceiver;
+
+
+                            var addTicketHistory = new TicketHistory
+                            {
+                                TicketConcernId = closingTicketExist.TicketConcernId,
+                                TransactedBy = closingTicketExist.TicketConcern.RequestorBy,
+                                TransactionDate = DateTime.Now,
+                                Request = TicketingConString.NotConfirm,
+                                Status = $"{TicketingConString.CloseForConfirmation} {closingTicketExist.TicketConcern.RequestorByUser.Fullname}",
+                            };
+
+                            await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                         }
                         else

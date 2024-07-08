@@ -8,7 +8,6 @@
         public ICollection<ClosingTicket> ClosingTickets { get; set; }
         public ICollection<ApproverTicketing> ApproverTicketings { get; set; }
         public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
-        public ICollection<ReTicketConcern> ReTicketConcerns { get;set; }
         public ICollection<TicketAttachment> TicketAttachments { get; set; }
     }
 }

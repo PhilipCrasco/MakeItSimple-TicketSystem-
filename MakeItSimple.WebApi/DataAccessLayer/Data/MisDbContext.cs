@@ -65,9 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
 
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<TicketConcern> TicketConcerns { get; set; }
-        public virtual DbSet<RequestTransaction> RequestTransactions { get; set; }
         public virtual DbSet<TransferTicketConcern> TransferTicketConcerns { get; set; }
-        public virtual DbSet<ReTicketConcern> ReTicketConcerns { get; set; }
         public virtual DbSet<ClosingTicket> ClosingTickets { get; set; }
         public virtual DbSet<ApproverTicketing> ApproverTicketings { get; set; }
         public virtual DbSet<TicketHistory> TicketHistories { get; set; }
@@ -76,7 +74,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketTransaction> TicketTransactions { get; set; }
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
-        public virtual DbSet<TicketReDate> TicketReDates { get; set; }
 
         public virtual DbSet<Team> Teams { get; set; }
 
@@ -85,8 +82,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         {
             optionsBuilder.EnableSensitiveDataLogging();
         }
-
-
 
         protected override async void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -109,14 +104,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TransferTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ApproverTicketingConfiguration());
-            modelBuilder.ApplyConfiguration(new ReTicketConcernConfiguration());
             modelBuilder.ApplyConfiguration(new TicketHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new ClosingTicketConfiguration());
             modelBuilder.ApplyConfiguration(new RequestConcernConfiguration());
             modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
-            modelBuilder.ApplyConfiguration(new TicketReDateConfiguration());
 
 
             //DateTime time = DateTime.Parse("2024-10-08");

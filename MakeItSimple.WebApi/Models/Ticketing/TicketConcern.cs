@@ -65,9 +65,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public DateTime ? TargetDate { get; set; }
 
-        public int? RequestTransactionId { get; set; }
-        public virtual RequestTransaction RequestTransaction { get; set; }
-
         public bool ? IsDone { get; set; }
 
         public string ConcernStatus { get; set; }
@@ -94,7 +91,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User ReDateByUser { get; set; }
 
         public ICollection<TicketAttachment> TicketAttachments { get; set; }    
-        public ICollection<TicketReDate> TicketReDates { get; set;}
 
         public ICollection<ClosingTicket> ClosingTickets { get; set; }
         public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
@@ -102,7 +98,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public ICollection<TicketComment> TicketComments { get; set; }
         public ICollection<TicketCommentView> TicketCommentViews { get; set; }
 
-        public ICollection<ReTicketConcern> ReTicketConcerns { get;set; }
 
 
     }

@@ -154,11 +154,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         TransactedBy = command.Transacted_By,
                         TransactionDate = DateTime.Now,
                         Request = TicketingConString.ForTransfer,
-                        Status = TicketingConString.RequestCreated
+                        Status = TicketingConString.TransferRequest
 
                     };
 
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                    var approverLevel = approverUser.ApproverLevel == 1 ? $"{approverUser.ApproverLevel}st"
+                        : approverUser.ApproverLevel == 2 ? $"{approverUser.ApproverLevel}nd"
+                        : approverUser.ApproverLevel == 3 ? $"{approverUser.ApproverLevel}rd"
+                        : $"{approverUser.ApproverLevel}th";
+
+
+                    var addApproverHistory = new TicketHistory
+                    {
+                        TicketConcernId = ticketConcernExist.Id,
+                        TransactedBy = approverUser.UserId,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.Approval,
+                        Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"
+                    };
+
+                    await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
 
                 }
 

@@ -1,9 +1,11 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.Common.SignalR;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
@@ -24,10 +26,14 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     public class ClosingTicketController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly TimerControl _timerControl;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public ClosingTicketController(IMediator mediator)
+        public ClosingTicketController(IMediator mediator, TimerControl timerControl, IHubContext<NotificationHub> client)
         {
             _mediator = mediator;
+            _timerControl = timerControl;
+            _client = client;
         }
 
         [HttpPost]
@@ -98,6 +104,23 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 };
 
                 var successResult = Result.Success(result);
+
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(query);
+                        await clientsAll.SendAsync("TicketData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
                 return Ok(successResult);
             }
             catch (Exception ex)

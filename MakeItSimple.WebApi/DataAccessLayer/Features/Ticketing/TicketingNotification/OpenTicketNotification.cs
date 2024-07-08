@@ -44,7 +44,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var query = await _context.TicketConcerns
                     .Include(x => x.RequestorByUser)
                     .Where(x => x.IsApprove == true && x.IsClosedApprove != true)
-                    .GroupBy(x => x.RequestTransactionId)
+                    .GroupBy(x => x.Id)
                     .ToListAsync();
 
                 var getQuery = query.Select(x => x.First().RequestorByUser.BusinessUnitId);
@@ -55,7 +55,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var receiverList = await _context.Receivers
                     .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
 
-                var fillterApproval = query.Select(x => x.First().RequestTransactionId);
+                var fillterApproval = query.Select(x => x.First().Id);
 
                 if (request.Status != null)
                 {
@@ -85,7 +85,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     }
                     else
                     {
-                        query = query.Where(x => x.First().RequestTransactionId == null).ToList();
+                        query = query.Where(x => x.First().Id == null).ToList();
                     }
 
                 }

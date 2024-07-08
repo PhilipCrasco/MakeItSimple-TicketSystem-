@@ -79,8 +79,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.Category)
                     .ThenInclude(x => x.SubCategories)
-                    .Include(x => x.RequestTransaction)
-                    .ThenInclude(x => x.ApproverTicketings)
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);

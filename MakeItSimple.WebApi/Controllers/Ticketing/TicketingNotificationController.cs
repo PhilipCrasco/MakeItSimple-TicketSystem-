@@ -9,7 +9,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNot
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.CommentNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.OpenTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ReTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -99,44 +98,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Ok(results);
             }
             catch (Exception ex)              
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpGet("re-ticket")]
-        public async Task<IActionResult> ReTicketNotification([FromQuery] ReTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }

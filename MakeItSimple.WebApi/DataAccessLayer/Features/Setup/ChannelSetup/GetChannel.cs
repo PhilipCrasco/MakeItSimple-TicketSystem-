@@ -80,7 +80,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     ProjectId = x.ProjectId,
                     Project_Name = x.Project.ProjectName,   
                     Channel_Name = x.ChannelName,
-                    Added_By = x.AddedByUser.Fullname,
+                    Added_By = x.AddedByUser.Fullname, 
                     Created_At = x.CreatedAt,
                     Updated_At = x.UpdatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,

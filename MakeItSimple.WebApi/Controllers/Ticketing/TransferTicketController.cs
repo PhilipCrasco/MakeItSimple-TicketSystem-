@@ -1,7 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.ApprovedTransferTicket;
@@ -9,11 +8,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
-
-using MakeItSimple.WebApi.Models;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
+using MakeItSimple.WebApi.Common.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -22,10 +18,14 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     public class TransferTicketController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly TimerControl _timerControl;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public TransferTicketController(IMediator mediator)
+        public TransferTicketController(IMediator mediator, TimerControl timerControl, IHubContext<NotificationHub> client)
         {
-            _mediator = mediator;    
+            _mediator = mediator;
+            _timerControl = timerControl;
+            _client = client;
         }
 
         [HttpPost("add-transfer")]
@@ -127,6 +127,22 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 };
 
                 var successResult = Result.Success(result);
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(query);
+                        await clientsAll.SendAsync("TicketData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
                 return Ok(successResult);
             }
             catch (Exception ex)

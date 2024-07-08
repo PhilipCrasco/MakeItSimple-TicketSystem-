@@ -235,7 +235,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
                             var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
                             var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                            var fillterApproval = requestConcernsQuery.Select(x => x.RequestTransactionId);
+                            var fillterApproval = requestConcernsQuery.Select(x => x.Id);
 
 
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)

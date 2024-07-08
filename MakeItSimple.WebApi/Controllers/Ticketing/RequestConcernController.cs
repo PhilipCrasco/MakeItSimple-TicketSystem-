@@ -243,7 +243,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(query);
-                        await clientsAll.SendAsync("PrepareConcernData", requestData);
+                        await clientsAll.SendAsync("TicketData", requestData);
                     }, 2000);
                 }
 

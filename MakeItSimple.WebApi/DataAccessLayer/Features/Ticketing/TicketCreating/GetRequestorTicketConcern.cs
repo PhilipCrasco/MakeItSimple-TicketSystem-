@@ -184,10 +184,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if (request.Concern_Status != null)
                     {
-                        //var ticketStatusList = await _context.TicketConcerns
-                        //    .Where(x => x.IsApprove == false)
-                        //    .Select(x => x.RequestConcernId)
-                        //    .ToListAsync();
 
                         switch (request.Concern_Status)
                         {
@@ -306,7 +302,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             .Select(tc => new TicketRequestConcern
                             {
 
-                                TicketConcernId = tc.Id,
+                                TicketConcernId = tc.ConcernStatus.Contains(TicketingConString.Approval) ? null : tc.Id,
                                 Ticket_No = tc.TicketNo,
                                 Concern_Description = tc.ConcernDetails,
                                 DepartmentId = tc.User.DepartmentId,

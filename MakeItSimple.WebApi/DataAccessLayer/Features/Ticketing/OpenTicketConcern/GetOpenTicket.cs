@@ -247,11 +247,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         {
                             ticketConcernQuery = ticketConcernQuery
                                 .Where(x => x.ClosingTickets
-                                .First(x => x.IsActive != false && x.IsClosing == false || x.IsRejectClosed != true).CreatedAt >= request.Date_From.Value
-                                && x.ClosingTickets.First(x => x.IsActive != false && x.IsClosing == false || x.IsRejectClosed != true).CreatedAt 
-                                <= request.Date_To.Value);
-
+                                .First(x => x.IsClosing == false).CreatedAt >= request.Date_From.Value
+                                && x.ClosingTickets.First(x => x.IsClosing == false).CreatedAt
+                                <= request.Date_To.Value && x.ClosingTickets.First().IsActive == true); 
                         }
+                        
+
                         else
                         {
                             return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);

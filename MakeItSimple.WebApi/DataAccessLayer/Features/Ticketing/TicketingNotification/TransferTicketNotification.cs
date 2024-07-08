@@ -42,10 +42,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public async Task<Result> Handle(TransferTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
                 var query = await _context.TransferTicketConcerns
-                    .GroupBy(x => x.TicketTransactionId
+                    .GroupBy(x => x.Id
                 ).ToListAsync();
 
-                var fillterApproval = query.Select(x => x.First().TicketTransactionId);
+                var fillterApproval = query.Select(x => x.First().Id);
 
 
                 if (TicketingConString.Users == request.Users)
@@ -75,16 +75,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
                             .ToList();
 
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketTransactionId);
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.Id);
 
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
                         query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover) 
-                        && userRequestIdApprovalList.Contains(x.First().TicketTransactionId))
+                        && userRequestIdApprovalList.Contains(x.First().Id))
                             .ToList();
                     }
                     else
                     {
-                        query = query.Where(x => x.First().TicketTransactionId == null).ToList();    
+                        query = query.Where(x => x.First().Id == null).ToList();    
                     }
 
                 }

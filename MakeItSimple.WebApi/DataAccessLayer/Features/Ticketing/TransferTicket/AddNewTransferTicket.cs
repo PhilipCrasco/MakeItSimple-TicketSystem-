@@ -135,7 +135,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         {
                             TicketConcernId = ticketConcernExist.Id,
                             TransferTicketConcernId = addTransferTicket.Id,
-                            SubUnitId = approver.SubUnitId,
                             UserId = approver.UserId,
                             ApproverLevel = approver.ApproverLevel,
                             AddedBy = command.Added_By,

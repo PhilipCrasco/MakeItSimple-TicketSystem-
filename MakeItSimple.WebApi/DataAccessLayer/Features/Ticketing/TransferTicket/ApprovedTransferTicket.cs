@@ -43,6 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
                 var transferTicketExist = await _context.TransferTicketConcerns
+                    .Include(x => x.TicketConcern)
                     .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId, cancellationToken);
 
                 if (transferTicketExist is null)
@@ -129,7 +130,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         ticketConcernExist.IsTransfer = true;
                         ticketConcernExist.TransferAt = DateTime.Now;
-                        ticketConcernExist.TransferBy = transferTicketExist.UserId;
+                        ticketConcernExist.TransferBy = transferTicketExist.TicketConcern.UserId;
 
                         ticketConcernExist.IsApprove = false;
                         ticketConcernExist.IsTransfer = true;

@@ -17,8 +17,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string FileName { get; set; }
         public decimal? FileSize { get; set; }
 
-        public int? TicketTransactionId { get; set; }
-        public virtual TicketTransaction TicketTransaction { get; set; }
 
         public int? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }

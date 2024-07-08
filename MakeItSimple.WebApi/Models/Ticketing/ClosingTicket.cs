@@ -23,25 +23,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
 
-
-        public int ? ChannelId { get; set; }
-        public virtual Channel Channel { get; set; }
-
-        public string ConcernDetails { get; set; }
-
-        public int ? CategoryId { get; set; }
-        public virtual Category Category { get; set; }
-
-        public int ? SubCategoryId { get; set; }
-        public virtual SubCategory SubCategory { get; set; }
-
-        public DateTime? StartDate { get; set; }
-
-        public DateTime? TargetDate { get; set; }
-
-        public Guid? UserId { get; set; }
-        public virtual User User { get; set; }
-
         public bool? IsClosing { get; set; }
         public DateTime? ClosingAt { get; set; }
         public Guid? ClosedBy { get; set; }
@@ -53,12 +34,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User RejectClosedByUser { get; set; }
         public string RejectRemarks { get; set; }
         public Guid? TicketApprover { get; set; }
-
-
-        public int? ReceiverId { get; set; }
-
-        public int? TicketTransactionId { get; set; }
-        public virtual TicketTransaction TicketTransaction { get; set; }
 
         public string Remarks { get; set; }
 

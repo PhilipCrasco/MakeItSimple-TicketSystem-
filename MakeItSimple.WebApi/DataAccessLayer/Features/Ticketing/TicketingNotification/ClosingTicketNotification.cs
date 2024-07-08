@@ -45,11 +45,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public async Task<Result> Handle(ClosingTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
                 var query = await _context.ClosingTickets
-                    .Include(x => x.User)
-                    .GroupBy(x => x.TicketTransactionId)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.User)
+                    .GroupBy(x => x.Id)
                     .ToListAsync();
 
-                var getQuery = query.Select(x => x.First().User.BusinessUnitId);
+                var getQuery = query.Select(x => x.First().TicketConcern.User.BusinessUnitId);
 
                 var businessUnitList = await _context.BusinessUnits
                     .FirstOrDefaultAsync(x => getQuery.Contains(x.Id));
@@ -60,7 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var userApprover = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
-                var fillterApproval = query.Select(x => x.First().TicketTransactionId);
+                var fillterApproval = query.Select(x => x.First().Id);
 
 
                 if (request.Reject != null)
@@ -86,12 +87,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
                             .ToList();
 
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketTransactionId);
+                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.Id);
 
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
 
                         query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover)
-                        && userRequestIdApprovalList.Contains(x.First().TicketTransactionId))
+                        && userRequestIdApprovalList.Contains(x.First().Id))
                             .ToList();
 
                     }
@@ -99,13 +100,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     else if (request.Role == TicketingConString.Receiver && request.UserId == receiverList.UserId)
                     {
                         var approverTransactList = await _context.ApproverTicketings
-                            .Where(x => fillterApproval.Contains(x.TicketTransactionId) && x.IsApprove == null)
+                            .Where(x => fillterApproval.Contains(x.Id) && x.IsApprove == null)
                             .ToListAsync();
 
                         if (approverTransactList != null && approverTransactList.Any())
                         {
-                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketTransactionId);
-                            query = query.Where(x => !generatedIdInApprovalList.Contains(x.First().TicketTransactionId))
+                            var generatedIdInApprovalList = approverTransactList.Select(approval => approval.Id);
+                            query = query.Where(x => !generatedIdInApprovalList.Contains(x.First().Id))
                                 .ToList();
                         }
                         var receiver = await _context.TicketConcerns
@@ -114,13 +115,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             .ToListAsync();
 
                         var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                        query = query.Where(x => receiverContains.Contains(x.First().User.BusinessUnitId))
+                        query = query.Where(x => receiverContains.Contains(x.First().TicketConcern.User.BusinessUnitId))
                             .ToList();
 
                     }
                     else
                     {
-                        query = query.Where(x => x.First().TicketTransactionId == null)
+                        query = query.Where(x => x.First().Id == null)
                             .ToList();
                     }
 

@@ -12,23 +12,11 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }
-        public int ? ChannelId { get; set; }
-        public virtual Channel Channel { get; set; }
-
-        public int ? SubUnitId { get; set; }
-        public virtual SubUnit SubUnit { get; set; }
-
         public Guid? UserId { get; set; }
         public virtual User User { get; set; }
         public bool ? IsApprove { get; set; }
         public int? ApproverLevel { get; set; }
-
-        //public Guid? IssueHandler { get; set; }
-
         public string Status { get; set; }
-
-        public int ? TicketTransactionId { get; set; }
-        public virtual TicketTransaction TicketTransaction { get; set; }
 
         public int ? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }

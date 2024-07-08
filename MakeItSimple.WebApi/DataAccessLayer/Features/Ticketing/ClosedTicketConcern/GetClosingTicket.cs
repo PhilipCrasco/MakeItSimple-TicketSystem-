@@ -243,7 +243,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         Start_Date = x.TicketConcern.StartDate,
                         Target_Date = x.TicketConcern.TargetDate,
                         Delay_Days = x.TicketConcern.TargetDate < dateToday && x.ClosingAt == null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, dateToday)
-                            : x.TicketConcern.TargetDate < x.ClosingAt && x.ClosingAt != null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TargetDate, x.ClosingAt) : 0,
+                            : x.TicketConcern.TargetDate < x.ClosingAt && x.ClosingAt != null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, x.ClosingAt) : 0,
 
                         Added_By = x.AddedByUser.Fullname,
                         Created_At = x.CreatedAt,

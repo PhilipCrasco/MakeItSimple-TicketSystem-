@@ -1583,6 +1583,10 @@ namespace MakeItSimple.WebApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("Approver_Level")
+                        .HasColumnType("int")
+                        .HasColumnName("approver_level");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("remarks");

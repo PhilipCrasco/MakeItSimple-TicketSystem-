@@ -50,7 +50,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 }
 
 
-                var subUnitExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+                var subUnitExist = await _context.SubUnits
+                    .FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
 
                 if (subUnitExist != null)
                 {
@@ -146,9 +147,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                     };
 
                     await _context.Locations.AddAsync(addLocation, cancellationToken);
-
-
-
 
                 }
 

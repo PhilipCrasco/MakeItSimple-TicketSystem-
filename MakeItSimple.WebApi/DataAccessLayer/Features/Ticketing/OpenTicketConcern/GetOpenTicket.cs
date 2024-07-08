@@ -396,7 +396,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     {
                         ClosingTicketId = x.Id,
                         Resolution = x.Resolution,
-                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove != null) ? true : false,
+                        IsApprove = x.ApproverTickets.Any(x => x.IsApprove == null) ? false : true,
 
                         GetAttachmentForClosingTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForClosingTicket.GetAttachmentForClosingTicket
                         {
@@ -428,7 +428,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }).ToList(),
 
-                }) ;
+                });
 
 
 

@@ -159,22 +159,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                    var approverLevel = approverUser.ApproverLevel == 1 ? $"{approverUser.ApproverLevel}st"
-                        : approverUser.ApproverLevel == 2 ? $"{approverUser.ApproverLevel}nd"
-                        : approverUser.ApproverLevel == 3 ? $"{approverUser.ApproverLevel}rd"
-                        : $"{approverUser.ApproverLevel}th";
-
-
-                    var addApproverHistory = new TicketHistory
+                    foreach(var approver in approverList)
                     {
-                        TicketConcernId = ticketConcernExist.Id,
-                        TransactedBy = approverUser.UserId,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Approval,
-                        Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"
-                    };
 
-                    await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
+                        var approverLevel = approver.ApproverLevel == 1 ? $"{approver.ApproverLevel}st"
+                            : approver.ApproverLevel == 2 ? $"{approver.ApproverLevel}nd"
+                            : approver.ApproverLevel == 3 ? $"{approver.ApproverLevel}rd"
+                            : $"{approver.ApproverLevel}th";
+
+
+                        var addApproverHistory = new TicketHistory
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransactedBy = approverUser.UserId,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Approval,
+                            Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"
+                        };
+
+                        await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
+                    }
+
 
                 }
 

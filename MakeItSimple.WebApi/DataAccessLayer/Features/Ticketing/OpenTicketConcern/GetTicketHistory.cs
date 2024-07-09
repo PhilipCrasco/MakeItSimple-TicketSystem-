@@ -66,7 +66,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     {
                         TicketConcernId = x.Key,
                         GetTicketHistoryConcerns = x.OrderByDescending(x => x.Id)
-                        .Where(x => !x.Request.Contains(TicketingConString.Approval))
+                        .Where(x => !x.Request.Contains(TicketingConString.Approval) && !x.Request.Contains(TicketingConString.NotConfirm))
                         .Select(x => new GetTicketHistoryConcern
                         {
                             TicketHistoryId = x.Id,
@@ -79,8 +79,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             IsApproved = x.IsApprove,
 
                         }).ToList(),
+
                         UpComingApprovers = x.OrderBy(x => x.Id)
-                        .Where(x => (x.IsApprove == null && x.Approver_Level != null) || x.Request.Contains(TicketingConString.Approval)) 
+                        .Where(x => (x.IsApprove == null && x.Approver_Level != null) || x.Request.Contains(TicketingConString.Approval)
+                        || x.Request.Contains(TicketingConString.NotConfirm)) 
                         .Select(x => new UpComingApprover
                         {
                             TicketHistoryId = x.Id,

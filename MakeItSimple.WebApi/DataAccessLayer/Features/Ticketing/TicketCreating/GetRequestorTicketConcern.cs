@@ -374,16 +374,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var ticketConcernExist = await _context.TicketConcerns
                             .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.RequestConcernId);
 
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketConcernId = ticketConcernExist.Id,
-                            TransactedBy = request.UserId,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.CloseTicket,
-                            Status = TicketingConString.CloseConfirm,
-                        };
+                        var ticketHistory = await _context.TicketHistories
+                            .Where(x => x.TicketConcernId == ticketConcernExist.Id
+                             && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
+                            .FirstOrDefaultAsync();
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                        ticketHistory.TicketConcernId = ticketConcernExist.Id;
+                        ticketHistory.TransactedBy = request.UserId;
+                        ticketHistory.TransactionDate = DateTime.Now;
+                        ticketHistory.Request = TicketingConString.Confirm;
+                        ticketHistory.Status = TicketingConString.CloseConfirm;
+
+                        //var addTicketHistory = new TicketHistory
+                        //{
+                        //    TicketConcernId = ticketConcernExist.Id,
+                        //    TransactedBy = request.UserId,
+                        //    TransactionDate = DateTime.Now,
+                        //    Request = TicketingConString.CloseTicket,
+                        //    Status = TicketingConString.CloseConfirm,
+                        //};
+
+                        //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                         await _context.SaveChangesAsync(cancellationToken);
                     }

@@ -66,6 +66,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
 
                     var closingTicketExist = await _context.ClosingTickets
+                        .Include(x => x.TicketConcern)
+                        .ThenInclude(x => x.RequestorByUser)
                         .FirstOrDefaultAsync(x => x.Id == command.ClosingTicketId);
 
                     if (closingTicketExist is not null)
@@ -195,6 +197,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         await _context.TicketHistories.AddAsync(addReceiverHistory, cancellationToken);
 
+                        var addForConfirmationHistory = new TicketHistory
+                        {
+                            TicketConcernId = closingTicketExist.TicketConcernId,
+                            TransactedBy = closingTicketExist.TicketConcern.RequestorBy,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.NotConfirm,
+                            Status = $"{TicketingConString.CloseForConfirmation} {closingTicketExist.TicketConcern.RequestorByUser.Fullname}",
+                        };
+
+                        await _context.TicketHistories.AddAsync(addForConfirmationHistory, cancellationToken);
+
                     }
 
                     var uploadTasks = new List<Task>();
@@ -281,7 +294,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         }
                     }
- 
 
                     await Task.WhenAll(uploadTasks);
 

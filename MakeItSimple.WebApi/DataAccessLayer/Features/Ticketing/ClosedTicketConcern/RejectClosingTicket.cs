@@ -53,7 +53,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.IsClosedApprove = null;
                 ticketConcernExist.Remarks = command.Reject_Remarks;
 
-
                 var approverList = await _context.ApproverTicketings
                     .Where(x => x.ClosingTicketId == command.ClosingTicketId)
                     .ToListAsync();
@@ -61,6 +60,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 foreach (var transferTicket in approverList)
                 {
                     _context.Remove(transferTicket);
+                }
+
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => (x.TicketConcernId == ticketConcernExist.Id
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                     || x.Request.Contains(TicketingConString.NotConfirm))
+                    .ToListAsync();
+
+                foreach (var item in ticketHistory)
+                {
+                    _context.TicketHistories.Remove(item);
                 }
 
                 var addTicketHistory = new TicketHistory

@@ -73,6 +73,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.ClosedApproveBy = null;
                 ticketConcernExist.ConcernStatus = TicketingConString.OnGoing;
 
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => x.Request.Contains(TicketingConString.NotConfirm))
+                    .FirstOrDefaultAsync();
+
+                    _context.TicketHistories.Remove(ticketHistory);
+                
                 var addTicketHistory = new TicketHistory
                 { 
                     TicketConcernId = ticketConcernExist.Id,
@@ -123,6 +129,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 File = new FileDescription(attachments.Attachment.FileName, stream),
                                 PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}"
                             };
+
 
                             var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
                             string attachmentUrl = attachmentResult.SecureUrl.ToString();

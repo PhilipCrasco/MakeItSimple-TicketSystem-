@@ -111,10 +111,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.TeamSetup
 
                     }).ToList(),
 
+
                     
-
-
-
                 });
 
                 return await PagedList<GetSubUnitResult>.CreateAsync(result, request.PageNumber, request.PageSize);

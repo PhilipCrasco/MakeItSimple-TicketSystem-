@@ -54,6 +54,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     _context.Remove(transferTicket);
                 }
 
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => (x.TicketConcernId == ticketConcernId.Id
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval)) 
+                     || x.Request.Contains(TicketingConString.NotConfirm))
+                    .ToListAsync();
+
+                foreach (var item in ticketHistory)
+                {
+                    _context.TicketHistories.Remove(item);
+                }
+
                 var addTicketHistory = new TicketHistory
                 {
                     TicketConcernId = closingTicketExist.Id,

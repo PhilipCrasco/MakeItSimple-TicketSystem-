@@ -46,20 +46,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 requestConcernId.Confirm_At = DateTime.Today;
                 requestConcernId.ConcernStatus = TicketingConString.Done;
                 
-
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.RequestConcernId == command.RequestConcernId, cancellationToken);
 
-                var addTicketHistory = new TicketHistory
-                {
-                    TicketConcernId = ticketConcernExist.Id,
-                    TransactedBy = command.Transacted_By,
-                    TransactionDate = DateTime.Now,
-                    Request = TicketingConString.Confirm,
-                    Status = TicketingConString.CloseConfirm,
-                };
 
-                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
+                    .FirstOrDefaultAsync();
+
+                ticketHistory.TicketConcernId = ticketConcernExist.Id;
+                ticketHistory.TransactedBy = command.Transacted_By;
+                ticketHistory.TransactionDate = DateTime.Now;
+                ticketHistory.Request = TicketingConString.Confirm;
+                ticketHistory.Status = TicketingConString.CloseConfirm;
+
+
+                //var addTicketHistory = new TicketHistory
+                //{
+                //    TicketConcernId = ticketConcernExist.Id,
+                //    TransactedBy = command.Transacted_By,
+                //    TransactionDate = DateTime.Now,
+                //    Request = TicketingConString.Confirm,
+                //    Status = TicketingConString.CloseConfirm,
+                //};
+
+                //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

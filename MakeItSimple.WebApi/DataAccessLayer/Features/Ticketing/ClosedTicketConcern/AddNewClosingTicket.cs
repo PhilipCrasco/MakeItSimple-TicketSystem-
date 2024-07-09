@@ -204,7 +204,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.NotConfirm,
                             Status = $"{TicketingConString.CloseForConfirmation} {closingTicketExist.TicketConcern.RequestorByUser.Fullname}",
-                        };
+                        };            
 
                         await _context.TicketHistories.AddAsync(addForConfirmationHistory, cancellationToken);
 

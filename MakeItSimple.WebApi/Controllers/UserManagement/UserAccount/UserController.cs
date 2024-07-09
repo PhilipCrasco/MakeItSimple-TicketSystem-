@@ -64,10 +64,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
 
                 var successResult = Result.Success(result);
 
-
-
-
-
                 return Ok(successResult);
             }
             catch (Exception ex)

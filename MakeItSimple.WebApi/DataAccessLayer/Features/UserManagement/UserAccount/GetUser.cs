@@ -123,7 +123,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     User_Role_Name = x.UserRole.UserRoleName,
                     DepartmentId = x.DepartmentId,
                     Department_Code = x.Department.DepartmentCode,
-                    Department_Name = x.Department.DepartmentName,
+                    Department_Name = x.Department.DepartmentName, 
                     SubUnitId = x.SubUnitId,
                     SubUnit_Code = x.SubUnit.SubUnitCode,
                     SubUnit_Name = x.SubUnit.SubUnitName,

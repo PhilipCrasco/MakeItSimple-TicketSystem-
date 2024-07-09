@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -22,6 +23,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 public string Transacted_By { get; set; }
                 public DateTime? Transaction_Date { get; set; }
                 public string Remarks { get; set; }
+                public int ? Approver_Level { get; set; }
+                public bool ? IsApproved { get; set; }
+            }
+
+            public List<UpComingApprover> UpComingApprovers { get; set; }
+            public class UpComingApprover
+            {
+                public int TicketHistoryId { get; set; }
+                public string Request { get; set; }
+                public string Status { get; set; }
+                public string Transacted_By { get; set; }
+                public DateTime? Transaction_Date { get; set; }
+                public string Remarks { get; set; }
+                public int? Approver_Level { get; set; }
+                public bool ? IsApproved { get; set; }
             }
         }
 
@@ -48,8 +64,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Where(x => x.TicketConcernId == request.TicketConcernId)
                     .GroupBy(x => x.TicketConcernId).Select(x => new GetTicketHistoryResult
                     {
-                       TicketConcernId = x.Key,
+                        TicketConcernId = x.Key,
                         GetTicketHistoryConcerns = x.OrderByDescending(x => x.Id)
+                        .Where(x => !x.Request.Contains(TicketingConString.Approval))
                         .Select(x => new GetTicketHistoryConcern
                         {
                             TicketHistoryId = x.Id,
@@ -57,11 +74,28 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             Request = x.Request,
                             Status = x.Status,
                             Transaction_Date = x.TransactionDate,
-                            Remarks = x.Remarks
+                            Remarks = x.Remarks,
+                            Approver_Level = x.Approver_Level,
+                            IsApproved = x.IsApprove,
 
-                        }).ToList()
+                        }).ToList(),
+                        UpComingApprovers = x.OrderBy(x => x.Id)
+                        .Where(x => (x.IsApprove == null && x.Approver_Level != null) || x.Request.Contains(TicketingConString.Approval)) 
+                        .Select(x => new UpComingApprover
+                        {
+                            TicketHistoryId = x.Id,
+                            Transacted_By = x.TransactedByUser.Fullname,
+                            Request = x.Request,
+                            Status = x.Status,
+                            Transaction_Date = x.TransactionDate,
+                            Remarks = x.Remarks,
+                            Approver_Level = x.Approver_Level,
+                            IsApproved = x.IsApprove,
+                                     
+                        }).ToList(),
 
                     }).ToListAsync();
+                    
 
                 return Result.Success(ticketHistory);
             }

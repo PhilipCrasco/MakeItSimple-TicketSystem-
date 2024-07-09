@@ -58,6 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     var ticketConcernExist = await _context.TicketConcerns
                         .Include(x => x.User)
+                        .Include(x => x.RequestorByUser)
                         .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 
                     if (ticketConcernExist == null)
@@ -99,7 +100,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             .Where(x => x.SubUnitId == approverByUser.SubUnitId)
                             .ToListAsync();
 
-                        if (approverList.Count() < 0)
+                        if (!approverList.Any())
                         {
                             return Result.Failure(ClosingTicketError.NoApproverHasSetup());
                         }
@@ -203,7 +204,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             TransactedBy = closingTicketExist.TicketConcern.RequestorBy,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.NotConfirm,
-                            Status = $"{TicketingConString.CloseForConfirmation} {closingTicketExist.TicketConcern.RequestorByUser.Fullname}",
+                            Status = $"{TicketingConString.CloseForConfirmation} {ticketConcernExist.RequestorByUser.Fullname}",
                         };            
 
                         await _context.TicketHistories.AddAsync(addForConfirmationHistory, cancellationToken);
@@ -289,14 +290,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                                 }
 
-
                             }, cancellationToken));
 
                         }
                     }
 
                     await Task.WhenAll(uploadTasks);
-
 
                     await _context.SaveChangesAsync(cancellationToken);
 

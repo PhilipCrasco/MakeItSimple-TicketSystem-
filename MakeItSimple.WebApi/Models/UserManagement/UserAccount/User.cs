@@ -1,12 +1,15 @@
-﻿using MakeItSimple.WebApi.Models.Setup;
-using MakeItSimple.WebApi.Models.Setup.AccountTitleSetup;
+﻿
+using MakeItSimple.WebApi.Models.Setup;
+using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MakeItSimple.WebApi.Models.Setup.TeamSetup;
+
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -68,6 +71,15 @@ namespace MakeItSimple.WebApi.Models
         public string ProfilePic { get; set; }
         public string FileName { get; set; }
         public decimal? FileSize { get; set; }
+
+        public ICollection<TicketConcern> TicketConcerns { get; set;}
+        public ICollection<Channel> Channels { get; set; }
+        public ICollection<Approver> Approvers { get; set; }
+        public ICollection<ApproverTicketing> ApproversTickets { get; set; }
+        public ICollection<RequestConcern> RequestConcerns { get; set;}
+
+        public ICollection<Receiver> Receivers { get; set; } 
+
 
 
     }

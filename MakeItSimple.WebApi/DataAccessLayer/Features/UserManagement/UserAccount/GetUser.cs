@@ -57,6 +57,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public string SubUnit_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
 
+            public bool Is_Use {  get; set; }
+
 
         }
 
@@ -137,7 +139,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     UnitId = x.UnitId,
                     Unit_Code = x.Units.UnitCode,
                     Unit_Name = x.Units.UnitName,
-                    Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
+                    Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions,
+                    Is_Use = x.Approvers.Any() || x.Receivers.Any() || x.ApproversTickets.Any(x => x.IsApprove == null) || 
+                    x.TicketConcerns.Any(x => x.IsApprove == true && x.IsClosedApprove != true) ? true : false,
 
                 });
 

@@ -42,7 +42,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors
         new Error("User.UserNoChanges", "No changes has made!");
 
         public static Error UserIsUse(string Fullname) =>
-        new Error("User.UserIsUse", $"User {Fullname} was use!");
+        new Error("User.UserIsUse", $"User {Fullname} was in use!"); 
 
         public static Error UserOldPasswordInCorrect() =>
         new Error("User.UserNotExist", "Current password is incorrect!");

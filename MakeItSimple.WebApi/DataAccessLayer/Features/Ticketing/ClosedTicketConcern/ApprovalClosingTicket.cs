@@ -113,25 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         else
                         {
                             closingTicketExist.TicketApprover = null;
-
-                            //var businessUnitList = await _context.BusinessUnits
-                            //    .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcern.User.BusinessUnitId);
-
-                            //var receiverList = await _context.Receivers
-                            //    .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-
-                            //var addApproverHistory = new TicketHistory
-                            //{
-                            //    TicketConcernId = closingTicketExist.TicketConcernId,
-                            //    TransactedBy = receiverList.UserId,
-                            //    TransactionDate = DateTime.Now,
-                            //    Request = TicketingConString.Approval,
-                            //    Status = $"{TicketingConString.CloseForApproval} {TicketingConString.Receiver}"
-                            //};
-
-                            //await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
                         }
-
 
                     }
                     else
@@ -156,7 +138,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             ticketConcernExist.Closed_At = DateTime.Now;
                             ticketConcernExist.ClosedApproveBy = command.Closed_By;
                             ticketConcernExist.IsDone = true;
-                            //ticketConcernExist.Remarks = TicketingConString.TicketClosed;
                             ticketConcernExist.ConcernStatus = TicketingConString.Done;
 
                             var requestConcernExist = await _context.RequestConcerns
@@ -166,22 +147,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             requestConcernExist.Resolution  = closingTicketExist.Resolution;
                             requestConcernExist.ConcernStatus = TicketingConString.NotConfirm;
 
-                            //var addTicketHistory = new TicketHistory
-                            //{
-                            //    TicketConcernId = closingTicketExist.TicketConcernId,
-                            //    TransactedBy = command.Transacted_By,
-                            //    TransactionDate = DateTime.Now,
-                            //    Request = TicketingConString.TicketClosed,
-                            //    Status = TicketingConString.CloseApproveReceiver,
-                            //};
-
-                            //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                             ticketHistory.TransactedBy = command.Transacted_By;
                             ticketHistory.TransactionDate = DateTime.Now;
                             ticketHistory.Request = TicketingConString.TicketClosed;
                             ticketHistory.Status = TicketingConString.CloseApproveReceiver;
-
+                            ticketHistory.IsApprove = true;
 
                             var addTicketHistory = new TicketHistory
                             {

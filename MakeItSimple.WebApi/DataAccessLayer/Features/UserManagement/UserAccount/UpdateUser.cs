@@ -123,7 +123,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     return Result.Failure(UserError.LocationNotExist());
                 }
 
-
                 //if (command.TeamId != null)
                 //{
                 //    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);

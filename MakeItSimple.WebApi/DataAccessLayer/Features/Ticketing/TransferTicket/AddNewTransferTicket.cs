@@ -180,8 +180,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
                     }
 
-
                 }
+
+
+
 
                 var uploadTasks = new List<Task>();
 

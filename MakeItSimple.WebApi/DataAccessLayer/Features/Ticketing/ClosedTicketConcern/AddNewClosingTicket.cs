@@ -122,16 +122,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ticketConcernExist.IsClosedApprove = false;
                         closingTicketExist = addNewClosingConcern;
 
-                        var getApprover = await _context.Approvers
-                        .Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
-                        .ToListAsync();
+                        //var getApprover = await _context.Approvers
+                        //.Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
+                        //.ToListAsync();
 
-                        if (getApprover == null)
-                        {
-                            return Result.Failure(TransferTicketError.NoApproverExist());
-                        }
+                        //if (getApprover == null)
+                        //{
+                        //    return Result.Failure(TransferTicketError.NoApproverExist());
+                        //}
 
-                        foreach (var approver in getApprover)
+                        foreach (var approver in approverList)
                         {
                             var addNewApprover = new ApproverTicketing
                             {
@@ -159,7 +159,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
-                        foreach(var approver in getApprover)
+                        foreach(var approver in approverList)
                         {
                             var approverLevel = approver.ApproverLevel == 1 ? $"{approver.ApproverLevel}st"
                                 : approver.ApproverLevel == 2 ? $"{approver.ApproverLevel}nd"

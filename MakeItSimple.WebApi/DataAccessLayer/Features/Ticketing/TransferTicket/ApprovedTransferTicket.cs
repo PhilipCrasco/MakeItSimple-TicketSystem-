@@ -56,11 +56,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .ToListAsync();
 
                 var ticketHistoryList = await _context.TicketHistories
-                    .Where(x => x.TicketConcernId == transferTicketExist.TicketConcernId)
+                    .Where(x => x.TicketConcernId == transferTicketExist.TicketConcernId
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
                     .ToListAsync();
-
-                var ticketHistory = ticketHistoryList
-                    .FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
 
                 var selectTransferRequestId = transferRequestTicketId
                     .FirstOrDefault(x => x.ApproverLevel == transferRequestTicketId.Min(x => x.ApproverLevel));
@@ -87,34 +85,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     var validateUserApprover = userApprovalId
                         .FirstOrDefault(x => x.ApproverLevel == selectTransferRequestId.ApproverLevel + 1);
 
-                    if (ticketHistory.Request == TicketingConString.Approval)
-                    {
+                    var ticketHistoryApproval = ticketHistoryList
+                        .FirstOrDefault(x => x.Approver_Level != null
+                        && x.Approver_Level == ticketHistoryList.Min(x => x.Approver_Level));
 
-                        ticketHistory.TransactedBy = command.Transacted_By;
-                        ticketHistory.TransactionDate = DateTime.Now;
-                        ticketHistory.Request = TicketingConString.Approve;
-                        ticketHistory.Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}";
-                    }
-
-                    var approverLevel = selectTransferRequestId.ApproverLevel == 1 ? $"{selectTransferRequestId.ApproverLevel}st"
-                        : selectTransferRequestId.ApproverLevel == 2 ? $"{selectTransferRequestId.ApproverLevel}nd"
-                        : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
-                        : $"{selectTransferRequestId.ApproverLevel}th";
+                    ticketHistoryApproval.TransactedBy = command.Transacted_By;
+                    ticketHistoryApproval.TransactionDate = DateTime.Now;
+                    ticketHistoryApproval.Request = TicketingConString.Approve;
+                    ticketHistoryApproval.Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}";
+                    ticketHistoryApproval.IsApprove = true;
 
                     if (validateUserApprover != null)
                     {
                         transferTicketExist.TicketApprover = validateUserApprover.UserId;
-
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketConcernId = transferTicketExist.TicketConcernId,
-                            TransactedBy = command.Transacted_By,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Transfer,
-                            Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"
-                        };
-
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                     }
                     else

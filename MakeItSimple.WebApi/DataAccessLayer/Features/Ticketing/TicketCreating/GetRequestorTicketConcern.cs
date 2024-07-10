@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Packaging.Core;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -380,11 +381,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             .FirstOrDefaultAsync();
 
 
-                        ticketHistory.TicketConcernId = ticketConcernExist.Id;
-                        ticketHistory.TransactedBy = request.UserId;
-                        ticketHistory.TransactionDate = DateTime.Now;
-                        ticketHistory.Request = TicketingConString.Confirm;
-                        ticketHistory.Status = TicketingConString.CloseConfirm;
+                        if(ticketHistory is not null)
+                        {
+                            ticketHistory.TicketConcernId = ticketConcernExist.Id;
+                            ticketHistory.TransactedBy = request.UserId;
+                            ticketHistory.TransactionDate = DateTime.Now;
+                            ticketHistory.Request = TicketingConString.Confirm;
+                            ticketHistory.Status = TicketingConString.CloseConfirm;
+                        }
+
+
+
 
                         //var addTicketHistory = new TicketHistory
                         //{

@@ -143,7 +143,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions,
                     Is_Use = x.Approvers.Any() || x.Receivers.Any() || 
                     x.ApproversTickets.Any(x => x.IsApprove == null) ||
-                    (x.UserRole.UserRoleName.Contains(TicketingConString.IssueHandler) && x.TicketConcerns.Any(x => x.IsApprove == true && x.IsClosedApprove == null)) ?
+                    (x.UserRole.UserRoleName.Contains(TicketingConString.IssueHandler)
+                    && x.TicketConcerns.Any(x => x.IsApprove == true && x.IsClosedApprove == null)) ?
                       true : false,
 
                 });

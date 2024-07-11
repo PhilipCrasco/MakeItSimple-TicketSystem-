@@ -207,17 +207,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
           
                                     }
 
-                                var receiver = await _context.TicketConcerns
-                                    .Include(x => x.RequestorByUser)
-                                    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
-                                    .ToListAsync();
+                                //var receiver = await _context.TicketConcerns
+                                //    .Include(x => x.RequestorByUser)
+                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
+                                //    .ToListAsync();
 
-                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                var requestorSelect = receiver.Select(x => x.Id);
+                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                //var requestorSelect = receiver.Select(x => x.Id);
 
                                 closingTicketsQuery = closingTicketsQuery
-                                    .Where(x => receiverContains.Contains(x.TicketConcern.User.BusinessUnitId) && requestorSelect
-                                         .Contains(x.TicketConcernId));
+                                    .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId));
 
                             }
 

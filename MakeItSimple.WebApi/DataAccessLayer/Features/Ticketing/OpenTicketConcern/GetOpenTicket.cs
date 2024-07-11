@@ -276,7 +276,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     if (request.Date_From is not null && request.Date_From is not null)
                     {
                         ticketConcernQuery = ticketConcernQuery
-                            .Where(x => x.TargetDate <= request.Date_From.Value && x.TargetDate >= request.Date_From.Value);
+                            .Where(x => x.TargetDate <= request.Date_From.Value && x.TargetDate >= request.Date_To.Value);
                     }
 
                     if (!string.IsNullOrEmpty(request.UserType))
@@ -334,17 +334,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
                             {
 
-                                var receiver = await _context.TicketConcerns
-                                    .Include(x => x.RequestorByUser)
-                                    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
-                                    .ToListAsync();
+                                //var receiver = await _context.TicketConcerns
+                                //    .Include(x => x.RequestorByUser)
+                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
+                                //    .ToListAsync();
 
-                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                var requestorSelect = receiver.Select(x => x.Id);
+                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                //var requestorSelect = receiver.Select(x => x.Id);
 
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => receiverContains.Contains(x.RequestorByUser.BusinessUnitId)
-                                    && requestorSelect.Contains(x.Id));
+                                    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId));
                             }
                             else
                             {

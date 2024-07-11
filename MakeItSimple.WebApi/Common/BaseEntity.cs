@@ -16,11 +16,8 @@ namespace MakeItSimple.WebApi.Common
 
 
         [ForeignKey("ModifiedByUser")]
-        public Guid? ModifiedBy { get; set; }
+        public  Guid? ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
-
-
-
 
     }
 }

@@ -3,6 +3,8 @@ using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -86,6 +88,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         }
 
+
+        //public record ReceiverResult
+        //{
+        //    public int Id { get; set; }
+        //    public bool IsActive { get; set; } = true;
+        //    public DateTime CreatedAt { get; set; } = DateTime.Now;
+        //    public DateTime? UpdatedAt { get; set; }
+        //    public Guid? AddedBy { get; set; }
+        //    public Guid? ModifiedBy { get; set; }
+        //    public int? BusinessUnitId { get; set; }
+        //    public Guid? UserId { get; set; }
+        //}
+
         public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
         {
             //public string Requestor { get; set; }
@@ -114,6 +129,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
                 int hoursDiff = 24; 
                 var dateToday = DateTime.Now;
+
+                var businessUnitList = new List<BusinessUnit>();
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
                     .Include(x => x.User)
@@ -223,38 +240,48 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
                                 return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                             }
-
                         }
 
                          if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
                          {
-
-                            var businessUnitList = await _context.BusinessUnits.FirstOrDefaultAsync(x => x.Id == requestConcernsQuery.First().User.BusinessUnitId);
-                            var receiverList = await _context.Receivers.FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-                            var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                            var fillterApproval = requestConcernsQuery.Select(x => x.Id);
-
-
-                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
+                            var listOfRequest = await requestConcernsQuery.Select(x => new 
                             {
-                                if (request.UserId == receiverList.UserId)
-                                {
-                                    //var ticketConcernApproveList = await _context.
+                                x.User.BusinessUnitId
 
-                                    var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser)
-                                        .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
-                                        .ToListAsync();
-                                    var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                    var requestorSelect = receiver.Select(x => x.Id);
+                            }).ToListAsync();
 
-                                    requestConcernsQuery = requestConcernsQuery
-                                        .Where(x => receiverContains.Contains(x.User.BusinessUnitId) && requestorSelect
-                                             .Contains(x.Id));
-                                }
-                                else
-                                {
-                                    return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
-                                }
+
+                            foreach ( var businessUnit in listOfRequest)
+                            {
+                                var businessUnitDefault = await _context.BusinessUnits
+                                    .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
+                                businessUnitList.Add(businessUnitDefault);
+
+                            }
+
+                           var businessSelect = businessUnitList.Select(x => x.Id).ToList();
+
+                            var receiverList = await _context.Receivers
+                                .Include(x => x.BusinessUnit)
+                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true && 
+                                 x.UserId == request.UserId)
+                                .ToListAsync();
+
+                            var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
+
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
+                            {
+                                //var receiver = await _context.TicketConcerns
+                                //    .Include(x => x.RequestorByUser)
+                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId)
+                                //    && businessSelect.Contains(x.RequestConcernId))
+                                //    .ToListAsync();
+
+                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
+                                //var requestorSelect = receiver.Select(x => x.Id);
+
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => selectReceiver.Contains(x.User.BusinessUnitId));
 
                             }
                             else

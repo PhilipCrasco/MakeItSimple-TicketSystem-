@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -110,6 +111,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string Search { get; set; }
             public bool? Status { get; set; }
             public string Concern_Status { get; set; }
+
+            public string History_Status { get; set; }
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
@@ -131,6 +134,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             {
                 var dateToday = DateTime.Today;
                 int hoursDiff = 24;
+                var businessUnitList = new List<BusinessUnit>();
 
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
                     .Include(x => x.AddedByUser)
@@ -150,11 +154,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 if (ticketConcernQuery.Any())
                 {
-                    var businessUnitList = await _context.BusinessUnits
-                        .FirstOrDefaultAsync(x => x.Id == ticketConcernQuery.First().RequestorByUser.BusinessUnitId);
-
-                    var receiverList = await _context.Receivers
-                        .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
 
                     var fillterApproval = ticketConcernQuery.Select(x => x.Id);
 
@@ -193,6 +192,49 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         switch(request.Concern_Status)
                         {
                             case TicketingConString.PendingRequest :
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsApprove == false);
+                                break;
+
+                            case TicketingConString.Open:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
+                                    && x.IsReTicket != false && x.IsClosedApprove == null);
+                                break;
+
+                            case TicketingConString.ForTransfer:
+
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsTransfer == false);
+                                break;
+
+
+                            case TicketingConString.ForClosing:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == false);
+                                break;
+
+                            case TicketingConString.NotConfirm:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                break;
+
+                            case TicketingConString.Closed:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
+                                break;
+
+                            default:
+                                return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
+
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(request.History_Status))
+                    {
+                        switch (request.History_Status)
+                        {
+                            case TicketingConString.PendingRequest:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsApprove == false);
                                 break;
@@ -301,17 +343,41 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             }
 
                         }
-                        else if (request.UserType == TicketingConString.Receiver && receiverList != null)
+                        else if (request.UserType == TicketingConString.Receiver)
                         {
-                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && request.UserId == receiverList.UserId)
+                            var listOfRequest = await ticketConcernQuery.Select(x => new
+                            {
+                                x.User.BusinessUnitId
+
+                            }).ToListAsync();
+
+                            foreach (var businessUnit in listOfRequest)
+                            {
+                                var businessUnitDefault = await _context.BusinessUnits
+                                    .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
+                                businessUnitList.Add(businessUnitDefault);
+
+                            }
+
+                            var businessSelect = businessUnitList.Select(x => x.Id).ToList();
+
+                            var receiverList = await _context.Receivers
+                                .Include(x => x.BusinessUnit)
+                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
+                                 x.UserId == request.UserId)
+                                .ToListAsync();
+
+                            var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
+
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
                             {
 
                                 var receiver = await _context.TicketConcerns
-                                    .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
+                                    .Include(x => x.RequestorByUser)
+                                    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
                                     .ToListAsync();
 
                                 var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-
                                 var requestorSelect = receiver.Select(x => x.Id);
 
                                 ticketConcernQuery = ticketConcernQuery

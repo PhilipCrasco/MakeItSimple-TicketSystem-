@@ -81,6 +81,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         }).ToList(),
 
                         UpComingApprovers = x.OrderBy(x => x.Id)
+                        .OrderByDescending(x => x.Id)
                         .Where(x => (x.IsApprove == null && x.Approver_Level != null) || x.Request.Contains(TicketingConString.Approval)
                         || x.Request.Contains(TicketingConString.NotConfirm)) 
                         .Select(x => new UpComingApprover

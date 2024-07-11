@@ -72,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.Closed_At = null;
                 ticketConcernExist.ClosedApproveBy = null;
                 ticketConcernExist.ConcernStatus = TicketingConString.OnGoing;
+                ticketConcernExist.IsDone = null;
 
                 var ticketHistory = await _context.TicketHistories
                     .Where(x => x.Request.Contains(TicketingConString.NotConfirm))

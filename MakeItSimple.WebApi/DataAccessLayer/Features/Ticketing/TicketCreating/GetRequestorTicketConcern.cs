@@ -304,11 +304,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {
-                    RequestConcernCount = requestConcerCount,
-                    ForApprovalCount = forApprovalCount,
-                    OnGoingCount = onGoingCount,
-                    ForConfirmationCount = forConfirmationCount,
-                    DoneCount = doneCount,
+                    RequestConcernCount = requestConcernsQuery.Count(),
+                    ForApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket)),
+                    OnGoingCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.CurrentlyFixing)),
+                    ForConfirmationCount = requestConcernsQuery.Count(x => x.Is_Confirm == null && x.ConcernStatus.Contains(TicketingConString.NotConfirm)),
+                    DoneCount = requestConcernsQuery.Count(x => x.Is_Confirm == true && x.ConcernStatus.Contains(TicketingConString.Done)),
                     RequestConcernId = g.Id,
                     Concern = g.Concern,
                     Resolution = g.Resolution,

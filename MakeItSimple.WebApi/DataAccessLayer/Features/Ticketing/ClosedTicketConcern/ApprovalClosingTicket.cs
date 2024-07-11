@@ -145,8 +145,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             ticketHistory.TransactionDate = DateTime.Now;
                             ticketHistory.Request = TicketingConString.TicketClosed;
                             ticketHistory.Status = TicketingConString.CloseApproveReceiver;
-                            ticketHistory.IsApprove = true;
-
+                            ticketHistory.IsApprove = true; 
                         }
                         else
                         {

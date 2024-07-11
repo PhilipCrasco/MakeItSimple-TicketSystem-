@@ -72,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             {
                 public int ? ClosingTicketId { get; set; }
                 public string Resolution { get; set; }
+                public string Remarks { get; set; }
                 public bool ? IsApprove { get; set; }
                      
                 public List<GetAttachmentForClosingTicket> GetAttachmentForClosingTickets { get; set; }
@@ -401,6 +402,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Select(x => new GetOpenTicketResult.GetForClosingTicket
                     {
                         ClosingTicketId = x.Id,
+                        Remarks = x.RejectRemarks,
                         Resolution = x.Resolution,
                         IsApprove = x.ApproverTickets.Any(x => x.IsApprove == null) ? false : true,
 

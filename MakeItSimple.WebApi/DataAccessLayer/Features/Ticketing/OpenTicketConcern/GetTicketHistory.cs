@@ -54,7 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public Handler(MisDbContext context)
             {
                 _context = context;
-            }
+            } 
 
             public async Task<Result> Handle(GetTicketHistoryQuery request, CancellationToken cancellationToken)
             {

@@ -75,7 +75,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 ticketConcernExist.IsDone = null;
 
                 var ticketHistory = await _context.TicketHistories
-                    .Where(x => x.Request.Contains(TicketingConString.NotConfirm))
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id 
+                    && x.Request.Contains(TicketingConString.NotConfirm))
                     .FirstOrDefaultAsync();
 
                     _context.TicketHistories.Remove(ticketHistory);

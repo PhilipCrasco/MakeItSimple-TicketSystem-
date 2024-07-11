@@ -294,13 +294,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                  }
 
-                var requestConcerCount = requestConcernsQuery.Count();
-                var forApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket));
-                var onGoingCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.CurrentlyFixing));
-                var forConfirmationCount = requestConcernsQuery.Count(x => x.Is_Confirm == null && x.ConcernStatus.Contains(TicketingConString.NotConfirm));
-                var doneCount = requestConcernsQuery.Count(x => x.Is_Confirm == true && x.ConcernStatus.Contains(TicketingConString.Done));
-
-
 
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {

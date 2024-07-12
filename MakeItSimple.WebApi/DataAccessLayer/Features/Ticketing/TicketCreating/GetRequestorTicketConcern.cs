@@ -83,6 +83,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public bool Is_Active { get; set; }
                 public bool Is_Reject { get; set; }
                 public DateTime ? Closed_At { get; set; }
+                public bool ? Is_Transfer { get; set; }
+                public DateTime ? Transfer_At {  get; set; }
+                public string Transfer_By { get; set; }
+
 
             }
 
@@ -132,8 +136,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .ThenInclude(x => x.RequestorByUser)
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
-                     .ThenInclude(x => x.ChannelUsers);
-
+                     .ThenInclude(x => x.ChannelUsers)
+                     .Include(x => x.TicketConcerns)
+                     .ThenInclude(x => x.TransferByUser);
+                    
                  if (requestConcernsQuery.Any())
                  {
 
@@ -194,7 +200,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         switch (request.Concern_Status)
                         {
 
-        
                             case TicketingConString.Approval:
                                 requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket 
                                 /*|| ticketStatusList.Contains(x.Id)*/);
@@ -282,7 +287,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                  }
 
-
                 var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {
                     RequestConcernCount = requestConcernsQuery.Count(),
@@ -331,9 +335,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Start_Date = tc.StartDate,
                                 Target_Date = tc.TargetDate,
                                 Remarks = tc.Remarks,
-
                                 Concern_Type = tc.TicketType,
-
                                 Ticket_Status = tc.IsApprove == true ? "Ticket Approve" : tc.IsReject ? "Rejected" :
                                 tc.ConcernStatus != TicketingConString.ForApprovalTicket ? tc.ConcernStatus
                                 : tc.IsApprove == false && tc.IsReject == false ? "For Approval" : "Unknown",
@@ -347,6 +349,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Is_Active = tc.IsActive,
                                 Is_Reject = tc.IsReject,
                                 Closed_At = tc.Closed_At,
+                                Is_Transfer = tc.IsTransfer,
+                                Transfer_At = tc.TransferAt,
+                                Transfer_By =tc.TransferByUser.Fullname,
 
                             }).ToList()
 
@@ -397,9 +402,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketHistory.Request = TicketingConString.Confirm;
                             ticketHistory.Status = TicketingConString.CloseConfirm;
                         }
-
-
-
 
                         //var addTicketHistory = new TicketHistory
                         //{

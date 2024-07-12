@@ -61,9 +61,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public bool? Done { get; set; }
 
             public bool ? Is_Transfer { get; set; }
+            public DateTime ? Transfer_At {  get; set; }
             public bool ? Is_Closed { get; set; }
-            public bool ? Is_ReTicket { get; set; }
-            public bool ? Is_ReDate {  get; set; }  
             public DateTime ? Closed_At { get; set; }
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
@@ -250,7 +249,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                     .Where(x => x.IsTransfer == false);
                                 break;
 
-
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsClosedApprove == false);
@@ -418,9 +416,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     IsActive = x.IsActive,
 
                     Is_Closed = x.IsClosedApprove,
-                    Is_ReDate = x.IsReDate,
-                    Is_ReTicket = x.IsReTicket,
+                    Closed_At = x.Closed_At,
                     Is_Transfer = x.IsTransfer,
+                    Transfer_At = x.TransferAt,
 
                     GetForClosingTickets = x.ClosingTickets
                     .Where(x => x.IsActive == true && x.IsRejectClosed == false)

@@ -123,7 +123,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     if (approverPermissionList.Any(x => x.Contains(request.Role)))
                     {
 
-                        var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                        var userApprover = await _context.Users
+                            .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
                         var approverTransactList = await _context.ApproverTicketings
                             .Where(x => x.UserId == userApprover.Id)
@@ -134,7 +135,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             .ToList();
 
                         var userRequestIdApprovalList = approvalLevelList.Select(x => x.TransferTicketConcernId);
-
                         var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
 
                         transferTicketQuery = transferTicketQuery

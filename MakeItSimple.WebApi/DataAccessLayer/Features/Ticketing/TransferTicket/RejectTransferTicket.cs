@@ -82,6 +82,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     _context.Remove(approverUserId);
                 }
 
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => (x.TicketConcernId == ticketConcernExist.Id
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                     || x.Request.Contains(TicketingConString.NotConfirm))
+                    .ToListAsync();
+
+                foreach (var item in ticketHistory)
+                {
+                    _context.TicketHistories.Remove(item);
+                }
+
                 var addTicketHistory = new TicketHistory
                 {
                     TicketConcernId = transferTicketExist.TicketConcernId,

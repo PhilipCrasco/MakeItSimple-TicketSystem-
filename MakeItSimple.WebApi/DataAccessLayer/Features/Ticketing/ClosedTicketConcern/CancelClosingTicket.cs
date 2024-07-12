@@ -40,10 +40,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 closingTicketExist.IsActive = false;
 
-                var ticketConcernId = await _context.TicketConcerns
+                var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcernId);
 
-                ticketConcernId.IsClosedApprove = null;
+                ticketConcernExist.IsClosedApprove = null;
 
                 var approverList = await _context.ApproverTicketings
                     .Where(x => x.ClosingTicketId == command.ClosingTicketId)
@@ -55,7 +55,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 }
 
                 var ticketHistory = await _context.TicketHistories
-                    .Where(x => (x.TicketConcernId == ticketConcernId.Id
+                    .Where(x => (x.TicketConcernId == ticketConcernExist.Id
                      && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval)) 
                      || x.Request.Contains(TicketingConString.NotConfirm))
                     .ToListAsync();

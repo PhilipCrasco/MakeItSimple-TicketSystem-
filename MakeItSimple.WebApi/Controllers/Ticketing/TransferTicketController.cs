@@ -167,7 +167,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
    
                     if(Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
-                        command.Transfer_By = userId;
+                        //command.Transfer_By = userId;
                         command.Users = userId;
                         command.Transacted_By = userId;
                     }

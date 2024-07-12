@@ -141,7 +141,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
                     .Include(x => x.Channel)
-                    .ThenInclude(x => x.Project)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)

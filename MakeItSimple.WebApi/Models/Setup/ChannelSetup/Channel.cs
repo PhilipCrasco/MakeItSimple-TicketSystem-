@@ -1,7 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
-using MakeItSimple.WebApi.Models.Setup.ProjectSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 
 
@@ -28,8 +27,6 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
         public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
 
-        public int ? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
 
         
         public ICollection<ChannelUser> ChannelUsers { get; set; }

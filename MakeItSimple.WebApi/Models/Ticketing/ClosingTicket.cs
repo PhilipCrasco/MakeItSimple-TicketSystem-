@@ -34,13 +34,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User RejectClosedByUser { get; set; }
         public string RejectRemarks { get; set; }
         public Guid? TicketApprover { get; set; }
-
         public string Remarks { get; set; }
-
         public string TicketNo { get; set; }
-
         public string Resolution { get; set; }
-
         public ICollection<TicketAttachment> TicketAttachments { get; set; }
         public ICollection<ApproverTicketing> ApproverTickets { get; set; }
 

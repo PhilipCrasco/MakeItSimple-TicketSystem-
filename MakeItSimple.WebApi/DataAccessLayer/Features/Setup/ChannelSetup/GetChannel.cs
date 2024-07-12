@@ -12,8 +12,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         public class GetChannelResult
         {
             public int Id { get; set; }
-            public int ? ProjectId { get; set; }
-            public string Project_Name { get; set; }
             public string Channel_Name { get; set; }
 
             public int No_Of_Members { get; set; }
@@ -59,7 +57,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 IQueryable<Channel> channelQuery = _context.Channels
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
-                    .Include(x => x.Project)
                     .Include(x => x.ChannelUsers)
                     .Include(x => x.User)
                     .ThenInclude(x => x.Department);
@@ -77,8 +74,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 var results = channelQuery.Select(x => new GetChannelResult
                 {
                     Id = x.Id,
-                    ProjectId = x.ProjectId,
-                    Project_Name = x.Project.ProjectName,   
                     Channel_Name = x.ChannelName,
                     Added_By = x.AddedByUser.Fullname, 
                     Created_At = x.CreatedAt,

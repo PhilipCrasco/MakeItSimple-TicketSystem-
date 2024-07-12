@@ -89,18 +89,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         }
 
 
-        //public record ReceiverResult
-        //{
-        //    public int Id { get; set; }
-        //    public bool IsActive { get; set; } = true;
-        //    public DateTime CreatedAt { get; set; } = DateTime.Now;
-        //    public DateTime? UpdatedAt { get; set; }
-        //    public Guid? AddedBy { get; set; }
-        //    public Guid? ModifiedBy { get; set; }
-        //    public int? BusinessUnitId { get; set; }
-        //    public Guid? UserId { get; set; }
-        //}
-
         public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
         {
             //public string Requestor { get; set; }

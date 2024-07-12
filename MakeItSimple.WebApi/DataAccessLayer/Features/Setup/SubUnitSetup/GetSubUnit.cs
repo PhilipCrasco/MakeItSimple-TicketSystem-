@@ -2,7 +2,6 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

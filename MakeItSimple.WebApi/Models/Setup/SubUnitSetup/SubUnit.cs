@@ -3,7 +3,6 @@ using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
-using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -45,7 +44,6 @@ namespace MakeItSimple.WebApi.Models.Setup.SubUnitSetup
         //public ICollection<Channel> Channels { get; set; }
         public ICollection<User> Users { get; set; }
         public ICollection <Approver > Approvers { get; set; }
-        public ICollection <Team> Teams { get; set; }
 
         //public ICollection<Location> Locations { get; set; }
 

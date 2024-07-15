@@ -170,7 +170,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         var addApproverHistory = new TicketHistory
                         {
                             TicketConcernId = ticketConcernExist.Id,
-                            TransactedBy = approverUser.UserId,
+                            TransactedBy = approver.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.Approval,
                             Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"

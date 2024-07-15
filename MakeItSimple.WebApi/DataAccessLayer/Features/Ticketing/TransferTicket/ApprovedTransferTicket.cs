@@ -17,7 +17,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string Role { get; set; }
             public Guid? Users { get; set; }
             public Guid? Transacted_By { get; set; }
-            //public Guid? Approver_By { get; set; }
             public int TransferTicketId { get; set; }
 
         }

@@ -21,7 +21,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         }
 
-
         public class Handler : IRequestHandler<RejectRequestTicketCommand, Result>
         {
 
@@ -34,7 +33,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(RejectRequestTicketCommand command, CancellationToken cancellationToken)
             {
-
 
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
@@ -60,8 +58,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var requestConcernExist = await _context.RequestConcerns
                     .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId,cancellationToken);
-
-              
+        
                 requestConcernExist.IsReject = true;
                 requestConcernExist.Remarks = command.Remarks;
                 requestConcernExist.RejectBy = command.Reject_By;

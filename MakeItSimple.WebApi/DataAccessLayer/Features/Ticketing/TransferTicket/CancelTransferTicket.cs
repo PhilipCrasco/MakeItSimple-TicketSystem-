@@ -5,7 +5,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Policy;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
@@ -31,7 +30,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(CancelTransferTicketCommand command, CancellationToken cancellationToken)
             {
-
 
                 var transferTicketExist = await _context.TransferTicketConcerns
                 .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId);

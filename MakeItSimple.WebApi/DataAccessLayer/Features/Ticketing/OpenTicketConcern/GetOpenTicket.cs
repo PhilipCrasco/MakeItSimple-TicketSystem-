@@ -248,7 +248,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsTransfer == false);
                                 break;
-
+                                
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsClosedApprove == false);

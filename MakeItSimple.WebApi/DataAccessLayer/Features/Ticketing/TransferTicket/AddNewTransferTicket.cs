@@ -173,7 +173,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             TransactedBy = approver.UserId,
                             TransactionDate = DateTime.Now,
                             Request = TicketingConString.Approval,
-                            Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver"
+                            Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver",
+                            Approver_Level = approver.ApproverLevel,
+                            
                         };
 
                         await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);

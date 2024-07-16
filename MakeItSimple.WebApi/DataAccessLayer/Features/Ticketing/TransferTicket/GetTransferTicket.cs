@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket.GetTransferTicketResult;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
@@ -39,6 +40,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
+
+            public List<TransferAttachment> TransferAttachments { get; set; }
+
+            public class TransferAttachment
+            {
+                public int? TicketAttachmentId { get; set; }
+                public string Attachment { get; set; }
+                public string FileName { get; set; }
+                public decimal? FileSize { get; set; }
+                public string Added_By { get; set; }
+                public DateTime Created_At { get; set; }
+                public string Modified_By { get; set; }
+                public DateTime? Updated_At { get; set; }
+            }
 
         }
 
@@ -183,7 +198,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     Added_By = x.AddedByUser.Fullname,
                     Created_At = x.CreatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
-                    Updated_At = x.UpdatedAt
+                    Updated_At = x.UpdatedAt,
+                    TransferAttachments = x.TicketAttachments
+                    .Select(x => new TransferAttachment
+                    {
+                        TicketAttachmentId = x.Id,
+                        Attachment = x.Attachment,
+                        FileName = x.FileName,
+                        FileSize = x.FileSize,
+                        Added_By = x.AddedByUser.Fullname,
+                        Created_At = x.CreatedAt,
+                        Modified_By = x.ModifiedByUser.Fullname,
+                        Updated_At = x.UpdatedAt,
+
+                    }).ToList(),
+                    
 
                 });
 

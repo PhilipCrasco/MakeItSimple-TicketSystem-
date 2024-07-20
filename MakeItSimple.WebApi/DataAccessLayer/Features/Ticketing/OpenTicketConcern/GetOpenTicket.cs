@@ -504,6 +504,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }
 
+                //if (request.PageSize >= 10000 )
+                //{
+                //    var totalCount = await results.CountAsync();
+                //    request.SetDynamicMaxPageSize(totalCount);
+                //}
+
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }

@@ -95,8 +95,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
         {
-            //public string Requestor { get; set; }
-            //public string Approver { get; set; }
+
             public string UserType {  get; set; }
             public string Role { get; set; }
             public Guid? UserId { get; set; }
@@ -130,15 +129,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .Include(x => x.ModifiedByUser)
                      .Include(x => x.User)
                      .ThenInclude(x => x.Department)
+                     .AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.User)
+                     .AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.RequestorByUser)
+                     .AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
                      .ThenInclude(x => x.ChannelUsers)
+                     .AsSplitQuery()
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.TransferByUser);
+                     .ThenInclude(x => x.TransferByUser)
+                     .AsSplitQuery();
                     
                  if (requestConcernsQuery.Any())
                  {
@@ -201,8 +205,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
 
                             case TicketingConString.Approval:
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket 
-                                /*|| ticketStatusList.Contains(x.Id)*/);
+                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket);
                                 break;
                             case TicketingConString.OnGoing:
                                 requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
@@ -264,14 +267,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
                             {
-                                //var receiver = await _context.TicketConcerns
-                                //    .Include(x => x.RequestorByUser)
-                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId)
-                                //    && businessSelect.Contains(x.RequestConcernId))
-                                //    .ToListAsync();
-
-                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                //var requestorSelect = receiver.Select(x => x.Id);
 
                                 requestConcernsQuery = requestConcernsQuery
                                     .Where(x => selectReceiver.Contains(x.User.BusinessUnitId));
@@ -418,7 +413,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
                }
-
+                //var totalCount = await results.CountAsync();
+                //request.SetDynamicMaxPageSize(totalCount);
 
                 return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

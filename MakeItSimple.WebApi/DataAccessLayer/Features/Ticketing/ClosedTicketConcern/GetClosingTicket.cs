@@ -281,6 +281,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
 
                     });
+                
+                //if(request.PageNumber == null || request.PageNumber == 0)
+                //{
+                //    //var totalCount = await results.CountAsync();
+                //    //request.SetDynamicMaxPageSize(totalCount);
+                //}
+
+
 
                 return await PagedList<GetClosingTicketResults>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

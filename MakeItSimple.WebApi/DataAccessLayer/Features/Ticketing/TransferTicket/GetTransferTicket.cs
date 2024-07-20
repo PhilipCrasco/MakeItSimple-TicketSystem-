@@ -216,6 +216,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 });
 
+                //var totalCount = await results.CountAsync();
+                //request.SetDynamicMaxPageSize(totalCount);
+
                 return await PagedList<GetTransferTicketResult>.CreateAsync(results, request.PageNumber , request.PageSize);
             }
         }

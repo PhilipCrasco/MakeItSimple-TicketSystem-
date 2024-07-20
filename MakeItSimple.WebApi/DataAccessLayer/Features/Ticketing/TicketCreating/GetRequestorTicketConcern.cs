@@ -129,20 +129,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .Include(x => x.ModifiedByUser)
                      .Include(x => x.User)
                      .ThenInclude(x => x.Department)
-                     .AsSplitQuery()
+                     //.AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.User)
-                     .AsSplitQuery()
+                     //.AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.RequestorByUser)
-                     .AsSplitQuery()
+                     //.AsSplitQuery()
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
                      .ThenInclude(x => x.ChannelUsers)
-                     .AsSplitQuery()
+                     //.AsSplitQuery()
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.TransferByUser)
-                     .AsSplitQuery();
+                     .ThenInclude(x => x.TransferByUser);
+                     //.AsSplitQuery();
 
                 if (requestConcernsQuery.Any())
                 {

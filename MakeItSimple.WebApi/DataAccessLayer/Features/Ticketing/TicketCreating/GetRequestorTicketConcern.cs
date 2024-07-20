@@ -23,12 +23,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestorTicketConcernResult
         {
-            
-            public int ? RequestConcernCount { get; set; }
-            public int ? ForApprovalCount { get; set; }
-            public int ? OnGoingCount { get; set; }
-            public int ? ForConfirmationCount { get; set; }
-            public int ? DoneCount { get; set; }
+
+            public int? RequestConcernCount { get; set; }
+            public int? ForApprovalCount { get; set; }
+            public int? OnGoingCount { get; set; }
+            public int? ForConfirmationCount { get; set; }
+            public int? DoneCount { get; set; }
 
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
@@ -46,12 +46,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Modified_By { get; set; }
             public DateTime? updated_At { get; set; }
             public bool? Is_Confirmed { get; set; }
-            public DateTime ? Confirmed_At { get; set; }
+            public DateTime? Confirmed_At { get; set; }
 
             public List<TicketRequestConcern> TicketRequestConcerns { get; set; }
             public class TicketRequestConcern
             {
-               
+
                 public int? TicketConcernId { get; set; }
                 public string Ticket_No { get; set; }
                 public string Concern_Description { get; set; }
@@ -70,9 +70,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public int? SubCategoryId { get; set; }
                 public string SubCategory_Description { get; set; }
                 public DateTime? Start_Date { get; set; }
-                public DateTime ? Target_Date { get; set; }
+                public DateTime? Target_Date { get; set; }
                 public string Ticket_Status { get; set; }
-                public bool ? Is_Assigned { get; set; }
+                public bool? Is_Assigned { get; set; }
                 //public string Concern_Status {  get; set; }
                 public string Remarks { get; set; }
                 public string Concern_Type { get; set; }
@@ -82,9 +82,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public DateTime? Updated_At { get; set; }
                 public bool Is_Active { get; set; }
                 public bool Is_Reject { get; set; }
-                public DateTime ? Closed_At { get; set; }
-                public bool ? Is_Transfer { get; set; }
-                public DateTime ? Transfer_At {  get; set; }
+                public DateTime? Closed_At { get; set; }
+                public bool? Is_Transfer { get; set; }
+                public DateTime? Transfer_At { get; set; }
                 public string Transfer_By { get; set; }
 
 
@@ -96,14 +96,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
         {
 
-            public string UserType {  get; set; }
+            public string UserType { get; set; }
             public string Role { get; set; }
             public Guid? UserId { get; set; }
             public string Concern_Status { get; set; }
             public string Search { get; set; }
             public bool? Status { get; set; }
-            public bool ? Is_Reject { get; set; }
-            public bool ? Is_Approve { get; set; }
+            public bool? Is_Reject { get; set; }
+            public bool? Is_Approve { get; set; }
             public bool? Ascending { get; set; }
         }
 
@@ -118,7 +118,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                int hoursDiff = 24; 
+                int hoursDiff = 24;
                 var dateToday = DateTime.Now;
 
                 var businessUnitList = new List<BusinessUnit>();
@@ -143,17 +143,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.TransferByUser)
                      .AsSplitQuery();
-                    
-                 if (requestConcernsQuery.Any())
-                 {
+
+                if (requestConcernsQuery.Any())
+                {
 
                     var allUserList = await _context.UserRoles.ToListAsync();
 
                     var receiverPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
-                     var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                   .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
 
                     var requestorPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
@@ -175,8 +175,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
                     }
 
-                    if(request.Is_Approve != null)
-                    { 
+                    if (request.Is_Approve != null)
+                    {
                         var ticketStatusList = await _context.TicketConcerns
                             .Where(x => x.IsApprove == request.Is_Approve)
                             .Select(x => x.RequestConcernId)
@@ -186,7 +186,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
-                    if(request.Is_Reject != null)
+                    if (request.Is_Reject != null)
                     {
                         requestConcernsQuery = requestConcernsQuery.Where(x => x.IsReject == request.Is_Reject);
                     }
@@ -220,7 +220,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 break;
                             default:
                                 return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
-                                
+
                         }
                     }
 
@@ -238,16 +238,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             }
                         }
 
-                         if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
-                         {
-                            var listOfRequest = await requestConcernsQuery.Select(x => new 
+                        if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
+                        {
+                            var listOfRequest = await requestConcernsQuery.Select(x => new
                             {
                                 x.User.BusinessUnitId
 
                             }).ToListAsync();
 
 
-                            foreach ( var businessUnit in listOfRequest)
+                            foreach (var businessUnit in listOfRequest)
                             {
                                 var businessUnitDefault = await _context.BusinessUnits
                                     .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
@@ -255,11 +255,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                             }
 
-                           var businessSelect = businessUnitList.Select(x => x.Id).ToList();
+                            var businessSelect = businessUnitList.Select(x => x.Id).ToList();
 
                             var receiverList = await _context.Receivers
                                 .Include(x => x.BusinessUnit)
-                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true && 
+                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
                                  x.UserId == request.UserId)
                                 .ToListAsync();
 
@@ -274,15 +274,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             }
                             else
                             {
-                               return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
+                                return new PagedList<GetRequestorTicketConcernResult>(new List<GetRequestorTicketConcernResult>(), 0, request.PageNumber, request.PageSize);
                             }
-                         }
+                        }
 
                     }
 
-                 }
+                }
 
-                var results =  requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
+                var results = requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
                 {
                     RequestConcernCount = requestConcernsQuery.Count(),
                     ForApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket)),
@@ -346,7 +346,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Closed_At = tc.Closed_At,
                                 Is_Transfer = tc.IsTransfer,
                                 Transfer_At = tc.TransferAt,
-                                Transfer_By =tc.TransferByUser.Fullname,
+                                Transfer_By = tc.TransferByUser.Fullname,
 
                             }).ToList()
 
@@ -357,16 +357,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     .Where(x => x.Is_Confirmed == null && x.Is_Done == true)
                     .ToList();
 
-               foreach(var confirmConcern in confirmConcernList)
-               {
+                foreach (var confirmConcern in confirmConcernList)
+                {
 
-                    var daysClose =  confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Day - dateToday.Day;
+                    var daysClose = confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Day - dateToday.Day;
 
                     daysClose = Math.Abs(daysClose) * (1);
 
                     if (daysClose >= 1)
                     {
-                       daysClose = daysClose * 24;
+                        daysClose = daysClose * 24;
                     }
 
                     var hourConvert = (daysClose + confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
@@ -389,7 +389,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             .FirstOrDefaultAsync();
 
 
-                        if(ticketHistory is not null)
+                        if (ticketHistory is not null)
                         {
                             ticketHistory.TicketConcernId = ticketConcernExist.Id;
                             ticketHistory.TransactedBy = request.UserId;
@@ -412,7 +412,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         await _context.SaveChangesAsync(cancellationToken);
                     }
 
-               }
+                }
                 //var totalCount = await results.CountAsync();
                 //request.SetDynamicMaxPageSize(totalCount);
 

@@ -14,13 +14,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class GetTransferTicketResult
         {
 
-            public int ? TicketConcernId { get; set; }
-            public int ? TransferTicketId { get; set; }
+            public int? TicketConcernId { get; set; }
+            public int? TransferTicketId { get; set; }
             public string Department_Code { get; set; }
             public string Department_Name { get; set; }
-            public int ? ChannelId { get; set; }
+            public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
-            public Guid ? UserId  { get; set; }
+            public Guid? UserId { get; set; }
             public string Fullname { get; set; }
             public string Concern_Details { get; set; }
             public string Category_Description { get; set; }
@@ -28,8 +28,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public DateTime? Start_Date { get; set; }
             public DateTime? Target_Date { get; set; }
             public bool IsActive { get; set; }
-            public string  Transfer_By { get; set; }
-            public DateTime ? Transfer_At { get; set; }
+            public string Transfer_By { get; set; }
+            public DateTime? Transfer_At { get; set; }
             public string Transfer_Status { get; set; }
             public string Transfer_Remarks { get; set; }
             public string RejectTransfer_By { get; set; }
@@ -39,7 +39,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
-            public DateTime ? Updated_At { get; set; }
+            public DateTime? Updated_At { get; set; }
 
             public List<TransferAttachment> TransferAttachments { get; set; }
 
@@ -59,17 +59,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
         public class GetTransferTicketQuery : UserParams, IRequest<PagedList<GetTransferTicketResult>>
         {
-            public Guid ? UserId { get; set; }
+            public Guid? UserId { get; set; }
             //public string Approval { get; set; }
             public string UserType { get; set; }
             public string Role { get; set; }
-            public bool ? IsTransfer { get; set; }
-            public bool ? IsReject { get; set; }
+            public bool? IsTransfer { get; set; }
+            public bool? IsReject { get; set; }
             public string Search { get; set; }
-            public bool ? Status { get; set; }
+            public bool? Status { get; set; }
 
 
-            
+
         }
 
         public class Handler : IRequestHandler<GetTransferTicketQuery, PagedList<GetTransferTicketResult>>
@@ -145,7 +145,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             .Where(x => x.UserId == userApprover.Id)
                             .ToListAsync();
 
-                        var approvalLevelList = approverTransactList                       
+                        var approvalLevelList = approverTransactList
                             .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
                             .ToList();
 
@@ -163,9 +163,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 }
 
-                if(request.UserType == TicketingConString.IssueHandler)
+                if (request.UserType == TicketingConString.IssueHandler)
                 {
-                   transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId); 
+                    transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
                 }
 
                 var results = transferTicketQuery.Select(x => new GetTransferTicketResult
@@ -186,8 +186,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     IsActive = x.IsActive,
                     Transfer_By = x.TransferByUser.Fullname,
                     Transfer_At = x.TransferAt,
-                    Transfer_Status = x.IsTransfer == false && x.IsRejectTransfer == false ? "For Transfer Approval" 
-                                    : x.IsTransfer == true && x.IsRejectTransfer == false ? "Transfer Approve" 
+                    Transfer_Status = x.IsTransfer == false && x.IsRejectTransfer == false ? "For Transfer Approval"
+                                    : x.IsTransfer == true && x.IsRejectTransfer == false ? "Transfer Approve"
                                     : x.IsRejectTransfer == true ? "Transfer Reject" : "Unknown",
 
                     Transfer_Remarks = x.TransferRemarks,
@@ -212,14 +212,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         Updated_At = x.UpdatedAt,
 
                     }).ToList(),
-                    
+
 
                 });
 
                 //var totalCount = await results.CountAsync();
                 //request.SetDynamicMaxPageSize(totalCount);
 
-                return await PagedList<GetTransferTicketResult>.CreateAsync(results, request.PageNumber , request.PageSize);
+                return await PagedList<GetTransferTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }
     }

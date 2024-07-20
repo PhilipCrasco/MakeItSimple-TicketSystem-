@@ -13,10 +13,5 @@
            set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value ;
         }
 
-        //public void SetDynamicMaxPageSize(int totalCount)
-        //{
-        //    _pageSize = totalCount;
-        //}
-
     }
 }

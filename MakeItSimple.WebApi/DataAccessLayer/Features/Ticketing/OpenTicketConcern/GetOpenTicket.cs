@@ -17,7 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public int? ForConfirmationCount { get; set; }
             public int? CloseTicketCount { get; set; }
             public int? DelayedTicketCount { get; set; }
-            public int ? ForClosingTicketCount { get; set; }
+            public int? ForClosingTicketCount { get; set; }
             public int? TicketConcernId { get; set; }
             public int? RequestConcernId { get; set; }
 
@@ -60,21 +60,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string Remarks { get; set; }
             public bool? Done { get; set; }
 
-            public bool ? Is_Transfer { get; set; }
-            public DateTime ? Transfer_At {  get; set; }
-            public bool ? Is_Closed { get; set; }
-            public DateTime ? Closed_At { get; set; }
+            public bool? Is_Transfer { get; set; }
+            public DateTime? Transfer_At { get; set; }
+            public bool? Is_Closed { get; set; }
+            public DateTime? Closed_At { get; set; }
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
 
             public class GetForClosingTicket
             {
-                public int ? ClosingTicketId { get; set; }
+                public int? ClosingTicketId { get; set; }
                 public string Resolution { get; set; }
                 public string Remarks { get; set; }
-                public bool ? IsApprove { get; set; }
-                     
+                public bool? IsApprove { get; set; }
+
                 public List<GetAttachmentForClosingTicket> GetAttachmentForClosingTickets { get; set; }
                 public class GetAttachmentForClosingTicket
                 {
@@ -101,7 +101,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     public decimal? FileSize { get; set; }
                 }
 
-            } 
+            }
 
         }
 
@@ -148,7 +148,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern)
                     .ThenInclude(x => x.TicketConcerns);
-                    
+
 
                 if (ticketConcernQuery.Any())
                 {
@@ -185,11 +185,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Status);
                     }
 
-                    if(!string.IsNullOrEmpty(request.Concern_Status))
+                    if (!string.IsNullOrEmpty(request.Concern_Status))
                     {
-                        switch(request.Concern_Status)
+                        switch (request.Concern_Status)
                         {
-                            case TicketingConString.PendingRequest :
+                            case TicketingConString.PendingRequest:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsApprove == false);
                                 break;
@@ -248,7 +248,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsTransfer == false);
                                 break;
-                                
+
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsClosedApprove == false);
@@ -353,7 +353,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
                         }
                     }
-                    
+
                 }
 
                 var confirmConcernList = ticketConcernQuery
@@ -498,17 +498,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ticketHistory.TransactionDate = DateTime.Now;
                         ticketHistory.Request = TicketingConString.CloseTicket;
                         ticketHistory.Status = TicketingConString.CloseConfirm;
-              
+
                         await _context.SaveChangesAsync(cancellationToken);
                     }
 
                 }
-
-                //if (request.PageSize >= 10000 )
-                //{
-                //    var totalCount = await results.CountAsync();
-                //    request.SetDynamicMaxPageSize(totalCount);
-                //}
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

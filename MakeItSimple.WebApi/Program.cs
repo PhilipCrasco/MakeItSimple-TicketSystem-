@@ -10,10 +10,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
-using System.Configuration;
 using MakeItSimple.WebApi;
 using MakeItSimple.WebApi.Common.SignalR;
 
@@ -30,30 +28,9 @@ x.UseSqlServer(connectionString)
     .UseSnakeCaseNamingConvention()
     .EnableDetailedErrors()
     .EnableSensitiveDataLogging()
+
     );
 
-
-//var connectionString = builder.Configuration.GetConnectionString("DevConnection");
-
-//var serverVersion = new MySqlServerVersion(new Version(8, 2, 17));
-//builder.Services.AddDbContext<MisDbContext>(x =>
-//{
-//    if (connectionString != null) x.UseMySql(connectionString, serverVersion)
-//        .UseSnakeCaseNamingConvention()
-//        .EnableDetailedErrors()
-//        .EnableSensitiveDataLogging();
-
-//});
-
-//var serverVersion = ServerVersion.AutoDetect(connectionString);
-
-//builder.Services.AddDbContext<MisDbContext>(x =>
-//{
-//    if (connectionString != null)
-//        x.UseMySql(connectionString, serverVersion)
-//         .UseSnakeCaseNamingConvention()
-//         .EnableSensitiveDataLogging();
-//});
 
 
 builder.Services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly);

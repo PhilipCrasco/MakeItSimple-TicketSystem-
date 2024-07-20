@@ -74,6 +74,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+
+
         }
 
         protected override async void OnModelCreating(ModelBuilder modelBuilder)

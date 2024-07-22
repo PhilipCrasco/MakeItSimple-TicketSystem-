@@ -59,6 +59,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public async Task<Result> Handle(GetTicketHistoryQuery request, CancellationToken cancellationToken)
             {
                 var ticketHistory = await _context.TicketHistories
+                    .AsNoTracking()
                     .Include(x => x.TransactedByUser)
                     .Include(x => x.TicketConcern)
                     .Where(x => x.TicketConcernId == request.TicketConcernId)

@@ -124,6 +124,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var businessUnitList = new List<BusinessUnit>();
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
+                    .AsNoTracking()
                     .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
@@ -142,7 +143,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 if (requestConcernsQuery.Any())
                 {
 
-                    var allUserList = await _context.UserRoles.ToListAsync();
+                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
 
                     var receiverPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
@@ -167,30 +168,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     if (request.Status != null)
                     {
-                        requestConcernsQuery = requestConcernsQuery.Where(x => x.IsActive == request.Status);
+                        requestConcernsQuery = requestConcernsQuery
+                            .Where(x => x.IsActive == request.Status);
                     }
 
                     if (request.Is_Approve != null)
                     {
                         var ticketStatusList = await _context.TicketConcerns
+                            .AsNoTracking()
                             .Where(x => x.IsApprove == request.Is_Approve)
                             .Select(x => x.RequestConcernId)
                             .ToListAsync();
 
-                        requestConcernsQuery = requestConcernsQuery.Where(x => ticketStatusList.Contains(x.Id));
+                        requestConcernsQuery = requestConcernsQuery
+                           .Where(x => ticketStatusList.Contains(x.Id));
                     }
 
 
                     if (request.Is_Reject != null)
                     {
-                        requestConcernsQuery = requestConcernsQuery.Where(x => x.IsReject == request.Is_Reject);
+                        requestConcernsQuery = requestConcernsQuery
+                            .Where(x => x.IsReject == request.Is_Reject);
                     }
 
                     if (request.Ascending != null)
                     {
                         requestConcernsQuery = request.Ascending.Value
                             ? requestConcernsQuery.OrderBy(x => x.Id)
-                            : requestConcernsQuery.OrderByDescending(x => x.Id);
+                            : requestConcernsQuery
+                            .OrderByDescending(x => x.Id);
                     }
 
                     if (request.Concern_Status != null)
@@ -200,10 +206,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         {
 
                             case TicketingConString.Approval:
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket);
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket);
                                 break;
                             case TicketingConString.OnGoing:
-                                requestConcernsQuery = requestConcernsQuery.Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing);
                                 break;
 
                             case TicketingConString.NotConfirm:
@@ -235,7 +243,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
                         {
-                            var listOfRequest = await requestConcernsQuery.Select(x => new
+                            var listOfRequest = await requestConcernsQuery
+                                .AsNoTracking()
+                                .Select(x => new
                             {
                                 x.User.BusinessUnitId
 
@@ -245,14 +255,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             foreach (var businessUnit in listOfRequest)
                             {
                                 var businessUnitDefault = await _context.BusinessUnits
+                                    .AsNoTracking()
                                     .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
                                 businessUnitList.Add(businessUnitDefault);
 
                             }
 
-                            var businessSelect = businessUnitList.Select(x => x.Id).ToList();
+                            var businessSelect = businessUnitList
+                                .Select(x => x.Id).ToList();
 
                             var receiverList = await _context.Receivers
+                                .AsNoTracking()
                                 .Include(x => x.BusinessUnit)
                                 .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
                                  x.UserId == request.UserId)
@@ -277,7 +290,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                var results = requestConcernsQuery.Select(g => new GetRequestorTicketConcernResult
+                var results = requestConcernsQuery
+                    .Select(g => new GetRequestorTicketConcernResult
                 {
                     RequestConcernCount = requestConcernsQuery.Count(),
                     ForApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket)),
@@ -393,23 +407,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketHistory.Status = TicketingConString.CloseConfirm;
                         }
 
-                        //var addTicketHistory = new TicketHistory
-                        //{
-                        //    TicketConcernId = ticketConcernExist.Id,
-                        //    TransactedBy = request.UserId,
-                        //    TransactionDate = DateTime.Now,
-                        //    Request = TicketingConString.CloseTicket,
-                        //    Status = TicketingConString.CloseConfirm,
-                        //};
-
-                        //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
                         await _context.SaveChangesAsync(cancellationToken);
                     }
 
                 }
-                //var totalCount = await results.CountAsync();
-                //request.SetDynamicMaxPageSize(totalCount);
+
 
                 return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

@@ -52,6 +52,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(GetRequestAttachmentQuery request, CancellationToken cancellationToken)
             {
                 IQueryable<TicketAttachment>  ticketAttachmentQuery = _context.TicketAttachments
+                    .AsNoTracking()
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.AddedByUser)
                     .ThenInclude(x => x.ModifiedByUser);

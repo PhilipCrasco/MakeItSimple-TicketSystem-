@@ -136,6 +136,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 var businessUnitList = new List<BusinessUnit>();
 
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
+                    .AsNoTracking()
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
@@ -146,8 +147,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.TransferTicketConcerns)
                     .ThenInclude(x => x.TicketAttachments)
-                    .Include(x => x.RequestConcern)
-                    .ThenInclude(x => x.TicketConcerns);
+                    .Include(x => x.RequestConcern);
 
 
                 if (ticketConcernQuery.Any())
@@ -156,6 +156,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     var fillterApproval = ticketConcernQuery.Select(x => x.Id);
 
                     var allUserList = await _context.UserRoles
+                        .AsNoTracking()
                         .ToListAsync();
 
                     var receiverPermissionList = allUserList.Where(x => x.Permissions
@@ -182,7 +183,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     if (request.Status != null)
                     {
-                        ticketConcernQuery = ticketConcernQuery.Where(x => x.IsActive == request.Status);
+                        ticketConcernQuery = ticketConcernQuery
+                            .Where(x => x.IsActive == request.Status);
                     }
 
                     if (!string.IsNullOrEmpty(request.Concern_Status))
@@ -288,6 +290,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             if (supportPermissionList.Any(x => x.Contains(request.Role)))
                             {
                                 var channelUserValidation = await _context.ChannelUsers
+                                    .AsNoTracking()
                                     .Where(x => x.UserId == request.UserId)
                                     .ToListAsync();
 
@@ -313,6 +316,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             foreach (var businessUnit in listOfRequest)
                             {
                                 var businessUnitDefault = await _context.BusinessUnits
+                                    .AsNoTracking()
                                     .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
                                 businessUnitList.Add(businessUnitDefault);
 
@@ -321,6 +325,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             var businessSelect = businessUnitList.Select(x => x.Id).ToList();
 
                             var receiverList = await _context.Receivers
+                                .AsNoTracking()
                                 .Include(x => x.BusinessUnit)
                                 .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
                                  x.UserId == request.UserId)

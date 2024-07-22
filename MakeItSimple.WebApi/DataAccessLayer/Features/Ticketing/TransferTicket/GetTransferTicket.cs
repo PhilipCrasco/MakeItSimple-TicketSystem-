@@ -86,6 +86,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
 
                 IQueryable<TransferTicketConcern> transferTicketQuery = _context.TransferTicketConcerns
+                    .AsNoTracking()
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.User)
                     .ThenInclude(x => x.Department)
@@ -98,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
 
-                var allUserList = await _context.UserRoles.ToListAsync();
+                var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
 
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
@@ -139,9 +140,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
 
                         var userApprover = await _context.Users
+                            .AsNoTracking()
                             .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
                         var approverTransactList = await _context.ApproverTicketings
+                            .AsNoTracking()
                             .Where(x => x.UserId == userApprover.Id)
                             .ToListAsync();
 
@@ -215,9 +218,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
 
                 });
-
-                //var totalCount = await results.CountAsync();
-                //request.SetDynamicMaxPageSize(totalCount);
 
                 return await PagedList<GetTransferTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

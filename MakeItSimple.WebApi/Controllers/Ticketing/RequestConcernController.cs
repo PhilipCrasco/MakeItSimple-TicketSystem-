@@ -229,7 +229,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     requestConcern.TotalPages,
                     requestConcern.HasPreviousPage,
                     requestConcern.HasNextPage
-                };
+                }; 
 
                 var successResult = Result.Success(result);
 

@@ -24,10 +24,11 @@ var config = builder.Configuration;
 
 var connectionString = builder.Configuration.GetConnectionString("Testing");
 builder.Services.AddDbContext<MisDbContext>(x =>
-x.UseSqlServer(connectionString)
+x.UseSqlServer(connectionString, sqlOptions => sqlOptions.CommandTimeout(180))
     .UseSnakeCaseNamingConvention()
     .EnableDetailedErrors()
     .EnableSensitiveDataLogging()
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll)
 
     );
 

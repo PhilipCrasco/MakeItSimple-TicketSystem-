@@ -43,6 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<UserRole> UserRoles { get; set; }
 
         // Setup
+
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Company> Companies { get; set; }
         public virtual DbSet<BusinessUnit> BusinessUnits { get; set; }
@@ -55,7 +56,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<Approver> Approvers { get; set; }
-
 
         //Ticketing
 
@@ -70,13 +70,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 
-
+        
         }
 
         protected override async void OnModelCreating(ModelBuilder modelBuilder)
@@ -105,16 +104,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
 
-
-            //DateTime time = DateTime.Parse("2024-10-08");
-
-            //if (DateTime.Now == time)
-            //{
-            //    Remove(Users);
-            //    SaveChanges();
-            //}
-
         }
+
+
+
 
 
     }

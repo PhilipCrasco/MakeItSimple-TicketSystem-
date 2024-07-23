@@ -143,17 +143,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             .AsNoTracking()
                             .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
+
                         var approverTransactList = await _context.ApproverTicketings
                             .AsNoTracking()
                             .Where(x => x.UserId == userApprover.Id)
+                            .Where(x => x.IsApprove == null)
+                            .Select(x => new
+                            {
+                                ApproverLevel = x.ApproverLevel,
+                                IsApprove = x.IsApprove,
+                                TransferTicketConcernId = x.ClosingTicketId,
+                                UserId = x.UserId,
+
+                            })
                             .ToListAsync();
 
-                        var approvalLevelList = approverTransactList
-                            .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
-                            .ToList();
-
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.TransferTicketConcernId);
-                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                        var userRequestIdApprovalList = approverTransactList.Select(x => x.TransferTicketConcernId);
+                        var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
 
                         transferTicketQuery = transferTicketQuery
                             .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)

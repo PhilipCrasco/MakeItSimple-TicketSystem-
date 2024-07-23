@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
@@ -109,7 +110,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 {
 
                     var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
-
                     var receiverPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
@@ -150,14 +150,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 var approverTransactList = await _context.ApproverTicketings
                                     .AsNoTracking()
                                     .Where(x => x.UserId == userApprover.Id)
+                                    .Where(x => x.IsApprove == null)
+                                    .Select(x => new
+                                    {
+                                        ApproverLevel = x.ApproverLevel,
+                                        IsApprove = x.IsApprove,
+                                        ClosingTicketId = x.ClosingTicketId,
+                                        UserId = x.UserId,
+
+                                    })
                                     .ToListAsync();
 
-                                var approvalLevelList = approverTransactList
-                                    .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
-                                    .ToList();
-
-                                var userRequestIdApprovalList = approvalLevelList.Select(x => x.ClosingTicketId);
-                                var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
+                                var userRequestIdApprovalList = approverTransactList.Select(x => x.ClosingTicketId);
+                                var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
 
                                 closingTicketsQuery = closingTicketsQuery
                                     .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
@@ -211,14 +216,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                         .Where(x => !generatedIdInApprovalList.Contains(x.Id));
 
                                 }
-
-                                //var receiver = await _context.TicketConcerns
-                                //    .Include(x => x.RequestorByUser)
-                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
-                                //    .ToListAsync();
-
-                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                //var requestorSelect = receiver.Select(x => x.Id);
 
                                 closingTicketsQuery = closingTicketsQuery
                                     .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId));

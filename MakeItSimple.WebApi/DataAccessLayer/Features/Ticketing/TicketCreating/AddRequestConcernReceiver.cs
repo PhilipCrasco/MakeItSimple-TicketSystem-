@@ -84,8 +84,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var requestorPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
 
-                var channelidExist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
-                if(channelidExist == null)
+                var channelExist = await _context.Channels
+                    .FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
+                if(channelExist == null)
                 {
                     return Result.Failure(TicketRequestError.ChannelNotExist());
                 }

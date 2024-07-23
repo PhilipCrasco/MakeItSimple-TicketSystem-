@@ -362,6 +362,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 }
 
                 var confirmConcernList = ticketConcernQuery
+                    .AsNoTrackingWithIdentityResolution()
                     .Where(x => x.RequestConcern.Is_Confirm == null && x.RequestConcern.IsDone == true)
                     .ToList();
 

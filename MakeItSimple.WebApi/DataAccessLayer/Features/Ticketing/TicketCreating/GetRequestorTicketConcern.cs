@@ -161,7 +161,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         requestConcernsQuery = requestConcernsQuery
-                            .Where(x => x.User.Fullname.Contains(request.Search)
+                            .Where(x => x.User.Fullname
+                            .Contains(request.Search)
                             || x.Id.ToString().Contains(request.Search)
                             || x.Concern.Contains(request.Search));
                     }
@@ -175,7 +176,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     if (request.Is_Approve != null)
                     {
                         var ticketStatusList = await _context.TicketConcerns
-                            .AsNoTracking()
+                            .AsNoTrackingWithIdentityResolution()
                             .Where(x => x.IsApprove == request.Is_Approve)
                             .Select(x => x.RequestConcernId)
                             .ToListAsync();
@@ -244,7 +245,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
                         {
                             var listOfRequest = await requestConcernsQuery
-                                .AsNoTracking()
                                 .Select(x => new
                             {
                                 x.User.BusinessUnitId
@@ -255,7 +255,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             foreach (var businessUnit in listOfRequest)
                             {
                                 var businessUnitDefault = await _context.BusinessUnits
-                                    .AsNoTracking()
+                                    .AsNoTrackingWithIdentityResolution()
                                     .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
                                 businessUnitList.Add(businessUnitDefault);
 
@@ -265,7 +265,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 .Select(x => x.Id).ToList();
 
                             var receiverList = await _context.Receivers
-                                .AsNoTracking()
+                                .AsNoTrackingWithIdentityResolution()
                                 .Include(x => x.BusinessUnit)
                                 .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
                                  x.UserId == request.UserId)
@@ -278,7 +278,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                                 requestConcernsQuery = requestConcernsQuery
                                     .Where(x => selectReceiver.Contains(x.User.BusinessUnitId));
-
+                  
                             }
                             else
                             {
@@ -349,10 +349,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Created_At = tc.CreatedAt,
                                 Modified_By = tc.ModifiedByUser.Fullname,
                                 Updated_At = tc.UpdatedAt,
-
                                 Is_Active = tc.IsActive,
                                 Is_Reject = tc.IsReject,
-                                Closed_At = tc.Closed_At,
+                                Closed_At = tc.Closed_At, 
                                 Is_Transfer = tc.IsTransfer,
                                 Transfer_At = tc.TransferAt,
                                 Transfer_By = tc.TransferByUser.Fullname,
@@ -396,7 +395,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             .Where(x => x.TicketConcernId == ticketConcernExist.Id
                              && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
                             .FirstOrDefaultAsync();
-
 
                         if (ticketHistory is not null)
                         {

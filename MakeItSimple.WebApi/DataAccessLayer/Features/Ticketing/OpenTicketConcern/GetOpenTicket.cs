@@ -316,7 +316,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             foreach (var businessUnit in listOfRequest)
                             {
                                 var businessUnitDefault = await _context.BusinessUnits
-                                    .AsNoTracking()
+                                    .AsNoTrackingWithIdentityResolution()
                                     .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
                                 businessUnitList.Add(businessUnitDefault);
 
@@ -325,7 +325,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             var businessSelect = businessUnitList.Select(x => x.Id).ToList();
 
                             var receiverList = await _context.Receivers
-                                .AsNoTracking()
+                                .AsNoTrackingWithIdentityResolution()
                                 .Include(x => x.BusinessUnit)
                                 .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
                                  x.UserId == request.UserId)

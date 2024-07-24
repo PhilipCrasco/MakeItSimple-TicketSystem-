@@ -104,11 +104,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
-
                 var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
-
-
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -145,7 +142,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
 
                         var approverTransactList = await _context.ApproverTicketings
-                            .AsNoTracking()
+                            .AsNoTrackingWithIdentityResolution()
                             .Where(x => x.UserId == userApprover.Id)
                             .Where(x => x.IsApprove == null)
                             .Select(x => new

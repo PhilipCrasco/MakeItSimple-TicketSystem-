@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MakeItSimple.WebApi", "Make
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2891EF0C-D7E3-4B2B-9A7B-52E9D353AD21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeItSimple.Api.Test", "..\MakeItSimple.Api.Test\MakeItSimple.Api.Test.csproj", "{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,12 +27,17 @@ Global
 		{2891EF0C-D7E3-4B2B-9A7B-52E9D353AD21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2891EF0C-D7E3-4B2B-9A7B-52E9D353AD21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2891EF0C-D7E3-4B2B-9A7B-52E9D353AD21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{12ECBD99-9F88-492F-B3D6-9080D55EF843} = {AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}
+		{61FEE33A-9B22-44BE-8DC3-B16BFB12CCD6} = {0A46CC87-0BC8-417F-93F8-4924D5C7424F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5D82B40A-4BDF-4A8B-A123-6FE0D5EBD9EA}

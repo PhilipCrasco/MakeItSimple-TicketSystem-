@@ -52,8 +52,6 @@ builder.Services.AddControllers( options =>
 
 }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-
-
 builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddScoped<TransformUrl>();

@@ -12,12 +12,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
         public class GetOpenTicketResult
         {
 
-            public int? RequestedTicketCount { get; set; }
-            public int? OpenTicketCount { get; set; }
-            public int? ForConfirmationCount { get; set; }
-            public int? CloseTicketCount { get; set; }
-            public int? DelayedTicketCount { get; set; }
-            public int? ForClosingTicketCount { get; set; }
+            //public int? RequestedTicketCount { get; set; }
+            //public int? OpenTicketCount { get; set; }
+            //public int? ForConfirmationCount { get; set; }
+            //public int? CloseTicketCount { get; set; }
+            //public int? DelayedTicketCount { get; set; }
+            //public int? ForClosingTicketCount { get; set; }
             public int? TicketConcernId { get; set; }
             public int? RequestConcernId { get; set; }
 
@@ -336,14 +336,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
                             {
 
-                                //var receiver = await _context.TicketConcerns
-                                //    .Include(x => x.RequestorByUser)
-                                //    .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId))
-                                //    .ToListAsync();
-
-                                //var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                //var requestorSelect = receiver.Select(x => x.Id);
-
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => selectReceiver.Contains(x.RequestorByUser.BusinessUnitId));
                             }
@@ -368,13 +360,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 var results = ticketConcernQuery.Select(x => new GetOpenTicketResult
                 {
-                    CloseTicketCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true),
-                    RequestedTicketCount = ticketConcernQuery.Count(),
-                    OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
-                    ForConfirmationCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == null && x.IsClosedApprove == true),
-                    DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
-                    ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
-                    Closed_Status = x.TargetDate.Value.Day >= x.Closed_At.Value.Day ? TicketingConString.OnTime : TicketingConString.Delay,
+                    //CloseTicketCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true),
+                    //RequestedTicketCount = ticketConcernQuery.Count(),
+                    //OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
+                    //ForConfirmationCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == null && x.IsClosedApprove == true),
+                    //DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
+                    //ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
+                    Closed_Status = x.TargetDate.Value.Day >= x.Closed_At.Value.Day && x.IsClosedApprove == true 
+                    ? TicketingConString.OnTime : x.TargetDate.Value.Day < x.Closed_At.Value.Day && x.IsClosedApprove == true
+                    ? TicketingConString.Delay : null,
                     TicketConcernId = x.Id,
                     RequestConcernId = x.RequestConcernId,
                     Concern_Description = x.ConcernDetails,
@@ -507,7 +501,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                         await _context.SaveChangesAsync(cancellationToken);
                     }
-
                 }
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);

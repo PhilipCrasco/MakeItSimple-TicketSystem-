@@ -1,9 +1,11 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.CodeAnalysis.Classification;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -23,11 +25,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
         public class TransferTicketNotificationResultQuery : IRequest<Result>
         {
             public Guid? UserId { get; set; }
-            public string Role {  get; set; }
-            public string Approval {  get; set; }
-            public string Users { get; set; }
-            public bool? IsReject { get; set; }
+            public string UserType { get; set; }
+            public string Role { get; set; }
             public bool? IsTransfer { get; set; }
+            public bool? IsReject { get; set; }
+            public string Search { get; set; }
+            public bool? Status { get; set; }
         }
 
         public class Handler : IRequestHandler<TransferTicketNotificationResultQuery, Result>
@@ -41,51 +44,91 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public async Task<Result> Handle(TransferTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
+
                 var query = await _context.TransferTicketConcerns
-                    .GroupBy(x => x.Id
-                ).ToListAsync();
+                                .Include(x => x.TicketConcern)
+                                .ThenInclude(x => x.User)
+                                .ToListAsync();
 
-                var fillterApproval = query.Select(x => x.First().Id);
-
-
-                if (TicketingConString.Users == request.Users)
+                if(query.Any()) 
                 {
-                    query = query.Where(x => x.First().AddedBy == request.UserId).ToList();
-                }
+                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
 
-                if (request.IsTransfer != null)
-                {
-                    query = query.Where(x => x.First().IsTransfer == request.IsTransfer).ToList();
-                }
+                    var approverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
-                if (request.IsReject != null)
-                {
-                    query = query.Where(x => x.First().IsRejectTransfer == request.IsReject).ToList();
-                }
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
 
-                if (TicketingConString.Approval == request.Approval)
-                {
-                    if (request.UserId != null && TicketingConString.Approver == request.Role)
+                    if (request.Status != null)
                     {
-                        var approverTransactList = await _context.ApproverTicketings
-                            .Where(x => x.UserId == request.UserId)
-                            .ToListAsync();
-
-                        var approvalLevelList = approverTransactList
-                            .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
-                            .ToList();
-
-                        var userRequestIdApprovalList = approvalLevelList.Select(x => x.Id);
-
-                        var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                        query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover) 
-                        && userRequestIdApprovalList.Contains(x.First().Id))
+                        query = query
+                            .Where(x => x.IsActive == request.Status)
                             .ToList();
                     }
-                    else
+
+                    if (request.IsTransfer != null)
                     {
-                        query = query.Where(x => x.First().Id == null).ToList();    
+
+                        query = query
+                            .Where(x => x.IsTransfer == request.IsTransfer)
+                            .ToList();
                     }
+
+                    if (request.IsReject != null)
+                    {
+                        query = query
+                            .Where(x => x.IsRejectTransfer == request.IsReject)
+                            .ToList();
+                    }
+
+                    if (request.UserType == TicketingConString.Approver)
+                    {
+
+                        if (approverPermissionList.Any(x => x.Contains(request.Role)))
+                        {
+
+                            var userApprover = await _context.Users
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+
+
+                            var approverTransactList = await _context.ApproverTicketings
+                                .AsNoTrackingWithIdentityResolution()
+                                .Where(x => x.UserId == userApprover.Id)
+                                .Where(x => x.IsApprove == null)
+                                .Select(x => new
+                                {
+                                    ApproverLevel = x.ApproverLevel,
+                                    IsApprove = x.IsApprove,
+                                    TransferTicketConcernId = x.ClosingTicketId,
+                                    UserId = x.UserId,
+
+                                })
+                                .ToListAsync();
+
+                            var userRequestIdApprovalList = approverTransactList.Select(x => x.TransferTicketConcernId);
+                            var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
+
+                            query = query
+                                .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
+                                && userRequestIdApprovalList.Contains(x.Id))
+                                .ToList();
+                        }
+                        else
+                        {
+                            return Result.Success(query == null);
+                        }
+
+                    }
+
+                    if (request.UserType == TicketingConString.IssueHandler)
+                    {
+                        query = query
+                            .Where(x => x.AddedByUser.Id == request.UserId)
+                            .ToList();
+                    }
+
 
                 }
 

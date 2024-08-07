@@ -157,7 +157,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
-                        //query.Users = userId;
                         command.UserId = userId;
 
                     }
@@ -167,9 +166,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
                     return BadRequest(results);
                 }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
 
                 return Ok(results);
             }

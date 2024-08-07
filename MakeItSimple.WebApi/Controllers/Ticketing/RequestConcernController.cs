@@ -119,8 +119,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Added_By = userId;
                         command.Modified_By = userId;
-                        //command.Requestor_By = userId;
-                        //command.IssueHandler = userId;
 
                     }
                 }

@@ -1,8 +1,12 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -20,20 +24,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         }
 
-
         public class RequestTicketNotificationResultQuery : IRequest<Result>
         {
 
-                public Guid? UserId { get; set; }
-                public string Role { get; set; }
-                //public string IssueHandler { get; set; }
-                public string Approver { get; set; }
-
-                public string UserType { get; set; }
-                //public string Requestor { get; set; }
-                public bool ? Status { get; set; }
-                public bool? Reject { get; set; }
-                public bool? Approval { get; set; }
+            public Guid? UserId { get; set; }
+            public string Role { get; set; }
+            public string UserType { get; set; }
+            public string Concern_Status { get; set; }
+            public bool? Status { get; set; }
+            public bool? Is_Reject { get; set; }
+            public bool? Is_Approve { get; set; }
 
         }
 
@@ -49,161 +49,172 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public async Task<Result> Handle(RequestTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
 
-                var query = await _context.TicketConcerns
-                    .Include(x => x.RequestorByUser)
-                    .GroupBy(x => new
+                var businessUnitList = new List<BusinessUnit>();
+
+                var requestConcernsQuery = await _context.RequestConcerns
+                    .AsNoTracking()
+                    .Include(x => x.TicketConcerns)
+                    .Include(x => x.User)
+                    .ToListAsync();
+
+                if(requestConcernsQuery.Any())
+                {
+
+                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
+
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+
+                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
+                   .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+
+                    var requestorPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
+
+                    var approverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+
+                    if (request.Status != null)
                     {
-                        x.UserId
-                    }).ToListAsync();
+                        requestConcernsQuery = requestConcernsQuery
+                            .Where(x => x.IsActive == request.Status)
+                            .ToList();
+                    }
 
-
-                var getQuery = query.Select(x => x.First().RequestorByUser.BusinessUnitId);
-
-                var businessUnitList = await _context.BusinessUnits
-                    .FirstOrDefaultAsync(x => getQuery.Contains(x.Id));
-
-                var receiverList = await _context.Receivers
-                    .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-
-                var userApprover = await _context.Users
-                    .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-
-                var fillterApproval = query.Select(x => x.First().Id);
-
-                var allUserList = await _context.UserRoles.ToListAsync();
-
-                var receiverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
-
-                var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
-
-                var requestorPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
-
-                var approverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
-
-
-                if (request.Status != null)
-                {
-                    query = query.Where(x => x.First().IsActive == request.Status).ToList();
-                }
-
-                if (request.Approval != null)
-                {
-                    query = query.Where(x => x.First().IsApprove == request.Approval).ToList();
-                }
-
-                if (request.Reject != null)
-                {
-                    query = query.Where(x => x.First().IsReject == request.Reject).ToList();
-                }
-
-
-                if (!string.IsNullOrEmpty(request.UserType))
-                {
-
-                    if (request.UserType == TicketingConString.Approver)
+                    if (request.Is_Approve != null)
                     {
-                        if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
-                        { 
-                            if (request.UserId == receiverList.UserId)
+                        var ticketStatusList = await _context.TicketConcerns
+                            .AsNoTrackingWithIdentityResolution()
+                            .Where(x => x.IsApprove == request.Is_Approve)
+                            .Select(x => x.RequestConcernId)
+                            .ToListAsync();
+
+                        requestConcernsQuery = requestConcernsQuery
+                           .Where(x => ticketStatusList.Contains(x.Id))
+                           .ToList();
+                    }
+
+
+                    if (request.Is_Reject != null)
+                    {
+                        requestConcernsQuery = requestConcernsQuery
+                            .Where(x => x.IsReject == request.Is_Reject)
+                            .ToList();
+                    }
+
+
+                    if (request.Concern_Status is not null)
+                    {
+
+                        switch (request.Concern_Status)
+                        {
+
+                            case TicketingConString.Approval:
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.ConcernStatus == TicketingConString.ForApprovalTicket)
+                                    .ToList();
+                                break;
+                            case TicketingConString.OnGoing:
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.ConcernStatus == TicketingConString.CurrentlyFixing)
+                                    .ToList();
+                                break;
+
+                            case TicketingConString.NotConfirm:
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.Is_Confirm == null && x.ConcernStatus == TicketingConString.NotConfirm)
+                                    .ToList();
+                                break;
+
+                            case TicketingConString.Done:
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.ConcernStatus == TicketingConString.Done && x.Is_Confirm == true)
+                                    .ToList();
+                                break;
+                            default:
+                                return Result.Success(requestConcernsQuery == null);
+
+                        }
+                    }
+
+
+                    if (!string.IsNullOrEmpty(request.UserType))
+                    {
+
+                        if (request.UserType == TicketingConString.Requestor)
+                        {
+                            if (requestorPermissionList.Any(x => x.Contains(request.Role)))
+                            {
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => x.UserId == request.UserId)
+                                    .ToList();
+                            }
+                            else
+                            {
+                                return Result.Success(requestConcernsQuery == null);
+                            }
+                        }
+
+                        if (request.UserType == TicketingConString.Receiver && requestConcernsQuery.Any())
+                        {
+                            var listOfRequest = requestConcernsQuery
+                                .Select(x => new
+                                {
+                                    x.User.BusinessUnitId
+
+                                }).ToList();
+
+
+                            foreach (var businessUnit in listOfRequest)
+                            {
+                                var businessUnitDefault = await _context.BusinessUnits
+                                    .AsNoTrackingWithIdentityResolution()
+                                    .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
+                                businessUnitList.Add(businessUnitDefault);
+
+                            }
+
+                            var businessSelect = businessUnitList
+                                .Select(x => x.Id)
+                                .ToList();
+
+                            var receiverList = await _context.Receivers
+                                .AsNoTrackingWithIdentityResolution()
+                                .Include(x => x.BusinessUnit)
+                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
+                                 x.UserId == request.UserId)
+                                .ToListAsync();
+
+                            var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
+
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
                             {
 
-                                var approverTransactList = await _context.ApproverTicketings
-                                    .Where(x => fillterApproval.Contains(x.Id) && x.IsApprove == null)
-                                    .ToListAsync();
-
-                                if (approverTransactList != null && approverTransactList.Any())
-                                {
-                                    var generatedIdInApprovalList = approverTransactList.Select(approval => approval.Id);
-                                    query = query.Where(x => !generatedIdInApprovalList.Contains(x.First().Id)).ToList();
-                                }
-
-                                var receiver = await _context.TicketConcerns
-                                    .Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId)
-                                    .ToListAsync();
-
-                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                var requestorSelect = receiver.Select(x => x.Id);
-
-                                query = query.Where(x => receiverContains.Contains(x.First().RequestorByUser.BusinessUnitId)
-                                && requestorSelect.Contains(x.First().Id))
+                                requestConcernsQuery = requestConcernsQuery
+                                    .Where(x => selectReceiver.Contains(x.User.BusinessUnitId))
                                     .ToList();
 
                             }
                             else
                             {
-                                query = query.Where(x => x.First().Id == null).ToList();
+                                return Result.Success(requestConcernsQuery == null);
                             }
 
-
-                        }
-
-                        else if (approverPermissionList.Any(x => x.Contains(request.Role)))
-                        {
-                            var approverTransactList = await _context.ApproverTicketings
-                                .Where(x => x.UserId == userApprover.Id)
-                                .ToListAsync();
-
-                            var approvalLevelList = approverTransactList
-                                .Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null)
-                                .ToList();
-
-                            var userRequestIdApprovalList = approvalLevelList.Select(x => x.Id);
-                            var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-
-                            query = query.Where(x => userIdsInApprovalList.Contains(x.First().TicketApprover)
-                            && userRequestIdApprovalList.Contains(x.First().Id))
-                                .ToList();
-
-                        }
-                        else
-                        {
-                            query = query.Where(x => x.First().Id == null).ToList();
-                        }
-
-                    }
-
-
-                    if (request.UserType == TicketingConString.Requestor)
-                    {
-                        if (requestorPermissionList.Any(x => x.Contains(request.Role)))
-                        {
-                            var requestConcernList = await _context.RequestConcerns.Where(x => x.UserId == request.UserId).ToListAsync();
-                            var requestConcernContains = requestConcernList.Select(x => x.UserId);
-                            query = query.Where(x => requestConcernContains.Contains(x.First().RequestorBy)).ToList();
-                        }
-                        else
-                        {
-                            query = query.Where(x => x.First().Id == null).ToList();
-                        }
-
-                    }
-
-
-                    if (request.UserType == TicketingConString.IssueHandler)
-                    {
-                        if (issueHandlerPermissionList.Any(x => x.Contains(request.Role)))
-                        {
-                            query = query.Where(x => x.First().UserId == request.UserId).ToList();
-                        }
-                        else
-                        {
-                            query = query.Where(x => x.First().Id == null).ToList();
                         }
                     }
-
+                     
                 }
 
-                var notification = query.Select(x => new RequestTicketNotificationResult
-                {
-                    RequestTicketCount = query.Count()
+                var notification = requestConcernsQuery
+                        .Select(x => new RequestTicketNotificationResult
+                        {
+                            RequestTicketCount = requestConcernsQuery.Count()
 
-                }).DistinctBy(x => x.RequestTicketCount).ToList();
+                        }).DistinctBy(x => x.RequestTicketCount).ToList();
 
                 return Result.Success(notification);
+
+
             }
         }
 

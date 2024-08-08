@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
@@ -62,7 +63,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                     users.HasNextPage
                 };
 
-                var successResult = Result.Success(result);
+                var successResult = Result<PagedList<GetUserResult>>.Success(users);
 
                 return Ok(successResult);
             }
@@ -71,7 +72,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                 return Conflict(ex.Message);
             }
         }
-
 
 
         [HttpPost("AddNewUser")]
@@ -198,7 +198,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                 return Conflict(ex.Message);
             }
         }
-
 
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateProfilePic([FromForm] UpdateProfilePicCommand command)

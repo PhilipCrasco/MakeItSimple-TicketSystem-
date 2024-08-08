@@ -124,8 +124,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketConcernExist.TargetDate = null;
                         ticketConcernExist.IsAssigned = null;
 
-                        
-
+                       
                     }
 
                 }

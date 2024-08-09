@@ -63,7 +63,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                     users.HasNextPage
                 };
 
-                var successResult = Result<PagedList<GetUserResult>>.Success(users);
+                var successResult = Result.Success(users);
 
                 return Ok(successResult);
             }

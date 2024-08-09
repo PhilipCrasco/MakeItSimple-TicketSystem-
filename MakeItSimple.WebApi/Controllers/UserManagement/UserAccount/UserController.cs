@@ -63,8 +63,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                     users.HasNextPage
                 };
 
-                var successResult = Result.Success(users);
-
+                var successResult = Result.Success(result);
                 return Ok(successResult);
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
@@ -14,8 +15,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
     {
         public class OpenTicketNotificationResult
         {
-            public int OpenTicketCount { get; set; }
-            
+            public int AllTicketNotif { get; set; }
+            public int PendingTicketNotif { get; set; }
+            public int OpenTicketNotif { get; set; }
+            public int ForTransferNotif { get; set; }
+            public int ForCloseNotif { get; set; }
+            public int NotConfirmNotif { get; set; }
+            public int ClosedNotif {  get; set; }
+
         }
 
         public class OpenTicketNotificationQuery
@@ -25,15 +32,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class OpenTicketNotificationResultQuery : IRequest<Result>
         {
-            public bool? Status { get; set; }
-            public string Concern_Status { get; set; }
-
-            public string History_Status { get; set; }
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
             public string Role { get; set; }
-            public DateTime? Date_From { get; set; }
-            public DateTime? Date_To { get; set; }
+
         }
 
 
@@ -50,9 +52,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             {
 
                 var businessUnitList = new List<BusinessUnit>();
+                var AllTicketNotif = new List<TicketConcern>();
+                var PendingTicketNotif = new List<TicketConcern>();
+                var OpenTicketNotif = new List<TicketConcern>();
+                var ForTransferNotif = new List<TicketConcern>();
+                var ForCloseNotif = new List<TicketConcern>();
+                var NotConfirmNotif = new List<TicketConcern>();
+                var ClosedNotif = new List<TicketConcern>();
 
                 var query = await _context.TicketConcerns
                     .AsNoTracking()
+                    .Include(x => x.RequestConcern)
+                    .Include(x => x.User)
                     .Include(x => x.RequestorByUser)
                     .ToListAsync();
 
@@ -78,119 +89,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         .Select(x => x.UserRoleName)
                         .ToList();
 
-                    if (request.Status is not null)
-                    {
-                        query = query.Where(x => x.IsActive == request.Status)
-                            .ToList();
-                    }
-
-                    if (!string.IsNullOrEmpty(request.Concern_Status))
-                    {
-                        switch (request.Concern_Status)
-                        {
-                            case TicketingConString.PendingRequest:
-                                query = query
-                                    .Where(x => x.IsApprove == false)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.Open:
-                                query = query
-                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
-                                    && x.IsReTicket != false && x.IsClosedApprove == null)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.ForTransfer:
-
-                                query = query
-                                    .Where(x => x.IsTransfer == false)
-                                    .ToList();
-                                break;
-
-
-                            case TicketingConString.ForClosing:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == false)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.NotConfirm:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.Closed:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true)
-                                    .ToList();
-                                break;
-
-                            default:
-                                return Result.Success(query == null);
-
-                        }
-
-
-                    }
-
-                    if (!string.IsNullOrEmpty(request.History_Status))
-                    {
-                        switch (request.History_Status)
-                        {
-                            case TicketingConString.PendingRequest:
-                                query = query
-                                    .Where(x => x.IsApprove == false)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.Open:
-                                query = query
-                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
-                                    && x.IsReTicket != false && x.IsClosedApprove == null)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.ForTransfer:
-
-                                query = query
-                                    .Where(x => x.IsTransfer == false)
-                                    .ToList();
-                                break;
-
-
-                            case TicketingConString.ForClosing:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == false)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.NotConfirm:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null)
-                                    .ToList();
-                                break;
-
-                            case TicketingConString.Closed:
-                                query = query
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true)
-                                    .ToList();
-                                break;
-
-                            default:
-                                return Result.Success(query == null);
-
-                        }
-
-                    }
-
-                    if (request.Date_From is not null && request.Date_From is not null)
-                    {
                         query = query
-                            .Where(x => x.TargetDate >= request.Date_From.Value && x.TargetDate <= request.Date_To.Value)
-                            .ToList();
-                    }
+                        .Where(x => x.IsActive == true)
+                        .ToList();
 
                     if (!string.IsNullOrEmpty(request.UserType))
                     {
@@ -201,6 +102,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                 .Where(x => x.UserId == request.UserId)
                                 .ToList();
                         }
+
                         else if (request.UserType == TicketingConString.Support)
                         {
 
@@ -273,13 +175,80 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         }
                     }
 
+                    foreach(var item in query)
+                    {
+                        AllTicketNotif.Add(item);
+                    }
+
+                    var pendingTicket = query
+                          .Where(x => x.IsApprove == false)
+                          .ToList();
+
+                    foreach(var item in pendingTicket)
+                    {
+                        PendingTicketNotif.Add(item);
+                       
+                    }
+
+                   var openTicket = query
+                        .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
+                        && x.IsReTicket != false && x.IsClosedApprove == null)
+                        .ToList();
+
+                    foreach (var item in openTicket)
+                    {
+                       OpenTicketNotif.Add(item);
+                    }
+
+                   var forTransferTicket = query
+                        .Where(x => x.IsTransfer == false)
+                        .ToList();
+
+                    foreach (var item in forTransferTicket)
+                    {
+                        ForTransferNotif.Add(item);
+                    }
+
+                    var forClosedTicket = query
+                        .Where(x => x.IsClosedApprove == false)
+                        .ToList();
+
+                    foreach(var item in forClosedTicket)
+                    {
+                        ForCloseNotif.Add(item);
+                    }
+
+                    var notConfirmTicket = query
+                        .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null)
+                        .ToList();
+
+                    foreach(var item in notConfirmTicket)
+                    {
+                        NotConfirmNotif.Add(item);
+                    }
+
+                    var closedTicket = query
+                        .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true)
+                        .ToList();
+
+                    foreach (var item in closedTicket)
+                    {
+                        ClosedNotif.Add(item);
+                    }
+
                 }
 
                 var notification = query.Select(x => new OpenTicketNotificationResult
                 {
-                    OpenTicketCount = query.Count()
+                    AllTicketNotif = AllTicketNotif.Count(),
+                    PendingTicketNotif = PendingTicketNotif.Count(),
+                    OpenTicketNotif = OpenTicketNotif.Count(),
+                    ForTransferNotif = ForTransferNotif.Count(),
+                    ForCloseNotif = ForCloseNotif.Count(),
+                    NotConfirmNotif = NotConfirmNotif.Count(),
+                    ClosedNotif = ClosedNotif.Count(),
 
-                }).DistinctBy(x => x.OpenTicketCount)
+                }).DistinctBy(x => x.AllTicketNotif)
                 .ToList();
 
                 return Result.Success(notification);

@@ -1,4 +1,5 @@
 ﻿
+using MakeItSimple.WebApi.Common.SignalR;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -21,12 +22,13 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     public class TicketingNotificationController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly TimerControl _timerControl;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public TicketingNotificationController(IMediator mediator , IHubContext<NotificationHub> hubContext)
+        public TicketingNotificationController(IMediator mediator , IHubContext<NotificationHub> client)
         {
             _mediator = mediator;
-            _hubContext = hubContext;
+            _client = client;
         }
 
         [HttpGet("ticket-request")]
@@ -55,8 +57,22 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     return BadRequest(results);
                 }
 
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(command);
+                        await clientsAll.SendAsync("TicketData", requestData);
+
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
 
                 return Ok(results);
             }
@@ -86,14 +102,28 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     }
                 }
+
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
                     return BadRequest(results);
                 }
 
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(command);
+                        await clientsAll.SendAsync("TicketData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
 
                 return Ok(results);
             }
@@ -130,8 +160,23 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     return BadRequest(results);
                 }
 
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(command);
+                        await clientsAll.SendAsync("TicketData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
+
 
                 return Ok(results);
             }
@@ -167,6 +212,22 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     return BadRequest(results);
                 }
 
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
+                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                {
+                    timerControl.ScheduleTimer(async (scopeFactory) =>
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                        var requestData = await mediator.Send(command);
+                        await clientsAll.SendAsync("TicketData", requestData);
+                    }, 2000);
+                }
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
                 return Ok(results);
             }
             catch (Exception ex)
@@ -192,7 +253,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 }
 
                 var results = await _mediator.Send(command);
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
 
                 return Ok(results);
 

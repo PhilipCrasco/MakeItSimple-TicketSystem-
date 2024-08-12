@@ -20,14 +20,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int ForTicketNotif { get; set;}
             public int CurrentlyFixingNotif { get; set; }
             public int NotConfirmNotif { get; set; }
-
             public int DoneNotif { get; set; }
-
-        }
-
-        public class RequestTicketNotificationQuery
-        {
-            public int ? RequestTransactionId { get; set; }
+            public int ReceiverForApprovalNotif { get; set; }
+            public int ReceiverApproveNotif {  get; set; }
 
         }
 
@@ -56,6 +51,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var currentlyFixingNotif = new List<RequestConcern>();
                 var notConfirmNotif = new List<RequestConcern>();
                 var doneNotif = new List<RequestConcern>();
+                var receiverForApprovalNotif = new List<TicketConcern>();
+                var receiverApproveNotif = new List<TicketConcern>();
 
                 var businessUnitList = new List<BusinessUnit>();                
 
@@ -63,25 +60,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     .AsNoTracking()
                     .Include(x => x.TicketConcerns)
                     .Include(x => x.User)
+                    .Where(x => x.IsActive == true)
                     .ToListAsync();
 
-                if(requestConcernsQuery.Any())
-                {
 
+                if (requestConcernsQuery.Any())
+                {
                     var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
 
                     var requestorPermissionList = allUserList.Where(x => x.Permissions
                     .Contains(TicketingConString.Requestor)).Select(x => x.UserRoleName).ToList();
 
+                    var receiverPermissionList = allUserList.Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
 
-                    requestConcernsQuery = requestConcernsQuery
-                        .Where(x => x.IsActive == true)
-                        .ToList();
-
-
-                    requestConcernsQuery = requestConcernsQuery
-                        .Where(x => x.IsReject == false)
-                        .ToList();
 
                     var ticketStatusList = await _context.TicketConcerns
                         .AsNoTrackingWithIdentityResolution()
@@ -141,6 +133,64 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         doneNotif.Add(ticket);
                     }
 
+                    var listOfRequest =  requestConcernsQuery
+                        .Select(x => new
+                        {
+                            x.User.BusinessUnitId
+
+                        }).ToList();
+
+
+                    foreach (var businessUnit in listOfRequest)
+                    {
+                        var businessUnitDefault = await _context.BusinessUnits
+                            .AsNoTrackingWithIdentityResolution()
+                            .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
+                        businessUnitList.Add(businessUnitDefault);
+
+                    }
+
+                    var businessSelect = businessUnitList
+                        .Select(x => x.Id).ToList();
+
+                    var receiverList = await _context.Receivers
+                        .AsNoTrackingWithIdentityResolution()
+                        .Include(x => x.BusinessUnit)
+                        .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
+                         x.UserId == request.UserId)
+                        .ToListAsync();
+
+                    var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
+
+                    if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
+                    {
+
+                        var receiverConcernsQuery = requestConcernsQuery
+                            .Where(x => selectReceiver.Contains(x.User.BusinessUnitId))
+                            .Select(x => x.Id)
+                            .ToList();
+
+
+                        var forApprovalConcerns = await _context.TicketConcerns
+                            .AsNoTrackingWithIdentityResolution()
+                            .Where(x => receiverConcernsQuery.Contains(x.RequestConcernId.Value) && x.IsApprove == false)
+                            .ToListAsync();
+
+                        foreach(var item in forApprovalConcerns)
+                        {
+                            receiverForApprovalNotif.Add(item);
+                        }
+
+                        var ApproveConcerns = await _context.TicketConcerns
+                            .AsNoTrackingWithIdentityResolution()
+                            .Where(x => receiverConcernsQuery.Contains(x.RequestConcernId.Value) && x.IsApprove == true)
+                            .ToListAsync();
+
+                        foreach(var item in ApproveConcerns)
+                        {
+                            receiverApproveNotif.Add(item);
+                        }
+                    }
 
                 }
 
@@ -152,9 +202,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             CurrentlyFixingNotif = currentlyFixingNotif.Count(),
                             NotConfirmNotif = notConfirmNotif.Count(),
                             DoneNotif = doneNotif.Count(),
+                            ReceiverForApprovalNotif = receiverForApprovalNotif.Count(),
+                            ReceiverApproveNotif = receiverApproveNotif.Count(),
 
                            
-                        }).DistinctBy(x => x.AllTicketNotif).ToList();
+                        }).DistinctBy(x => x.AllTicketNotif)
+                        .ToList();
 
                 return Result.Success(notification);
 

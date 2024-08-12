@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.CodeAnalysis.Classification;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class TransferTicketNotificationResult
         {
-            public int TransferTicketCount { get; set; }
-        }
 
-        public class TransferTicketNotificationQuery
-        {
-            public int ? TicketGeneratorId { get; set; }   
+            public int AllTransferNotif { get; set; }
+            public int ForTransferClosingNotif { get; set; }
+            public int ApproveTransferNotif { get; set; }
         }
 
         public class TransferTicketNotificationResultQuery : IRequest<Result>
@@ -27,10 +26,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public Guid? UserId { get; set; }
             public string UserType { get; set; }
             public string Role { get; set; }
-            public bool? IsTransfer { get; set; }
-            public bool? IsReject { get; set; }
-            public string Search { get; set; }
-            public bool? Status { get; set; }
+
+
         }
 
         public class Handler : IRequestHandler<TransferTicketNotificationResultQuery, Result>
@@ -45,42 +42,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public async Task<Result> Handle(TransferTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
 
+                var AllTransferNotif = new List<TransferTicketConcern>();
+                var ForApprovalTransferNotif = new List<TransferTicketConcern>();
+                var ApproveTransferNotif = new List<TransferTicketConcern>();
+
                 var query = await _context.TransferTicketConcerns
+                                .AsNoTracking()
                                 .Include(x => x.TicketConcern)
                                 .ThenInclude(x => x.User)
+                                .Where(x => x.IsActive == true)
                                 .ToListAsync();
 
                 if(query.Any()) 
                 {
-                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
+                    var allUserList = await _context.UserRoles
+                        .AsNoTracking()
+                        .ToListAsync();
 
-                    var approverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                    var approverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Approver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
-                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+                    var issueHandlerPermissionList = allUserList
+                        .Where(x => x.Permissions
+                    .Contains(TicketingConString.IssueHandler))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
-                    if (request.Status != null)
-                    {
-                        query = query
-                            .Where(x => x.IsActive == request.Status)
-                            .ToList();
-                    }
-
-                    if (request.IsTransfer != null)
-                    {
-
-                        query = query
-                            .Where(x => x.IsTransfer == request.IsTransfer)
-                            .ToList();
-                    }
-
-                    if (request.IsReject != null)
-                    {
-                        query = query
-                            .Where(x => x.IsRejectTransfer == request.IsReject)
-                            .ToList();
-                    }
 
                     if (request.UserType == TicketingConString.Approver)
                     {
@@ -99,16 +89,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                 .Where(x => x.IsApprove == null)
                                 .Select(x => new
                                 {
-                                    ApproverLevel = x.ApproverLevel,
-                                    IsApprove = x.IsApprove,
-                                    TransferTicketConcernId = x.ClosingTicketId,
-                                    UserId = x.UserId,
+                                     x.ApproverLevel,
+                                     x.IsApprove,
+                                     x.TransferTicketConcernId,
+                                     x.UserId,
 
-                                })
-                                .ToListAsync();
+                                }).ToListAsync();
 
-                            var userRequestIdApprovalList = approverTransactList.Select(x => x.TransferTicketConcernId);
-                            var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
+                            var userRequestIdApprovalList = approverTransactList
+                                .Select(x => x.TransferTicketConcernId);
+
+                            var userIdsInApprovalList = approverTransactList
+                                .Select(approval => approval.UserId);
 
                             query = query
                                 .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
@@ -129,14 +121,41 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             .ToList();
                     }
 
+                    foreach (var item in query)
+                    {
+                        AllTransferNotif.Add(item);
+                    }
+
+                    var forApprovalTransfer = query
+                           .Where(x => x.IsTransfer == false)
+                           .ToList();
+
+                    foreach (var item in forApprovalTransfer)
+                    {
+                        ForApprovalTransferNotif.Add(item);
+                        
+                    }
+
+                    var approveTransfer = query
+                           .Where(x => x.IsTransfer == true)
+                           .ToList();
+
+                    foreach (var item in approveTransfer)
+                    {
+                        ApproveTransferNotif.Add(item);
+                    }
 
                 }
 
                 var notification = query.Select(x => new TransferTicketNotificationResult
                 {
-                    TransferTicketCount = query.Count(),    
+                    AllTransferNotif = AllTransferNotif.Count(),    
+                    ForTransferClosingNotif  = ApproveTransferNotif.Count(),
+                    ApproveTransferNotif = ApproveTransferNotif.Count(),
+                   
 
-                }).DistinctBy(x => x.TransferTicketCount).ToList();
+                }).DistinctBy(x => x.AllTransferNotif)
+                    .ToList();
 
 
                 return Result.Success(notification);

@@ -1,13 +1,12 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
-using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Immutable;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
+
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -15,24 +14,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
     {
         public class ClosingTicketNotificationResult
         {
-            public int ClosingTicketCount { get; set; }
-        }
-
-        public class ClosingTicketNotificationQuery
-        {
-            public int? TicketTransactionId { get; set; }
+            public int AllClosingNotif { get; set; }
+            public int ForApprovalClosingNotif { get; set; }
+            public int ApproveClosingNotif { get; set; }
 
         }
+
         public class ClosingTicketNotificationResultQuery : IRequest<Result>
         {
 
             public Guid? UserId { get; set; }
             public string UserType { get; set; }
             public string Role { get; set; }
-            public string Search { get; set; }
-            public bool? IsClosed { get; set; }
-            public bool? IsReject { get; set; }
-            //public Guid? UserApproverId { get; set; }
 
         }
 
@@ -49,35 +42,37 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public async Task<Result> Handle(ClosingTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
 
+                var AllClosingNotif = new List<ClosingTicket>();
+                var ForApprovalClosingNotif = new List<ClosingTicket>();
+                var ApproveClosingNotif = new List<ClosingTicket>();
+
                 var businessUnitList = new List<BusinessUnit>();
 
                 var query = await _context.ClosingTickets
+                    .AsNoTracking()
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.User)
+                    .Where(x => x.IsActive)
                     .ToListAsync();
 
                 if(query.Any())
                 {
-                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
-                    var receiverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+                    var allUserList = await _context.UserRoles
+                        .AsNoTracking()
+                        .ToListAsync();
 
-                    var approverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                    var receiverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                    .Contains(TicketingConString.Receiver))
+                    .Select(x => x.UserRoleName)
+                    .ToList();
 
-                    if (request.IsReject != null)
-                    {
-                        query = query
-                            .Where(x => x.IsRejectClosed == request.IsReject)
-                            .ToList();
-                    }
+                    var approverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver))
+                    .Select(x => x.UserRoleName)
+                    .ToList();
 
-                    if (request.IsClosed != null)
-                    {
-                        query = query
-                            .Where(x => x.IsClosing == request.IsClosed)
-                            .ToList();
-                    }
 
                     if (!string.IsNullOrEmpty(request.UserType))
                     {
@@ -99,10 +94,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                     .Where(x => x.IsApprove == null)
                                     .Select(x => new
                                     {
-                                        ApproverLevel = x.ApproverLevel,
-                                        IsApprove = x.IsApprove,
-                                        ClosingTicketId = x.ClosingTicketId,
-                                        UserId = x.UserId,
+                                         x.ApproverLevel,
+                                         x.IsApprove,
+                                         x.ClosingTicketId,
+                                         x.UserId,
 
                                     })
                                     .ToListAsync();
@@ -162,7 +157,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                     query = query
                                         .Where(x => !generatedIdInApprovalList.Contains(x.Id))
                                         .ToList();
-
                                 }
 
                                 query = query
@@ -186,12 +180,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                 }
 
+               foreach(var item in query)
+                {
+                    AllClosingNotif.Add(item);
+                }
+
+               var forClosingApproval = query
+                    .Where(x => x.IsClosing == false)   
+                    .ToList();
+
+                foreach(var item in  forClosingApproval)
+                {
+                    ForApprovalClosingNotif.Add(item);
+                }
+
+               var closingApprove = query
+                    .Where(x => x.IsClosing == true)
+                    .ToList();
+
+                foreach(var item in closingApprove)
+                {
+                    ApproveClosingNotif.Add(item);
+                }
+
+
                 var notification = query.Select(x => new ClosingTicketNotificationResult
                 {
-                    ClosingTicketCount = query.Count()
+                    AllClosingNotif = AllClosingNotif.Count(),
+                    ForApprovalClosingNotif = forClosingApproval.Count(),
+                    ApproveClosingNotif = ApproveClosingNotif.Count(),
 
-                }).DistinctBy(x => x.ClosingTicketCount).ToList();
-
+                }).DistinctBy(x => x.AllClosingNotif)
+                .ToList();
 
                 return Result.Success(notification);
 

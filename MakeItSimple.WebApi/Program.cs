@@ -163,7 +163,8 @@ app.UseWebSockets();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/notification-hub");
+    endpoints.MapHub<NotificationHub>("/notification-hub")
+    .RequireCors("AllowSpecificOrigin");
 });
 //app.MapControllers(); 
 

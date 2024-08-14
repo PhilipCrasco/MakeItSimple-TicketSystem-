@@ -25,10 +25,11 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         private readonly TimerControl _timerControl;
         private readonly IHubContext<NotificationHub> _client;
 
-        public TicketingNotificationController(IMediator mediator , IHubContext<NotificationHub> client)
+        public TicketingNotificationController(IMediator mediator, TimerControl timerControl, IHubContext<NotificationHub> client)
         {
             _mediator = mediator;
             _client = client;
+            _timerControl = timerControl;
         }
 
         [HttpGet("ticket-request")]
@@ -205,6 +206,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     }
                 }
+
                 var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {

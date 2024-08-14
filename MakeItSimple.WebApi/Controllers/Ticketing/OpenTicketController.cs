@@ -71,21 +71,21 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                 var successResult = Result.Success(result);
 
-                var timerControl = _timerControl;
-                var clientsAll = _client.Clients.All;
+                //var timerControl = _timerControl;
+                //var clientsAll = _client.Clients.All;
 
-                if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
-                {
-                    timerControl.ScheduleTimer(async (scopeFactory) =>
-                    {
-                        using var scope = scopeFactory.CreateScope();
-                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                        var requestData = await mediator.Send(query);
-                        await clientsAll.SendAsync("TicketData", requestData);
-                    }, 2000);
-                }
+                //if (timerControl != null && !timerControl.IsTimerStarted && clientsAll != null)
+                //{
+                //    timerControl.ScheduleTimer(async (scopeFactory) =>
+                //    {
+                //        using var scope = scopeFactory.CreateScope();
+                //        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                //        var requestData = await mediator.Send(query);
+                //        await clientsAll.SendAsync("TicketData", requestData);
+                //    }, 2000);
+                //}
 
-                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+                //await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
 
                 return Ok(successResult);
 

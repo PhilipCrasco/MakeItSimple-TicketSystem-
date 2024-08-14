@@ -46,7 +46,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
-                        //query.Users = userId;
                         command.UserId = userId;
 
                     }
@@ -67,7 +66,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(command);
-                        await clientsAll.SendAsync("TicketData", requestData);
+                        await clientsAll.SendAsync("TicketRequestData", requestData);
 
                     }, 2000);
                 }
@@ -119,7 +118,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(command);
-                        await clientsAll.SendAsync("TicketData", requestData);
+                        await clientsAll.SendAsync("TransferData", requestData);
                     }, 2000);
                 }
 
@@ -170,7 +169,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(command);
-                        await clientsAll.SendAsync("TicketData", requestData);
+                        await clientsAll.SendAsync("ClosingData", requestData);
                     }, 2000);
                 }
 
@@ -222,7 +221,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(command);
-                        await clientsAll.SendAsync("TicketData", requestData);
+                        await clientsAll.SendAsync("OpenData", requestData);
                     }, 2000);
                 }
 

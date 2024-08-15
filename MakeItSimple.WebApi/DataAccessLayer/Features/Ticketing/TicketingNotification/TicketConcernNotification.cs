@@ -26,7 +26,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         }
 
-        public class RequestTicketNotificationResultQuery : IRequest<Result>
+        public class RequestTicketNotificationResultQuery : IRequest<List<RequestTicketNotificationResult>>
         {
 
             public Guid? UserId { get; set; }
@@ -34,7 +34,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         }
 
-        public class Handler : IRequestHandler<RequestTicketNotificationResultQuery, Result>
+        public class Handler : IRequestHandler<RequestTicketNotificationResultQuery, List<RequestTicketNotificationResult>>
         {
             private readonly MisDbContext _context;
 
@@ -43,7 +43,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 _context = context;
             }
 
-            public async Task<Result> Handle(RequestTicketNotificationResultQuery request, CancellationToken cancellationToken)
+            public async Task<List<RequestTicketNotificationResult>> Handle(RequestTicketNotificationResultQuery request, CancellationToken cancellationToken)
             {
 
                 var allTicketNotif = new List<RequestConcern>();
@@ -204,13 +204,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             DoneNotif = doneNotif.Count(),
                             ReceiverForApprovalNotif = receiverForApprovalNotif.Count(),
                             ReceiverApproveNotif = receiverApproveNotif.Count(),
-
                            
                         }).DistinctBy(x => x.AllTicketNotif)
                         .ToList();
 
-                return Result.Success(notification);
-
+                return notification;
                
             }
         }

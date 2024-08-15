@@ -52,6 +52,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             {
 
                 var businessUnitList = new List<BusinessUnit>();
+
                 var AllTicketNotif = new List<TicketConcern>();
                 var PendingTicketNotif = new List<TicketConcern>();
                 var OpenTicketNotif = new List<TicketConcern>();

@@ -8,6 +8,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNot
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
 using System.Security.Claims;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketingNotification;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -69,29 +70,29 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpGet("ticket-request")]
-        public async Task<IActionResult> RequestTicketNotification([FromQuery] RequestTicketNotificationResultQuery command)
+        [HttpGet("ticket-notif")]
+        public async Task<IActionResult> TicketingNotification([FromQuery] TicketingNotificationCommand command)
         {
-            return await HandleNotification(command, "TicketRequestData");
+            return await HandleNotification(command, "TicketNotifData");
         }
 
-        [HttpGet("transfer-ticket")]
-        public async Task<IActionResult> TransferTicketNotification([FromQuery] TransferTicketNotificationResultQuery command)
-        {
-            return await HandleNotification(command, "TransferData");
-        }
+        //[HttpGet("transfer-ticket")]
+        //public async Task<IActionResult> TransferTicketNotification([FromQuery] TransferTicketNotificationResultQuery command)
+        //{
+        //    return await HandleNotification(command, "TransferData");
+        //}
 
-        [HttpGet("closing-ticket")]
-        public async Task<IActionResult> ClosingTicketNotification([FromQuery] ClosingTicketNotificationResultQuery command)
-        {
-            return await HandleNotification(command, "ClosingData");
-        }
+        //[HttpGet("closing-ticket")]
+        //public async Task<IActionResult> ClosingTicketNotification([FromQuery] ClosingTicketNotificationResultQuery command)
+        //{
+        //    return await HandleNotification(command, "ClosingData");
+        //}
 
-        [HttpGet("open-ticket")]
-        public async Task<IActionResult> OpenTicketNotification([FromQuery] OpenTicketNotificationResultQuery command)
-        {
-            return await HandleNotification(command, "OpenTicketData");
-        }
+        //[HttpGet("open-ticket")]
+        //public async Task<IActionResult> OpenTicketNotification([FromQuery] OpenTicketNotificationResultQuery command)
+        //{
+        //    return await HandleNotification(command, "OpenTicketData");
+        //}
 
         [HttpGet("ticket-comment")]
         public async Task<IActionResult> CommentNotification([FromQuery] CommentNotificationQueryResult command)

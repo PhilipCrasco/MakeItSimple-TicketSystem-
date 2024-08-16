@@ -35,11 +35,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public int AllTransferNotif { get; set; }
             public int ForApprovalTransferNotif { get; set; }
-            public int ApproveTransferNotif { get; set; }
+            //public int ApproveTransferNotif { get; set; }
 
             public int AllClosingNotif { get; set; }
             public int ForApprovalClosingNotif { get; set; }
-            public int ApproveClosingNotif { get; set; }
+            //public int ApproveClosingNotif { get; set; }
 
 
         }
@@ -86,11 +86,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                 var allTransferNotif = new List<TransferTicketConcern>();
                 var forApprovalTransferNotif = new List<TransferTicketConcern>();
-                var approveTransferNotif = new List<TransferTicketConcern>();
+                //var approveTransferNotif = new List<TransferTicketConcern>();
 
                 var allClosingNotif = new List<ClosingTicket>();
                 var forApprovalClosingNotif = new List<ClosingTicket>();
-                var approveClosingNotif = new List<ClosingTicket>();
+                //var approveClosingNotif = new List<ClosingTicket>();
 
                 var businessUnitRequestList = new List<BusinessUnit>();
                 var businessUnitCloseList = new List<BusinessUnit>();
@@ -294,7 +294,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                         }).ToListAsync();
 
-
                     if(transferQuery.Any())
                     {
                         var userRequestIdApprovalList = approverTransactList
@@ -322,14 +321,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             forApprovalTransferNotif.Add(item);
                         }
 
-                        var approveTransfer = transferQuery
-                               .Where(x => x.IsTransfer == true)
-                               .ToList();
+                        //var approveTransfer = transferQuery
+                        //       .Where(x => x.IsTransfer == true)
+                        //       .ToList();
 
-                        foreach (var item in approveTransfer)
-                        {
-                            approveTransferNotif.Add(item);
-                        }
+                        //foreach (var item in approveTransfer)
+                        //{
+                        //    approveTransferNotif.Add(item);
+                        //}
 
                     }
 
@@ -484,14 +483,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         forApprovalClosingNotif.Add(item);
                     }
 
-                    var closingApprove = closeQuery
-                         .Where(x => x.IsClosing == true)
-                         .ToList();
+                    //var closingApprove = closeQuery
+                    //     .Where(x => x.IsClosing == true)
+                    //     .ToList();
 
-                    foreach (var item in closingApprove)
-                    {
-                        approveClosingNotif.Add(item);
-                    }
+                    //foreach (var item in closingApprove)
+                    //{
+                    //    approveClosingNotif.Add(item);
+                    //}
 
                 }
 
@@ -515,12 +514,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     ClosedNotif = closedNotif.Count(),
 
                     AllTransferNotif = allTransferNotif.Count(),
-                    ForApprovalTransferNotif = approveTransferNotif.Count(),
-                    ApproveTransferNotif = approveTransferNotif.Count(),
+                    ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
+                    //ApproveTransferNotif = approveTransferNotif.Count(),
 
                     AllClosingNotif = allClosingNotif.Count(),
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
-                    ApproveClosingNotif = approveClosingNotif.Count(),
+                    //ApproveClosingNotif = approveClosingNotif.Count(),
 
 
                 };

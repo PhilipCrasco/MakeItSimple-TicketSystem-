@@ -245,7 +245,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 //    }, 2000);
                 //}
 
-                //await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
 
                 return Ok(successResult);
             }

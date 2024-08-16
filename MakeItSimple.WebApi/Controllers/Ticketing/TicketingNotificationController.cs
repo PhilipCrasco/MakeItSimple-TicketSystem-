@@ -14,12 +14,12 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     {
         private readonly IMediator _mediator;
         private readonly TimerControl _timerControl;
-        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public TicketingNotificationController(IMediator mediator, IHubContext<NotificationHub> hubContext, TimerControl timerControl)
+        public TicketingNotificationController(IMediator mediator, IHubContext<NotificationHub> client, TimerControl timerControl)
         {
             _mediator = mediator;
-            _hubContext = hubContext;
+            _client = client;
             _timerControl = timerControl;
         }
 
@@ -45,6 +45,9 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                 var results = await _mediator.Send(command);
 
+                var timerControl = _timerControl;
+                var clientsAll = _client.Clients.All;
+
                 if (_timerControl != null && !_timerControl.IsTimerStarted)
                 {
                     _timerControl.ScheduleTimer(async (scopeFactory) =>
@@ -52,11 +55,11 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                         using var scope = scopeFactory.CreateScope();
                         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                         var requestData = await mediator.Send(command);
-                        await _hubContext.Clients.All.SendAsync(notificationType, requestData);
+                        await _client.Clients.All.SendAsync(notificationType, requestData);
                     }, 2000);
                 }
 
-                await _hubContext.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
 
                 return Ok(results);
             }

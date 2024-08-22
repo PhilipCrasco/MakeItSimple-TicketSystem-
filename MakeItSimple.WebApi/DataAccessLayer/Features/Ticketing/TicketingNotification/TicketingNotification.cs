@@ -430,7 +430,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                         }
 
-                        var businessSelect = businessUnitCloseList.Select(x => x.Id).ToList();
+                        var businessSelect = businessUnitCloseList
+                            .Select(x => x.Id)
+                            .ToList();
 
                         var receiverList = await _context.Receivers
                             .Include(x => x.BusinessUnit)
@@ -460,7 +462,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                             closeQuery = closeQuery
                                 .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId))
+                                .Where(x => x.IsRejectClosed == false)
                                 .ToList();
+
                         }
 
                     }
@@ -483,14 +487,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         forApprovalClosingNotif.Add(item);
                     }
 
-                    //var closingApprove = closeQuery
-                    //     .Where(x => x.IsClosing == true)
-                    //     .ToList();
-
-                    //foreach (var item in closingApprove)
-                    //{
-                    //    approveClosingNotif.Add(item);
-                    //}
 
                 }
 

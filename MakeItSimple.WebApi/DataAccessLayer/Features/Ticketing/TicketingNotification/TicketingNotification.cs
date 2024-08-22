@@ -191,7 +191,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                     foreach (var ticket in notConfirm)
                     {
-                        notConfirm.Add(ticket);
+                        notConfirmNotif.Add(ticket);
                     }
 
                     var done = requestConcernsQuery
@@ -492,10 +492,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     ClosedNotif = closedNotif.Count(),
 
                     ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
-                    //ApproveTransferNotif = approveTransferNotif.Count(),
 
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
-                    //ApproveClosingNotif = approveClosingNotif.Count(),
+
 
 
                 };

@@ -316,15 +316,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             forApprovalTransferNotif.Add(item);
                         }
 
-                        //var approveTransfer = transferQuery
-                        //       .Where(x => x.IsTransfer == true)
-                        //       .ToList();
-
-                        //foreach (var item in approveTransfer)
-                        //{
-                        //    approveTransferNotif.Add(item);
-                        //}
-
                     }
 
                     if(closeQuery.Any())
@@ -337,6 +328,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
                             && userRequestIdApprovalList.Contains(x.Id))
                             .ToList();
+
+                        foreach(var ticket in closeQuery)
+                        {
+                            forApprovalClosingNotif.Add(ticket);
+                        }
+
                     }
 
                 }

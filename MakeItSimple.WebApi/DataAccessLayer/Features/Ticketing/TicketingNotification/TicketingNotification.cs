@@ -33,11 +33,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int NotConfirmCloseNotif { get; set; }
             public int ClosedNotif { get; set; }
 
-            public int AllTransferNotif { get; set; }
+
             public int ForApprovalTransferNotif { get; set; }
             //public int ApproveTransferNotif { get; set; }
 
-            public int AllClosingNotif { get; set; }
             public int ForApprovalClosingNotif { get; set; }
             //public int ApproveClosingNotif { get; set; }
 
@@ -84,11 +83,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var closedNotif = new List<TicketConcern>();
 
 
-                var allTransferNotif = new List<TransferTicketConcern>();
                 var forApprovalTransferNotif = new List<TransferTicketConcern>();
                 //var approveTransferNotif = new List<TransferTicketConcern>();
 
-                var allClosingNotif = new List<ClosingTicket>();
                 var forApprovalClosingNotif = new List<ClosingTicket>();
                 //var approveClosingNotif = new List<ClosingTicket>();
 
@@ -307,10 +304,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             && userRequestIdApprovalList.Contains(x.Id))
                             .ToList();
 
-                        foreach (var item in transferQuery)
-                        {
-                            allTransferNotif.Add(item);
-                        }
 
                         var forApprovalTransfer = transferQuery
                                .Where(x => x.IsTransfer == false)
@@ -408,7 +401,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                 receiverApproveNotif.Add(item);
                             }
                         }
-
                     }
 
                     if (closeQuery.Any())
@@ -465,28 +457,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                                 .Where(x => x.IsRejectClosed == false)
                                 .ToList();
 
+                            var forClosingApproval = closeQuery
+                                 .Where(x => x.IsClosing == false)
+                                 .ToList();
+
+                            foreach (var item in forClosingApproval)
+                            {
+                                forApprovalClosingNotif.Add(item);
+                            }
+
                         }
 
                     }
-
-                }
-
-                if (closeQuery.Any())
-                {
-                    foreach (var item in closeQuery)
-                    {
-                        allClosingNotif.Add(item);
-                    }
-
-                    var forClosingApproval = closeQuery
-                         .Where(x => x.IsClosing == false)
-                         .ToList();
-
-                    foreach (var item in forClosingApproval)
-                    {
-                        forApprovalClosingNotif.Add(item);
-                    }
-
 
                 }
 
@@ -509,11 +491,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     NotConfirmCloseNotif = notCloseConfirmCloseNotif.Count(),
                     ClosedNotif = closedNotif.Count(),
 
-                    AllTransferNotif = allTransferNotif.Count(),
                     ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
                     //ApproveTransferNotif = approveTransferNotif.Count(),
 
-                    AllClosingNotif = allClosingNotif.Count(),
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
                     //ApproveClosingNotif = approveClosingNotif.Count(),
 

@@ -113,6 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 .Include(x => x.TicketConcern)
                 .ThenInclude(x => x.User)
                 .Where(x => x.IsActive == true)
+                .Where(x => x.IsRejectTransfer == false)
                 .ToListAsync();
 
                 var closeQuery = await _context.ClosingTickets
@@ -120,6 +121,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.User)
                     .Where(x => x.IsActive)
+                    .Where(x => x.IsRejectClosed == false)
                     .ToListAsync();
 
 
@@ -454,7 +456,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                             closeQuery = closeQuery
                                 .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId))
-                                .Where(x => x.IsRejectClosed == false)
                                 .ToList();
 
                             var forClosingApproval = closeQuery

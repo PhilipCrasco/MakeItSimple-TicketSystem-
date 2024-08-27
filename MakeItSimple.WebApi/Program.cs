@@ -104,7 +104,7 @@ builder.Services.AddAuthentication(authOptions =>
         jwtOptions.RequireHttpsMetadata = false;
         jwtOptions.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),                          
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuer = true,
@@ -112,7 +112,26 @@ builder.Services.AddAuthentication(authOptions =>
             ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
             ValidAudience = builder.Configuration["JwtConfig:Audience"]
         };
+
+        jwtOptions.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments("/notification-hub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+
+
+
     });
+
+builder.Services.AddSignalR();
 
 builder.Services.Configure<CloudinaryOption>(config.GetSection("Cloudinary"));
 
@@ -129,8 +148,6 @@ builder.Services.AddCors(options =>
 });
 
 
-
-builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -141,30 +158,26 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseSwagger();
     app.UseSwaggerUI();
     app.ApplyMigrations();
 }
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseHttpsRedirection();
 app.UseCors(clientPermission);
 
-
+//app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.MapControllers();
-
 app.UseWebSockets();
-
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<NotificationHub>("/notification-hub")
-    .RequireCors("AllowSpecificOrigin");
+    .RequireCors(clientPermission);
 });
 //app.MapControllers(); 
 

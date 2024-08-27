@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.CommentNotification;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketingNotification;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {
@@ -27,46 +28,56 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
+                if (User.Identity is ClaimsIdentity identity &&
+                    Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
+                    dynamic cmd = command;
+                    cmd.UserId = userId;
+                    cmd.Role = identity.FindFirst(ClaimTypes.Role)?.Value;
+
+                    var result = await _mediator.Send(command);
+
+                    if (_timerControl != null && !_timerControl.IsTimerStarted)
                     {
-                        dynamic cmd = command;
-                        cmd.Role = userRole.Value;
+                        _timerControl.ScheduleTimer(async (scopeFactory) =>
+                        {
+                            using var scope = scopeFactory.CreateScope();
+                            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                            var requestData = await mediator.Send(command);
+                            await _client.Clients.Group(userId.ToString()).SendAsync(notificationType, requestData);
+                        }, 2000);
                     }
 
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        dynamic cmd = command;
-                        cmd.UserId = userId;
-                    }
+                    await _client.Clients.Group(userId.ToString()).SendAsync("ReceiveNotification", "New data has been received or sent.");
+
+                    return Ok(result);
                 }
 
-                var results = await _mediator.Send(command);
-
-                var timerControl = _timerControl;
-                var clientsAll = _client.Clients.All;
-
-                if (_timerControl != null && !_timerControl.IsTimerStarted)
-                {
-                    _timerControl.ScheduleTimer(async (scopeFactory) =>
-                    {
-                        using var scope = scopeFactory.CreateScope();
-                        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                        var requestData = await mediator.Send(command);
-                        await _client.Clients.All.SendAsync(notificationType, requestData);
-                    }, 2000);
-                }
-
-                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
-
-                return Ok(results);
+                return BadRequest("User ID not found.");
             }
             catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }
+        }
+
+        [HttpPost("send-notification")]
+        public async Task<IActionResult> SendNotification([FromBody] SendNotificationModel model)
+        {
+            if (model == null || string.IsNullOrWhiteSpace(model.Message))
+            {
+                return BadRequest("Invalid notification data.");
+            }
+
+            var userId = User.FindFirstValue("id");
+
+            if (Guid.TryParse(userId, out var guidUserId))
+            {
+                await _client.Clients.Group(guidUserId.ToString()).SendAsync("ReceiveNotification", model.Message);
+                return Ok("Notification sent.");
+            }
+
+            return BadRequest("User ID not found.");
         }
 
         [HttpGet("ticket-notif")]
@@ -75,28 +86,17 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             return await HandleNotification(command, "TicketNotifData");
         }
 
-        //[HttpGet("transfer-ticket")]
-        //public async Task<IActionResult> TransferTicketNotification([FromQuery] TransferTicketNotificationResultQuery command)
-        //{
-        //    return await HandleNotification(command, "TransferData");
-        //}
-
-        //[HttpGet("closing-ticket")]
-        //public async Task<IActionResult> ClosingTicketNotification([FromQuery] ClosingTicketNotificationResultQuery command)
-        //{
-        //    return await HandleNotification(command, "ClosingData");
-        //}
-
-        //[HttpGet("open-ticket")]
-        //public async Task<IActionResult> OpenTicketNotification([FromQuery] OpenTicketNotificationResultQuery command)
-        //{
-        //    return await HandleNotification(command, "OpenTicketData");
-        //}
 
         [HttpGet("ticket-comment")]
         public async Task<IActionResult> CommentNotification([FromQuery] CommentNotificationQueryResult command)
         {
             return await HandleNotification(command, "CommentData");
+        }
+
+        public class SendNotificationModel
+        {
+            public Guid UserId { get; set; }
+            public string Message { get; set; }
         }
     }
 }

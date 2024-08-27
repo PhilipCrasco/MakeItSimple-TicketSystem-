@@ -1,6 +1,4 @@
-﻿
-
-using MakeItSimple.WebApi.Common;
+﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;

@@ -358,14 +358,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Where(x => x.RequestConcern.Is_Confirm == null && x.RequestConcern.IsDone == true)
                     .ToList();
 
-                var results = ticketConcernQuery.Select(x => new GetOpenTicketResult
+                var results = ticketConcernQuery
+                    .Select(x => new GetOpenTicketResult
                 {
-                    //CloseTicketCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true),
-                    //RequestedTicketCount = ticketConcernQuery.Count(),
-                    //OpenTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove != true),
-                    //ForConfirmationCount = ticketConcernQuery.Count(x => x.RequestConcern.Is_Confirm == null && x.IsClosedApprove == true),
-                    //DelayedTicketCount = ticketConcernQuery.Count(x => x.TargetDate < dateToday && x.IsClosedApprove != true),
-                    //ForClosingTicketCount = ticketConcernQuery.Count(x => x.IsClosedApprove == false),
+
                     Closed_Status = x.TargetDate.Value.Day >= x.Closed_At.Value.Day && x.IsClosedApprove == true 
                     ? TicketingConString.OnTime : x.TargetDate.Value.Day < x.Closed_At.Value.Day && x.IsClosedApprove == true
                     ? TicketingConString.Delay : null,

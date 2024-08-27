@@ -144,7 +144,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
-                    .ThenInclude(x => x.TicketAttachments)
+                    .ThenInclude(x => x.TicketAttachments) 
                     .Include(x => x.TransferTicketConcerns)
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
@@ -493,13 +493,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                              && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
                             .FirstOrDefaultAsync();
 
-                        ticketHistory.TicketConcernId = ticketConcernExist.Id;
-                        ticketHistory.TransactedBy = request.UserId;
-                        ticketHistory.TransactionDate = DateTime.Now;
-                        ticketHistory.Request = TicketingConString.CloseTicket;
-                        ticketHistory.Status = TicketingConString.CloseConfirm;
+                        if (ticketHistory is not null)
+                        {
+                            ticketHistory.TicketConcernId = ticketConcernExist.Id;
+                            ticketHistory.TransactedBy = request.UserId;
+                            ticketHistory.TransactionDate = DateTime.Now;
+                            ticketHistory.Request = TicketingConString.CloseTicket;
+                            ticketHistory.Status = TicketingConString.CloseConfirm;
 
+                        }
                         await _context.SaveChangesAsync(cancellationToken);
+
                     }
                 }
 

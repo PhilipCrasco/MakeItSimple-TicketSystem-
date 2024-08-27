@@ -82,12 +82,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var notCloseConfirmCloseNotif = new List<TicketConcern>();
                 var closedNotif = new List<TicketConcern>();
 
-
                 var forApprovalTransferNotif = new List<TransferTicketConcern>();
-                //var approveTransferNotif = new List<TransferTicketConcern>();
-
                 var forApprovalClosingNotif = new List<ClosingTicket>();
-                //var approveClosingNotif = new List<ClosingTicket>();
 
                 var businessUnitRequestList = new List<BusinessUnit>();
                 var businessUnitCloseList = new List<BusinessUnit>();
@@ -490,10 +486,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     ClosedNotif = closedNotif.Count(),
 
                     ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
-
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
-
-
 
                 };
 

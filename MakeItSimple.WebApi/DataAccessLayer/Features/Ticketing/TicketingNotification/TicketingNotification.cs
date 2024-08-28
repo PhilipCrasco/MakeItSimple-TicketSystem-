@@ -1,19 +1,15 @@
-﻿using Azure.Core;
-using MakeItSimple.WebApi.Common;
+﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketConcernNotification;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
     public class TicketingNotification
     {
-
         public class TicketingNotifResult
         {
             public int AllRequestTicketNotif { get; set; }
@@ -23,8 +19,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int DoneNotif { get; set; }
             public int ReceiverForApprovalNotif { get; set; }
             public int ReceiverApproveNotif { get; set; }
-
-
             public int AllTicketNotif { get; set; }
             public int PendingTicketNotif { get; set; }
             public int OpenTicketNotif { get; set; }
@@ -32,14 +26,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int ForCloseNotif { get; set; }
             public int NotConfirmCloseNotif { get; set; }
             public int ClosedNotif { get; set; }
-
-
             public int ForApprovalTransferNotif { get; set; }
-            //public int ApproveTransferNotif { get; set; }
-
             public int ForApprovalClosingNotif { get; set; }
-            //public int ApproveClosingNotif { get; set; }
-
 
         }
 

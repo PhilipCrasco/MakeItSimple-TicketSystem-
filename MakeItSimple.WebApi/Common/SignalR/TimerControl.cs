@@ -15,13 +15,11 @@ namespace MakeItSimple.WebApi.Common.SignalR
 
         public void ScheduleTimer(string key, Func<IServiceScopeFactory, Task> scopedAction, int delay, int period)
         {
-            // Stop existing timer if it exists for the given key
             if (_timers.TryRemove(key, out var existingTimer))
             {
                 existingTimer.Dispose();
-            }
+            } 
 
-            // Create and start a new timer
             var timer = new Timer(async _ =>
             {
                 using var scope = _serviceScopeFactory.CreateScope();
@@ -37,7 +35,7 @@ namespace MakeItSimple.WebApi.Common.SignalR
             {
                 timer.Dispose();
             }
-        }
+        } 
 
         public void StopAllTimers()
         {

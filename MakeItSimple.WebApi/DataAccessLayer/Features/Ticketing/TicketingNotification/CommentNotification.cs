@@ -2,7 +2,6 @@
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {

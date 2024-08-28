@@ -1,42 +1,51 @@
-﻿namespace MakeItSimple.WebApi.Common.SignalR
+﻿using System.Collections.Concurrent;
+using System.Threading;
+
+namespace MakeItSimple.WebApi.Common.SignalR
 {
     public class TimerControl
     {
-        private Timer? _timer;
-        private AutoResetEvent? _autoResetEvent;
+        private readonly ConcurrentDictionary<string, Timer> _timers = new();
         private readonly IServiceScopeFactory _serviceScopeFactory;
-
-        public DateTime TimerStarted { get; set; }
-        public bool IsTimerStarted { get; set; }
 
         public TimerControl(IServiceScopeFactory serviceScopeFactory)
         {
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public void ScheduleTimer(Func<IServiceScopeFactory, Task> scopedAction, int paramTime)
+        public void ScheduleTimer(string key, Func<IServiceScopeFactory, Task> scopedAction, int delay, int period)
         {
-            _timer?.Dispose(); // Dispose previous timer if one exists
-            _timer = new Timer(async _ =>
+            // Stop existing timer if it exists for the given key
+            if (_timers.TryRemove(key, out var existingTimer))
+            {
+                existingTimer.Dispose();
+            }
+
+            // Create and start a new timer
+            var timer = new Timer(async _ =>
             {
                 using var scope = _serviceScopeFactory.CreateScope();
                 await scopedAction(scope.ServiceProvider.GetRequiredService<IServiceScopeFactory>());
-            }, null, 1000, paramTime);
+            }, null, delay, period);
 
-            TimerStarted = DateTime.Now;
-            IsTimerStarted = true;
+            _timers[key] = timer;
         }
 
-        public void StopTimer()
+        public void StopTimer(string key)
         {
-            if (_timer != null)
+            if (_timers.TryRemove(key, out var timer))
             {
-                _timer.Dispose();
-                _timer = null;
-                IsTimerStarted = false;
+                timer.Dispose();
             }
         }
 
-
+        public void StopAllTimers()
+        {
+            foreach (var timer in _timers.Values)
+            {
+                timer.Dispose();
+            }
+            _timers.Clear();
+        }
     }
 }

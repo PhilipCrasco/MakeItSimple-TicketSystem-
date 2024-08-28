@@ -1,24 +1,27 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MakeItSimple.WebApi
 {
     public class NotificationHub : Hub
     {
-        private readonly IConfiguration _configuration;
+        private readonly IHubCaller _hubCaller;
 
-        public NotificationHub(IConfiguration configuration)
+        public NotificationHub(IHubCaller hubCaller)
         {
-            _configuration = configuration;
+            _hubCaller = hubCaller;
         }
 
         public override async Task OnConnectedAsync()
         {
-            var userIdClaim = Context.GetHttpContext().Request.Query["userId"].FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+            if (Context.User.Identity is ClaimsIdentity identity &&
+                Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
+                // Add the user to their specific group based on their user ID.
+                await _hubCaller.AddUserToGroupAsync(Context.ConnectionId, userId);
             }
 
             await base.OnConnectedAsync();
@@ -26,19 +29,24 @@ namespace MakeItSimple.WebApi
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var userIdClaim = Context.GetHttpContext().Request.Query["userId"].FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+            if (Context.User.Identity is ClaimsIdentity identity &&
+                Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId.ToString());
+                // Remove the user from their specific group based on their user ID.
+                await _hubCaller.RemoveUserFromGroupAsync(Context.ConnectionId, userId);
             }
 
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendNotification(Guid userId, string message)
+        public async Task SendNotificationToUser(string userId, string message)
         {
-            await Clients.Group(userId.ToString()).SendAsync("ReceiveNotification", message);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await _hubCaller.SendNotificationAsync(Guid.Parse(userId), message);
+            }
         }
+
+
     }
 }

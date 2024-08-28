@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi;
 using MakeItSimple.WebApi.Common.SignalR;
+using Microsoft.AspNetCore.Http.Connections;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,8 +31,7 @@ x.UseSqlServer(connectionString, sqlOptions => sqlOptions.CommandTimeout(180))
     .EnableSensitiveDataLogging()
     .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll)
 
-    );
-
+);
 
 
 builder.Services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly);
@@ -56,6 +56,7 @@ builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddScoped<TransformUrl>();
 builder.Services.AddSingleton<TimerControl>();
+builder.Services.AddScoped<IHubCaller, HubCaller>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -176,8 +177,11 @@ app.UseWebSockets();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/notification-hub")
-    .RequireCors(clientPermission);
+    endpoints.MapHub<NotificationHub>("/notification-hub", options =>
+    {
+        options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
+        options.CloseOnAuthenticationExpiration = true;
+    });
 });
 //app.MapControllers(); 
 

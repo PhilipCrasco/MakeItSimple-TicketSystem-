@@ -54,30 +54,30 @@ public class TicketingNotificationController : ControllerBase
 
                 //var result = await _mediator.Send(command);
 
-                //var timerKey = $"{userId}_{notificationType}";
+                var timerKey = $"{userId}_{notificationType}";
 
-                //_timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
-                //{
-                //    using var scope = scopeFactory.CreateScope();
-                //    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                //    var requestData = await mediator.Send(command);
-                //    await _hubCaller.SendNotificationAsync(userId, requestData);
-                //}, 2000, 2000); 
-
-                //await _hubCaller.SendNotificationAsync(userId, result);
-
-                //return Ok(result);
-
-                var cacheKey = $"{userId}_{notificationType}";
-                var previousResult = _memoryCache.Get<object>(cacheKey);
-
-                if (result != null && !Equals(result, previousResult))
+                _timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
                 {
-                    await _hubCaller.SendNotificationAsync(userId, result);
-                    _memoryCache.Set(cacheKey, result); // Update cache with new result
-                }
+                    using var scope = scopeFactory.CreateScope();
+                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                    var requestData = await mediator.Send(command);
+                    await _hubCaller.SendNotificationAsync(userId, requestData);
+                }, 2000, 2000);
+
+                await _hubCaller.SendNotificationAsync(userId, result);
 
                 return Ok(result);
+
+                //var cacheKey = $"{userId}_{notificationType}";
+                //var previousResult = _memoryCache.Get<object>(cacheKey);
+
+                //if (result != null && !Equals(result, previousResult))
+                //{
+                //    await _hubCaller.SendNotificationAsync(userId, result);
+                //    _memoryCache.Set(cacheKey, result); // Update cache with new result
+                //}
+
+                //return Ok(result);
 
 
             }

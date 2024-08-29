@@ -31,7 +31,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         }
 
-
         public class TicketingNotificationCommand : IRequest<Result>
         {
             public Guid UserId { get; set; }

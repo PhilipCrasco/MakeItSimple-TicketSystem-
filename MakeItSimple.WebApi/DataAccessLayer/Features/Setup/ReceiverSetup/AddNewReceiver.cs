@@ -29,7 +29,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
         }
 
-
         public class Handler : IRequestHandler<AddNewReceiverCommand, Result>
         {
             private readonly MisDbContext _context;

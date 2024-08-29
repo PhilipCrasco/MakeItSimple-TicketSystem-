@@ -55,13 +55,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                      && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
                     .FirstOrDefaultAsync();
 
-                ticketHistory.TicketConcernId = ticketConcernExist.Id;
-                ticketHistory.TransactedBy = command.Transacted_By;
-                ticketHistory.TransactionDate = DateTime.Now;
-                ticketHistory.Request = TicketingConString.Confirm;
-                ticketHistory.Status = TicketingConString.CloseConfirm;
+                if (ticketHistory is not null) 
+                {
+                    ticketHistory.TicketConcernId = ticketConcernExist.Id;
+                    ticketHistory.TransactedBy = command.Transacted_By;
+                    ticketHistory.TransactionDate = DateTime.Now;
+                    ticketHistory.Request = TicketingConString.Confirm;
+                    ticketHistory.Status = TicketingConString.CloseConfirm;
 
-
+                }
                 //var addTicketHistory = new TicketHistory
                 //{
                 //    TicketConcernId = ticketConcernExist.Id,

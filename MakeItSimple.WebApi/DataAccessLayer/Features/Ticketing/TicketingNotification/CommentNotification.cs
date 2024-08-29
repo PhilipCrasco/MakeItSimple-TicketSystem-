@@ -18,13 +18,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
             public int ? TicketCommentId { get; set; }
 
-            public bool IsActive { get; set; }
-
-            
+            public bool IsActive { get; set; }           
 
         }
-
-     
 
         public class CommentNotificationQueryResult : IRequest<Result>
         {
@@ -33,7 +29,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public Guid ? UserId { get; set; }
 
         }
-
 
         public class Handler : IRequestHandler<CommentNotificationQueryResult, Result>
         {
@@ -76,7 +71,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 }).DistinctBy(x => x.CommentTicketCount)
                 .ToList();
          
-
                 return Result.Success(notification);
             }
         }

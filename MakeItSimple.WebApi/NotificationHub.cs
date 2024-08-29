@@ -9,7 +9,7 @@ namespace MakeItSimple.WebApi
     {
         private readonly IHubCaller _hubCaller;
 
-        public NotificationHub(IHubCaller hubCaller)
+        public NotificationHub(IHubCaller hubCaller) 
         {
             _hubCaller = hubCaller;
         }
@@ -20,7 +20,6 @@ namespace MakeItSimple.WebApi
             if (Context.User.Identity is ClaimsIdentity identity &&
                 Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
             {
-                // Add the user to their specific group based on their user ID.
                 await _hubCaller.AddUserToGroupAsync(Context.ConnectionId, userId);
             }
 
@@ -32,7 +31,6 @@ namespace MakeItSimple.WebApi
             if (Context.User.Identity is ClaimsIdentity identity &&
                 Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
             {
-                // Remove the user from their specific group based on their user ID.
                 await _hubCaller.RemoveUserFromGroupAsync(Context.ConnectionId, userId);
             }
 

@@ -132,6 +132,7 @@ builder.Services.AddAuthentication(authOptions =>
 
     });
 
+builder.Services.AddMemoryCache();
 builder.Services.AddSignalR();
 
 builder.Services.Configure<CloudinaryOption>(config.GetSection("Cloudinary"));

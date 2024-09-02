@@ -63,8 +63,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 }
 
                 var ticketHistory = await _context.TicketHistories
-                    .Where(x => (x.TicketConcernId == ticketConcernExist.Id
-                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id)
+                    .Where(x => (x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
                      || x.Request.Contains(TicketingConString.NotConfirm))
                     .ToListAsync();
 

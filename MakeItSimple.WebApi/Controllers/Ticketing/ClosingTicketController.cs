@@ -1,12 +1,9 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
 using MakeItSimple.WebApi.Common.SignalR;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
@@ -15,7 +12,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicket
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.RejectClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ReturnClosedTicket;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing

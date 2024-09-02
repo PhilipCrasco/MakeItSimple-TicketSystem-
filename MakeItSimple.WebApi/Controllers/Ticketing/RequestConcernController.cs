@@ -17,8 +17,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
-using MakeItSimple.WebApi.Common.SignalR;
 using Microsoft.AspNetCore.SignalR;
+using MakeItSimple.WebApi.Common.SignalR;
 
 
 

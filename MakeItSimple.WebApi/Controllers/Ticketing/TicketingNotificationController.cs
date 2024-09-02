@@ -1,4 +1,4 @@
-﻿using MakeItSimple.WebApi.Common.SignalR;
+﻿
 using MakeItSimple.WebApi;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +7,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNot
 using System.Security.Claims;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Memory;
+using MakeItSimple.WebApi.Common.SignalR;
 
 [ApiController]
 [Route("api/ticketing-notification")]
@@ -15,14 +16,12 @@ public class TicketingNotificationController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IHubCaller _hubCaller;
     private readonly TimerControl _timerControl;
-    private readonly IMemoryCache _memoryCache;
 
-    public TicketingNotificationController(IMediator mediator, IHubCaller hubCaller, TimerControl timerControl , IMemoryCache memoryCache)
+    public TicketingNotificationController(IMediator mediator, IHubCaller hubCaller, TimerControl timerControl)
     {
         _mediator = mediator;
         _hubCaller = hubCaller;
         _timerControl = timerControl;
-        _memoryCache = memoryCache; 
     }
 
     private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
@@ -38,22 +37,6 @@ public class TicketingNotificationController : ControllerBase
 
                 var result = await _mediator.Send(command);
 
-                //var timerKey = $"{userId}_{notificationType}";
-
-                //_timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
-                //{
-                //    using var scope = scopeFactory.CreateScope();
-                //    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                //    var requestData = await mediator.Send(command);
-                //    await _hubCaller.SendNotificationAsync(userId, requestData);
-                //}, 2000, 2000);
-
-                //await _hubCaller.SendNotificationAsync(userId, result);
-
-                //return Ok(result);
-
-                //var result = await _mediator.Send(command);
-
                 var timerKey = $"{userId}_{notificationType}";
 
                 _timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
@@ -68,18 +51,22 @@ public class TicketingNotificationController : ControllerBase
 
                 return Ok(result);
 
-                //var cacheKey = $"{userId}_{notificationType}";
-                //var previousResult = _memoryCache.Get<object>(cacheKey);
+                //var result = await _mediator.Send(command);
 
-                //if (result != null && !Equals(result, previousResult))
+                //var timerKey = $"{userId}_{notificationType}";
+
+                //_timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
                 //{
-                //    await _hubCaller.SendNotificationAsync(userId, result);
-                //    _memoryCache.Set(cacheKey, result); // Update cache with new result
-                //}
+                //    using var scope = scopeFactory.CreateScope();
+                //    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                //    var requestData = await mediator.Send(command);
+                //    await _hubCaller.SendNotificationAsync(userId, requestData);
+
+                //}, 2000, 2000);
+
+                //await _hubCaller.SendNotificationAsync(userId, result);
 
                 //return Ok(result);
-
-
             }
             else
             {
@@ -91,9 +78,6 @@ public class TicketingNotificationController : ControllerBase
             return Conflict(ex.Message);
         }
     }
-
-
-
 
     [HttpGet("ticket-notif")]
     public async Task<IActionResult> TicketingNotification([FromQuery] TicketingNotificationCommand command)

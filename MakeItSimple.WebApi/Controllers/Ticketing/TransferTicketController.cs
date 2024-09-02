@@ -8,8 +8,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
-using MakeItSimple.WebApi.Common.SignalR;
 using Microsoft.AspNetCore.SignalR;
+using MakeItSimple.WebApi.Common.SignalR;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {

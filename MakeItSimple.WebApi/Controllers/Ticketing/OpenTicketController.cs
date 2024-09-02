@@ -6,8 +6,8 @@ using System.Security.Claims;
 using MediatR;
 using MakeItSimple.WebApi.Common;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
-using MakeItSimple.WebApi.Common.SignalR;
 using Microsoft.AspNetCore.SignalR;
+using MakeItSimple.WebApi.Common.SignalR;
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
 {

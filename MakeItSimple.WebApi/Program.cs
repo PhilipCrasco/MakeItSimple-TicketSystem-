@@ -13,8 +13,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
 using MakeItSimple.WebApi;
-using MakeItSimple.WebApi.Common.SignalR;
 using Microsoft.AspNetCore.Http.Connections;
+using MakeItSimple.WebApi.Common.SignalR;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +55,7 @@ builder.Services.AddControllers( options =>
 builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddScoped<TransformUrl>();
-builder.Services.AddSingleton<TimerControl>();
+builder.Services.AddScoped<TimerControl>();
 builder.Services.AddScoped<IHubCaller, HubCaller>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -127,8 +127,6 @@ builder.Services.AddAuthentication(authOptions =>
                 return Task.CompletedTask;
             }
         };
-
-
 
     });
 

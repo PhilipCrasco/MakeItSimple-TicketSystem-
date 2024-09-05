@@ -101,18 +101,33 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 if(transferTicketQuery.Any())
                 {
-                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
+                    var allUserList = await _context.UserRoles
+                        .AsNoTracking()
+                        .Select(x => new
+                        {
+                            x.Id,
+                            x.UserRoleName,
+                            x.Permissions
 
-                    var approverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                        }).ToListAsync();
 
-                    var issueHandlerPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.IssueHandler)).Select(x => x.UserRoleName).ToList();
+                    var approverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Approver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
+
+                    var issueHandlerPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.IssueHandler))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
                     if (!string.IsNullOrEmpty(request.Search))
                     {
                         transferTicketQuery = transferTicketQuery
-                            .Where(x => x.TicketConcern.User.Fullname.Contains(request.Search)
+                            .Where(x => x.TicketConcern.User.Fullname
+                            .Contains(request.Search)
                         || x.TicketConcernId.ToString().Contains(request.Search));
                     }
 
@@ -158,8 +173,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                                 })
                                 .ToListAsync();
 
-                            var userRequestIdApprovalList = approverTransactList.Select(x => x.TransferTicketConcernId);
-                            var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
+                            var userRequestIdApprovalList = approverTransactList
+                                .Select(x => x.TransferTicketConcernId);
+
+                            var userIdsInApprovalList = approverTransactList
+                                .Select(approval => approval.UserId);
 
                             transferTicketQuery = transferTicketQuery
                                 .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)

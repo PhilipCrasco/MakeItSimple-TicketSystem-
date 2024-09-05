@@ -8,6 +8,13 @@ using System.Security.Claims;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Memory;
 using MakeItSimple.WebApi.Common.SignalR;
+using LazyCache;
+using MakeItSimple.WebApi.Common.Caching;
+using Microsoft.Build.Experimental.ProjectCache;
+using System.Linq;
+using Newtonsoft.Json;
+using System.Text;
+using System.Security.Cryptography;
 
 [ApiController]
 [Route("api/ticketing-notification")]
@@ -17,17 +24,31 @@ public class TicketingNotificationController : ControllerBase
     private readonly IHubCaller _hubCaller;
     private readonly TimerControl _timerControl;
 
-    public TicketingNotificationController(IMediator mediator, IHubCaller hubCaller, TimerControl timerControl)
+    private ICacheProvider _cacheProvider;
+
+    public TicketingNotificationController(IMediator mediator, IHubCaller hubCaller, TimerControl timerControl , ICacheProvider cacheProvider)
     {
         _mediator = mediator;
         _hubCaller = hubCaller;
         _timerControl = timerControl;
+        _cacheProvider = cacheProvider;
+    }
+
+    private string ComputeHash(object obj)
+    {
+        var jsonString = JsonConvert.SerializeObject(obj);
+        using (var sha256 = SHA256.Create())
+        {
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(jsonString));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
     }
 
     private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
     {
         try
         {
+
             if (User.Identity is ClaimsIdentity identity &&
                 Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
             {
@@ -35,43 +56,54 @@ public class TicketingNotificationController : ControllerBase
                 cmd.UserId = userId;
                 cmd.Role = identity.FindFirst(ClaimTypes.Role)?.Value;
 
-                var result = await _mediator.Send(command);
+
+
+
+                if (_cacheProvider.TryGetValue(CacheKeys.TicketingNotif, out object cachedResult))
+                {
+                    var newData = await _mediator.Send(command) ;
+
+                    var cachedHash = ComputeHash(cachedResult);
+                    var newHash = ComputeHash(newData);
+
+                    if (cachedHash == newHash)
+                    {
+                        return Ok(cachedResult);
+                    }
+                }
+
+
+                var results = await _mediator.Send(command);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                    SlidingExpiration = TimeSpan.FromSeconds(30),
+                    Size = 1024
+                };
+
+                _cacheProvider.Set(CacheKeys.TicketingNotif, results, cacheEntryOptions);
 
                 var timerKey = $"{userId}_{notificationType}";
-
                 _timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
                 {
                     using var scope = scopeFactory.CreateScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                     var requestData = await mediator.Send(command);
                     await _hubCaller.SendNotificationAsync(userId, requestData);
+
                 }, 2000, 2000);
 
-                await _hubCaller.SendNotificationAsync(userId, result);
+                await _hubCaller.SendNotificationAsync(userId, results);
 
-                return Ok(result);
-
-                //var result = await _mediator.Send(command);
-
-                //var timerKey = $"{userId}_{notificationType}";
-
-                //_timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
-                //{
-                //    using var scope = scopeFactory.CreateScope();
-                //    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                //    var requestData = await mediator.Send(command);
-                //    await _hubCaller.SendNotificationAsync(userId, requestData);
-
-                //}, 2000, 2000);
-
-                //await _hubCaller.SendNotificationAsync(userId, result);
-
-                //return Ok(result);
+                return Ok(results);
             }
             else
             {
-                return Unauthorized("User identity is not valid.");
+                return Unauthorized("User not autorized");
             }
+
+
         }
         catch (Exception ex)
         {
@@ -82,6 +114,7 @@ public class TicketingNotificationController : ControllerBase
     [HttpGet("ticket-notif")]
     public async Task<IActionResult> TicketingNotification([FromQuery] TicketingNotificationCommand command)
     {
+
         return await HandleNotification(command, "TicketNotifData");
     }
 

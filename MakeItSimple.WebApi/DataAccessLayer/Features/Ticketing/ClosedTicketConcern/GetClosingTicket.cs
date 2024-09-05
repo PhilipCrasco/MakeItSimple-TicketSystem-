@@ -109,12 +109,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 if (closingTicketsQuery.Any())
                 {
 
-                    var allUserList = await _context.UserRoles.AsNoTracking().ToListAsync();
-                    var receiverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+                    var allUserList = await _context.UserRoles
+                        .AsNoTracking()
+                        .Select(x => new
+                        {
+                            x.Id,
+                            x.UserRoleName,
+                            x.Permissions
 
-                    var approverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                        }).ToListAsync();
+
+                    var receiverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Receiver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
+
+                    var approverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Approver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
                     if (!string.IsNullOrEmpty(request.Search))
                     {
@@ -153,10 +168,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                     .Where(x => x.IsApprove == null)
                                     .Select(x => new
                                     {
-                                        ApproverLevel = x.ApproverLevel,
-                                        IsApprove = x.IsApprove,
-                                        ClosingTicketId = x.ClosingTicketId,
-                                        UserId = x.UserId,
+                                        x.ApproverLevel,
+                                        x.IsApprove,
+                                        x.ClosingTicketId,
+                                        x.UserId,
 
                                     })
                                     .ToListAsync();
@@ -284,19 +299,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     });
 
-                //if(request.PageNumber == null || request.PageNumber == 0)
-                //{
-                //    //var totalCount = await results.CountAsync();
-                //    //request.SetDynamicMaxPageSize(totalCount);
-                //}
-
-
-
                 return await PagedList<GetClosingTicketResults>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }
     }
-
-
 
 }

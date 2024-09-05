@@ -27,8 +27,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
         public IValidator<UpdateUserRoleCommand>  UpdateUserRoleValidator { get; set; }
         public IValidator<UntagAndTagUserRolePermissionCommand> TagAndUntagUserRoleValidator {  get; set; }
 
-        
-
         //Category Setup
         public IValidator<UpsertCategoryCommand> UpsertCategoryValidator { get; set; }
 
@@ -49,9 +47,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler
             AddUserRoleValidator = new UserRole.UserRoleValidator();
             UpdateUserRoleValidator = new UserRole.UpdateUserRoleValidator();
             TagAndUntagUserRoleValidator = new UserRole.TagAndUntagUserRoleValidator();
-
-
-            //Channel Setup
 
 
             //Category Setup

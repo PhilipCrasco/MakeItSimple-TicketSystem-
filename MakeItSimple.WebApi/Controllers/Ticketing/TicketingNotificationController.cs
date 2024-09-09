@@ -128,20 +128,15 @@ public class TicketingNotificationController : ControllerBase
                 cmd.UserId = userId;
                 cmd.Role = identity.FindFirst(ClaimTypes.Role)?.Value;
 
-                var newData = await _mediator.Send(command);
-
-
                 var cacheKey = $"{userId}_{notificationType}_CacheKey";
-
-
                 var timerKey = $"{userId}_{notificationType}";
 
+                var newData = await _mediator.Send(command);
+                var newHash = ComputeHash(newData);
 
                 if (_cacheProvider.TryGetValue(cacheKey, out object cachedResult))
                 {
                     var cachedHash = ComputeHash(cachedResult);
-                    var newHash = ComputeHash(newData);
-
 
                     if (cachedHash == newHash)
                     {
@@ -175,7 +170,7 @@ public class TicketingNotificationController : ControllerBase
                         await _hubCaller.SendNotificationAsync(userId, requestData);
                     }
 
-                }, 2000, 2000);
+                }, 5000, 5000);
 
 
                 await _hubCaller.SendNotificationAsync(userId, newData);

@@ -19,8 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         public class AddRequestConcernCommand : IRequest<Result>
         {
-            
-            //public int ? RequestTransactionId { get; set; }
+           
              
             public Guid ? Added_By { get; set; } 
             public Guid ? Modified_By { get; set; }
@@ -121,7 +120,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     var addRequestConcern = new RequestConcern
                     {
-                        //RequestTransactionId = requestTransactionExist.Id,
                         UserId = userId.Id,
                         Concern = command.Concern,
                         AddedBy = command.Added_By,

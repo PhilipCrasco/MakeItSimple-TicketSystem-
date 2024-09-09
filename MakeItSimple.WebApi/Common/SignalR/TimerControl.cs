@@ -15,9 +15,6 @@ namespace MakeItSimple.WebApi.Common.SignalR
 
         public void ScheduleTimer(string key, Func<IServiceScopeFactory, Task> scopedAction, int delay, int period)
         {
- 
-
-
             if (_timers.TryRemove(key, out var existingTimer))
             {
                 existingTimer.Dispose();
@@ -31,6 +28,7 @@ namespace MakeItSimple.WebApi.Common.SignalR
 
             _timers[key] = timer;
         }
+
 
         public void StopTimer(string key)
         {
@@ -48,11 +46,5 @@ namespace MakeItSimple.WebApi.Common.SignalR
             }
             _timers.Clear();
         }
-
-
     }
 }
-
-
-
-

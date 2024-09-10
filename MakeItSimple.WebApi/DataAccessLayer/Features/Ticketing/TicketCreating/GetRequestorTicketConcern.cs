@@ -288,11 +288,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var results = requestConcernsQuery
                     .Select(g => new GetRequestorTicketConcernResult
                     {
-                        //RequestConcernCount = requestConcernsQuery.Count(),
-                        //ForApprovalCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.ForApprovalTicket)),
-                        //OnGoingCount = requestConcernsQuery.Count(x => x.ConcernStatus.Contains(TicketingConString.CurrentlyFixing)),
-                        //ForConfirmationCount = requestConcernsQuery.Count(x => x.Is_Confirm == null && x.ConcernStatus.Contains(TicketingConString.NotConfirm)),
-                        //DoneCount = requestConcernsQuery.Count(x => x.Is_Confirm == true && x.ConcernStatus.Contains(TicketingConString.Done)),
+
                         RequestConcernId = g.Id,
                         Concern = g.Concern,
                         Resolution = g.Resolution,
@@ -355,54 +351,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     });
 
-                var confirmConcernList = results
-                    .Where(x => x.Is_Confirmed == null && x.Is_Done == true)
-                    .ToList();
 
-                //foreach (var confirmConcern in confirmConcernList)
-                //{
-
-                //    var daysClose = confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Day - dateToday.Day;
-
-                //    daysClose = Math.Abs(daysClose) * (1);
-
-                //    if (daysClose >= 1)
-                //    {
-                //        daysClose = daysClose * 24;
-                //    }
-
-                //    var hourConvert = (daysClose + confirmConcern.TicketRequestConcerns.First().Closed_At.Value.Hour) - dateToday.Hour;
-
-                //    if (hourConvert >= hourDif)
-                //    {
-                //        var requestConcern = await _context.RequestConcerns
-                //            .FirstOrDefaultAsync(x => x.Id == confirmConcern.RequestConcernId);
-
-                //        requestConcern.Is_Confirm = true;
-                //        requestConcern.Confirm_At = DateTime.Today;
-                //        requestConcern.ConcernStatus = TicketingConString.Done;
-
-                //        var ticketConcernExist = await _context.TicketConcerns
-                //            .FirstOrDefaultAsync(x => x.RequestConcernId == confirmConcern.RequestConcernId);
-
-                //        var ticketHistory = await _context.TicketHistories
-                //            .Where(x => x.TicketConcernId == ticketConcernExist.Id
-                //             && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
-                //            .FirstOrDefaultAsync();
-
-                //        if (ticketHistory is not null)
-                //        {
-                //            ticketHistory.TicketConcernId = ticketConcernExist.Id;
-                //            ticketHistory.TransactedBy = request.UserId;
-                //            ticketHistory.TransactionDate = DateTime.Now;
-                //            ticketHistory.Request = TicketingConString.Confirm;
-                //            ticketHistory.Status = TicketingConString.CloseConfirm;
-                //        }
-
-                //        await _context.SaveChangesAsync(cancellationToken);
-                //    }
-
-                //}
 
                 return await PagedList<GetRequestorTicketConcernResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

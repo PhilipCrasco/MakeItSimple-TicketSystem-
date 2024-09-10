@@ -46,7 +46,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         }
 
-
         public class Handler : IRequestHandler<TicketingNotificationCommand, Result>
         {
             private IMemoryCache _cache;

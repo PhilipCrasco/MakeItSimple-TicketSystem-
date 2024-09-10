@@ -30,7 +30,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
 
         }
 
-
         public class Handler : IRequestHandler<UserChangePasswordCommand, Result>
         {
             private readonly MisDbContext _context;
@@ -82,7 +81,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccoun
                 };
 
                 return Result.Success(result);
-
 
             }
         }

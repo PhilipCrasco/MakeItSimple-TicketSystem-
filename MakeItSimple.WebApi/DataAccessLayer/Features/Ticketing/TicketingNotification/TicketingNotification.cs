@@ -20,9 +20,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int NotConfirmNotif { get; set; }
             public int DoneNotif { get; set; }
             public int ReceiverForApprovalNotif { get; set; }
-            //public int ReceiverApproveNotif { get; set; }
             public int AllTicketNotif { get; set; }
-            //public int PendingTicketNotif { get; set; }
             public int OpenTicketNotif { get; set; }
             public int ForTransferNotif { get; set; }
             public int ForCloseNotif { get; set; }
@@ -149,7 +147,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                       
                     }).ToListAsync();
 
-
                 var transferQuery = await _context.TransferTicketConcerns
                 .AsNoTracking()
                 .Include(x => x.TicketConcern)
@@ -167,7 +164,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
 
                 }).ToListAsync();
-
 
                 var closeQuery = await _context.ClosingTickets
                     .AsNoTracking()
@@ -250,10 +246,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                          .Select(x => x.Id)
                          .ToList();
 
-
                     openTicketNotif = openTicket;
-
-
 
                     var forTransferTicket = ticketConcernQuery
                          .Where(x => x.IsTransfer == false)
@@ -272,8 +265,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
 
                     forCloseNotif = forClosedTicket;
-
-
 
                     var notConfirmTicket = ticketConcernQuery
                         .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null)

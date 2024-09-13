@@ -75,6 +75,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         //Phase 2 
 
         public virtual DbSet<Form> Forms { get; set; }
+        public virtual DbSet<QuestionModule> QuestionModules { get; set; }
+        public virtual DbSet<QuestionModuleForm> QuestionModuleForms { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -110,7 +112,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
 
+
             modelBuilder.ApplyConfiguration(new FormConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestionModulesConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestionModuleFormConfiguration()); 
+            
 
 
 

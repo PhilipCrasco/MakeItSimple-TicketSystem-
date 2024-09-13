@@ -1,11 +1,9 @@
-﻿using MakeItSimple.WebApi.Common;
-
-namespace MakeItSimple.WebApi.Models.Setup.FormSetup
+﻿namespace MakeItSimple.WebApi.Models.Setup.FormSetup
 {
-    public class Form : BaseEntity
+    public class QuestionModule
     {
         public int Id { get; set; }
-        public string Form_Name { get; set; }
+        public string Question_Modules_Name { get; set; }
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
@@ -15,6 +13,11 @@ namespace MakeItSimple.WebApi.Models.Setup.FormSetup
         public virtual User ModifiedByUser { get; set; }
 
         public ICollection<QuestionModuleForm> QuestionModuleForms { get; set; }
+
+        //public ICollection<int> FormId { get; set; }
+        //public virtual Form Form { get; set; }
+
+
 
     }
 }

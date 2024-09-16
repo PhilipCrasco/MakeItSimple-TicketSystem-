@@ -1,8 +1,8 @@
-﻿using MakeItSimple.WebApi.Models.Setup.FormSetup;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Data.Setup.FormSetup
+namespace MakeItSimple.WebApi.DataAccessLayer.Data.Setup.QuestionModuleSetup
 {
     public class QuestionModuleFormConfiguration : IEntityTypeConfiguration<QuestionModuleForm>
     {

@@ -6,7 +6,8 @@ using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ChannelSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.CompanySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.FormSetup;
-using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup; 
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.LocationSetup;
+using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.QuestionModuleSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.ReceiverSetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.DataAccessLayer.Data.Setup.SubUnitSetup;
@@ -25,7 +26,7 @@ using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.FormSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
-
+using MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.UnitSetup;
@@ -71,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<RequestConcern> RequestConcerns { get; set; }
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
+        public virtual DbSet<TicketTransactionNotification> TicketTransactionNotifications { get; set; }
 
         //Phase 2 
 
@@ -111,6 +113,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new ReceiverConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketTransactionNotificationConfiguration());
 
 
             modelBuilder.ApplyConfiguration(new FormConfiguration());

@@ -59,7 +59,7 @@ builder.Services.AddScoped<TransformUrl>();
 builder.Services.AddScoped<TimerControl>();
 builder.Services.AddScoped<IHubCaller, HubCaller>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle  
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen( c =>

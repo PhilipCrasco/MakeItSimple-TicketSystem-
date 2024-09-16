@@ -4,7 +4,7 @@ namespace MakeItSimple.WebApi
 {
     public interface IHubCaller
     {
-        Task SendNotificationAsync(Guid userId, object message);
+        Task SendNotificationAsync(Guid userId, string notificationType, object message);
         Task AddUserToGroupAsync(string connectionId, Guid userId);
         Task RemoveUserFromGroupAsync(string connectionId, Guid userId);
     }
@@ -19,9 +19,9 @@ namespace MakeItSimple.WebApi
             _hubContext = hubContext;
         }
 
-        public async Task SendNotificationAsync(Guid userId, object message)
+        public async Task SendNotificationAsync(Guid userId, string notificationType ,object message)
         {
-            await _hubContext.Clients.Group(userId.ToString()).SendAsync("ReceiveNotification", message);
+            await _hubContext.Clients.Group(userId.ToString()).SendAsync(notificationType, message);
         }
 
         public async Task AddUserToGroupAsync(string connectionId, Guid userId)

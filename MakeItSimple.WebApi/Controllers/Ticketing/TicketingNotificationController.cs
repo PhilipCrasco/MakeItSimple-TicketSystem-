@@ -167,13 +167,13 @@ public class TicketingNotificationController : ControllerBase
                     {
 
                         _cacheProvider.Set(cacheKey, requestData, cacheEntryOptions);
-                        await _hubCaller.SendNotificationAsync(userId, requestData);
+                        await _hubCaller.SendNotificationAsync(userId,notificationType,requestData);
                     }
 
                 }, 5000, 5000);
 
 
-                await _hubCaller.SendNotificationAsync(userId, newData);
+                await _hubCaller.SendNotificationAsync(userId,notificationType,newData);
 
                 return Ok(newData);
             }

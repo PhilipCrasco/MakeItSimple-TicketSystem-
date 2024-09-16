@@ -37,11 +37,11 @@ namespace MakeItSimple.WebApi
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendNotificationToUser(string userId, string message)
+        public async Task SendNotificationToUser(string userId, string notificationType,string message)
         {
             if (!string.IsNullOrEmpty(userId))
             {
-                await _hubCaller.SendNotificationAsync(Guid.Parse(userId), message);
+                await _hubCaller.SendNotificationAsync(Guid.Parse(userId),notificationType ,message);
             }
         }
 

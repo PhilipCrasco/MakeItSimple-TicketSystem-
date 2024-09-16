@@ -1,15 +1,15 @@
-﻿using MakeItSimple.WebApi.Models.Setup.FormSetup;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
+using MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Data.Setup.FormSetup
+namespace MakeItSimple.WebApi.DataAccessLayer.Data.Setup.QuestionModuleSetup
 {
     public class QuestionModulesConfiguration : IEntityTypeConfiguration<QuestionModule>
     {
         public void Configure(EntityTypeBuilder<QuestionModule> builder)
-        { 
+        {
 
             builder.HasOne(u => u.AddedByUser)
            .WithMany()

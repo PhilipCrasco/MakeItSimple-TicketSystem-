@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public Guid? Transacted_By { get; set; }
             public string Reject_Remarks { get; set; }
             public int ? ClosingTicketId { get; set; }
+            public string Modules { get; set; }
 
         }
 
@@ -85,6 +86,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Closing request for ticket number {ticketConcernExist.Id} was rejected.",
+                    AddedBy = userDetails.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = ticketConcernExist.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

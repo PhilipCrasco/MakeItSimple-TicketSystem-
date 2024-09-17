@@ -43,10 +43,13 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\appsettings.json
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebApi.exe
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebApi.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MediatR.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\LazyCache.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Caching.Abstractions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.SqlServer.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Primitives.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\FluentValidation.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.Relational.dll
@@ -57,7 +60,10 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensio
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Packaging.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\System.IdentityModel.Tokens.Jwt.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Tokens.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Newtonsoft.Json.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\FluentValidation.DependencyInjectionExtensions.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Caching.Memory.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\LazyCache.AspNetCore.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Swashbuckle.AspNetCore.Swagger.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFrameworkCore.Abstractions.dll
@@ -66,7 +72,6 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.AspNetCo
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\EFCore.NamingConventions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\BCrypt.Net-Next.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Data.SqlClient.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Newtonsoft.Json.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Frameworks.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Versioning.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Common.dll
@@ -79,8 +84,3 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebAp
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-c.35A3FFBA.Up2Date
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\LazyCache.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Primitives.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Caching.Abstractions.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Caching.Memory.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\LazyCache.AspNetCore.dll

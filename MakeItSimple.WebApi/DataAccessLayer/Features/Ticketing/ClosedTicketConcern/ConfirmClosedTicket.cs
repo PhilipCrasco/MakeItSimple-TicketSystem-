@@ -16,6 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public int? RequestConcernId { get; set; }
             public Guid ? Transacted_By { get; set; }   
+            public string Modules { get; set; }
+
         }
 
         public class Hanler : IRequestHandler<ConfirmClosedTicketCommand, Result>
@@ -64,6 +66,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     ticketHistory.Status = TicketingConString.CloseConfirm;
 
                 }
+
                 //var addTicketHistory = new TicketHistory
                 //{
                 //    TicketConcernId = ticketConcernExist.Id,
@@ -74,6 +77,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 //};
 
                 //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket number {ticketConcernExist.Id} has been closed",
+                    AddedBy = command.Transacted_By.Value,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = requestConcernId.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

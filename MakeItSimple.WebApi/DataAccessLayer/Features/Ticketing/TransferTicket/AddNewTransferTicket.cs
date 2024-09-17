@@ -25,6 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public int? TransferTicketId { get; set; }
             public int ? TicketConcernId { get; set; }
             public string TransferRemarks { get; set; }
+            public string Modules {  get; set; }
             public List<AddTransferAttachment> AddTransferAttachments { get; set; }
 
             public class AddTransferAttachment
@@ -180,6 +181,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                         await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
                     }
+
+
+                    var addNewTicketTransactionNotification = new TicketTransactionNotification
+                    {
+
+                        Message = $"Ticket number {ticketConcernExist.Id} is pending for transfer approval",
+                        AddedBy = userDetails.Id,
+                        Created_At = DateTime.Now,
+                        ReceiveBy = addTransferTicket.TicketApprover.Value,
+                        Modules = command.Modules,
+
+                    };
+
+                    await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 }
 

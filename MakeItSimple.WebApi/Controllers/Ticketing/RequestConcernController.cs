@@ -16,7 +16,6 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
 
@@ -313,27 +312,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
         }
 
-
-        [HttpPut("return")]
-        public async Task<IActionResult> ReturnRequestTicket([FromBody] ReturnRequestTicketCommand command)
-        {
-            try
-            {
-
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
 
         [HttpPost("add-comment")]
         public async Task<IActionResult> AddTicketComment([FromForm] AddTicketCommentCommand command)

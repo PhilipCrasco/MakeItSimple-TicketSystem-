@@ -17,6 +17,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public Guid? UserId { get; set; }
             public string Role { get; set; }
             public int? TicketConcernId { get; set; }
+
+            public string Modules { get; set; } 
             
         }
 
@@ -97,6 +99,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
+
+
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

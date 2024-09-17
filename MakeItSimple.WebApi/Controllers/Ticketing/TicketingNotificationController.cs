@@ -11,6 +11,8 @@ using MakeItSimple.WebApi.Common.Caching;
 using Newtonsoft.Json;
 using System.Text;
 using System.Security.Cryptography;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.GetTicketTransactionNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClickedTransaction;
 
 [ApiController]
 [Route("api/ticketing-notification")]
@@ -40,82 +42,7 @@ public class TicketingNotificationController : ControllerBase
         }
     }
 
-    //private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
-    //{
-    //    try
-    //    {
 
-    //        if (User.Identity is ClaimsIdentity identity &&
-    //            Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-    //        {
-    //            dynamic cmd = command;
-    //            cmd.UserId = userId;
-    //            cmd.Role = identity.FindFirst(ClaimTypes.Role)?.Value;
-
-
-    //            var newData = await _mediator.Send(command);
-
-    //            var timerKey = $"{userId}_{notificationType}";
-
-    //            if (_cacheProvider.TryGetValue(CacheKeys.TicketingNotif, out object cachedResult))
-    //            {
-
-    //                var cachedHash = ComputeHash(cachedResult);
-    //                var newHash = ComputeHash(newData);
-
-    //                if (cachedHash == newHash)
-    //                {
-
-    //                    //var timerKey = $"{userId}_{notificationType}";
-    //                    _timerControl.StopTimer(timerKey);
-
-    //                    return Ok(cachedResult);
-    //                }
-    //            }
-
-    //            var cacheEntryOptions = new MemoryCacheEntryOptions
-    //            {
-    //                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1),
-    //                SlidingExpiration = TimeSpan.FromDays(1),
-    //                Size = 1024
-    //            };
-
-    //            _cacheProvider.Set(CacheKeys.TicketingNotif, newData, cacheEntryOptions);
-
-
-    //            _timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
-    //            {
-    //                using var scope = scopeFactory.CreateScope();
-    //                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-    //                var requestData = await mediator.Send(command);
-
-
-    //                var requestDataHash = ComputeHash(requestData);
-    //                var lastDataHash = ComputeHash(_cacheProvider.Get(CacheKeys.TicketingNotif));
-
-    //                if (requestDataHash != lastDataHash)
-    //                {
-    //                    await _hubCaller.SendNotificationAsync(userId, requestData);
-    //                }
-
-
-    //            }, 2000, 2000);
-
-    //            await _hubCaller.SendNotificationAsync(userId, newData);
-
-    //            return Ok(newData);
-    //        } 
-    //        else
-    //        {
-    //            return Unauthorized("User not autorized");
-    //        }
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Conflict(ex.Message);
-    //    }
-    //}
 
     private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
     {
@@ -189,7 +116,6 @@ public class TicketingNotificationController : ControllerBase
     }
 
 
-
     [HttpGet("ticket-notif")]
     public async Task<IActionResult> TicketingNotification([FromQuery] TicketingNotificationCommand command)
     {
@@ -202,4 +128,34 @@ public class TicketingNotificationController : ControllerBase
     {
         return await HandleNotification(command, "CommentData");
     }
+
+    [HttpGet("ticket-transaction")]
+    public async Task<IActionResult> GetTicketTransactionNotification([FromQuery] GetTicketTransactionNotificationCommand command)
+    {
+        return await HandleNotification(command, "TransactionData");
+    }
+
+
+    [HttpGet("clicked-transaction")]
+    public async Task<IActionResult> ClickedTransaction([FromQuery] ClickedTransactionCommand command)
+    {
+        try
+        {
+            var result = await _mediator.Send(command);
+
+            if(result.IsFailure)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);  
+
+        }
+        catch(Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+
 }

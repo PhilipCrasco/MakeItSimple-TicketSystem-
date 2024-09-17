@@ -23,6 +23,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public int ? TicketConcernId { get; set; }
             public int? ClosingTicketId { get; set; }
             public string Resolution { get; set; } 
+            public string Modules { get; set; } 
             public List<AddClosingAttachment> AddClosingAttachments { get; set; }
 
             public class AddClosingAttachment
@@ -198,6 +199,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         };            
 
                         await _context.TicketHistories.AddAsync(addForConfirmationHistory, cancellationToken);
+
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"Ticket number {ticketConcernExist.Id} is pending for closing approval",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = addNewClosingConcern.TicketApprover.Value,
+                            Modules = command.Modules,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                     }
 

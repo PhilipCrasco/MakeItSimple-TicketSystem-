@@ -33,6 +33,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public DateTime Target_Date { get; set; }
             public string Role { get; set; }
             public string Remarks { get; set; } 
+            public string Modules { get; set; }
 
             public List<ConcernAttachment> ConcernAttachments {  get; set; }
 
@@ -192,14 +193,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcern.Remarks = null;
                     }
 
-                    //if(upsertConcern.IsTransfer is true)
-                    //{
-                    //    upsertConcern.IsTransfer = null;
-                    //    upsertConcern.TransferAt = null;
-                    //    upsertConcern.TransferBy =  null;
-                    //    upsertConcern.Remarks = null;
-
-                    //}
 
                     var requestUpsertConcern = await _context.RequestConcerns
                         .Where(x => x.Id == upsertConcern.RequestConcernId)
@@ -240,6 +233,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     upsertConcern.TicketType = TicketingConString.Concern; 
 
                     removeTicketConcern.Add(upsertConcern);
+
+                    var addNewTicketTransactionNotification = new TicketTransactionNotification
+                    {
+
+                        Message = $"Ticket number {upsertConcern.Id} has been assigned",
+                        AddedBy = userDetails.Id,
+                        Created_At = DateTime.Now,
+                        ReceiveBy = command.UserId.Value,
+                        Modules = command.Modules,
+
+                    };
+
+                    await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
                     await _context.SaveChangesAsync(cancellationToken);
                 }
                 else
@@ -314,6 +321,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                         await _context.TicketHistories.AddAsync(addAssignHistory, cancellationToken);
                     }
+
+                    var addNewTicketTransactionNotification = new TicketTransactionNotification
+                    {
+
+                        Message = $"New concern received from : {userDetails.Fullname}",
+                        AddedBy = userDetails.Id,
+                        Created_At = DateTime.Now,
+                        ReceiveBy = addRequestConcern.UserId.Value,
+                        Modules = command.Modules,
+
+                    };
+
+                    await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 }
 

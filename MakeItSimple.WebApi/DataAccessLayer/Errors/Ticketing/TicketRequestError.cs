@@ -86,5 +86,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
      public static Error ConfirmAlready() =>
      new Error("TicketRequest.ConfirmAlready", "Concern already been confirm!");
+
+     public static Error TransactionNotExist() =>
+     new Error("TicketRequest.TransactionNotExist", "Ticketing Transaction not exist!");
     }
 }

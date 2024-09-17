@@ -14,6 +14,8 @@
         public Guid ReceiveBy { get; set; }
         public virtual User ReceiveByUser { get; set; }
 
+        public bool IsChecked { get; set; } = false;
+
         public string Modules { get; set; }
 
 

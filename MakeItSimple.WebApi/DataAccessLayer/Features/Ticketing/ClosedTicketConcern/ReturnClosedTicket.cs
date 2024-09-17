@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
-    public class ReturnClosedTicket
+    public class ReturnClosedTicket                                                                                                                                                                   
     {
 
         public class ReturnClosedTicketCommand : IRequest<Result>
@@ -21,6 +21,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public string Remarks { get; set; }
 
             public Guid ? Added_By { get; set; }
+
+            public string Modules { get; set; }
 
             public List<ReturnTicketAttachment> ReturnTicketAttachments { get; set; }
             public class ReturnTicketAttachment
@@ -92,6 +94,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Confirmation request for ticket number {ticketConcernExist.Id} was rejected.",
+                    AddedBy = userDetails.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = ticketConcernExist.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 var uploadTasks = new List<Task>();
 

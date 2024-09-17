@@ -19,6 +19,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public string Role { get; set; }
             public int TransferTicketId { get; set; }
 
+            public string Modules { get; set; }
+
             public string Reject_Remarks { get; set; }
         }
 
@@ -104,6 +106,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Transfer request for ticket number {transferTicketExist.TicketConcernId} was rejected.",
+                    AddedBy = userDetails.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = ticketConcernExist.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
@@ -18,6 +19,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
             public Guid? Users { get; set; }
             public Guid? Transacted_By { get; set; }
             public int TransferTicketId { get; set; }
+            public string Modules { get; set; }
 
         }
 
@@ -97,6 +99,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     {
                         transferTicketExist.TicketApprover = validateUserApprover.UserId;
 
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"Ticket number {transferTicketExist.TicketConcernId} is pending for transfer approval",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = validateUserApprover.UserId.Value,
+                            Modules = command.Modules,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
                     }
                     else
                     {
@@ -107,6 +122,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         transferTicketExist.TransferAt = DateTime.Now;
 
                         var ticketConcernExist = await _context.TicketConcerns
+                            .Include(x => x.RequestorByUser)
                             .FirstOrDefaultAsync(x => x.Id == transferTicketExist.TicketConcernId);
 
                         ticketConcernExist.IsTransfer = true;
@@ -124,7 +140,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketConcernExist.TargetDate = null;
                         ticketConcernExist.IsAssigned = null;
 
-                       
+                        var requestorReceiver = await _context.Receivers
+                            .FirstOrDefaultAsync(x => x.BusinessUnitId == ticketConcernExist.RequestorByUser.BusinessUnitId);
+
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"New concern received from : {userDetails.Fullname}",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = requestorReceiver.UserId.Value,
+                            Modules = command.Modules,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+
                     }
 
                 }

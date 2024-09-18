@@ -136,8 +136,8 @@ public class TicketingNotificationController : ControllerBase
     }
 
 
-    [HttpGet("clicked-transaction")]
-    public async Task<IActionResult> ClickedTransaction([FromQuery] ClickedTransactionCommand command)
+    [HttpPost("clicked-transaction")]
+    public async Task<IActionResult> ClickedTransaction([FromBody] ClickedTransactionCommand command)
     {
         try
         {

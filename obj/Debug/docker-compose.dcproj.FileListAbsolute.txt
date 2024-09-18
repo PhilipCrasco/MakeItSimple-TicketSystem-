@@ -76,10 +76,10 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Frameworks.d
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Versioning.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Common.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Configuration.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Logging.dll
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Abstractions.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Identity.Client.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.IdentityModel.Abstractions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebApi.pdb
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache

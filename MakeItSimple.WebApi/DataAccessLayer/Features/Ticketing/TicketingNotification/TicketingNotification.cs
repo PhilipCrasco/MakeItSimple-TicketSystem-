@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup.GetCompany.GetCompanyResult;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
@@ -41,6 +42,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
         {
             public Guid UserId { get; set; }
             public string Role {  get; set; }
+
+            public string Modules { get; set; }
 
         }
 
@@ -507,6 +510,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             ticketHistory.Request = TicketingConString.Confirm;
                             ticketHistory.Status = TicketingConString.CloseConfirm;
                         }
+
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"Ticket number {confirm.Id} has been closed",
+                            AddedBy = request.UserId,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = confirm.UserId.Value,
+                            Modules = request.Modules,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                     }
 

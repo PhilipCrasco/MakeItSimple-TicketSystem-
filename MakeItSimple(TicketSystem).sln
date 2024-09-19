@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AD67F55F-6D7A-409E-AEA4-390FCEEFFB82}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0A46CC87-0BC8-417F-93F8-4924D5C7424F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MakeItSimple.WebApi", "MakeItSimple.WebApi\MakeItSimple.WebApi.csproj", "{12ECBD99-9F88-492F-B3D6-9080D55EF843}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2891EF0C-D7E3-4B2B-9A7B-52E9D353AD21}"

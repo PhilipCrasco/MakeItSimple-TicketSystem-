@@ -133,16 +133,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 }
 
 
-                //if(command.TeamId != null)
-                //{
-                //    var teamNotExist = await _context.Teams.FirstOrDefaultAsync(x => x.Id == command.TeamId, cancellationToken);
-                //    if (teamNotExist == null)
-                //    {
-                //        return Result.Failure(UserError.TeamNotExist());
-                //    }
-
-                //}
-
                 var users = new User
                 {
 
@@ -152,7 +142,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     Password = BCrypt.Net.BCrypt.HashPassword(command.Username),
                     UserRoleId = command.UserRoleId,
                     SubUnitId = command.SubUnitId,
-                    //TeamId = command.TeamId,
+                    ProfilePic = "https://res-console.cloudinary.com/dctfcg76v/thumbnails/v1/image/upload/v1719373008/TWFrZUlUU2ltcGxlL1JERi1GZWF0dXJlZF9zdWJ6dXU=/drilldown",
+                    FileName = "RDF-Featured_subzuu",
+                    FileSize = 84.47m,
                     DepartmentId = command.DepartmentId,    
                     CompanyId = command.CompanyId,  
                     LocationId = LocationNotExist.Id,

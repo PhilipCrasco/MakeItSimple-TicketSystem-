@@ -19,23 +19,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         public class AddNewTransferTicketCommand : IRequest<Result>
         {
             public Guid ? Added_By { get; set; }
-            public Guid ? Requestor_By { get; set; }
+            public Guid ? Modified_By { get; set; }
+            public Guid ? Transacted_By { get; set; }
             public Guid ? Transfer_By { get; set; }
-            public int ChannelId { get; set; }
+            public int? TransferTicketId { get; set; }
+            public int ? TicketConcernId { get; set; }
             public string TransferRemarks { get; set; }
-            public List<AddTransferTicket> AddTransferTickets { get; set; }
+            public string Modules {  get; set; }
             public List<AddTransferAttachment> AddTransferAttachments { get; set; }
-
-            public class AddTransferTicket
-            {
-                public int? RequestGeneratorId { get; set; }
-                public Guid? UserId { get; set; }
-                public DateTime ? Start_Date { get; set; }
-                public DateTime ? Target_Date { get; set; }
-            }
 
             public class AddTransferAttachment
             {
+                public int ? TicketAttachmentId { get; set; }
                 public IFormFile Attachment { get; set; }
             }
         }
@@ -44,8 +39,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
         {
             private readonly MisDbContext _context;
             private readonly Cloudinary _cloudinary;
+            private readonly TransformUrl _url;
 
-            public Handler(MisDbContext context, IOptions<CloudinaryOption> options)
+            public Handler(MisDbContext context, IOptions<CloudinaryOption> options, TransformUrl url)
             {
                 _context = context;
                 var account = new Account(
@@ -54,197 +50,237 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     options.Value.ApiSecret
                     );
                 _cloudinary = new Cloudinary(account);
+                _url = url;
             }
 
             public async Task<Result> Handle(AddNewTransferTicketCommand command, CancellationToken cancellationToken)
             {
-                var transferList = new List<TransferTicketConcern>();
-                var ticketGenerator = new TicketGenerator { IsActive = true };
 
-                await _context.TicketGenerators.AddAsync(ticketGenerator, cancellationToken);
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+               
+                var ticketConcernExist = await _context.TicketConcerns
+                    .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 
-                var channelexist = await _context.Channels.FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
-                if (channelexist is null)
+                if (ticketConcernExist is null)
                 {
-                    return Result.Failure(TransferTicketError.ChannelNotExist());
+                    return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                 }
 
-                foreach (var transferConcern in command.AddTransferTickets)
+                if (ticketConcernExist.IsTransfer is not null)
                 {
-
-                    var userExist = await _context.Users.FirstOrDefaultAsync(x => x.Id == transferConcern.UserId, cancellationToken);
-
-                    if(userExist is null)
+                    if (ticketConcernExist.IsReDate is false || ticketConcernExist.IsReTicket is false
+                        || ticketConcernExist.IsClosedApprove is not null)
                     {
-                        return Result.Failure(TransferTicketError.UserNotExist());
+                        return Result.Failure(TransferTicketError.TransferInvalid());
                     }
-
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == transferConcern.RequestGeneratorId, cancellationToken);
-                    if (requestGeneratorExist != null )
-                    {
-
-                        if (command.AddTransferTickets.Count(x => x.RequestGeneratorId == transferConcern.RequestGeneratorId) > 1)
-                        {
-                            return Result.Failure(TransferTicketError.DuplicateConcernTicket());
-                        }
-
-                        var ticketConcern = await _context.TicketConcerns
-                            .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
-                            && x.UserId == command.Added_By && x.RequestConcernId != null && x.IsActive == true)
-                            .FirstOrDefaultAsync();
-
-                        var ticketConcernList = await _context.TicketConcerns
-                               .Where(x => x.RequestGeneratorId == requestGeneratorExist.Id && x.IsActive == true)
-                               .ToListAsync();
-
-                        foreach (var concern in ticketConcernList)
-                        {
-                            concern.IsTransfer = false;
-                        }
-
-                        if (ticketConcern.UserId == transferConcern.UserId) 
-                        {
-                            return Result.Failure(TransferTicketError.InvalidTransferTicket());
-                        }
-
-                        var transferTicketAlreadyExist = await _context.TransferTicketConcerns
-                            .FirstOrDefaultAsync(x => x.RequestGeneratorId == transferConcern.RequestGeneratorId
-                          && x.IsActive == true && x.IsTransfer == false, cancellationToken);
-
-                        if (transferTicketAlreadyExist != null)
-                        {
-                            return Result.Failure(TransferTicketError.TransferTicketAlreadyExist());  
-                        }
-
-                        await _context.SaveChangesAsync(cancellationToken);
-
-                        var getApproverUser = await _context.Approvers.Include(x => x.User).Where(x => x.SubUnitId == userExist.SubUnitId).ToListAsync();
-                        
-                        var getApproverUserId = getApproverUser.First(x => x.ApproverLevel == getApproverUser.Min(x => x.ApproverLevel));
-
-                        var addTransferTicket = new TransferTicketConcern
-                        {
-                            TicketGeneratorId = ticketGenerator.Id,
-                            RequestGeneratorId = requestGeneratorExist.Id,
-                            ChannelId = command.ChannelId,
-                            UserId = transferConcern.UserId,
-                            ConcernDetails = ticketConcern.ConcernDetails,
-                            TransferRemarks = command.TransferRemarks,
-                            AddedBy = command.Added_By,
-                            StartDate = ticketConcern.StartDate,
-                            TargetDate = ticketConcern.TargetDate,
-                            IsTransfer = false,
-                            TicketApprover = getApproverUserId.UserId
-
-                        };
-
-                        transferList.Add(addTransferTicket);
-                        await _context.TransferTicketConcerns.AddAsync(addTransferTicket, cancellationToken);
-
-                        await _context.SaveChangesAsync(cancellationToken);
-
-                    }
-                    else
-                    {
-                        return Result.Failure(TransferTicketError.TicketIdNotExist());
-                    }
-
-                    var uploadTasks = new List<Task>();
-
-                    if (command.AddTransferAttachments.Count(x => x.Attachment != null) > 0)
-                    {
-                        foreach (var attachments in command.AddTransferAttachments.Where(attachments => attachments.Attachment.Length > 0))
-                        {
-
-   
-                            if (attachments.Attachment == null || attachments.Attachment.Length == 0)
-                            {
-                                return Result.Failure(TicketRequestError.AttachmentNotNull());
-                            }
-
-                            if (attachments.Attachment.Length > 10 * 1024 * 1024)
-                            {
-                                return Result.Failure(TicketRequestError.InvalidAttachmentSize());
-                            }
-
-                            var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
-                            var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
-
-                            if (extension == null || !allowedFileTypes.Contains(extension))
-                            {
-                                return Result.Failure(TicketRequestError.InvalidAttachmentType());
-                            }
-
-                            uploadTasks.Add(Task.Run(async () =>
-                            {
-                                await using var stream = attachments.Attachment.OpenReadStream();
-
-                                var attachmentsParams = new RawUploadParams
-                                {
-                                    File = new FileDescription(attachments.Attachment.FileName, stream),
-                                    PublicId = $"MakeITSimple/Ticketing/Request/{ticketGenerator.Id}/{attachments.Attachment.FileName}"
-                                };
-
-                                var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-
-                                    var addAttachment = new TicketAttachment
-                                    {
-                                        TicketGeneratorId = ticketGenerator.Id,
-                                        Attachment = attachmentResult.SecureUrl.ToString(),
-                                        FileName = attachments.Attachment.FileName,
-                                        FileSize = attachments.Attachment.Length,
-                                        AddedBy = command.Added_By,
-                                    };
-
-                                    await _context.AddAsync(addAttachment, cancellationToken);
-
-                            }, cancellationToken));
-
-                        }
-
-                        await Task.WhenAll(uploadTasks);
-                    }
-
                 }
 
-                var getApprover = await _context.Approvers.Include(x => x.User)
-                    .Where(x => x.SubUnitId == transferList.First().User.SubUnitId).ToListAsync();
+                var approverList = await _context.Approvers
+               .Include(x => x.User)
+               .Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
+               .ToListAsync();
 
-
-                if (getApprover == null)
+                if (approverList == null)
                 {
                     return Result.Failure(TransferTicketError.NoApproverExist());
                 }
 
-                foreach (var approver in getApprover)
+                var transferTicketExist = await _context.TransferTicketConcerns
+                        .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId, cancellationToken);
+
+                if (transferTicketExist is not null)
                 {
-                    var addNewApprover = new ApproverTicketing
+                    var isChange = false;
+
+                    if(transferTicketExist.TransferRemarks != command.TransferRemarks)
                     {
-                        TicketGeneratorId = ticketGenerator.Id,
-                        SubUnitId = approver.SubUnitId,
-                        UserId = approver.UserId,
-                        ApproverLevel = approver.ApproverLevel,
+                        transferTicketExist.TransferRemarks = command.TransferRemarks;
+                    }
+
+                    if(isChange)
+                    {
+                        transferTicketExist.ModifiedBy = command.Modified_By;
+                        transferTicketExist.UpdatedAt = DateTime.Now;
+                    }
+
+                }
+                else
+                {
+
+                    var approverUser = approverList
+                        .FirstOrDefault(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
+
+                    ticketConcernExist.IsTransfer = false;
+
+                    var addTransferTicket = new TransferTicketConcern
+                    {
+                        TicketConcernId = ticketConcernExist.Id,
+                        TransferRemarks = command.TransferRemarks,
+                        TransferBy = command.Transfer_By,
+                        IsTransfer = false,
                         AddedBy = command.Added_By,
-                        CreatedAt = DateTime.Now,
-                        Status = "Transfer",
+                        TicketApprover = approverUser.UserId,
 
                     };
 
-                    await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                    await _context.TransferTicketConcerns.AddAsync(addTransferTicket);
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    transferTicketExist = addTransferTicket;
+
+                    foreach (var approver in approverList)
+                    {
+                        var addNewApprover = new ApproverTicketing
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransferTicketConcernId = addTransferTicket.Id,
+                            UserId = approver.UserId,
+                            ApproverLevel = approver.ApproverLevel,
+                            AddedBy = command.Added_By,
+                            CreatedAt = DateTime.Now,
+                            Status = "Transfer",
+
+                        };
+
+                        await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
+                    }
+
+                    var addTicketHistory = new TicketHistory
+                    {
+
+                        TicketConcernId = ticketConcernExist.Id,
+                        TransactedBy = command.Transacted_By,
+                        TransactionDate = DateTime.Now,
+                        Request = TicketingConString.ForTransfer,
+                        Status = TicketingConString.TransferRequest
+
+                    };
+
+                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                    foreach(var approver in approverList)
+                    {
+
+                        var approverLevel = approver.ApproverLevel == 1 ? $"{approver.ApproverLevel}st"
+                            : approver.ApproverLevel == 2 ? $"{approver.ApproverLevel}nd"
+                            : approver.ApproverLevel == 3 ? $"{approver.ApproverLevel}rd"
+                            : $"{approver.ApproverLevel}th";
+
+
+                        var addApproverHistory = new TicketHistory
+                        {
+                            TicketConcernId = ticketConcernExist.Id,
+                            TransactedBy = approver.UserId,
+                            TransactionDate = DateTime.Now,
+                            Request = TicketingConString.Approval,
+                            Status = $"{TicketingConString.TransferForApproval} {approverLevel} Approver",
+                            Approver_Level = approver.ApproverLevel,
+                            
+                        };
+
+                        await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
+                    }
+
+
+                    var addNewTicketTransactionNotification = new TicketTransactionNotification
+                    {
+
+                        Message = $"Ticket number {ticketConcernExist.Id} is pending for transfer approval",
+                        AddedBy = userDetails.Id,
+                        Created_At = DateTime.Now,
+                        ReceiveBy = addTransferTicket.TicketApprover.Value,
+                        Modules = command.Modules,
+
+                    };
+
+                    await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
                 }
 
-                var addTicketHistory = new TicketHistory
+                var uploadTasks = new List<Task>();
+
+                if (command.AddTransferAttachments.Count(x => x.Attachment != null) > 0)
                 {
-                    
-                   TicketGeneratorId = ticketGenerator.Id,
-                   RequestorBy = command.Requestor_By,
-                   TransactionDate = DateTime.Now,
-                   Request = TicketingConString.Transfer,
-                   Status = TicketingConString.RequestCreated
 
-                };
+                    foreach (var attachments in command.AddTransferAttachments.Where(attachments => attachments.Attachment.Length > 0))
+                    {
 
-                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                        var ticketAttachment = await _context.TicketAttachments
+                         .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
+                        {
+                            return Result.Failure(TicketRequestError.AttachmentNotNull());
+                        }
+
+                        if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                        }
+
+                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                        if (extension == null || !allowedFileTypes.Contains(extension))
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                        }
+
+                        uploadTasks.Add(Task.Run(async () =>
+                        {
+                            await using var stream = attachments.Attachment.OpenReadStream();
+
+                            var attachmentsParams = new RawUploadParams
+                            {
+                                File = new FileDescription(attachments.Attachment.FileName, stream),
+                                PublicId = $"MakeITSimple/Ticketing/Transfer/{userDetails.Fullname}/{attachments.Attachment.FileName}"
+                            };
+
+                            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+                            string attachmentUrl = attachmentResult.SecureUrl.ToString();
+                            string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
+
+                            if (ticketAttachment is not null)
+                            {
+
+                                var hasChanged = false;
+
+                                if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
+                                {
+                                    ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
+                                    hasChanged = true;
+                                }
+
+                                if (hasChanged)
+                                {
+                                    ticketAttachment.ModifiedBy = command.Modified_By;
+                                    ticketAttachment.FileName = attachments.Attachment.FileName;
+                                    ticketAttachment.FileSize = attachments.Attachment.Length;
+                                    ticketAttachment.UpdatedAt = DateTime.Now;
+                                }
+
+                            }
+                            else
+                            {
+                                var addAttachment = new TicketAttachment
+                                {
+                                    TransferTicketConcernId = transferTicketExist.Id,
+                                    Attachment = attachmentResult.SecureUrl.ToString(),
+                                    FileName = attachments.Attachment.FileName,
+                                    FileSize = attachments.Attachment.Length,
+                                    AddedBy = command.Added_By,
+                                };
+
+                                await _context.AddAsync(addAttachment, cancellationToken);
+                            }
+
+                        }, cancellationToken));
+
+                    }
+
+                    await Task.WhenAll(uploadTasks);
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

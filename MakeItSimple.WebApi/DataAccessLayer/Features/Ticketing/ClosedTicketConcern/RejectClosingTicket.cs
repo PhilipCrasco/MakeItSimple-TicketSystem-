@@ -5,6 +5,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
@@ -13,17 +14,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         public class RejectClosingTicketCommand : IRequest<Result>
         {
             public Guid? RejectClosed_By { get; set; }
-            public Guid? Requestor_By { get; set; }
-            public Guid? Approver_By { get; set; }
-            //public string Role { get; set; }
+            public Guid? Transacted_By { get; set; }
             public string Reject_Remarks { get; set; }
+            public int ? ClosingTicketId { get; set; }
+            public string Modules { get; set; }
 
-            public ICollection<RejectClosedTicketConcern> RejectClosedTicketConcerns { get; set; }
-            public class RejectClosedTicketConcern
-            {
-                public int TicketGeneratorId { get; set; }
-
-            }
         }
 
         public class Handler : IRequestHandler<RejectClosingTicketCommand, Result>
@@ -37,55 +32,73 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             public async Task<Result> Handle(RejectClosingTicketCommand command, CancellationToken cancellationToken)
             {
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
+                var closedTicketExist = await _context.ClosingTickets
+                        .FirstOrDefaultAsync(x => x.Id == command.ClosingTicketId);
 
-
-                foreach (var close in command.RejectClosedTicketConcerns)
+                if (closedTicketExist == null)
                 {
-                    var requestGeneratorExist = await _context.TicketGenerators.FirstOrDefaultAsync(x => x.Id == close.TicketGeneratorId, cancellationToken);
-
-                    if (requestGeneratorExist == null)
-                    {
-                        return Result.Failure(ClosingTicketError.TicketIdNotExist());
-                    }
-
-                    var closedList = await _context.ClosingTickets.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var approverUserList = await _context.ApproverTicketings.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var approverLevelValidation = approverUserList.FirstOrDefault(x => x.ApproverLevel == approverUserList.Min(x => x.ApproverLevel));
-
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == requestGeneratorExist.Id).ToListAsync();
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
-
-                    foreach (var approverUserId in approverUserList)
-                    {
-                        approverUserId.IsApprove = null;
-                    }
-
-                    foreach (var perTicketId in closedList)
-                    {
-                        perTicketId.RejectClosedAt = DateTime.Now;
-                        perTicketId.IsRejectClosed = true;
-                        perTicketId.RejectClosedBy = command.RejectClosed_By;
-                        perTicketId.TicketApprover = approverLevelValidation.UserId;
-                        perTicketId.RejectRemarks = command.Reject_Remarks;
-                    }
-
-                    if (ticketHistoryId.Status != TicketingConString.RejectedBy)
-                    {
-                        var addTicketHistory = new TicketHistory
-                        {
-                            TicketGeneratorId = requestGeneratorExist.Id,
-                            RequestorBy = closedList.First().AddedBy,
-                            ApproverBy = command.Approver_By,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.CloseTicket,
-                            Status = TicketingConString.RejectedBy
-                        };
-
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
-                    }
+                    return Result.Failure(ClosingTicketError.ClosingTicketIdNotExist());
                 }
+
+                closedTicketExist.RejectClosedAt = DateTime.Now;
+                closedTicketExist.IsRejectClosed = true;
+                closedTicketExist.RejectClosedBy = command.RejectClosed_By;
+                closedTicketExist.RejectRemarks = command.Reject_Remarks;
+
+                var ticketConcernExist = await _context.TicketConcerns
+                    .FirstOrDefaultAsync(x => x.Id == closedTicketExist.TicketConcernId);
+
+                ticketConcernExist.IsClosedApprove = null;
+                ticketConcernExist.Remarks = command.Reject_Remarks;
+
+                var approverList = await _context.ApproverTicketings
+                    .Where(x => x.ClosingTicketId == command.ClosingTicketId)
+                    .ToListAsync();
+
+                foreach (var transferTicket in approverList)
+                {
+                    _context.Remove(transferTicket);
+                }
+
+                var ticketHistory = await _context.TicketHistories
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id)
+                    .Where(x => (x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                     || x.Request.Contains(TicketingConString.NotConfirm))
+                    .ToListAsync();
+
+                foreach (var item in ticketHistory)
+                {
+                    _context.TicketHistories.Remove(item);
+                }
+
+                var addTicketHistory = new TicketHistory
+                {
+                    TicketConcernId = closedTicketExist.TicketConcernId,
+                    TransactedBy = command.Transacted_By,
+                    TransactionDate = DateTime.Now,
+                    Request = TicketingConString.Reject,
+                    Status = $"{TicketingConString.CloseReject} {userDetails.Fullname}",
+                    Remarks = command.Reject_Remarks,
+                    
+                };
+
+                await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Closing request for ticket number {ticketConcernExist.Id} was rejected.",
+                    AddedBy = userDetails.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = ticketConcernExist.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

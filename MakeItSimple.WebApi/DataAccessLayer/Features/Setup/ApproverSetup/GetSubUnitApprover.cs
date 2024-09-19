@@ -32,11 +32,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
             public async Task<Result> Handle(GetSubUnitApproverCommand request, CancellationToken cancellationToken)
             {
-                var approverList = await _context.Approvers.ToListAsync();
+                var approverList = await _context.Approvers
+                    .Select(x => x.SubUnitId)
+                    .ToListAsync();              
 
-                var selectApprover = approverList.Select(x => x.SubUnitId);
-
-                var subUnitList = await _context.SubUnits.Where(x => !selectApprover.Contains(x.Id) && x.IsActive == true).Select(x => new GetSubUnitApproverResult
+                var subUnitList = await _context.SubUnits
+                    .Where(x => !approverList.Contains(x.Id) && x.IsActive == true)
+                    .Select(x => new GetSubUnitApproverResult
                 {
                     SubUnitId = x.Id,
                     SubUnit_Code = x.SubUnitCode,

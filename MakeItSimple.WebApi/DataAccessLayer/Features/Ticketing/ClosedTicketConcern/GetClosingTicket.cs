@@ -1,11 +1,11 @@
 ﻿using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
+using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq.Extensions;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ReTicket.GetReTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
 {
@@ -14,20 +14,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
         public class GetClosingTicketResults
         {
-            public int? TicketGeneratorId { get; set; }
-            public int ? DepartmentId { get; set; }
+            //public int? TicketTransactionId { get; set; }
+            public int ClosingTicketId { get; set; }
+            public int TicketConcernId { get; set; }
+            public string Resolution { get; set; }
+            public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
-            public int ? UnitId { get; set; }
-            public string Unit_Name { get; set; }
-            public int ? SubUnitId { get; set; }
-            public string SubUnit_Name { get; set; }
+            public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
             public Guid? UserId { get; set; }
             public string Fullname { get; set; }
-            public bool IsActive { get; set; }
-
-            //public int ? Delay_Days { get; set; }
-
+            public string Concern_Details { get; set; }
+            public string Category_Description { get; set; }
+            public string SubCategoryDescription { get; set; }
+            public int? Delay_Days { get; set; }
             public string Closed_By { get; set; }
             public DateTime? Closed_At { get; set; }
             public string Closed_Status { get; set; }
@@ -35,40 +35,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public string RejectClosed_By { get; set; }
             public DateTime? RejectClosed_At { get; set; }
             public string Reject_Remarks { get; set; }
-            public int RequestCount { get; set; }
+            public string Added_By { get; set; }
+            public DateTime Created_At { get; set; }
+            public string Modified_By { get; set; }
+            public DateTime? Updated_At { get; set; }
+            public DateTime? Start_Date { get; set; }
+            public DateTime? Target_Date { get; set; }
 
-            public List<GetClosedTicketConcern> GetClosedTicketConcerns {  get; set; }
+            public List<ClosingAttachment> ClosingAttachments { get; set; }
 
-            public class GetClosedTicketConcern
+            public class ClosingAttachment
             {
-                public int ClosingTicketId { get; set; }
-                public int TicketConcernId { get; set; }
-                public string Concern_Details { get; set; }
-                public string Category_Description { get; set; }
-                public string SubCategoryDescription { get; set; }
-                public int? Delay_Days { get; set; }
+                public int? TicketAttachmentId { get; set; }
+                public string Attachment { get; set; }
+                public string FileName { get; set; }
+                public decimal? FileSize { get; set; }
                 public string Added_By { get; set; }
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; }
-                public DateTime? Start_Date { get; set; }
-                public DateTime? Target_Date { get; set; }
             }
-            
+
         }
 
 
-        public class GetClosingTicketQuery : UserParams , IRequest<PagedList<GetClosingTicketResults>>
+        public class GetClosingTicketQuery : UserParams, IRequest<PagedList<GetClosingTicketResults>>
         {
             public Guid? UserId { get; set; }
-            public string Approver { get; set; }
-            public string Users { get; set; }
+            public string UserType { get; set; }
             public string Role { get; set; }
             public string Search { get; set; }
             public bool? IsClosed { get; set; }
             public bool? IsReject { get; set; }
-            //public Guid? UserApproverId { get; set; }
-
 
         }
 
@@ -84,37 +82,60 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public async Task<PagedList<GetClosingTicketResults>> Handle(GetClosingTicketQuery request, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
+                var businessUnitList = new List<BusinessUnit>();
 
                 IQueryable<ClosingTicket> closingTicketsQuery = _context.ClosingTickets
+                    .AsNoTracking()
                     .Include(x => x.AddedByUser)
-                    .Include(x => x.Channel)
-                    .Include(x => x.User)
-                    .ThenInclude(x => x.BusinessUnit)
-                    .Include(x => x.RejectClosedByUser) 
-                    .Include(x => x.ClosedByUser);
+                    .Include(x => x.RejectClosedByUser)
+                    .Include(x => x.ClosedByUser)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.User)
+                    .ThenInclude(x => x.Department)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.User)
+                    .ThenInclude(x => x.SubUnit)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.Channel)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.Category)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.SubCategory)
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.RequestorByUser);
 
 
-                if(closingTicketsQuery.Count() > 0)
+
+                if (closingTicketsQuery.Any())
                 {
-                    var closingTicket = closingTicketsQuery.Include(x => x.User).ThenInclude(x => x.BusinessUnit).Select(x => x.User.BusinessUnitId);
-                    var receiverList = await _context.Receivers.Include(x => x.User).FirstOrDefaultAsync(x => closingTicket.Contains(x.BusinessUnitId));
-                    var userApprover = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
-                    var fillterApproval = closingTicketsQuery.Select(x => x.RequestGeneratorId);
 
-                    var allUserList = await _context.UserRoles.ToListAsync();
+                    var allUserList = await _context.UserRoles
+                        .AsNoTracking()
+                        .Select(x => new
+                        {
+                            x.Id,
+                            x.UserRoleName,
+                            x.Permissions
 
-                    var receiverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+                        }).ToListAsync();
 
-                    var approverPermissionList = allUserList.Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                    var receiverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Receiver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
-
+                    var approverPermissionList = allUserList
+                        .Where(x => x.Permissions
+                        .Contains(TicketingConString.Approver))
+                        .Select(x => x.UserRoleName)
+                        .ToList();
 
                     if (!string.IsNullOrEmpty(request.Search))
                     {
-                        closingTicketsQuery = closingTicketsQuery.Where(x => x.User.Fullname.Contains(request.Search)
-                                        || x.User.EmpId.Contains(request.Search));
+                        closingTicketsQuery = closingTicketsQuery
+                            .Where(x => x.TicketConcern.User.Fullname.Contains(request.Search)
+                                        || x.TicketConcernId.ToString().Contains(request.Search));
                     }
 
                     if (request.IsReject != null)
@@ -127,103 +148,160 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         closingTicketsQuery = closingTicketsQuery.Where(x => x.IsClosing == request.IsClosed);
                     }
 
-                    if (TicketingConString.Approver == request.Approver)
+                    if (!string.IsNullOrEmpty(request.UserType))
                     {
+                        var filterApproval = closingTicketsQuery.Select(x => x.Id);
 
-                        if (request.UserId != null && approverPermissionList.Any(x => x.Contains(request.Role)))
+                        if (request.UserType == TicketingConString.Approver)
                         {
-                            var approverTransactList = await _context.ApproverTicketings.Where(x => x.UserId == userApprover.Id).ToListAsync();
-                            var approvalLevelList = approverTransactList.Where(x => x.ApproverLevel == approverTransactList.First().ApproverLevel && x.IsApprove == null).ToList();
-                            var userRequestIdApprovalList = approvalLevelList.Select(x => x.TicketGeneratorId);
-                            var userIdsInApprovalList = approvalLevelList.Select(approval => approval.UserId);
-                            closingTicketsQuery = closingTicketsQuery.Where(x => userIdsInApprovalList.Contains(x.TicketApprover) && userRequestIdApprovalList.Contains(x.TicketGeneratorId));
 
+                            if (approverPermissionList.Any(x => x.Contains(request.Role)))
+                            {
+
+                                var userApprover = await _context.Users
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+
+                                var approverTransactList = await _context.ApproverTicketings
+                                    .AsNoTracking()
+                                    .Where(x => x.UserId == userApprover.Id)
+                                    .Where(x => x.IsApprove == null)
+                                    .Select(x => new
+                                    {
+                                        x.ApproverLevel,
+                                        x.IsApprove,
+                                        x.ClosingTicketId,
+                                        x.UserId,
+
+                                    })
+                                    .ToListAsync();
+
+                                var userRequestIdApprovalList = approverTransactList.Select(x => x.ClosingTicketId);
+                                var userIdsInApprovalList = approverTransactList.Select(approval => approval.UserId);
+
+                                closingTicketsQuery = closingTicketsQuery
+                                    .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
+                                    && userRequestIdApprovalList.Contains(x.Id));
+
+                            }
                         }
 
-                        else if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList != null)
+                        else if (request.UserType == TicketingConString.Receiver)
                         {
-                            if (request.UserId == receiverList.UserId)
-                            {
-                                var approverTransactList = await _context.ApproverTicketings.Where(x => fillterApproval.Contains(x.TicketGeneratorId) && x.IsApprove == null).ToListAsync();
 
-                                if (approverTransactList != null && approverTransactList.Any())
+                            var listOfRequest = await closingTicketsQuery.Select(x => new
+                            {
+                                x.TicketConcern.User.BusinessUnitId
+
+                            }).ToListAsync();
+
+                            foreach (var businessUnit in listOfRequest)
+                            {
+                                var businessUnitDefault = await _context.BusinessUnits
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
+                                businessUnitList.Add(businessUnitDefault);
+
+                            }
+
+                            var businessSelect = businessUnitList.Select(x => x.Id).ToList();
+
+                            var receiverList = await _context.Receivers
+                                .Include(x => x.BusinessUnit)
+                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
+                                 x.UserId == request.UserId)
+                                .ToListAsync();
+
+                            var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
+
+                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
+                            {
+
+                                var approverTransactList = await _context.ApproverTicketings
+                                    .AsNoTracking()
+                                    .Where(x => filterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
+                                    .ToListAsync();
+
+                                if (approverTransactList.Any())
                                 {
-                                    var generatedIdInApprovalList = approverTransactList.Select(approval => approval.TicketGeneratorId);
-                                    closingTicketsQuery = closingTicketsQuery.Where(x => !generatedIdInApprovalList.Contains(x.TicketGeneratorId));
+                                    var generatedIdInApprovalList = approverTransactList
+                                        .Select(approval => approval.ClosingTicketId);
+
+                                    closingTicketsQuery = closingTicketsQuery
+                                        .Where(x => !generatedIdInApprovalList.Contains(x.Id));
+
                                 }
-                                var receiver = await _context.TicketConcerns.Include(x => x.RequestorByUser).Where(x => x.RequestorByUser.BusinessUnitId == receiverList.BusinessUnitId).ToListAsync();
-                                var receiverContains = receiver.Select(x => x.RequestorByUser.BusinessUnitId);
-                                closingTicketsQuery = closingTicketsQuery.Where(x => receiverContains.Contains(x.User.BusinessUnitId));
-                            }
-                            else
-                            {
-                                closingTicketsQuery = closingTicketsQuery.Where(x => x.TicketGeneratorId == null);
+
+                                closingTicketsQuery = closingTicketsQuery
+                                    .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId));
+
                             }
 
+                        }
+                        else if (request.UserType == TicketingConString.Users)
+                        {
+                            closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
                         }
                         else
                         {
-                            closingTicketsQuery = closingTicketsQuery.Where(x => x.TicketGeneratorId == null);
+                            return new PagedList<GetClosingTicketResults>(new List<GetClosingTicketResults>(), 0, request.PageNumber, request.PageSize);
                         }
 
                     }
 
-
-                    if (TicketingConString.Users == request.Users)
-                    {
-                        closingTicketsQuery = closingTicketsQuery.Where(x => x.AddedByUser.Id == request.UserId);
-                    }
                 }
-                //if()
 
-                var distictQuery = closingTicketsQuery.Select(x => x.TicketGeneratorId).Distinct();
-
-                var results = closingTicketsQuery.GroupBy(x => x.TicketGeneratorId)
+                var results = closingTicketsQuery
                     .Select(x => new GetClosingTicketResults
                     {
-                        TicketGeneratorId = x.Key,
-                        DepartmentId = x.First().User.DepartmentId,
-                        Department_Name = x.First().User.Department.DepartmentName,
-                        UnitId = x.First().User.UnitId,
-                        Unit_Name = x.First().User.Units.UnitName,
-                        SubUnitId = x.First().User.SubUnitId,
-                        SubUnit_Name = x.First().User.SubUnit.SubUnitName,
-                        Channel_Name = x.First().Channel.ChannelName,
-                        UserId = x.First().UserId,   
-                        Fullname = x.First().User.Fullname,
-                        IsActive = x.First().User.IsActive,
-                        RejectClosed_By = x.First().RejectClosedByUser.Fullname,
-                        RejectClosed_At= x.First().RejectClosedAt,
-                        Reject_Remarks = x.First().RejectRemarks,
-                        Closed_By = x.First().ClosedByUser.Fullname,
-                        Closed_At = x.First().ClosingAt,
-                        RequestCount = distictQuery.Count() ,
-                        Closed_Remarks = x.First().ClosingRemarks,
-                        GetClosedTicketConcerns = x.Select(x => new GetClosingTicketResults.GetClosedTicketConcern
+                        ClosingTicketId = x.Id,
+                        TicketConcernId = x.TicketConcernId,
+                        Resolution = x.Resolution,
+                        DepartmentId = x.TicketConcern.User.DepartmentId,
+                        Department_Name = x.TicketConcern.User.Department.DepartmentName,
+                        ChannelId = x.TicketConcern.ChannelId,
+                        Channel_Name = x.TicketConcern.Channel.ChannelName,
+                        UserId = x.TicketConcern.UserId,
+                        Fullname = x.TicketConcern.User.Fullname,
+                        Concern_Details = x.TicketConcern.ConcernDetails,
+                        Category_Description = x.TicketConcern.Category.CategoryDescription,
+                        SubCategoryDescription = x.TicketConcern.SubCategory.SubCategoryDescription,
+                        RejectClosed_By = x.RejectClosedByUser.Fullname,
+                        RejectClosed_At = x.RejectClosedAt,
+                        Reject_Remarks = x.RejectRemarks,
+                        Closed_By = x.ClosedByUser.Fullname,
+                        Closed_At = x.ClosingAt,
+                        Closed_Remarks = x.ClosingRemarks,
+                        Start_Date = x.TicketConcern.StartDate,
+                        Target_Date = x.TicketConcern.TargetDate,
+                        Delay_Days = x.TicketConcern.TargetDate < dateToday && x.ClosingAt == null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, dateToday)
+                            : x.TicketConcern.TargetDate < x.ClosingAt && x.ClosingAt != null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, x.ClosingAt) : 0,
+
+                        Added_By = x.AddedByUser.Fullname,
+                        Created_At = x.CreatedAt,
+                        Updated_At = x.UpdatedAt,
+                        Modified_By = x.ModifiedByUser.Fullname,
+
+                        ClosingAttachments = x.TicketAttachments.Select(x => new GetClosingTicketResults.ClosingAttachment
                         {
-                         
-                            ClosingTicketId = x.Id,
-                            TicketConcernId = x.TicketConcernId,
-                            Concern_Details = x.ConcernDetails,
-                            Category_Description = x.Category.CategoryDescription,
-                            SubCategoryDescription = x.SubCategory.SubCategoryDescription,
-                            Start_Date = x.StartDate,
-                            Target_Date = x.TargetDate,
-                            Delay_Days = x.TargetDate < dateToday && x.ClosingAt == null ? EF.Functions.DateDiffDay(x.TargetDate, dateToday)
-                            : x.TargetDate < x.ClosingAt && x.ClosingAt != null ? EF.Functions.DateDiffDay(x.TargetDate, x.ClosingAt) : 0,
+
+                            TicketAttachmentId = x.Id,
+                            Attachment = x.Attachment,
+                            FileName = x.FileName,
+                            FileSize = x.FileSize,
                             Added_By = x.AddedByUser.Fullname,
                             Created_At = x.CreatedAt,
+                            Modified_By = x.ModifiedByUser.Fullname,
                             Updated_At = x.UpdatedAt,
-                            Modified_By = x.ModifiedByUser.Fullname
 
                         }).ToList(),
+
+
                     });
 
                 return await PagedList<GetClosingTicketResults>.CreateAsync(results, request.PageNumber, request.PageSize);
             }
         }
     }
-
-
 
 }

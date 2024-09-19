@@ -13,7 +13,7 @@ namespace MakeItSimple.WebApi.Common.Pagination
 
         public int TotalCount { get;  private set; }
 
-        public bool HasPreviousPage { get; private set; }
+        public bool HasPreviousPage { get; private set; } 
 
         public bool HasNextPage { get; private set; }
         public bool IsFailure { get; internal set; }
@@ -36,9 +36,6 @@ namespace MakeItSimple.WebApi.Common.Pagination
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
 
-        internal static Task<PagedList<GetUser.GetUserResult>> CreateAsync(List<GetUser.GetUserResult> users, int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }

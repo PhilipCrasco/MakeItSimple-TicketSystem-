@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount;
 using MakeItSimple.WebApi.DataAccessLayer.ValidatorHandler;
 using MediatR;
@@ -8,9 +9,11 @@ using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures.GetUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.AddNewUser;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures.UpdateUser;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateProfilePic;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UpdateUserStatus;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserChangePassword;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.UserManagement.UserAccount.UserResetPassword;
+using static NuGet.Packaging.PackagingConstants;
 
 
 namespace MakeItSimple.WebApi.Controllers.UserController
@@ -20,7 +23,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
     public class UserController : ControllerBase
     {
 
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator; 
         private readonly ValidatorHandler _validatorHandler;
 
 
@@ -28,9 +31,7 @@ namespace MakeItSimple.WebApi.Controllers.UserController
         {
             _mediator = mediator;
             _validatorHandler = validatorHandler;
-
         }
-
 
         [HttpGet("GetUser")]
         public async Task<IActionResult> GetUser([FromQuery] GetUsersQuery query)
@@ -70,7 +71,6 @@ namespace MakeItSimple.WebApi.Controllers.UserController
                 return Conflict(ex.Message);
             }
         }
-
 
 
         [HttpPost("AddNewUser")]
@@ -198,8 +198,30 @@ namespace MakeItSimple.WebApi.Controllers.UserController
             }
         }
 
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfilePic([FromForm] UpdateProfilePicCommand command)
+        {
+            try
+            {
 
+                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                {
+                    command.UserId = userId;
+                }
 
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
 
 
 

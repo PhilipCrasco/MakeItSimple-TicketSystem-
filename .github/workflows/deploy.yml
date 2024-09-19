@@ -35,12 +35,20 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
+<<<<<<< HEAD
         run: dotnet restore ./RDF.Arcana.API/RDF.Arcana.API.csproj
+=======
+        run: dotnet restore ./MakeItSimple.WebApi/MakeItSimple.WebApi.csproj
+>>>>>>> Development
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
+<<<<<<< HEAD
         run: dotnet publish ./RDF.Arcana.API/RDF.Arcana.API.csproj --configuration Release
+=======
+        run: dotnet publish ./MakeItSimple.WebApi/MakeItSimple.WebApi.csproj --configuration Release
+>>>>>>> Development
 
       - name: Deploy
         id: deploy
@@ -58,7 +66,11 @@ jobs:
           elif [ "${{ github.ref }}" = "refs/heads/Development" ]; then
               # Deploy to 'deploy-dev' folder for development branch changes
             mkdir deploy-dev
+<<<<<<< HEAD
             cp -R ./MakeItSimple-TicketSystem-/MakeItSimple.WebApi/bin/Release/net7.0/publish deploy-dev/
+=======
+            cp -R ./MakeItSimple.WebApi/bin/Release/net7.0/publish deploy-dev/
+>>>>>>> Development
             cd deploy-dev
             git init
             git add .

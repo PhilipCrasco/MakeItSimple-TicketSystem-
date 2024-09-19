@@ -1,255 +1,161 @@
-﻿using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification;
+﻿using MakeItSimple.WebApi;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using System.Security.Claims;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClosingTicketNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.CommentNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.OpenTicketNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.RequestTicketNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ReTicketNotification;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TransferTicketNotification;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.TicketingNotification;
+using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
+using MakeItSimple.WebApi.Common.SignalR;
+using LazyCache;
+using MakeItSimple.WebApi.Common.Caching;
+using Newtonsoft.Json;
+using System.Text;
+using System.Security.Cryptography;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.GetTicketTransactionNotification;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClickedTransaction;
 
-
-namespace MakeItSimple.WebApi.Controllers.Ticketing
+[ApiController]
+[Route("api/ticketing-notification")]
+public class TicketingNotificationController : ControllerBase
 {
-    [Route("api/ticketing-notification")]
-    [ApiController]
-    public class TicketingNotificationController : ControllerBase
+    private readonly IMediator _mediator;
+    private readonly IHubCaller _hubCaller;
+    private readonly TimerControl _timerControl;
+
+    private ICacheProvider _cacheProvider;
+
+    public TicketingNotificationController(IMediator mediator, IHubCaller hubCaller, TimerControl timerControl , ICacheProvider cacheProvider)
     {
-        private readonly IMediator _mediator;
-        private readonly IHubContext<NotificationHub> _hubContext;
-
-        public TicketingNotificationController(IMediator mediator , IHubContext<NotificationHub> hubContext)
-        {
-            _mediator = mediator;
-            _hubContext = hubContext;
-        }
-
-        [HttpGet("ticket-request")]
-        public async Task<IActionResult> RequestTicketNotification([FromQuery] RequestTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpGet("transfer-ticket")]
-        public async Task<IActionResult> TransferTicketNotification([FromQuery] TransferTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)              
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpGet("re-ticket")]
-        public async Task<IActionResult> ReTicketNotification([FromQuery] ReTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpGet("closing-ticket")]
-        public async Task<IActionResult> ClosingTicketNotification([FromQuery] ClosingTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpGet("open-ticket")]
-        public async Task<IActionResult> OpenTicketNotification([FromQuery] OpenTicketNotificationResultQuery command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-
-                // Notify clients using SignalR
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpGet("ticket-comment")]
-        public async Task<IActionResult> CommentNotification([FromQuery] CommentNotificationQueryResult command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        //query.Users = userId;
-                        command.UserId = userId;
-
-                    }
-                }
-
-                var results = await _mediator.Send(command);
-                await _hubContext.Clients.All.SendAsync("SendingMessage", results);
-
-                return Ok(results);
-
-            }
-            catch(Exception ex) 
-            {
-                return Conflict(ex.Message);
-
-            }
-        }
-
-
-
-
+        _mediator = mediator;
+        _hubCaller = hubCaller;
+        _timerControl = timerControl;
+        _cacheProvider = cacheProvider;
     }
+
+    private string ComputeHash(object obj)
+    {
+        var jsonString = JsonConvert.SerializeObject(obj);
+        using (var sha256 = SHA256.Create())
+        {
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(jsonString));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
+    }
+
+
+
+    private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
+    {
+        try
+        {
+            if (User.Identity is ClaimsIdentity identity &&
+                Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+            {
+                dynamic cmd = command;
+                cmd.UserId = userId;
+                cmd.Role = identity.FindFirst(ClaimTypes.Role)?.Value;
+
+                var cacheKey = $"{userId}_{notificationType}_CacheKey";
+                var timerKey = $"{userId}_{notificationType}";
+
+                var newData = await _mediator.Send(command);
+                var newHash = ComputeHash(newData);
+
+                if (_cacheProvider.TryGetValue(cacheKey, out object cachedResult))
+                {
+                    var cachedHash = ComputeHash(cachedResult);
+
+                    if (cachedHash == newHash)
+                    {
+                        _timerControl.StopTimer(timerKey); 
+                        return Ok(cachedResult);
+                    }
+                }
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1),
+                    SlidingExpiration = TimeSpan.FromDays(1),
+                    Size = 1024
+                };
+
+                _cacheProvider.Set(cacheKey, newData, cacheEntryOptions);
+
+                _timerControl.ScheduleTimer(timerKey, async (scopeFactory) =>
+                {
+                    using var scope = scopeFactory.CreateScope();
+                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                    var requestData = await mediator.Send(command);
+
+                    var requestDataHash = ComputeHash(requestData);
+                    var lastDataHash = ComputeHash(_cacheProvider.Get(cacheKey));
+
+                    if (requestDataHash != lastDataHash)
+                    {
+
+                        _cacheProvider.Set(cacheKey, requestData, cacheEntryOptions);
+                        await _hubCaller.SendNotificationAsync(userId,notificationType,requestData);
+                    }
+
+                }, 5000, 5000);
+
+
+                await _hubCaller.SendNotificationAsync(userId,notificationType,newData);
+
+                return Ok(newData);
+            }
+            else
+            {
+                return Unauthorized("User not authorized");
+            }
+        }
+        catch (Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+
+    [HttpGet("ticket-notif")]
+    public async Task<IActionResult> TicketingNotification([FromQuery] TicketingNotificationCommand command)
+    {
+
+        return await HandleNotification(command, "TicketNotifData");
+    }
+
+    [HttpGet("ticket-comment")]
+    public async Task<IActionResult> CommentNotification([FromQuery] CommentNotificationQueryResult command)
+    {
+        return await HandleNotification(command, "CommentData");
+    }
+
+    [HttpGet("ticket-transaction")]
+    public async Task<IActionResult> GetTicketTransactionNotification([FromQuery] GetTicketTransactionNotificationCommand command)
+    {
+        return await HandleNotification(command, "TransactionData");
+    }
+
+
+    [HttpPost("clicked-transaction")]
+    public async Task<IActionResult> ClickedTransaction([FromBody] ClickedTransactionCommand command)
+    {
+        try
+        {
+            var result = await _mediator.Send(command);
+
+            if(result.IsFailure)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);  
+
+        }
+        catch(Exception ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+
 }

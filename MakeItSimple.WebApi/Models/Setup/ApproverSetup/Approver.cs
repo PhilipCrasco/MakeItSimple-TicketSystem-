@@ -1,7 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
-using MakeItSimple.WebApi.Models.Setup.TeamSetup;
 
 namespace MakeItSimple.WebApi.Models.Setup.ApproverSetup
 {

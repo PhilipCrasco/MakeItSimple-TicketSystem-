@@ -10,15 +10,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing
         {
 
 
-            builder.HasOne(u => u.RequestorByUser)
+            builder.HasOne(u => u.TransactedByUser)
            .WithMany()
-           .HasForeignKey(u => u.RequestorBy)
+           .HasForeignKey(u => u.TransactedBy)
            .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(u => u.ApproverByUser)
-           .WithMany()
-           .HasForeignKey(u => u.ApproverBy)
-           .OnDelete(DeleteBehavior.Restrict);
+           // builder.HasOne(u => u.ApproverByUser)
+           //.WithMany()
+           //.HasForeignKey(u => u.ApproverBy)
+           //.OnDelete(DeleteBehavior.Restrict);
 
 
         }

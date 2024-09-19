@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
 using MakeItSimple.WebApi.Common.Cloudinary;
-using MakeItSimple.WebApi.DataAccessLayer.Features.SignalRNotification;
+using MakeItSimple.WebApi;
+using Microsoft.AspNetCore.Http.Connections;
+using MakeItSimple.WebApi.Common.SignalR;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,15 +24,16 @@ var config = builder.Configuration;
 // Add services to the container.
 
 
-var connectionString = builder.Configuration.GetConnectionString("DevConnection");
-
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
+var connectionString = builder.Configuration.GetConnectionString("Testing");
 builder.Services.AddDbContext<MisDbContext>(x =>
-{
-    if (connectionString != null) x.UseMySql(connectionString, serverVersion)
-        .UseSnakeCaseNamingConvention()
-        .EnableSensitiveDataLogging();
-});
+x.UseSqlServer(connectionString, sqlOptions => sqlOptions.CommandTimeout(180))
+    .UseSnakeCaseNamingConvention()
+    .EnableDetailedErrors()
+    .EnableSensitiveDataLogging()
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll)
+
+);
+
 
 builder.Services.AddValidatorsFromAssembly(ApplicationAssemblyReference.Assembly);
 
@@ -50,12 +53,13 @@ builder.Services.AddControllers( options =>
 
 }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-
-builder.Services.AddControllers();
 builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
+builder.Services.AddScoped<TransformUrl>();
+builder.Services.AddScoped<TimerControl>();
+builder.Services.AddScoped<IHubCaller, HubCaller>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle  
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen( c =>
@@ -102,7 +106,7 @@ builder.Services.AddAuthentication(authOptions =>
         jwtOptions.RequireHttpsMetadata = false;
         jwtOptions.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),                          
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuer = true,
@@ -110,7 +114,26 @@ builder.Services.AddAuthentication(authOptions =>
             ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
             ValidAudience = builder.Configuration["JwtConfig:Audience"]
         };
+
+        jwtOptions.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments("/notification-hub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+
     });
+
+builder.Services.AddMemoryCache();
+builder.Services.AddLazyCache();
+builder.Services.AddSignalR();
 
 builder.Services.Configure<CloudinaryOption>(config.GetSection("Cloudinary"));
 
@@ -127,37 +150,38 @@ builder.Services.AddCors(options =>
 });
 
 
-
-builder.Services.AddSignalR();
+builder.Services.AddControllers();
 
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseSwagger();
     app.UseSwaggerUI();
     app.ApplyMigrations();
 }
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseHttpsRedirection();
 app.UseCors(clientPermission);
 
-
+//app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.MapControllers();
-
 app.UseWebSockets();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notification-hub", options =>
+    {
+        options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
+        options.CloseOnAuthenticationExpiration = true;
+    });
+});
+//app.MapControllers(); 
 
-app.MapHub<NotificationHub>("/notification-hub"); // Use top-level route registration
-app.MapControllers(); 
-
-                                         app.Run();
+app.Run();

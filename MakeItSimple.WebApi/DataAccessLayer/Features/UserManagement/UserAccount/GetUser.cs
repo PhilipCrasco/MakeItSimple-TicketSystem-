@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Common.Pagination;
+using MakeItSimple.WebApi.Common.ConstantString;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
 {
@@ -22,6 +23,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public bool Is_Active { get; set; }
             public string Modified_By { get; set; }
             public DateTime ? Update_At { get; set;}
+
+            public string Profile_Pic { get; set; }
+            public string FileName { get; set; }
+            public decimal? FileSize { get; set; }
 
             public int? UserRoleId { get; set; }
             public string User_Role_Name { get; set; }
@@ -45,12 +50,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
             public int ? UnitId { get; set; }
             public string Unit_Code { get; set; }
             public string Unit_Name {  get; set; }
+
             
 
             public int ? SubUnitId { get; set; }
             public string SubUnit_Code { get; set; }    
             public string SubUnit_Name { get; set; }
             public ICollection<string> Permission {  get; set; }
+
+            public bool Is_Use {  get; set; }
 
 
         }
@@ -108,12 +116,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     Created_At = x.CreatedAt,
                     Is_Active = x.IsActive,
                     Modified_By = x.ModifiedByUser.Fullname,
+                    Profile_Pic = x.ProfilePic,
+                    FileName = x.FileName,
+                    FileSize = x.FileSize,
                     Update_At = x.UpdatedAt,
                     UserRoleId = x.UserRoleId,
                     User_Role_Name = x.UserRole.UserRoleName,
                     DepartmentId = x.DepartmentId,
                     Department_Code = x.Department.DepartmentCode,
-                    Department_Name = x.Department.DepartmentName,
+                    Department_Name = x.Department.DepartmentName, 
                     SubUnitId = x.SubUnitId,
                     SubUnit_Code = x.SubUnit.SubUnitCode,
                     SubUnit_Name = x.SubUnit.SubUnitName,
@@ -129,7 +140,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     UnitId = x.UnitId,
                     Unit_Code = x.Units.UnitCode,
                     Unit_Name = x.Units.UnitName,
-                    Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions
+                    Permission =  x.UserRole.Permissions != null ? x.UserRole.Permissions : userPermissions,
+                    Is_Use = x.Approvers.Any() || x.Receivers.Any() || 
+                    x.ApproversTickets.Any(x => x.IsApprove == null) ||
+                    (x.UserRole.UserRoleName.Contains(TicketingConString.IssueHandler)
+                    && x.TicketConcerns.Any(x => x.IsApprove == true && x.IsClosedApprove == null)) ?
+                      true : false,
 
                 });
 

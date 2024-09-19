@@ -3,6 +3,7 @@ using System;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -17,7 +18,9 @@ namespace MakeItSimple.WebApi.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.14")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.AccountTitleSetup.AccountTitle", b =>
                 {
@@ -26,8 +29,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("AccountCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("account_code");
 
                     b.Property<int>("AccountNo")
@@ -35,35 +40,35 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("account_no");
 
                     b.Property<string>("AccountTitles")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("account_titles");
 
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -85,8 +90,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int?>("ApproverLevel")
@@ -98,15 +105,15 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("channel_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<int?>("SubUnitId")
@@ -114,11 +121,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("sub_unit_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -149,16 +156,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("BusinessCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("business_code");
 
                     b.Property<string>("BusinessName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("business_name");
 
                     b.Property<int?>("Business_No")
@@ -170,27 +179,27 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("company_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -215,28 +224,30 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("CategoryDescription")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("category_description");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -258,16 +269,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("ChannelName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("channel_name");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<int?>("DepartmentId")
@@ -275,11 +288,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("department_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<int?>("SubUnitId")
@@ -287,11 +300,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("sub_unit_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -322,16 +335,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -353,16 +368,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("CompanyCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("company_code");
 
                     b.Property<string>("CompanyName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("company_name");
 
                     b.Property<int>("CompanyNo")
@@ -370,27 +387,27 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("company_no");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -412,8 +429,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int?>("BusinessUnitId")
@@ -421,15 +440,15 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("business_unit_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<string>("DepartmentCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("department_code");
 
                     b.Property<string>("DepartmentName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("department_name");
 
                     b.Property<int>("DepartmentNo")
@@ -437,23 +456,23 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("department_no");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -471,6 +490,51 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("departments", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.FormSetup.Form", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Form_Name")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("form_name");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("modified_by");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_forms");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_forms_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_forms_modified_by");
+
+                    b.ToTable("forms", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -478,24 +542,26 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<string>("LocationCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("location_code");
 
                     b.Property<string>("LocationName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("location_name");
 
                     b.Property<int>("LocationNo")
@@ -503,11 +569,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("location_no");
 
                     b.Property<string>("Manual")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("manual");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<int?>("SubUnitId")
@@ -515,15 +581,15 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("sub_unit_id");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -541,6 +607,106 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("locations", (string)null);
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("modified_by");
+
+                    b.Property<string>("Question_Modules_Name")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("question_modules_name");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_question_modules");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_question_modules_added_by");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_question_modules_modified_by");
+
+                    b.ToTable("question_modules", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModuleForm", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("AddedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("FormId")
+                        .HasColumnType("int")
+                        .HasColumnName("form_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("modified_by");
+
+                    b.Property<int>("QuestionModuleId")
+                        .HasColumnType("int")
+                        .HasColumnName("question_module_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_question_module_forms");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_question_module_forms_added_by");
+
+                    b.HasIndex("FormId")
+                        .HasDatabaseName("ix_question_module_forms_form_id");
+
+                    b.HasIndex("ModifiedBy")
+                        .HasDatabaseName("ix_question_module_forms_modified_by");
+
+                    b.HasIndex("QuestionModuleId")
+                        .HasDatabaseName("ix_question_module_forms_question_module_id");
+
+                    b.ToTable("question_module_forms", (string)null);
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.Receiver", b =>
                 {
                     b.Property<int>("Id")
@@ -548,8 +714,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int?>("BusinessUnitId")
@@ -557,23 +725,23 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("business_unit_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -601,8 +769,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int>("CategoryId")
@@ -610,23 +780,23 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<string>("SubCategoryDescription")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sub_category_description");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -651,12 +821,14 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<int?>("DepartmentId")
@@ -664,23 +836,23 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("department_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<string>("Manual")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("manual");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<string>("SubUnitCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sub_unit_code");
 
                     b.Property<string>("SubUnitName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sub_unit_name");
 
                     b.Property<int?>("SubUnitNo")
@@ -688,11 +860,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("sub_unit_no");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<int?>("UnitId")
@@ -700,7 +872,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("unit_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -721,56 +893,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("sub_units", (string)null);
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("added_by");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("modified_by");
-
-                    b.Property<int?>("SubUnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_unit_id");
-
-                    b.Property<string>("TeamName")
-                        .HasColumnType("longtext")
-                        .HasColumnName("team_name");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_teams");
-
-                    b.HasIndex("AddedBy")
-                        .HasDatabaseName("ix_teams_added_by");
-
-                    b.HasIndex("ModifiedBy")
-                        .HasDatabaseName("ix_teams_modified_by");
-
-                    b.HasIndex("SubUnitId")
-                        .HasDatabaseName("ix_teams_sub_unit_id");
-
-                    b.ToTable("teams", (string)null);
-                });
-
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", b =>
                 {
                     b.Property<int>("Id")
@@ -778,12 +900,14 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<int?>("DepartmentId")
@@ -791,27 +915,27 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("department_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("sync_date");
 
                     b.Property<string>("SyncStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("sync_status");
 
                     b.Property<string>("UnitCode")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("unit_code");
 
                     b.Property<string>("UnitName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("unit_name");
 
                     b.Property<int>("UnitNo")
@@ -819,7 +943,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("unit_no");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -844,52 +968,46 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int?>("ApproverLevel")
                         .HasColumnType("int")
                         .HasColumnName("approver_level");
 
-                    b.Property<int?>("ChannelId")
+                    b.Property<int?>("ClosingTicketId")
                         .HasColumnType("int")
-                        .HasColumnName("channel_id");
+                        .HasColumnName("closing_ticket_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsApprove")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_approve");
 
-                    b.Property<Guid?>("IssueHandler")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("issue_handler");
-
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
                     b.Property<string>("Status")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
-                    b.Property<int?>("SubUnitId")
+                    b.Property<int?>("TicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("sub_unit_id");
+                        .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketGeneratorId")
+                    b.Property<int?>("TransferTicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
+                        .HasColumnName("transfer_ticket_concern_id");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -898,17 +1016,14 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_approver_ticketings_added_by");
 
-                    b.HasIndex("ChannelId")
-                        .HasDatabaseName("ix_approver_ticketings_channel_id");
+                    b.HasIndex("ClosingTicketId")
+                        .HasDatabaseName("ix_approver_ticketings_closing_ticket_id");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_approver_ticketings_request_generator_id");
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_approver_ticketings_ticket_concern_id");
 
-                    b.HasIndex("SubUnitId")
-                        .HasDatabaseName("ix_approver_ticketings_sub_unit_id");
-
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_approver_ticketings_ticket_generator_id");
+                    b.HasIndex("TransferTicketConcernId")
+                        .HasDatabaseName("ix_approver_ticketings_transfer_ticket_concern_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_approver_ticketings_user_id");
@@ -923,121 +1038,85 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<int?>("ChannelId")
-                        .HasColumnType("int")
-                        .HasColumnName("channel_id");
-
                     b.Property<Guid?>("ClosedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("closed_by");
 
                     b.Property<DateTime?>("ClosingAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("closing_at");
 
                     b.Property<string>("ClosingRemarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("closing_remarks");
 
-                    b.Property<string>("ConcernDetails")
-                        .HasColumnType("longtext")
-                        .HasColumnName("concern_details");
-
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsClosing")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_closing");
 
                     b.Property<bool>("IsRejectClosed")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_reject_closed");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int")
-                        .HasColumnName("receiver_id");
-
                     b.Property<DateTime?>("RejectClosedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("reject_closed_at");
 
                     b.Property<Guid?>("RejectClosedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("reject_closed_by");
 
                     b.Property<string>("RejectRemarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("reject_remarks");
 
                     b.Property<string>("Remarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("remarks");
 
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("start_date");
-
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_category_id");
-
-                    b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("target_date");
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("resolution");
 
                     b.Property<Guid?>("TicketApprover")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("ticket_approver");
 
                     b.Property<int>("TicketConcernId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("user_id");
 
                     b.HasKey("Id")
                         .HasName("pk_closing_tickets");
 
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_closing_tickets_added_by");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_closing_tickets_category_id");
-
-                    b.HasIndex("ChannelId")
-                        .HasDatabaseName("ix_closing_tickets_channel_id");
 
                     b.HasIndex("ClosedBy")
                         .HasDatabaseName("ix_closing_tickets_closed_by");
@@ -1048,172 +1127,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("RejectClosedBy")
                         .HasDatabaseName("ix_closing_tickets_reject_closed_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_closing_tickets_request_generator_id");
-
-                    b.HasIndex("SubCategoryId")
-                        .HasDatabaseName("ix_closing_tickets_sub_category_id");
-
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_closing_tickets_ticket_concern_id");
 
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_closing_tickets_ticket_generator_id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_closing_tickets_user_id");
-
                     b.ToTable("closing_tickets", (string)null);
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("added_by");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<int?>("ChannelId")
-                        .HasColumnType("int")
-                        .HasColumnName("channel_id");
-
-                    b.Property<string>("ConcernDetails")
-                        .HasColumnType("longtext")
-                        .HasColumnName("concern_details");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool?>("IsReTicket")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_re_ticket");
-
-                    b.Property<bool>("IsRejectReTicket")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_reject_re_ticket");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("modified_by");
-
-                    b.Property<DateTime?>("ReTicketAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("re_ticket_at");
-
-                    b.Property<Guid?>("ReTicketBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("re_ticket_by");
-
-                    b.Property<string>("ReTicketRemarks")
-                        .HasColumnType("longtext")
-                        .HasColumnName("re_ticket_remarks");
-
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int")
-                        .HasColumnName("receiver_id");
-
-                    b.Property<DateTime?>("RejectReTicketAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("reject_re_ticket_at");
-
-                    b.Property<Guid?>("RejectReTicketBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("reject_re_ticket_by");
-
-                    b.Property<string>("RejectRemarks")
-                        .HasColumnType("longtext")
-                        .HasColumnName("reject_remarks");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("longtext")
-                        .HasColumnName("remarks");
-
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("start_date");
-
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_category_id");
-
-                    b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("target_date");
-
-                    b.Property<Guid?>("TicketApprover")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("ticket_approver");
-
-                    b.Property<int>("TicketConcernId")
-                        .HasColumnType("int")
-                        .HasColumnName("ticket_concern_id");
-
-                    b.Property<int?>("TicketGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_re_ticket_concerns");
-
-                    b.HasIndex("AddedBy")
-                        .HasDatabaseName("ix_re_ticket_concerns_added_by");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_re_ticket_concerns_category_id");
-
-                    b.HasIndex("ChannelId")
-                        .HasDatabaseName("ix_re_ticket_concerns_channel_id");
-
-                    b.HasIndex("ModifiedBy")
-                        .HasDatabaseName("ix_re_ticket_concerns_modified_by");
-
-                    b.HasIndex("ReTicketBy")
-                        .HasDatabaseName("ix_re_ticket_concerns_re_ticket_by");
-
-                    b.HasIndex("RejectReTicketBy")
-                        .HasDatabaseName("ix_re_ticket_concerns_reject_re_ticket_by");
-
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_re_ticket_concerns_request_generator_id");
-
-                    b.HasIndex("SubCategoryId")
-                        .HasDatabaseName("ix_re_ticket_concerns_sub_category_id");
-
-                    b.HasIndex("TicketConcernId")
-                        .HasDatabaseName("ix_re_ticket_concerns_ticket_concern_id");
-
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_re_ticket_concerns_ticket_generator_id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_re_ticket_concerns_user_id");
-
-                    b.ToTable("re_ticket_concerns", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", b =>
@@ -1223,56 +1140,66 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("Concern")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern");
 
                     b.Property<string>("ConcernStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern_status");
 
+                    b.Property<DateTime?>("Confirm_At")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("confirm_at");
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsDone")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_done");
 
                     b.Property<bool>("IsReject")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_reject");
 
+                    b.Property<bool?>("Is_Confirm")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_confirm");
+
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<Guid?>("RejectBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("reject_by");
 
                     b.Property<string>("Remarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("remarks");
 
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("resolution");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -1287,30 +1214,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("RejectBy")
                         .HasDatabaseName("ix_request_concerns_reject_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_request_concerns_request_generator_id");
-
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_request_concerns_user_id");
 
                     b.ToTable("request_concerns", (string)null);
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.HasKey("Id")
-                        .HasName("pk_request_generators");
-
-                    b.ToTable("request_generators", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketAttachment", b =>
@@ -1320,44 +1227,50 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("Attachment")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("attachment");
 
+                    b.Property<int?>("ClosingTicketId")
+                        .HasColumnType("int")
+                        .HasColumnName("closing_ticket_id");
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("file_name");
 
                     b.Property<decimal?>("FileSize")
-                        .HasColumnType("decimal(65,30)")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("file_size");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<int?>("RequestGeneratorId")
+                    b.Property<int?>("TicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
+                        .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketGeneratorId")
+                    b.Property<int?>("TransferTicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
+                        .HasColumnName("transfer_ticket_concern_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -1366,14 +1279,17 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_ticket_attachments_added_by");
 
+                    b.HasIndex("ClosingTicketId")
+                        .HasDatabaseName("ix_ticket_attachments_closing_ticket_id");
+
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_ticket_attachments_modified_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_ticket_attachments_request_generator_id");
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_attachments_ticket_concern_id");
 
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_ticket_attachments_ticket_generator_id");
+                    b.HasIndex("TransferTicketConcernId")
+                        .HasDatabaseName("ix_ticket_attachments_transfer_ticket_concern_id");
 
                     b.ToTable("ticket_attachments", (string)null);
                 });
@@ -1385,48 +1301,50 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<string>("Attachment")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("attachment");
 
                     b.Property<string>("Comment")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("comment");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("file_name");
 
                     b.Property<decimal?>("FileSize")
-                        .HasColumnType("decimal(65,30)")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("file_size");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsClicked")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_clicked");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<int?>("RequestGeneratorId")
+                    b.Property<int?>("TicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
+                        .HasColumnName("ticket_concern_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -1438,8 +1356,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_ticket_comments_modified_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_ticket_comments_request_generator_id");
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_comments_ticket_concern_id");
 
                     b.ToTable("ticket_comments", (string)null);
                 });
@@ -1451,24 +1369,26 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<bool?>("IsClicked")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_clicked");
-
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
 
                     b.Property<int?>("TicketCommentId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_comment_id");
 
+                    b.Property<int?>("TicketConcernId")
+                        .HasColumnType("int")
+                        .HasColumnName("ticket_concern_id");
+
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -1477,11 +1397,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_ticket_comment_views_added_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_ticket_comment_views_request_generator_id");
-
                     b.HasIndex("TicketCommentId")
                         .HasDatabaseName("ix_ticket_comment_views_ticket_comment_id");
+
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_comment_views_ticket_concern_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_ticket_comment_views_user_id");
@@ -1496,16 +1416,18 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("approved_at");
 
                     b.Property<Guid?>("ApprovedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("approved_by");
 
                     b.Property<int?>("CategoryId")
@@ -1517,87 +1439,99 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("channel_id");
 
                     b.Property<Guid?>("ClosedApproveBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("closed_approve_by");
 
                     b.Property<DateTime?>("Closed_At")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("closed_at");
 
                     b.Property<string>("ConcernDetails")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern_details");
 
                     b.Property<string>("ConcernStatus")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern_status");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsApprove")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_approve");
 
+                    b.Property<bool?>("IsAssigned")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_assigned");
+
                     b.Property<bool?>("IsClosedApprove")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_closed_approve");
 
                     b.Property<bool>("IsClosedReject")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_closed_reject");
 
                     b.Property<bool?>("IsDone")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_done");
 
+                    b.Property<bool?>("IsReDate")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_re_date");
+
                     b.Property<bool?>("IsReTicket")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_re_ticket");
 
                     b.Property<bool>("IsReject")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_reject");
 
                     b.Property<bool?>("IsTransfer")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_transfer");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
+                    b.Property<DateTime?>("ReDateAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("re_date_at");
+
+                    b.Property<Guid?>("ReDateBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("re_date_by");
+
                     b.Property<string>("Remarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("remarks");
 
                     b.Property<int?>("RequestConcernId")
                         .HasColumnType("int")
                         .HasColumnName("request_concern_id");
 
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
                     b.Property<Guid?>("RequestorBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("requestor_by");
 
                     b.Property<DateTime?>("ReticketAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("reticket_at");
 
                     b.Property<Guid?>("ReticketBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("reticket_by");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("start_date");
 
                     b.Property<int?>("SubCategoryId")
@@ -1605,31 +1539,35 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("sub_category_id");
 
                     b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("target_date");
 
                     b.Property<Guid?>("TicketApprover")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("ticket_approver");
 
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
+
                     b.Property<string>("TicketType")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("ticket_type");
 
                     b.Property<DateTime?>("TransferAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("transfer_at");
 
                     b.Property<Guid?>("TransferBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("transfer_by");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -1653,11 +1591,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_ticket_concerns_modified_by");
 
+                    b.HasIndex("ReDateBy")
+                        .HasDatabaseName("ix_ticket_concerns_re_date_by");
+
                     b.HasIndex("RequestConcernId")
                         .HasDatabaseName("ix_ticket_concerns_request_concern_id");
-
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_ticket_concerns_request_generator_id");
 
                     b.HasIndex("RequestorBy")
                         .HasDatabaseName("ix_ticket_concerns_requestor_by");
@@ -1677,23 +1615,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.ToTable("ticket_concerns", (string)null);
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.HasKey("Id")
-                        .HasName("pk_ticket_generators");
-
-                    b.ToTable("ticket_generators", (string)null);
-                });
-
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -1701,50 +1622,95 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("ApproverBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("approver_by");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("Approver_Level")
+                        .HasColumnType("int")
+                        .HasColumnName("approver_level");
+
+                    b.Property<bool?>("IsApprove")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_approve");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("remarks");
 
                     b.Property<string>("Request")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("request");
 
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
-                    b.Property<Guid?>("RequestorBy")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("requestor_by");
-
                     b.Property<string>("Status")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
-                    b.Property<int?>("TicketGeneratorId")
+                    b.Property<int?>("TicketConcernId")
                         .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
+                        .HasColumnName("ticket_concern_id");
+
+                    b.Property<Guid?>("TransactedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("transacted_by");
 
                     b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("transaction_date");
 
                     b.HasKey("Id")
                         .HasName("pk_ticket_histories");
 
-                    b.HasIndex("ApproverBy")
-                        .HasDatabaseName("ix_ticket_histories_approver_by");
+                    b.HasIndex("TicketConcernId")
+                        .HasDatabaseName("ix_ticket_histories_ticket_concern_id");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_ticket_histories_request_generator_id");
-
-                    b.HasIndex("RequestorBy")
-                        .HasDatabaseName("ix_ticket_histories_requestor_by");
-
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_ticket_histories_ticket_generator_id");
+                    b.HasIndex("TransactedBy")
+                        .HasDatabaseName("ix_ticket_histories_transacted_by");
 
                     b.ToTable("ticket_histories", (string)null);
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransactionNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("AddedBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("added_by");
+
+                    b.Property<DateTime>("Created_At")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_checked");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("message");
+
+                    b.Property<string>("Modules")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("modules");
+
+                    b.Property<Guid>("ReceiveBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("receive_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ticket_transaction_notifications");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_ticket_transaction_notifications_added_by");
+
+                    b.HasIndex("ReceiveBy")
+                        .HasDatabaseName("ix_ticket_transaction_notifications_receive_by");
+
+                    b.ToTable("ticket_transaction_notifications", (string)null);
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
@@ -1754,109 +1720,75 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<int?>("ChannelId")
-                        .HasColumnType("int")
-                        .HasColumnName("channel_id");
-
-                    b.Property<string>("ConcernDetails")
-                        .HasColumnType("longtext")
-                        .HasColumnName("concern_details");
-
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool>("IsRejectTransfer")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_reject_transfer");
 
                     b.Property<bool?>("IsTransfer")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_transfer");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int")
-                        .HasColumnName("receiver_id");
-
                     b.Property<string>("RejectRemarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("reject_remarks");
 
                     b.Property<DateTime?>("RejectTransferAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("reject_transfer_at");
 
                     b.Property<Guid?>("RejectTransferBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("reject_transfer_by");
 
                     b.Property<string>("Remarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("remarks");
 
-                    b.Property<int?>("RequestGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("request_generator_id");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("start_date");
-
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_category_id");
-
-                    b.Property<DateTime?>("TargetDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("target_date");
-
                     b.Property<Guid?>("TicketApprover")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("ticket_approver");
 
                     b.Property<int>("TicketConcernId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketGeneratorId")
-                        .HasColumnType("int")
-                        .HasColumnName("ticket_generator_id");
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
 
                     b.Property<DateTime?>("TransferAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("transfer_at");
 
                     b.Property<Guid?>("TransferBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("transfer_by");
 
                     b.Property<string>("TransferRemarks")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("transfer_remarks");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("user_id");
 
                     b.HasKey("Id")
                         .HasName("pk_transfer_ticket_concerns");
@@ -1864,35 +1796,17 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_added_by");
 
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_category_id");
-
-                    b.HasIndex("ChannelId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_channel_id");
-
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_modified_by");
 
                     b.HasIndex("RejectTransferBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_reject_transfer_by");
 
-                    b.HasIndex("RequestGeneratorId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_request_generator_id");
-
-                    b.HasIndex("SubCategoryId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_sub_category_id");
-
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_transfer_ticket_concerns_ticket_concern_id");
 
-                    b.HasIndex("TicketGeneratorId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_ticket_generator_id");
-
                     b.HasIndex("TransferBy")
                         .HasDatabaseName("ix_transfer_ticket_concerns_transfer_by");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_transfer_ticket_concerns_user_id");
 
                     b.ToTable("transfer_ticket_concerns", (string)null);
                 });
@@ -1901,11 +1815,11 @@ namespace MakeItSimple.WebApi.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<int?>("BusinessUnitId")
@@ -1917,7 +1831,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("company_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<int?>("DepartmentId")
@@ -1925,19 +1839,27 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("department_id");
 
                     b.Property<string>("EmpId")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("emp_id");
 
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("file_name");
+
+                    b.Property<decimal?>("FileSize")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("file_size");
+
                     b.Property<string>("Fullname")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("fullname");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<bool?>("IsPasswordChange")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_password_change");
 
                     b.Property<int?>("LocationId")
@@ -1945,12 +1867,16 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("location_id");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<string>("Password")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("password");
+
+                    b.Property<string>("ProfilePic")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("profile_pic");
 
                     b.Property<int?>("SubUnitId")
                         .HasColumnType("int")
@@ -1961,7 +1887,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("unit_id");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<int>("UserRoleId")
@@ -1969,7 +1895,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnName("user_role_id");
 
                     b.Property<string>("Username")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("username");
 
                     b.HasKey("Id")
@@ -2025,32 +1951,34 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<Guid?>("AddedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("bit")
                         .HasColumnName("is_active");
 
                     b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
                     b.Property<string>("Permissions")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("permissions");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("UserRoleName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("user_role_name");
 
                     b.HasKey("Id")
@@ -2070,7 +1998,7 @@ namespace MakeItSimple.WebApi.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
-                            Permissions = "[\"Overview\",\"User Management\",\"User Role\",\"User Account\",\"Request\",\"Channel\",\"Filing\",\"Generate\",\"Masterlist\",\"Company\",\"Business Unit\",\"Unit\",\"Location\",\"Sub Unit\",\"Department\",\"Category\",\"Sub Category\"]",
+                            Permissions = "[\"Overview\",\"User Management\",\"User Role\",\"User Account\",\"Channel\",\"Filing\",\"Generate\",\"Masterlist\",\"Company\",\"Business Unit\",\"Unit\",\"Location\",\"Sub Unit\",\"Department\",\"Category\",\"Sub Category\",\"Channel Setup\",\"Approver\",\"Receiver Concerns\",\"Receiver\"]",
                             UserRoleName = "Admin"
                         });
                 });
@@ -2111,7 +2039,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_approvers_users_modified_by_user_id");
+                        .HasConstraintName("fk_approvers_users_user_id1");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
                         .WithMany("Approvers")
@@ -2119,9 +2047,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_approvers_sub_units_sub_unit_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Approvers")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_approvers_users_user_id1");
+                        .HasConstraintName("fk_approvers_users_user_id11");
 
                     b.Navigation("AddedByUser");
 
@@ -2196,7 +2124,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_channels_users_modified_by_user_id");
+                        .HasConstraintName("fk_channels_users_user_id1");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
                         .WithMany()
@@ -2204,9 +2132,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_channels_sub_units_sub_unit_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Channels")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_channels_users_user_id1");
+                        .HasConstraintName("fk_channels_users_user_id11");
 
                     b.Navigation("AddedByUser");
 
@@ -2283,6 +2211,25 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.FormSetup.Form", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_forms_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_forms_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -2309,6 +2256,62 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("SubUnit");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModule", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_question_modules_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_question_modules_users_modified_by_user_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ModifiedByUser");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModuleForm", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_question_module_forms_users_added_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.FormSetup.Form", "Form")
+                        .WithMany("QuestionModuleForms")
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_question_module_forms_forms_form_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_question_module_forms_users_modified_by_user_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModule", "QuestionModule")
+                        .WithMany("QuestionModuleForms")
+                        .HasForeignKey("QuestionModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_question_module_forms_question_modules_question_module_id");
+
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("Form");
+
+                    b.Navigation("ModifiedByUser");
+
+                    b.Navigation("QuestionModule");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.Receiver", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -2326,12 +2329,12 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_receivers_users_modified_by_user_id");
+                        .HasConstraintName("fk_receivers_users_user_id1");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Receivers")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_receivers_users_user_id1");
+                        .HasConstraintName("fk_receivers_users_user_id11");
 
                     b.Navigation("AddedByUser");
 
@@ -2403,32 +2406,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.TeamSetup.Team", b =>
-                {
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
-                        .WithMany()
-                        .HasForeignKey("AddedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_teams_users_added_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_teams_users_modified_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
-                        .WithMany("Teams")
-                        .HasForeignKey("SubUnitId")
-                        .HasConstraintName("fk_teams_sub_units_sub_unit_id");
-
-                    b.Navigation("AddedByUser");
-
-                    b.Navigation("ModifiedByUser");
-
-                    b.Navigation("SubUnit");
-                });
-
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", b =>
                 {
                     b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
@@ -2463,40 +2440,33 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_approver_ticketings_users_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", "ClosingTicket")
+                        .WithMany("ApproverTickets")
+                        .HasForeignKey("ClosingTicketId")
+                        .HasConstraintName("fk_approver_ticketings_closing_tickets_closing_ticket_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
                         .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .HasConstraintName("fk_approver_ticketings_channels_channel_id");
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_approver_ticketings_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany("ApproverTicketings")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_approver_ticketings_request_generators_request_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
-                        .WithMany()
-                        .HasForeignKey("SubUnitId")
-                        .HasConstraintName("fk_approver_ticketings_sub_units_sub_unit_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
-                        .WithMany("ApproverTicketings")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_approver_ticketings_ticket_generators_ticket_generator_id");
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", "TransferTicketConcern")
+                        .WithMany("ApproverTickets")
+                        .HasForeignKey("TransferTicketConcernId")
+                        .HasConstraintName("fk_approver_ticketings_transfer_ticket_concerns_transfer_ticket_concern_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("ApproversTickets")
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_approver_ticketings_users_user_id1");
 
                     b.Navigation("AddedByUser");
 
-                    b.Navigation("Channel");
+                    b.Navigation("ClosingTicket");
 
-                    b.Navigation("RequestGenerator");
+                    b.Navigation("TicketConcern");
 
-                    b.Navigation("SubUnit");
-
-                    b.Navigation("TicketGenerator");
+                    b.Navigation("TransferTicketConcern");
 
                     b.Navigation("User");
                 });
@@ -2507,17 +2477,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("AddedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_closing_tickets_users_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("fk_closing_tickets_categories_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .HasConstraintName("fk_closing_tickets_channels_channel_id");
+                        .HasConstraintName("fk_closing_tickets_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ClosedByUser")
                         .WithMany()
@@ -2537,38 +2497,14 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_closing_tickets_users_reject_closed_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany()
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_closing_tickets_request_generators_request_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("fk_closing_tickets_sub_categories_sub_category_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
-                        .WithMany()
+                        .WithMany("ClosingTickets")
                         .HasForeignKey("TicketConcernId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_closing_tickets_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
-                        .WithMany("ClosingTickets")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_closing_tickets_ticket_generators_ticket_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_closing_tickets_users_user_id1");
-
                     b.Navigation("AddedByUser");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Channel");
 
                     b.Navigation("ClosedByUser");
 
@@ -2576,101 +2512,7 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("RejectClosedByUser");
 
-                    b.Navigation("RequestGenerator");
-
-                    b.Navigation("SubCategory");
-
                     b.Navigation("TicketConcern");
-
-                    b.Navigation("TicketGenerator");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ReTicketConcern", b =>
-                {
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
-                        .WithMany()
-                        .HasForeignKey("AddedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_re_ticket_concerns_users_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("fk_re_ticket_concerns_categories_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .HasConstraintName("fk_re_ticket_concerns_channels_channel_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_re_ticket_concerns_users_modified_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReTicketByUser")
-                        .WithMany()
-                        .HasForeignKey("ReTicketBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_re_ticket_concerns_users_re_ticket_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "RejectReTicketByUser")
-                        .WithMany()
-                        .HasForeignKey("RejectReTicketBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_re_ticket_concerns_users_reject_re_ticket_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany("ReTicketConcerns")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_re_ticket_concerns_request_generators_request_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("fk_re_ticket_concerns_sub_categories_sub_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
-                        .WithMany()
-                        .HasForeignKey("TicketConcernId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_re_ticket_concerns_ticket_concerns_ticket_concern_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
-                        .WithMany("ReTicketConcerns")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_re_ticket_concerns_ticket_generators_ticket_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_re_ticket_concerns_users_user_id1");
-
-                    b.Navigation("AddedByUser");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Channel");
-
-                    b.Navigation("ModifiedByUser");
-
-                    b.Navigation("ReTicketByUser");
-
-                    b.Navigation("RejectReTicketByUser");
-
-                    b.Navigation("RequestGenerator");
-
-                    b.Navigation("SubCategory");
-
-                    b.Navigation("TicketConcern");
-
-                    b.Navigation("TicketGenerator");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", b =>
@@ -2685,31 +2527,24 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_request_concerns_users_modified_by_user_id");
+                        .HasConstraintName("fk_request_concerns_users_user_id1");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "RejectByUser")
                         .WithMany()
                         .HasForeignKey("RejectBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_request_concerns_users_reject_by_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany()
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_request_concerns_request_generators_request_generator_id");
+                        .HasConstraintName("fk_request_concerns_users_user_id2");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("RequestConcerns")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_request_concerns_users_user_id1");
+                        .HasConstraintName("fk_request_concerns_users_user_id11");
 
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RejectByUser");
-
-                    b.Navigation("RequestGenerator");
 
                     b.Navigation("User");
                 });
@@ -2722,29 +2557,34 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_attachments_users_added_by_user_id");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", null)
+                        .WithMany("TicketAttachments")
+                        .HasForeignKey("ClosingTicketId")
+                        .HasConstraintName("fk_ticket_attachments_closing_tickets_closing_ticket_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_attachments_users_modified_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
                         .WithMany("TicketAttachments")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_ticket_attachments_request_generators_request_generator_id");
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_attachments_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", "TransferTicketConcern")
                         .WithMany("TicketAttachments")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_ticket_attachments_ticket_generators_ticket_generator_id");
+                        .HasForeignKey("TransferTicketConcernId")
+                        .HasConstraintName("fk_ticket_attachments_transfer_ticket_concerns_transfer_ticket_concern_id");
 
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
 
-                    b.Navigation("RequestGenerator");
+                    b.Navigation("TicketConcern");
 
-                    b.Navigation("TicketGenerator");
+                    b.Navigation("TransferTicketConcern");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
@@ -2761,16 +2601,16 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_comments_users_modified_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
                         .WithMany("TicketComments")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_ticket_comments_request_generators_request_generator_id");
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_comments_ticket_concerns_ticket_concern_id");
 
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ModifiedByUser");
 
-                    b.Navigation("RequestGenerator");
+                    b.Navigation("TicketConcern");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketCommentView", b =>
@@ -2781,15 +2621,15 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_comment_views_users_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany()
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_ticket_comment_views_request_generators_request_generator_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketComment", "TicketComment")
                         .WithMany("TicketCommentViews")
                         .HasForeignKey("TicketCommentId")
                         .HasConstraintName("fk_ticket_comment_views_ticket_comments_ticket_comment_id");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
+                        .WithMany("TicketCommentViews")
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_comment_views_ticket_concerns_ticket_concern_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany()
@@ -2798,9 +2638,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("AddedByUser");
 
-                    b.Navigation("RequestGenerator");
-
                     b.Navigation("TicketComment");
+
+                    b.Navigation("TicketConcern");
 
                     b.Navigation("User");
                 });
@@ -2817,7 +2657,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ApprovedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_approved_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id1");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
                         .WithMany()
@@ -2833,35 +2673,36 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("ClosedApproveBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_closed_approve_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id2");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_modified_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id3");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReDateByUser")
+                        .WithMany()
+                        .HasForeignKey("ReDateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_user_id4");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", "RequestConcern")
                         .WithMany("TicketConcerns")
                         .HasForeignKey("RequestConcernId")
                         .HasConstraintName("fk_ticket_concerns_request_concerns_request_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany("TicketConcerns")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_ticket_concerns_request_generators_request_generator_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.User", "RequestorByUser")
                         .WithMany()
                         .HasForeignKey("RequestorBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_requestor_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id5");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ReticketByUser")
                         .WithMany()
                         .HasForeignKey("ReticketBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_reticket_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id6");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
                         .WithMany()
@@ -2872,12 +2713,12 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("TransferBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_transfer_by_user_id");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id7");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("TicketConcerns")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_ticket_concerns_users_user_id1");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id11");
 
                     b.Navigation("AddedByUser");
 
@@ -2891,9 +2732,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("ModifiedByUser");
 
-                    b.Navigation("RequestConcern");
+                    b.Navigation("ReDateByUser");
 
-                    b.Navigation("RequestGenerator");
+                    b.Navigation("RequestConcern");
 
                     b.Navigation("RequestorByUser");
 
@@ -2908,35 +2749,41 @@ namespace MakeItSimple.WebApi.Migrations
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketHistory", b =>
                 {
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "ApproverByUser")
+                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
                         .WithMany()
-                        .HasForeignKey("ApproverBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_histories_users_approver_by_user_id");
+                        .HasForeignKey("TicketConcernId")
+                        .HasConstraintName("fk_ticket_histories_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany("TicketHistories")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_ticket_histories_request_generators_request_generator_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "RequestorByUser")
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "TransactedByUser")
                         .WithMany()
-                        .HasForeignKey("RequestorBy")
+                        .HasForeignKey("TransactedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_histories_users_requestor_by_user_id");
+                        .HasConstraintName("fk_ticket_histories_users_transacted_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
-                        .WithMany("TicketHistories")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_ticket_histories_ticket_generators_ticket_generator_id");
+                    b.Navigation("TicketConcern");
 
-                    b.Navigation("ApproverByUser");
+                    b.Navigation("TransactedByUser");
+                });
 
-                    b.Navigation("RequestGenerator");
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketTransactionNotification", b =>
+                {
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "AddedByUser")
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_transaction_notifications_users_added_by_user_id");
 
-                    b.Navigation("RequestorByUser");
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReceiveByUser")
+                        .WithMany()
+                        .HasForeignKey("ReceiveBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_ticket_transaction_notifications_users_receive_by_user_id");
 
-                    b.Navigation("TicketGenerator");
+                    b.Navigation("AddedByUser");
+
+                    b.Navigation("ReceiveByUser");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
@@ -2945,17 +2792,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("AddedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_transfer_ticket_concerns_users_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_categories_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_channels_channel_id");
+                        .HasConstraintName("fk_transfer_ticket_concerns_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
@@ -2969,27 +2806,12 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_transfer_ticket_concerns_users_reject_transfer_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", "RequestGenerator")
-                        .WithMany("TransferTicketConcerns")
-                        .HasForeignKey("RequestGeneratorId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_request_generators_request_generato");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_sub_categories_sub_category_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
-                        .WithMany()
+                        .WithMany("TransferTicketConcerns")
                         .HasForeignKey("TicketConcernId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_transfer_ticket_concerns_ticket_concerns_ticket_concern_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", "TicketGenerator")
-                        .WithMany("TransferTicketConcerns")
-                        .HasForeignKey("TicketGeneratorId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_ticket_generators_ticket_generator_");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "TransferByUser")
                         .WithMany()
@@ -2997,32 +2819,15 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_transfer_ticket_concerns_users_transfer_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_transfer_ticket_concerns_users_user_id1");
-
                     b.Navigation("AddedByUser");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Channel");
 
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RejectTransferByUser");
 
-                    b.Navigation("RequestGenerator");
-
-                    b.Navigation("SubCategory");
-
                     b.Navigation("TicketConcern");
 
-                    b.Navigation("TicketGenerator");
-
                     b.Navigation("TransferByUser");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
@@ -3143,11 +2948,19 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.FormSetup.Form", b =>
+                {
+                    b.Navigation("QuestionModuleForms");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.QuestionModuleSetup.QuestionModule", b =>
+                {
+                    b.Navigation("QuestionModuleForms");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", b =>
                 {
                     b.Navigation("Approvers");
-
-                    b.Navigation("Teams");
 
                     b.Navigation("Users");
                 });
@@ -3159,26 +2972,16 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.ClosingTicket", b =>
+                {
+                    b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
+                });
+
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", b =>
                 {
                     b.Navigation("TicketConcerns");
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.RequestGenerator", b =>
-                {
-                    b.Navigation("ApproverTicketings");
-
-                    b.Navigation("ReTicketConcerns");
-
-                    b.Navigation("TicketAttachments");
-
-                    b.Navigation("TicketComments");
-
-                    b.Navigation("TicketConcerns");
-
-                    b.Navigation("TicketHistories");
-
-                    b.Navigation("TransferTicketConcerns");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketComment", b =>
@@ -3186,19 +2989,39 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("TicketCommentViews");
                 });
 
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketGenerator", b =>
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", b =>
                 {
-                    b.Navigation("ApproverTicketings");
-
                     b.Navigation("ClosingTickets");
-
-                    b.Navigation("ReTicketConcerns");
 
                     b.Navigation("TicketAttachments");
 
-                    b.Navigation("TicketHistories");
+                    b.Navigation("TicketCommentViews");
+
+                    b.Navigation("TicketComments");
 
                     b.Navigation("TransferTicketConcerns");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>
+                {
+                    b.Navigation("ApproverTickets");
+
+                    b.Navigation("TicketAttachments");
+                });
+
+            modelBuilder.Entity("MakeItSimple.WebApi.Models.User", b =>
+                {
+                    b.Navigation("Approvers");
+
+                    b.Navigation("ApproversTickets");
+
+                    b.Navigation("Channels");
+
+                    b.Navigation("Receivers");
+
+                    b.Navigation("RequestConcerns");
+
+                    b.Navigation("TicketConcerns");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.UserManagement.UserRoleAccount.UserRole", b =>

@@ -1,6 +1,4 @@
-﻿
-
-using MakeItSimple.WebApi.Common;
+﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
@@ -22,18 +20,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
 
-        //public int ? CompanyId { get; set; }
-        //public virtual Company Company { get; set; }   
-
-        //public int ? DepartmentId { get; set; }
-        //public virtual Department Department { get; set; }
-
-        //public int ? SubUnitId { get; set; }
-        //public virtual SubUnit SubUnit { get; set; }
-
-        //public int ? UnitId { get; set; }
-        //public virtual Unit Unit { get; set; }
-
         public int ? ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
 
@@ -53,7 +39,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TransferBy { get; set; }
         public virtual User TransferByUser { get; set; }
 
-        public bool ? IsApprove { get; set; } = false;
+        public bool ? IsApprove { get; set; } 
         public DateTime? ApprovedAt { get; set; }
         public Guid? ApprovedBy { get; set; }
         public virtual User ApprovedByUser { get; set; }
@@ -77,9 +63,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public DateTime ? TargetDate { get; set; }
 
-        public int ? RequestGeneratorId { get; set; }
-        public virtual RequestGenerator RequestGenerator { get; set; }
-
         public bool ? IsDone { get; set; }
 
         public string ConcernStatus { get; set; }
@@ -96,8 +79,24 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public Guid? TicketApprover { get; set; }
 
+        public bool ? IsAssigned { get; set; }
 
-        //public ICollection<TicketComment> TicketComments { get; set; }
+        public string TicketNo { get; set; }
+
+        public bool? IsReDate { get; set; }
+        public DateTime? ReDateAt { get; set; }
+        public Guid? ReDateBy { get; set; }
+        public virtual User ReDateByUser { get; set; }
+
+        public ICollection<TicketAttachment> TicketAttachments { get; set; }    
+
+        public ICollection<ClosingTicket> ClosingTickets { get; set; }
+        public ICollection<TransferTicketConcern> TransferTicketConcerns { get; set; }
+
+        public ICollection<TicketComment> TicketComments { get; set; }
+        public ICollection<TicketCommentView> TicketCommentViews { get; set; }
+
+
 
     }
 }

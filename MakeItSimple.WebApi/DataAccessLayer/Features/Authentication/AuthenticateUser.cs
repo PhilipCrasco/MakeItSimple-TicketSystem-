@@ -23,6 +23,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
             public string Username { get; set; }
             public string Email { get; set; }
             public string UserRoleName { get; set; }
+            public string ProfilePic {  get; set; }
+            public decimal FileSize { get; set; }
+            public string FileName {  get; set; }
             //public string CompanyName {  get; set; }  
             //public string BusinessName { get; set; }
             //public string DepartmentName { get; set; }
@@ -40,17 +43,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.AuthenticationFeatures
                 EmpId = user.EmpId;
                 Fullname = user.Fullname;
                 Username = user.Username;
+                ProfilePic = user.ProfilePic;
+                FileName = user.FileName;
+                FileSize = user.FileSize.Value;
                 //CompanyName = user.Company.CompanyName;
                 //BusinessName = user.BusinessUnit.BusinessName;
                 //DepartmentName = user.Department.DepartmentName;
                 //UnitName = user.Units.UnitName;
                 //SubUnitName = user.SubUnit.SubUnitName;
                 //LocationName = user.Location.LocationName;
+               
                 UserRoleName = user.UserRole.UserRoleName;
                 Permissions = user.UserRole?.Permissions;
                 IsPasswordChanged = user.IsPasswordChange;
                 Token = token;
-                
             }
 
         }

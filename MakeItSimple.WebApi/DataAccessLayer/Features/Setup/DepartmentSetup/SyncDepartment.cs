@@ -118,9 +118,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup
                             ExistingDepartment.SyncDate = DateTime.Now;
                             ExistingDepartment.SyncStatus = "No new Update";
                         }
-
-
-
                     }
                     else
                     {

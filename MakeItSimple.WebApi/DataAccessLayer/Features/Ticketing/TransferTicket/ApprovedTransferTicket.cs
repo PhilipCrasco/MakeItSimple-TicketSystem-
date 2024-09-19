@@ -6,23 +6,20 @@ using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
     public class ApprovedTransferTicket
     {
-       public class ApprovedTransferTicketCommand : IRequest<Result>
+
+        public class ApprovedTransferTicketCommand : IRequest<Result>
         {
-            public Guid ? Transfer_By {  get; set; }
             public string Role { get; set; }
             public Guid? Users { get; set; }
-            public Guid? Requestor_By { get; set; }
-            public Guid? Approver_By { get; set; }
-            public ICollection<ApproveTransferTicket> ApproveTransferTickets { get; set; }
-            public class ApproveTransferTicket
-            {
-                public int RequestGeneratorId { get; set; }
-            }
+            public Guid? Transacted_By { get; set; }
+            public int TransferTicketId { get; set; }
+            public string Modules { get; set; }
 
         }
 
@@ -37,127 +34,136 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
             public async Task<Result> Handle(ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
             {
-                var allUserList = await _context.UserRoles.ToListAsync();
+                var userDetails = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
-                var receiverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+                var allUserList = await _context.UserRoles.ToListAsync();
 
                 var approverPermissionList = allUserList.Where(x => x.Permissions
                 .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
 
+                var transferTicketExist = await _context.TransferTicketConcerns
+                    .Include(x => x.TicketConcern)
+                    .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId, cancellationToken);
 
-                foreach (var ticketRequest in command.ApproveTransferTickets)
-                 {
+                if (transferTicketExist is null)
+                {
+                    return Result.Failure(TransferTicketError.TransferTicketConcernIdNotExist());
+                }
 
-                    var requestTicketExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketRequest.RequestGeneratorId, cancellationToken);
-                    if (requestTicketExist == null)
+                var transferRequestTicketId = await _context.ApproverTicketings
+                    .Where(x => x.TransferTicketConcernId == transferTicketExist.Id && x.IsApprove == null)
+                    .ToListAsync();
+
+                var ticketHistoryList = await _context.TicketHistories
+                    .Where(x => x.TicketConcernId == transferTicketExist.TicketConcernId
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                    .ToListAsync();
+
+                var selectTransferRequestId = transferRequestTicketId
+                    .FirstOrDefault(x => x.ApproverLevel == transferRequestTicketId.Min(x => x.ApproverLevel));
+
+                if (selectTransferRequestId != null)
+                {
+
+                    if (!approverPermissionList.Any(x => x.Contains(command.Role)))
                     {
-                        return Result.Failure(TransferTicketError.TicketIdNotExist());
+                        return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                     }
 
-                    var ticketHistoryList = await _context.TicketHistories.Where(x => x.TicketGeneratorId == x.TicketGeneratorId).ToListAsync();
-                    var ticketHistoryId = ticketHistoryList.FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
-
-                    var userTranferTicket = await _context.TransferTicketConcerns.Where(x => x.TicketGeneratorId == requestTicketExist.Id).ToListAsync();
-                    
-                    var transferRequestTicketId = await _context.ApproverTicketings
-                        .Where(x => x.TicketGeneratorId == requestTicketExist.Id && x.IsApprove == null).ToListAsync();
-
-                    var selectTransferRequestId = transferRequestTicketId.FirstOrDefault(x => x.ApproverLevel == transferRequestTicketId.Min(x => x.ApproverLevel));
-
-                    if(selectTransferRequestId != null)
+                    if (transferTicketExist.TicketApprover != command.Users)
                     {
+                        return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                    }
 
-                        selectTransferRequestId.IsApprove = true;
+                    selectTransferRequestId.IsApprove = true;
 
-                        if (!approverPermissionList.Any(x => x.Contains(command.Role)))
+                    var userApprovalId = await _context.ApproverTicketings
+                        .Where(x => x.TransferTicketConcernId == selectTransferRequestId.TransferTicketConcernId)
+                        .ToListAsync();
+
+                    var validateUserApprover = userApprovalId
+                        .FirstOrDefault(x => x.ApproverLevel == selectTransferRequestId.ApproverLevel + 1);
+
+                    var ticketHistoryApproval = ticketHistoryList
+                        .FirstOrDefault(x => x.Approver_Level != null
+                        && x.Approver_Level == ticketHistoryList.Min(x => x.Approver_Level));
+
+                    ticketHistoryApproval.TransactedBy = command.Transacted_By;
+                    ticketHistoryApproval.TransactionDate = DateTime.Now;
+                    ticketHistoryApproval.Request = TicketingConString.Approve;
+                    ticketHistoryApproval.Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}";
+                    ticketHistoryApproval.IsApprove = true;
+
+                    if (validateUserApprover != null)
+                    {
+                        transferTicketExist.TicketApprover = validateUserApprover.UserId;
+
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
                         {
-                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                        }
 
-                        if (userTranferTicket.First().TicketApprover != command.Users)
-                        {
-                            return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                        }
+                            Message = $"Ticket number {transferTicketExist.TicketConcernId} is pending for transfer approval",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = validateUserApprover.UserId.Value,
+                            Modules = command.Modules,
 
-                        var userApprovalId = await _context.ApproverTicketings.Where(x => x.TicketGeneratorId == selectTransferRequestId.TicketGeneratorId).ToListAsync();
-
-                        foreach(var concernTicket in userTranferTicket)
-                        {
-                            
-                            var validateUserApprover = userApprovalId.FirstOrDefault(x => x.ApproverLevel == selectTransferRequestId.ApproverLevel + 1);
-
-                            if(validateUserApprover != null)
-                            {
-                                concernTicket.TicketApprover = validateUserApprover.UserId;
-                            }
-                            else
-                            {
-                                concernTicket.TicketApprover = null;
-                            }
-
-                        }
-
-                        var approverLevel = selectTransferRequestId.ApproverLevel == 1 ? $"{selectTransferRequestId.ApproverLevel}st" 
-                            : selectTransferRequestId.ApproverLevel == 2 ? $"{selectTransferRequestId.ApproverLevel}nd" 
-                            : selectTransferRequestId.ApproverLevel == 3 ? $"{selectTransferRequestId.ApproverLevel}rd"
-                            : $"{selectTransferRequestId.ApproverLevel}th";
-
-                        var addTicketHistory = new TicketHistory
-                        {
-                            RequestGeneratorId = requestTicketExist.Id,
-                            ApproverBy = command.Approver_By,
-                            RequestorBy = userTranferTicket.First().AddedBy,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Transfer,
-                            Status = $"{ TicketingConString.ApproveBy} {approverLevel} approver"
                         };
 
-                        await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                     }
                     else
                     {
+                        transferTicketExist.TicketApprover = null;
 
-                        return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                        //if (TicketingConString.ApproverTransfer != command.Role)
-                        //{
-                        //    return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                        //}
-                        //foreach (var concernTicket in userTranferTicket)
-                        //{
-                        //    concernTicket.IsTransfer = true;
-                        //    concernTicket.TransferAt = DateTime.Now;
-                        //    concernTicket.TransferBy = command.Transfer_By;
+                        transferTicketExist.IsTransfer = true;
+                        transferTicketExist.TransferBy = transferTicketExist.TicketConcern.UserId;
+                        transferTicketExist.TransferAt = DateTime.Now;
 
-                        //    var concernTicketById = await _context.TicketConcerns.FirstOrDefaultAsync(x => x.Id == concernTicket.TicketConcernId, cancellationToken);
+                        var ticketConcernExist = await _context.TicketConcerns
+                            .Include(x => x.RequestorByUser)
+                            .FirstOrDefaultAsync(x => x.Id == transferTicketExist.TicketConcernId);
 
-                        //    concernTicketById.IsTransfer = true;
-                        //    concernTicketById.TransferAt = DateTime.Now;
-                        //    concernTicketById.TransferBy = command.Transfer_By;
-                        //    concernTicketById.ChannelId = concernTicket.ChannelId;
-                        //    concernTicketById.UserId = concernTicket.UserId;
-                        //    concernTicketById.RequestGeneratorId = concernTicket.RequestGeneratorId;
-                        //    concernTicketById.IsApprove = false;
-                        //    concernTicketById.Remarks = TicketingConString.Transfer;
-                        //}
+                        ticketConcernExist.IsTransfer = true;
+                        ticketConcernExist.TransferAt = DateTime.Now;
+                        ticketConcernExist.TransferBy = transferTicketExist.TicketConcern.UserId;
 
-                        //if(ticketHistoryId.Status != TicketingConString.ReceiverApproveBy)
-                        //{
-                        //    var addTicketHistory = new TicketHistory
-                        //    {
-                        //        RequestGeneratorId = requestTicketExist.Id,
-                        //        ApproverBy = command.Approver_By,
-                        //        RequestorBy = userTranferTicket.First().AddedBy,
-                        //        TransactionDate = DateTime.Now,
-                        //        Request = TicketingConString.Transfer,
-                        //        Status = TicketingConString.ReceiverApproveBy
-                        //    };
+                        ticketConcernExist.IsApprove = false;
+                        ticketConcernExist.IsTransfer = true;
+                        ticketConcernExist.Remarks = transferTicketExist.TransferRemarks;
+                        ticketConcernExist.ChannelId = null;
+                        ticketConcernExist.UserId = null;
+                        ticketConcernExist.CategoryId = null;
+                        ticketConcernExist.SubCategoryId = null;
+                        ticketConcernExist.StartDate = null;
+                        ticketConcernExist.TargetDate = null;
+                        ticketConcernExist.IsAssigned = null;
 
-                        //    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-                        //}
+                        var requestorReceiver = await _context.Receivers
+                            .FirstOrDefaultAsync(x => x.BusinessUnitId == ticketConcernExist.RequestorByUser.BusinessUnitId);
+
+                        var addNewTicketTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"New concern received from : {userDetails.Fullname}",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = requestorReceiver.UserId.Value,
+                            Modules = command.Modules,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+
                     }
-                 }
+
+                }
+                else
+                {
+                    return Result.Failure(TransferTicketError.ApproverUnAuthorized());
+                }
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

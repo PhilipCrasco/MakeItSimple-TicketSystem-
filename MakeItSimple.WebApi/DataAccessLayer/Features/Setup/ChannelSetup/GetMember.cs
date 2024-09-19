@@ -11,16 +11,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
         {
             public Guid? UserId { get; set; }
             public string EmpId { get; set; }
-            public  string FullName { get; set; }
-            public string UserRole {  get; set; }
+            public string FullName { get; set; }
+            public string UserRole { get; set; }
 
         }
 
         public class GetMemberQuery : IRequest<Result>
         {
-            public int ? ChannelId { get; set; }
+            public int? ChannelId { get; set; }
 
-            public  List<int> ? DepartmentId  { get; set; }
+            public List<int>? DepartmentId { get; set; }
 
 
         }
@@ -38,12 +38,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             {
                 var channelUsers = await _context.ChannelUsers
                     .Where(x => x.ChannelId == request.ChannelId)
-                    .ToListAsync(); 
+                    .ToListAsync();
 
                 var selectedChannelUsers = channelUsers.Select(x => x.UserId);
 
-                var departmentList = await _context.Departments.Where(x => request.DepartmentId.Contains(x.Id)).ToListAsync();
+                var departmentList = await _context.Departments.ToListAsync();
 
+                if (request.DepartmentId.Count() > 0 && departmentList != null)
+                {
+                    departmentList = await _context.Departments.Where(x => request.DepartmentId.Contains(x.Id)).ToListAsync();
+                }
                 var departmentSelect = departmentList.Select(x => x.Id).ToList();
 
                 var results = await _context.Users
@@ -57,7 +61,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         FullName = x.Fullname,
                         UserRole = x.UserRole.UserRoleName
 
-                    }).ToListAsync();   
+                    }).ToListAsync();
 
                 return Result.Success(results);
             }

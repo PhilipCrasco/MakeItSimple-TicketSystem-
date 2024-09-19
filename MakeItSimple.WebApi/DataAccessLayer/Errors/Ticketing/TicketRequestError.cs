@@ -6,6 +6,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
     {
       public static Error TicketIdNotExist() =>
       new Error("TicketRequest.TicketNotExist", "Ticket transaction not exist!");
+      public static Error RequestConcernIdNotExist() =>
+      new Error("TicketRequest.RequestConcernIdNotExist", "Request concern not exist!");
       public static Error TicketConcernIdNotExist() =>
       new Error("TicketRequest.TicketConcernIdNotExist", "Ticket concern not exist!");
       public static Error DepartmentNotExist() =>
@@ -62,15 +64,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       public static Error NotAutorizeToDelete() =>
       new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to delete!");
 
-      public static Error ProhibitedWord(string comment) =>
+        public static Error NotAutorize() =>
+        new Error("TicketRequest.NotAutorize", "User not Autorize!");
+
+        public static Error ProhibitedWord(string comment) =>
       new Error("TicketRequest.ProhibitedWord", $"Warning Inappropriate word '{comment}'!");
       public static Error TicketCommentNotExist() =>
       new Error("TicketRequest.TicketCommentNotExist", "Comment not Exist!");
 
      public static Error UnAuthorizedReceiver() =>
-     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized to approve concern!");
+     new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized!");
 
      public static Error NoComment() =>
      new Error("TicketRequest.NoComment", "No comment has been made!");
+     
+     public static Error InvalidReturnTicket() =>
+     new Error("TicketRequest.InvalidReturnTicket", "Return ticket invalid!");
+
+     public static Error InvalidTargetDate() =>
+     new Error("TicketRequest.InvalidTargetDate", "Invalid target date!");
+
+     public static Error ConfirmAlready() =>
+     new Error("TicketRequest.ConfirmAlready", "Concern already been confirm!");
+
+     public static Error TransactionNotExist() =>
+     new Error("TicketRequest.TransactionNotExist", "Ticketing Transaction not exist!");
     }
 }

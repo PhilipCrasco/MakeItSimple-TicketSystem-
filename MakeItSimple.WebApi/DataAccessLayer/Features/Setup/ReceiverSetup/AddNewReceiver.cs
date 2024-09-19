@@ -29,7 +29,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
         }
 
-
         public class Handler : IRequestHandler<AddNewReceiverCommand, Result>
         {
             private readonly MisDbContext _context;
@@ -44,8 +43,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
 
                 var receiverList = new List<Receiver>();
 
-                var userNotExist = await _context.Users.Where(x => x.Id == command.UserId
-                && x.UserRole.UserRoleName == TicketingConString.Receiver).FirstOrDefaultAsync(cancellationToken);
+                var allUserList = await _context.UserRoles
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var receiverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver))
+                    .Select(x => x.Id).ToList();
+
+                var userNotExist = await _context.Users
+                    .Where(x => x.Id == command.UserId
+                && receiverPermissionList.Contains(x.UserRoleId))
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (userNotExist == null)
                 {
@@ -105,7 +115,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         else
                         {
 
-
                             var addNewReceiver = new Receiver
                             {
                                 UserId = command.UserId,
@@ -125,7 +134,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                     else
                     {
 
-
                         var addNewReceiver = new Receiver
                         {
                             UserId = command.UserId,
@@ -139,9 +147,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ReceiverSetup
                         receiverList.Add(addNewReceiver);
 
                     }
-
-
-
 
                 }
 

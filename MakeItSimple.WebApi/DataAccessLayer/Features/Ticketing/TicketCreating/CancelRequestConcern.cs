@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,18 +11,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class CancelRequestConcernCommand : IRequest<Result>
         {
-            public List<CancelRequest> CancelRequests { get; set; }
-            public class CancelRequest
-            {
-               
-                public int? RequestGeneratorId { get; set; }
-                public List<RequestAttachment> RequestAttachments { get; set; }
 
-                public class RequestAttachment
-                {
-                    public int? TicketAttachmentId { get; set;}
-                }
-            }
+            public int? RequestConcernId { get; set; }
+            public string Modules { get; set; }
+
 
         }
         public class Handler : IRequestHandler<CancelRequestConcernCommand, Result>
@@ -35,53 +28,51 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(CancelRequestConcernCommand command, CancellationToken cancellationToken)
             {
-                foreach(var cancelRequestTransaction in command.CancelRequests)
+
+                var requestTransactionExist = await _context.RequestConcerns
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId);
+
+                if (requestTransactionExist == null)
                 {
-                    var requestGenaratorExist = await _context.RequestGenerators
-                        .FirstOrDefaultAsync(x => x.Id == cancelRequestTransaction.RequestGeneratorId);
-
-                    if (requestGenaratorExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.TicketIdNotExist());
-                    }
-
-                    if(cancelRequestTransaction.RequestAttachments.Count(x => x.TicketAttachmentId != null) <= 0)
-                    {
-                        var requestConcernList = await _context.RequestConcerns
-                            .Where(x => x.RequestGeneratorId == requestGenaratorExist.Id)
-                            .ToListAsync();
-
-                        foreach(var cancelRequest in requestConcernList)
-                        {
-                            cancelRequest.IsActive = false;
-                        }
-
-                        var requestConcernAttachmentList = await _context.RequestConcerns
-                            .Where(x => x.RequestGeneratorId == requestGenaratorExist.Id)
-                            .ToListAsync();
-
-                        foreach (var cancelAttachment in requestConcernAttachmentList)
-                        {
-                            cancelAttachment.IsActive = false;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var cancelAttachment in cancelRequestTransaction.RequestAttachments)
-                        {
-                            var requestAttachment = await _context.TicketAttachments
-                            .Where(x => x.Id == cancelAttachment.TicketAttachmentId)
-                            .FirstOrDefaultAsync();
-
-                            if (requestAttachment == null)
-                            {
-                                return Result.Failure(TicketRequestError.AttachmentNotExist());
-                            }
-
-                            requestAttachment.IsActive = false;
-                        }
-                    }
+                    return Result.Failure(TicketRequestError.RequestConcernIdNotExist());
                 }
+
+                requestTransactionExist.IsActive = false;
+
+                var ticketConcernExist = await _context.TicketConcerns
+                .FirstOrDefaultAsync(x => x.Id == requestTransactionExist.Id);
+
+                ticketConcernExist.IsActive = false;
+
+                var requestAttachment = await _context.TicketAttachments
+                .Where(x => x.TicketConcernId == ticketConcernExist.Id)
+                .ToListAsync();
+
+                foreach (var cancelAttachment in requestAttachment)
+                {
+                    cancelAttachment.IsActive = false;
+                }
+
+                var userReceiver = await _context.Receivers
+                    .FirstOrDefaultAsync(x => x.BusinessUnitId == requestTransactionExist.User.BusinessUnitId);
+
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket number {ticketConcernExist.Id} has been cancel",
+                    AddedBy = requestTransactionExist.UserId.Value,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = userReceiver.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+
+
                 await _context.SaveChangesAsync(cancellationToken);  
                 return Result.Success();
             }

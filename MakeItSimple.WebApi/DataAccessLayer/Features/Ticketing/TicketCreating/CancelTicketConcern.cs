@@ -1,4 +1,6 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using CloudinaryDotNet.Actions;
+using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -11,17 +13,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class CancelTicketConcernCommand : IRequest<Result>
         {
-            public List<CancelTicketGenerator> CancelTicketGenerators { get; set; }
-            public class CancelTicketGenerator
-            {
-                public int RequestGeneratorId { get; set; }
-                public Guid ? Issue_Handler {  get; set; }
-                public ICollection<CancelTicketConcern> CancelTicketConcerns { get; set; }
-                public class CancelTicketConcern
-                {
-                    public int? TicketConcernId { get; set; }
-                }
-            }
+            public int TicketConcernId { get; set; }
+            public string Role { get; set; }
+            public string Modules { get; set; }
 
         }
 
@@ -36,51 +30,59 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(CancelTicketConcernCommand command, CancellationToken cancellationToken)
             {
-                //var cancelList = new List<CancelTicketConcern>();
 
-                foreach (var ticketGenerator in command.CancelTicketGenerators)
+                var ticketConcernExist = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
+
+                if (ticketConcernExist == null)
+                {
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
+                }
+
+                var userRoleList = await _context.UserRoles.ToListAsync();
+
+                var receiverPermission = userRoleList
+                .Where(x => x.Permissions.Contains(TicketingConString.Receiver))
+                .Select(x => x.UserRoleName);
+
+                if(!receiverPermission.Any(x => x.Contains(command.Role)))
+                {
+                    return Result.Failure(TicketRequestError.UnAuthorizedReceiver());
+                }
+
+                ticketConcernExist.IsActive = false;
+
+                var requestConcernExist = await _context.RequestConcerns
+                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
+
+                requestConcernExist.IsActive = false;
+
+                var ticketAttachmentList =  await _context.TicketAttachments
+                    .Where(x => x.TicketConcernId == ticketConcernExist.Id)
+                    .ToListAsync();
+
+                foreach (var ticketAttachment in ticketAttachmentList)
+                {
+                    ticketAttachment.IsActive = false;
+                }
+
+                var userReceiver = await _context.Receivers
+                    .FirstOrDefaultAsync(x => x.BusinessUnitId == ticketConcernExist.RequestorByUser.BusinessUnitId);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    var requestGeneratorExist = await _context.RequestGenerators.FirstOrDefaultAsync(x => x.Id == ticketGenerator.RequestGeneratorId, cancellationToken);
-                    if (requestGeneratorExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.TicketIdNotExist());
-                    }
+                    Message = $"Ticket number {ticketConcernExist.Id} has been cancel",
+                    AddedBy = ticketConcernExist.RequestorBy.Value,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = userReceiver.UserId.Value,
+                    Modules = command.Modules,
 
-                    var issueHandlerExist = await _context.TicketConcerns.Where(x => x.RequestGeneratorId == requestGeneratorExist.Id
-                    && x.UserId == ticketGenerator.Issue_Handler).FirstOrDefaultAsync();
+                };
 
-                    if (issueHandlerExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.UserNotExist());
-                    }
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
-                    var ticketConcernExist = await _context.TicketConcerns
-                        .Where(x => x.RequestGeneratorId == ticketGenerator.RequestGeneratorId && x.UserId == ticketGenerator.Issue_Handler).ToListAsync();
-
-                    if (ticketGenerator.CancelTicketConcerns == null)
-                    {
-                        foreach (var cancelAll in ticketConcernExist)
-                        {
-                            cancelAll.IsActive = false;
-                        }
-                    }
-
-                    foreach (var ticketConcern in ticketGenerator.CancelTicketConcerns)
-                    {
-                        var ticketConcernById = ticketConcernExist.FirstOrDefault(x => x.Id == ticketConcern.TicketConcernId);
-                        if (ticketConcernById != null)
-                        {
-                            ticketConcernById.IsActive = false;
-                        }
-                        else
-                        {
-                            return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
-                        }
-
-                    }
-
-                }
 
                 await _context.SaveChangesAsync(cancellationToken);
 

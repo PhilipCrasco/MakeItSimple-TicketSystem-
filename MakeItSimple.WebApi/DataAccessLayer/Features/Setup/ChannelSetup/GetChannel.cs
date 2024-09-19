@@ -26,6 +26,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
             public class ChannelUser
             {
                 public int ? ChannelId { get; set; }
+                public int ? DepartmentId { get; set; }
+                public string Department_Code { get; set; }
+                public string Department_Name { get; set; }
                 public int ChannelUserId {  get; set; }
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
@@ -51,8 +54,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public async Task<PagedList<GetChannelResult>> Handle(GetChannelQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Channel> channelQuery = _context.Channels.Include(x => x.AddedByUser)
-                    .Include(x => x.ModifiedByUser).Include(x => x.ChannelUsers);
+                IQueryable<Channel> channelQuery = _context.Channels
+                    .Include(x => x.AddedByUser)
+                    .Include(x => x.ModifiedByUser)
+                    .Include(x => x.ChannelUsers)
+                    .Include(x => x.User)
+                    .ThenInclude(x => x.Department);
 
                 if (!string.IsNullOrEmpty(request.Search))
                 {
@@ -68,7 +75,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 {
                     Id = x.Id,
                     Channel_Name = x.ChannelName,
-                    Added_By = x.AddedByUser.Fullname,
+                    Added_By = x.AddedByUser.Fullname, 
                     Created_At = x.CreatedAt,
                     Updated_At = x.UpdatedAt,
                     Modified_By = x.ModifiedByUser.Fullname,
@@ -78,6 +85,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                     {
                         ChannelId = x.ChannelId,
                         ChannelUserId = x.Id,
+                        DepartmentId = x.Id,
+                        Department_Code = x.User.Department.DepartmentCode,
+                        Department_Name = x.User.Department.DepartmentName,
                         UserId = x.UserId,
                         Fullname = x.User.Fullname,
                         UserRole = x.User.UserRole.UserRoleName

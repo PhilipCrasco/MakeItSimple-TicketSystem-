@@ -17,11 +17,10 @@
         public string FileName { get; set; }
         public decimal? FileSize { get; set; }
 
-        public int? RequestGeneratorId { get; set; }
-        public virtual RequestGenerator RequestGenerator { get; set; }
 
-        //public int? TicketConcernId { get; set; }
-        //public virtual TicketConcern TicketConcern { get; set; }
+        public int? TicketConcernId { get; set; }
+        public virtual TicketConcern TicketConcern { get; set; }
+
         public bool? IsClicked { get; set; }
 
 

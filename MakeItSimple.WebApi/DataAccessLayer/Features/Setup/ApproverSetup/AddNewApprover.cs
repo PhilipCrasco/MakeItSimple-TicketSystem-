@@ -5,7 +5,7 @@ using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using MoreLinq;
+
 using System.Linq;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup

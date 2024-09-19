@@ -5,6 +5,7 @@ using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
 {
@@ -19,15 +20,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
             public string SubUnit_Name { get; set; }
             public Guid? Added_By { get; set; }
             public Guid? Modified_By { get; set; }
+            public string Location_Code { get; set; }
+            public string Location_Name { get; set; }
 
-            public List<Location> Locations { get; set; }
 
-            public class Location
-            {
 
-                public string Location_Code { get; set; }
-                public string Location_Name { get; set; }
-            }
+
+
+
 
         }
 
@@ -50,7 +50,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                 }
 
 
-                var subUnitExist = await _context.SubUnits.FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
+                var subUnitExist = await _context.SubUnits
+                    .FirstOrDefaultAsync(x => x.Id == command.SubUnitId, cancellationToken);
 
                 if (subUnitExist != null)
                 {
@@ -128,26 +129,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.SubUnitSetup
                     await _context.SubUnits.AddAsync(addSubUnit);
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    foreach (var location in command.Locations)
+                    var locationExist = await _context.Locations
+                        .FirstOrDefaultAsync(x => x.LocationCode == command.Location_Code, cancellationToken);
+
+                    if (locationExist == null)
                     {
-                        var locationExist = await _context.Locations.FirstOrDefaultAsync(x => x.LocationCode == location.Location_Code, cancellationToken);
-                        if (locationExist == null)
-                        {
-                            return Result.Failure(SubUnitError.LocationNotExist());
-                        }
-
-                        var addLocation = new Location
-                        {
-                            LocationNo = locationExist.LocationNo,
-                            LocationCode = locationExist.LocationCode,
-                            LocationName = locationExist.LocationName,
-                            SubUnitId = addSubUnit.Id,
-                            AddedBy = command.Added_By
-                        };
-
-                        await _context.Locations.AddAsync(addLocation, cancellationToken);
-
+                        return Result.Failure(SubUnitError.LocationNotExist());
                     }
+
+                    var addLocation = new Models.Setup.LocationSetup.Location
+                    {
+                        LocationNo = locationExist.LocationNo,
+                        LocationCode = locationExist.LocationCode,
+                        LocationName = locationExist.LocationName,
+                        SubUnitId = addSubUnit.Id,
+                        AddedBy = command.Added_By
+                    };
+
+                    await _context.Locations.AddAsync(addLocation, cancellationToken);
 
                 }
 

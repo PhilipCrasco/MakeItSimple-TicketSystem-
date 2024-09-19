@@ -1,28 +1,24 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddCommentNotificationValidator;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddDevelopingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddNewTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApproveRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelRequestConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestConcern.GetRequestConcernResult;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketHistory;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ReturnRequestTicket;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
+using Microsoft.AspNetCore.SignalR;
+using MakeItSimple.WebApi.Common.SignalR;
+
 
 
 namespace MakeItSimple.WebApi.Controllers.Ticketing
@@ -32,10 +28,14 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
     public class RequestConcernController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly TimerControl _timerControl;
+        private readonly IHubContext<NotificationHub> _client;
 
-        public RequestConcernController(IMediator mediator)
+        public RequestConcernController(IMediator mediator , TimerControl timerControl , IHubContext<NotificationHub> client)
         {
             _mediator = mediator;
+            _timerControl = timerControl;
+            _client = client;
         }
 
 
@@ -82,17 +82,11 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-
         [HttpPut("remove-attachment")]
         public async Task<IActionResult> RemoveTicketAttachment([FromBody] RemoveTicketAttachmentCommand command)
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.UserId = userId;
-
-                }
                 var result = await _mediator.Send(command);
                 if(result.IsFailure)
                 {
@@ -124,7 +118,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     {
                         command.Added_By = userId;
                         command.Modified_By = userId;
-                        //command.IssueHandler = userId;
 
                     }
                 }
@@ -143,67 +136,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
-        [HttpPost("add-development")]
-        public async Task<IActionResult> AddDevelopingTicket([FromForm] AddDevelopingTicketCommand command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.Added_By = userId;
-                        command.Modified_By = userId;
-                        //command.IssueHandler = userId;
-
-                    }
-                }
-                var result = await _mediator.Send(command);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-
-
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-        [HttpPost("attachment/{id}")]
-        public async Task<IActionResult> AddNewTicketAttachment([FromForm] AddNewTicketAttachmentCommand command, [FromRoute] int id)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                {
-                    command.Added_By = userId;
-                    command.Modified_By = userId;
-                }
-
-                command.RequestGeneratorId = id;
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
 
         [HttpGet("request-attachment")]
         public async Task<IActionResult> GetRequestAttachment([FromQuery] GetRequestAttachmentQuery query)
@@ -228,7 +160,17 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         {
             try
             {
-                var results = await _mediator.Send(command);
+
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
+                }
+
+                    var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
                     return BadRequest(results);
@@ -284,9 +226,13 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     requestConcern.TotalPages,
                     requestConcern.HasPreviousPage,
                     requestConcern.HasNextPage
-                };
+                }; 
 
                 var successResult = Result.Success(result);
+
+
+                await _client.Clients.All.SendAsync("ReceiveNotification", "New data has been received or sent.");
+
                 return Ok(successResult);
             }
             catch (Exception ex)
@@ -296,62 +242,8 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        [HttpGet("page")]
-        public async Task<IActionResult> GetRequestConcern([FromQuery] GetRequestConcernQuery query)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        query.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-
-                    }
-                }
-
-                var requestConcern = await _mediator.Send(query);
-
-                Response.AddPaginationHeader(
-
-                requestConcern.CurrentPage,
-                requestConcern.PageSize,
-                requestConcern.TotalCount,
-                requestConcern.TotalPages,
-                requestConcern.HasPreviousPage,
-                requestConcern.HasNextPage
-
-                );
-
-                var result = new
-                {
-                    requestConcern,
-                    requestConcern.CurrentPage,
-                    requestConcern.PageSize,
-                    requestConcern.TotalCount,
-                    requestConcern.TotalPages,
-                    requestConcern.HasPreviousPage,
-                    requestConcern.HasNextPage
-                };
-
-                var successResult = Result.Success(result);
-                return Ok(successResult);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
-        [HttpPut("approve-request")]
-        public async Task<IActionResult> ApproveRequestTicket([FromBody] ApproveRequestTicketCommand command)
+        [HttpPut("approval-request-receiver")]
+        public async Task<IActionResult> RequestApprovalReceiver([FromBody] RequestApprovalReceiverCommand command)
         {
             try
             {
@@ -385,14 +277,28 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }
         }
 
+
         [HttpPut("reject")]
         public async Task<IActionResult> RejectRequestTicket([FromBody] RejectRequestTicketCommand command)
         {
             try
             {
+                if (User.Identity is ClaimsIdentity identity)
+                {
+                    var userRole = identity.FindFirst(ClaimTypes.Role);
+                    if (userRole != null)
+                    {
+                        command.Role = userRole.Value;
+                    }
 
+                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
+                    {
+                        command.Reject_By = userId;
 
-                var results = await _mediator.Send(command);
+                    }
+                }
+
+                    var results = await _mediator.Send(command);
                 if (results.IsFailure)
                 {
                     return BadRequest(results);
@@ -406,51 +312,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
         }
 
-
-        [HttpPut("return")]
-        public async Task<IActionResult> ReturnRequestTicket([FromBody] ReturnRequestTicketCommand command)
-        {
-            try
-            {
-
-
-                var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
-
-
-        [HttpGet("history/{id}")]
-        public async Task<IActionResult> GetTicketHistory([FromRoute] int id)
-        {
-            try
-            {
-                var query = new GetTicketHistoryQuery
-                {
-                    TicketGeneratorId = id
-                };
-
-                var results = await _mediator.Send(query);
-                if (results.IsFailure)
-                {
-                    return BadRequest(query);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
 
         [HttpPost("add-comment")]
         public async Task<IActionResult> AddTicketComment([FromForm] AddTicketCommentCommand command)
@@ -525,7 +386,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                     command.UserId = userId;
                     command.Added_By = userId;  
 
-                }
+                }    
                 var result = await _mediator.Send(command);
                 if(result.IsFailure)
                 {

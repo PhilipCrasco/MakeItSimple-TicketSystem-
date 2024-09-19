@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup.GetDepartment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.DepartmentSetup.GetUserDepartment;
 
 namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
 {
@@ -80,6 +81,25 @@ namespace MakeItSimple.WebApi.Controllers.Setup.DepartmentController
             catch(Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("user-department")]
+        public async Task<IActionResult> GetUserDepartment([FromQuery] GetUserDepartmentCommand command)
+        {
+            try
+            {
+                var result = await _mediator.Send(command);
+                if(result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
+            }
+            catch( Exception ex )
+            {
+                return Conflict(ex.Message );
             }
         }
 

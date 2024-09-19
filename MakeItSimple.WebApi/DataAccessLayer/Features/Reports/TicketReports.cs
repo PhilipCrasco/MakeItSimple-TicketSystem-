@@ -1,4 +1,4 @@
-﻿using Humanizer;
+﻿ using Humanizer;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 {
@@ -32,10 +33,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
         public class TicketReportsQuery : UserParams , IRequest<PagedList<Reports>>
         {
-            public int ? Department { get; set; }
+
+            public string Search {  get; set; }
             public Guid ? UserId { get; set; }
             public string Status { get; set; }
             public string Remarks { get; set; }
+            public DateTime ? Date_From { get; set; }
+            public DateTime ? Date_To { get; set; }
 
         }
 
@@ -66,8 +70,62 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
 
+                if(request.UserId is not null)
+                {
+                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
+                }
 
-                
+                if(!string.IsNullOrEmpty(request.Status))
+                {
+                    switch(request.Status)
+                    {
+                        case TicketingConString.OpenTicket:
+                            ticketQuery = ticketQuery
+                                .Where(x => x.IsApprove == true && x.IsClosedApprove != true); 
+                            break;
+
+                        case TicketingConString.Closed:
+                            ticketQuery = ticketQuery
+                                .Where(x => x.IsApprove == true && x.IsClosedApprove == true);
+                            break;  
+                               
+                        default:
+                             return new PagedList<Reports>(new List<Reports>(), 0, request.PageNumber, request.PageSize);
+
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Remarks))
+                {
+                    switch (request.Remarks)
+                    {
+                        case TicketingConString.OnTime:
+                            ticketQuery = ticketQuery
+                                .Where(x => x.Closed_At != null  && x.TargetDate.Value > x.Closed_At.Value);
+                            break;
+
+                        case TicketingConString.Delay:
+                            ticketQuery = ticketQuery
+                                .Where(x => x.Closed_At != null && x.TargetDate.Value < x.Closed_At.Value);
+                            break;
+
+                        default:
+                            return new PagedList<Reports>(new List<Reports>(), 0, request.PageNumber, request.PageSize);
+
+                    }
+                }
+
+                if(string.IsNullOrEmpty(request.Search))
+                {
+                    ticketQuery = ticketQuery.Where(x => x.Id.ToString()
+                    .Contains(request.Search));
+                }
+
+                if(request.Date_From is not null && request.Date_To is not null)
+                {
+                    ticketQuery = ticketQuery
+                        .Where(x => x.TargetDate >= request.Date_From && x.TargetDate < request.Date_To);
+                }
 
                 var results = ticketQuery
                     .Select(x => new Reports
@@ -87,10 +145,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                        Efficeincy = x.Closed_At != null ? Math.Max(0,100m - ((decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
                        / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
                        Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
-                       Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.Delay : TicketingConString.OnTime
+                       Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.OnTime : TicketingConString.Delay
                     });
-
-
 
                 return await PagedList<Reports>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

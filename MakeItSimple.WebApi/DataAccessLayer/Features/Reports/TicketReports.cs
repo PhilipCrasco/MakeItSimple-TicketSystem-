@@ -1,4 +1,6 @@
-﻿using MakeItSimple.WebApi.Common;
+﻿using Humanizer;
+using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -22,20 +24,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
             public DateTime Target_Date { get; set; }
             public DateTime Actual { get; set; }
             public int Varience {get; set;}
-            public string Efficeincy { get; set; }
+            public decimal ? Efficeincy { get; set; }
             public string Status { get; set; }
             public string Remarks { get; set; }
 
-
         }
 
-        public class RequestConcernReportsQuery : UserParams , IRequest<PagedList<Reports>>
+        public class TicketReportsQuery : UserParams , IRequest<PagedList<Reports>>
         {
+            public int ? Department { get; set; }
+            public Guid ? UserId { get; set; }
+            public string Status { get; set; }
+            public string Remarks { get; set; }
 
         }
 
 
-        public class Handler : IRequestHandler<RequestConcernReportsQuery, PagedList<Reports>>
+        public class Handler : IRequestHandler<TicketReportsQuery, PagedList<Reports>>
         {
             private readonly MisDbContext _context;
 
@@ -44,11 +49,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                 _context = context;
             }
 
-            public async Task<PagedList<Reports>> Handle(RequestConcernReportsQuery request, CancellationToken cancellationToken)
+            public async Task<PagedList<Reports>> Handle(TicketReportsQuery request, CancellationToken cancellationToken)
             {
 
                 IQueryable<TicketConcern> ticketQuery = _context.TicketConcerns
-                    .AsNoTracking()
+                    .AsNoTracking() 
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
@@ -60,6 +65,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .Include(x => x.TransferTicketConcerns)
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
+
+
+                
 
                 var results = ticketQuery
                     .Select(x => new Reports
@@ -76,8 +84,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                         Actual = x.Closed_At != null ? new DateTime(x.Closed_At.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year)
                         : new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
                        Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date , x.Closed_At.Value.Date),
-
-
+                       Efficeincy = x.Closed_At != null ? Math.Max(0,100m - ((decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
+                       / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
+                       Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
+                       Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.Delay : TicketingConString.OnTime
                     });
 
 

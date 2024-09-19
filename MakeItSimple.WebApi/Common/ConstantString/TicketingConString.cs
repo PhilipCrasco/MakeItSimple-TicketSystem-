@@ -30,20 +30,14 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         //Close History
 
         public const string CloseRequest = "Ticket closure requested";
-
         public const string CloseForApproval = "Ticket closure pending approval from";
-
         public const string CloseCancel = "Ticket closure request canceled";
         public const string CloseReject = "Ticket closure request rejected by";
         public const string CloseApprove = "Ticket closure request approved by";
         public const string CloseApproveReceiver = "Receiver approved the ticket closure request";
         public const string CloseConfirm = "Ticket confirmed as resolved";
-
         public const string CloseForConfirmation = "Ticket closure for confirmation by";
-
         public const string CloseReturn = "Ticket remains open due to unresolved issues";
-
-
 
         //Transfer History
 
@@ -62,14 +56,11 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string ReDateReject = "Ticket re-date request rejected by";
         public const string ReDateApprove = "Ticket re-date request approved by";
 
-
-
         public const string RejectedBy = "Request was rejected";
         public const string RequestUpdate = "Request updated";
         public const string ApproveBy = "Request approve by";
         public const string ReceiverApproveBy = "Request has been approved by receiver";
         public const string Returned = "Request was returned";
-
 
         // Concern Status 
         public const string ConcernAssign = "Assign";
@@ -92,13 +83,10 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string OpenTicket = "Open Ticket";
         public const string PendingRequest = "Pending Request";
         public const string ForReDate = "For Re-Date";
-
         public const string ClosedTicket = "ClosedTicket";
         public const string TransferTicket = "Transfer Ticket";
         public const string CloseTicket = "Closing Ticket";
-
         public const string Open = "Open Ticket";
-
         public const string ReTicket = "Re-Ticket";
         public const string ReDate = "Re-Date";
         public const string Closed = "Closed";
@@ -106,16 +94,8 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string Request = "Request Concern";
         public const string NotConfirm = "For Confirmation";
         public const string Approve = "Approved";
-
-
-
         public const string TicketClosed = "Ticket Closed";
-
         public const string RequestApproval = "For approval by ";
-
-        //public const string ApprovalHistory = "For Approval of";
-
-
         public const string OnTime = "On-Time";
         public const string Delay = "Delay";
 

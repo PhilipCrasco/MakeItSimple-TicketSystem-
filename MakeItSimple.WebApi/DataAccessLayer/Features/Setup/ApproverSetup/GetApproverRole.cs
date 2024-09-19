@@ -38,21 +38,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
             public async Task<Result> Handle(GetApproverRoleQuery request, CancellationToken cancellationToken)
             {
 
-                var approver = await _context.Approvers.Where(x => x.SubUnitId == request.SubUnitId).ToListAsync();
+                var approver = await _context.Approvers
+                    .Where(x => x.SubUnitId == request.SubUnitId)
+                    .Select(x => x.UserId)
+                    .ToListAsync();
 
-                var selectApprover = approver.Select(x => x.UserId);
-
-                var allUserRole = await _context.UserRoles.ToListAsync();
+                var allUserRole = await _context.UserRoles
+                    .ToListAsync();
 
                 var roleList = allUserRole
                     .Where(x => x.Permissions.Contains(TicketingConString.Approver))
-                     .ToList();
-
-                var roleSelect = roleList.Select(x => x.Id).ToList();
+                    .Select(x => x.Id)
+                    .ToList();
 
                 var results = await _context.Users
                     .Include(x => x.UserRole)
-                    .Where(x => !selectApprover.Contains(x.Id) && roleSelect.Contains(x.UserRoleId)
+                    .Where(x => !approver.Contains(x.Id) && roleList.Contains(x.UserRoleId)
                    && x.IsActive == true )
                     .Select(x => new GetApproverRoleResult
                     {

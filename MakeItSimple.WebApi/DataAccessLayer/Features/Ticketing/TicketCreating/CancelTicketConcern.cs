@@ -15,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         {
             public int TicketConcernId { get; set; }
             public string Role { get; set; }
+            public string Modules { get; set; }
 
         }
 
@@ -31,6 +32,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
 
                 var ticketConcernExist = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
                     .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId, cancellationToken);
 
                 if (ticketConcernExist == null)
@@ -64,6 +66,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     ticketAttachment.IsActive = false;
                 }
+
+                var userReceiver = await _context.Receivers
+                    .FirstOrDefaultAsync(x => x.BusinessUnitId == ticketConcernExist.RequestorByUser.BusinessUnitId);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket number {ticketConcernExist.Id} has been cancel",
+                    AddedBy = ticketConcernExist.RequestorBy.Value,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = userReceiver.UserId.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
 
                 await _context.SaveChangesAsync(cancellationToken);
 

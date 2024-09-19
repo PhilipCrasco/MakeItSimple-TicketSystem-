@@ -16,6 +16,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
         {
             public Guid ? Transacted_By {  get; set; }
             public int? ClosingTicketId { get; set; }
+
+            public string Modules { get; set; }
         }
 
         public class Handler : IRequestHandler<CancelClosingTicketCommand, Result>
@@ -77,6 +79,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
+
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket closing request #{ticketConcernExist.Id} has been canceled.",
+                    AddedBy = closingTicketExist.AddedBy.Value,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = closingTicketExist.TicketApprover.Value,
+                    Modules = command.Modules,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

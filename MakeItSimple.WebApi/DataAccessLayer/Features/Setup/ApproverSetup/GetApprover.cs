@@ -48,8 +48,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
 
             public async Task<PagedList<GetApproverResult>> Handle(GetApproverQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<Approver> approverQuery = _context.Approvers.Include(x => x.User).Include(x => x.SubUnit)
-                                                      .Include(x => x.AddedByUser).Include(x => x.ModifiedByUser);
+                IQueryable<Approver> approverQuery = _context.Approvers
+                    .Include(x => x.User)
+                    .Include(x => x.SubUnit)
+                    .Include(x => x.AddedByUser)
+                    .Include(x => x.ModifiedByUser);
 
                 if(!string.IsNullOrEmpty(request.Search))
                 {
@@ -65,8 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                 var result = approverQuery.GroupBy(x => x.SubUnitId)
                                 .Select(x => new GetApproverResult
                                 {
-                                    SubUnitId = x.Key,
-                                   
+                                    SubUnitId = x.Key,   
                                     SubUnit_Code = x.First().SubUnit.SubUnitCode,
                                     SubUnit_Name = x.First().SubUnit.SubUnitName,
                                     Is_Active = x.First().IsActive,
@@ -81,7 +83,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ApproverSetup
                                        Fullname = x.User.Fullname,
                                        ApproverLevel = x.ApproverLevel
 
-                                    }).OrderBy(x => x.ApproverLevel).ToList(),
+                                    }).OrderBy(x => x.ApproverLevel)
+                                    .ToList(),
                                     
                                 });
 

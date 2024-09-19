@@ -68,8 +68,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var updateRequestAttachmentList = new List<TicketAttachment>();
                 var ticketConcernList = new List<TicketConcern>();
 
-                //var yearSuffix = DateTime.Now.Year % 100;
-
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
 
@@ -275,15 +273,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         updateRequestAttachmentList.Add(ticketAttachment);
                                     }
                                 }
-
-
+                                                                                   
                             }
 
                         }, cancellationToken));
 
                     }
                 }
-
 
                 if (updateRequestList.Any() || updateRequestAttachmentList.Any())
                 {

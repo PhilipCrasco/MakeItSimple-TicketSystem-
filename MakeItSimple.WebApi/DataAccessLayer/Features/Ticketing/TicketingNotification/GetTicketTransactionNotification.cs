@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             private readonly MisDbContext _context;
 
             public Handler(MisDbContext context)
-            { 
+            {                                                                                     
                 _context = context;
             }
 

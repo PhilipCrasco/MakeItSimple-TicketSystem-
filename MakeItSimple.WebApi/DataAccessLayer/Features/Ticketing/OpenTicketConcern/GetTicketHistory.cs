@@ -8,6 +8,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketCo
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern
 {
+
     public class GetTicketHistory
     {
         public class GetTicketHistoryResult
@@ -40,7 +41,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 public bool ? IsApproved { get; set; }
             }
         }
-
 
         public class GetTicketHistoryQuery : IRequest<Result>
         {
@@ -95,14 +95,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             Remarks = x.Remarks,
                             Approver_Level = x.Approver_Level,
                             IsApproved = x.IsApprove,
-                                     
+                                                                               
                         }).ToList(),
 
                     }).ToListAsync();
                     
-
                 return Result.Success(ticketHistory);
             }
+
         }
 
     }

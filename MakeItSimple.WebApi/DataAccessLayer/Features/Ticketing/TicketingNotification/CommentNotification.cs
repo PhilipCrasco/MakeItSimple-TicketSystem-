@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification
 {
-    public class CommentNotification
+    public class CommentNotification             
     {
         public class CommentTicketNotificationResult
         {

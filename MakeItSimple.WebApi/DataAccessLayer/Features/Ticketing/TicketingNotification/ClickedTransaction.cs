@@ -35,6 +35,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                 transactionExist.IsChecked = true;
 
+                await _context.SaveChangesAsync(cancellationToken);
+
                 return Result.Success();
             }
         }

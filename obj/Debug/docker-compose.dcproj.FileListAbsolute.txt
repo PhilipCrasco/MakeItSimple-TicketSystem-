@@ -84,4 +84,3 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcp
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\obj\Debug\docker-c.35A3FFBA.Up2Date
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\appsettings.json
-C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MakeItSimple.WebApi.staticwebassets.runtime.json

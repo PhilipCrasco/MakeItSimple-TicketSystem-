@@ -56,7 +56,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         Is_Checked = x.IsChecked,
                         Modules = x.Modules
 
-                    }).ToListAsync();
+                    }).OrderBy(x => x.Created_At)
+                    .ToListAsync();
 
                 return Result.Success(result);
             }

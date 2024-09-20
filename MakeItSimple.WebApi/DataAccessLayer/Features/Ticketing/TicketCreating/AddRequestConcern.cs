@@ -184,6 +184,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
+                //if(updateRequestList == null)
+                //{
                 var uploadTasks = new List<Task>();
 
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
@@ -273,7 +275,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                         updateRequestAttachmentList.Add(ticketAttachment);
                                     }
                                 }
-                                                                                   
+
                             }
 
                         }, cancellationToken));
@@ -290,6 +292,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
                 await Task.WhenAll(uploadTasks);
+
+                //}
+
+
+
+
+
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

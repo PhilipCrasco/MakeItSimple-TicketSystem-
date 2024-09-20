@@ -83,7 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    Message = $"Ticket closing request #{ticketConcernExist.Id} has been canceled.",
+                    Message = $"Ticket closing request #{ticketConcernExist.Id} has been canceled",
                     AddedBy = closingTicketExist.AddedBy.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = closingTicketExist.TicketApprover.Value,

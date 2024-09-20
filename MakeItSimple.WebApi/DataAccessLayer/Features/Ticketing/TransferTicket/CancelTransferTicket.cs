@@ -81,7 +81,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    Message = $"Ticket transfer request #{ticketConcernExist.Id} has been canceled.",
+                    Message = $"Ticket transfer request #{ticketConcernExist.Id} has been canceled",
                     AddedBy = transferTicketExist.AddedBy.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = transferTicketExist.TicketApprover.Value,

@@ -102,8 +102,8 @@ namespace MakeItSimple.WebApi.Common.ConstantString
 
         // Attachment
 
-        //public const string AttachmentPath = @"C:\inetpub\wwwroot\mis_assets";
-        public const string AttachmentPath = @"C:\MakeItSimplePic\Tickets";
+        public const string AttachmentPath = @"C:\inetpub\wwwroot\mis_assets";
+        //public const string AttachmentPath = @"C:\MakeItSimplePic\Tickets";
 
 
     }

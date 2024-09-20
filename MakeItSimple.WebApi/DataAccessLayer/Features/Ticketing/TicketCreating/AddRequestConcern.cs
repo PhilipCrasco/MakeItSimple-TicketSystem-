@@ -294,7 +294,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
 
-                var uploadTasks = new List<Task>();
+
+
+                if (!Directory.Exists(TicketingConString.AttachmentPath))
+                {
+                    Directory.CreateDirectory(TicketingConString.AttachmentPath);
+                }
 
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
                 {
@@ -339,25 +344,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             };
 
                             await _context.TicketAttachments.AddAsync(addAttachment);
-                        }
 
-                        string uploadDirectory = Path.Combine(Environment.CurrentDirectory, TicketingConString.AttachmentPath);
 
-                        if (!Directory.Exists(uploadDirectory))
-                        {
-                            Directory.CreateDirectory(uploadDirectory);
                         }
 
                         await using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await attachments.Attachment.CopyToAsync(stream);
                         }
-
                     }
                 }
-
-
-
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();

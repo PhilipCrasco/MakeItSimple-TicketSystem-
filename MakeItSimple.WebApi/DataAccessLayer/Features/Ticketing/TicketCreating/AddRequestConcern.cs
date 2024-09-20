@@ -48,6 +48,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             private readonly MisDbContext _context;
             private readonly Cloudinary _cloudinary;
             private readonly TransformUrl _url;
+            private readonly string _assetsPath = @"C:\inetpub\wwwroot\mis_assets";
 
             public Handler(MisDbContext context, IOptions<CloudinaryOption> options , TransformUrl url)
             {
@@ -184,22 +185,124 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 }
 
-                //if(updateRequestList == null)
-                //{
+                if(ticketConcernList == null)
+                {
+                    //var uploadTasks = new List<Task>();
+
+                    //if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
+                    //{
+                    //    foreach (var attachments in command.RequestAttachmentsFiles.Where(attachments => attachments.Attachment.Length > 0))
+                    //    {
+
+                    //        var ticketAttachment = await _context.TicketAttachments
+                    //            .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                    //        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
+                    //        {
+                    //            return Result.Failure(TicketRequestError.AttachmentNotNull());
+                    //        }
+
+                    //        if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                    //        {
+                    //            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                    //        }
+
+                    //        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                    //        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                    //        if (extension == null || !allowedFileTypes.Contains(extension))
+                    //        {
+                    //            return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                    //        }
+
+                    //        uploadTasks.Add(Task.Run(async () =>
+                    //        {
+                    //            await using var stream = attachments.Attachment.OpenReadStream();
+
+                    //            var attachmentsParams = new RawUploadParams
+                    //            {
+                    //                File = new FileDescription(attachments.Attachment.FileName, stream),
+                    //                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}",
+                    //            };
+
+                    //            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
+                    //            string attachmentUrl = attachmentResult.SecureUrl.ToString();
+                    //            string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
+
+                    //            if (ticketAttachment != null)
+                    //            {
+                    //                var hasChanged = false;
+
+                    //                if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
+                    //                {
+                    //                    ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
+                    //                    hasChanged = true;
+                    //                }
+
+                    //                if (hasChanged)
+                    //                {
+                    //                    ticketAttachment.ModifiedBy = command.Modified_By;
+                    //                    ticketAttachment.FileName = attachments.Attachment.FileName;
+                    //                    ticketAttachment.FileSize = attachments.Attachment.Length;
+                    //                    ticketAttachment.UpdatedAt = DateTime.Now;
+
+                    //                    if (ticketAttachment != null)
+                    //                    {
+                    //                        if (requestConcernIdExist.IsReject is true)
+                    //                        {
+                    //                            updateRequestAttachmentList.Add(ticketAttachment);
+                    //                        }
+                    //                    }
+                    //                }
+
+                    //            }
+                    //            else
+                    //            {
+                    //                var addAttachment = new TicketAttachment
+                    //                {
+                    //                    TicketConcernId = ticketConcernList.First().Id,
+                    //                    Attachment = attachmentResult.SecureUrl.ToString(),
+                    //                    FileName = attachments.Attachment.FileName,
+                    //                    FileSize = attachments.Attachment.Length,
+                    //                    AddedBy = command.Added_By,
+                    //                };
+
+                    //                await _context.TicketAttachments.AddAsync(addAttachment);
+
+                    //                if (requestConcernIdExist != null)
+                    //                {
+                    //                    if (requestConcernIdExist.IsReject is true)
+                    //                    {
+                    //                        updateRequestAttachmentList.Add(ticketAttachment);
+                    //                    }
+                    //                }
+
+                    //            }
+
+                    //        }, cancellationToken));
+
+                    //    }
+                    //}
+
+                    //if (updateRequestList.Any() || updateRequestAttachmentList.Any())
+                    //{
+                    //    requestConcernIdExist.Remarks = command.Remarks;
+                    //    requestConcernIdExist.IsReject = false;
+                    //    requestConcernIdExist.RejectBy = null;
+
+                    //}
+
+                    //await Task.WhenAll(uploadTasks);
+
+                }
+
+
                 var uploadTasks = new List<Task>();
 
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
                 {
-                    foreach (var attachments in command.RequestAttachmentsFiles.Where(attachments => attachments.Attachment.Length > 0))
+                    foreach (var attachments in command.RequestAttachmentsFiles.Where(a => a.Attachment.Length > 0))
                     {
-
-                        var ticketAttachment = await _context.TicketAttachments
-                            .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
-
-                        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
-                        {
-                            return Result.Failure(TicketRequestError.AttachmentNotNull());
-                        }
 
                         if (attachments.Attachment.Length > 10 * 1024 * 1024)
                         {
@@ -214,90 +317,51 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             return Result.Failure(TicketRequestError.InvalidAttachmentType());
                         }
 
+                        var fileName = $"{Guid.NewGuid()}{extension}";
+                        var filePath = Path.Combine(_assetsPath, fileName);
+
                         uploadTasks.Add(Task.Run(async () =>
                         {
-                            await using var stream = attachments.Attachment.OpenReadStream();
 
-                            var attachmentsParams = new RawUploadParams
+                            if (!Directory.Exists(_assetsPath))
                             {
-                                File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}",
-                            };
+                                Directory.CreateDirectory(_assetsPath);
+                            }
 
-                            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-                            string attachmentUrl = attachmentResult.SecureUrl.ToString();
-                            string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
+                            await using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await attachments.Attachment.CopyToAsync(stream);
+                            }
+
+                            var ticketAttachment = await _context.TicketAttachments
+                                .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
 
                             if (ticketAttachment != null)
                             {
-                                var hasChanged = false;
-
-                                if (ticketAttachment.Attachment != attachmentResult.SecureUrl.ToString())
-                                {
-                                    ticketAttachment.Attachment = attachmentResult.SecureUrl.ToString();
-                                    hasChanged = true;
-                                }
-
-                                if (hasChanged)
-                                {
-                                    ticketAttachment.ModifiedBy = command.Modified_By;
-                                    ticketAttachment.FileName = attachments.Attachment.FileName;
-                                    ticketAttachment.FileSize = attachments.Attachment.Length;
-                                    ticketAttachment.UpdatedAt = DateTime.Now;
-
-                                    if (ticketAttachment != null)
-                                    {
-                                        if (requestConcernIdExist.IsReject is true)
-                                        {
-                                            updateRequestAttachmentList.Add(ticketAttachment);
-                                        }
-                                    }
-                                }
-
+                                ticketAttachment.Attachment = filePath;
+                                ticketAttachment.FileName = attachments.Attachment.FileName;
+                                ticketAttachment.FileSize = attachments.Attachment.Length;
+                                ticketAttachment.UpdatedAt = DateTime.Now;
                             }
                             else
                             {
                                 var addAttachment = new TicketAttachment
                                 {
                                     TicketConcernId = ticketConcernList.First().Id,
-                                    Attachment = attachmentResult.SecureUrl.ToString(),
+                                    Attachment = filePath,
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,
                                     AddedBy = command.Added_By,
                                 };
 
                                 await _context.TicketAttachments.AddAsync(addAttachment);
-
-                                if (requestConcernIdExist != null)
-                                {
-                                    if (requestConcernIdExist.IsReject is true)
-                                    {
-                                        updateRequestAttachmentList.Add(ticketAttachment);
-                                    }
-                                }
-
                             }
 
                         }, cancellationToken));
-
                     }
                 }
 
-                if (updateRequestList.Any() || updateRequestAttachmentList.Any())
-                {
-                    requestConcernIdExist.Remarks = command.Remarks;
-                    requestConcernIdExist.IsReject = false;
-                    requestConcernIdExist.RejectBy = null;
-
-                }
-
                 await Task.WhenAll(uploadTasks);
-
-                //}
-
-
-
-
 
 
                 await _context.SaveChangesAsync(cancellationToken);

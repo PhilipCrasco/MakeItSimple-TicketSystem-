@@ -283,6 +283,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
+
+
+
+
                 }
 
                 var results = requestConcernsQuery

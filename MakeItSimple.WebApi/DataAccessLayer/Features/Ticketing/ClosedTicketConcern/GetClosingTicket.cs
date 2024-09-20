@@ -252,6 +252,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 }
 
                 var results = closingTicketsQuery
+                    .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new GetClosingTicketResults
                     {
                         ClosingTicketId = x.Id,

@@ -136,7 +136,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
-                    .ThenInclude(x => x.TicketAttachments) 
+                    .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.TransferTicketConcerns)
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
@@ -345,71 +345,78 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     }
 
                 }
-
-                var confirmConcernList = ticketConcernQuery
-                    .AsNoTrackingWithIdentityResolution()
-                    .Where(x => x.RequestConcern.Is_Confirm == null && x.RequestConcern.IsDone == true)
-                    .ToList();
-
+                 
                 var results = ticketConcernQuery
+                    .Join(_context.TicketHistories
+                    .AsNoTracking()
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.TicketConcernId,
+                        x.TransactionDate,
+                    }), 
+                    ticket => ticket.Id, history => history.TicketConcernId, 
+                    (ticket, history) =>
+                    new { ticket, history })
+                    .OrderByDescending(x => x.history.TransactionDate.Value)
                     .Select(x => new GetOpenTicketResult
                     {
 
-                        Closed_Status = x.TargetDate.Value.Day >= x.Closed_At.Value.Day && x.IsClosedApprove == true
-                        ? TicketingConString.OnTime : x.TargetDate.Value.Day < x.Closed_At.Value.Day && x.IsClosedApprove == true
+                        Closed_Status = x.ticket.TargetDate.Value.Day >= x.ticket.Closed_At.Value.Day && x.ticket.IsClosedApprove == true
+                        ? TicketingConString.OnTime : x.ticket.TargetDate.Value.Day < x.ticket.Closed_At.Value.Day && x.ticket.IsClosedApprove == true
                         ? TicketingConString.Delay : null,
-                        TicketConcernId = x.Id,
-                        RequestConcernId = x.RequestConcernId,
-                        Concern_Description = x.ConcernDetails,
-                        Requestor_By = x.RequestorBy,
-                        Requestor_Name = x.RequestorByUser.Fullname,
+                        TicketConcernId = x.ticket.Id,
+                        RequestConcernId = x.ticket.RequestConcernId,
+                        Concern_Description = x.ticket.ConcernDetails,
+                        Requestor_By = x.ticket.RequestorBy,
+                        Requestor_Name = x.ticket.RequestorByUser.Fullname,
 
-                        DepartmentId = x.RequestorByUser.DepartmentId,
-                        Department_Name = x.RequestorByUser.Department.DepartmentName,
+                        DepartmentId = x.ticket.RequestorByUser.DepartmentId,
+                        Department_Name = x.ticket.RequestorByUser.Department.DepartmentName,
 
-                        UnitId = x.User.UnitId,
-                        Unit_Name = x.User.Units.UnitName,
-                        SubUnitId = x.User.SubUnitId,
-                        SubUnit_Name = x.User.SubUnit.SubUnitName,
-                        ChannelId = x.ChannelId,
-                        Channel_Name = x.Channel.ChannelName,
+                        UnitId = x.ticket.User.UnitId,
+                        Unit_Name = x.ticket.User.Units.UnitName,
+                        SubUnitId = x.ticket.User.SubUnitId,
+                        SubUnit_Name = x.ticket.User.SubUnit.SubUnitName,
+                        ChannelId = x.ticket.ChannelId,
+                        Channel_Name = x.ticket.Channel.ChannelName,
 
-                        UserId = x.UserId,
-                        Issue_Handler = x.User.Fullname,
+                        UserId = x.ticket.UserId,
+                        Issue_Handler = x.ticket.User.Fullname,
 
-                        CategoryId = x.CategoryId,
-                        Category_Description = x.Category.CategoryDescription,
+                        CategoryId = x.ticket.CategoryId,
+                        Category_Description = x.ticket.Category.CategoryDescription,
 
-                        SubCategoryId = x.SubCategoryId,
-                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
+                        SubCategoryId = x.ticket.SubCategoryId,
+                        SubCategory_Description = x.ticket.SubCategory.SubCategoryDescription,
 
-                        Start_Date = x.StartDate,
-                        Target_Date = x.TargetDate,
+                        Start_Date = x.ticket.StartDate,
+                        Target_Date = x.ticket.TargetDate,
 
-                        Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
-                                        : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
-                                        : x.IsTransfer == false ? TicketingConString.ForTransfer
-                                        : x.IsReTicket == false ? TicketingConString.ForReticket
-                                        : x.IsReDate == false ? TicketingConString.ForReDate
-                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing
-                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
-                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true ? TicketingConString.Closed
+                        Ticket_Status = x.ticket.IsApprove == false ? TicketingConString.PendingRequest
+                                        : x.ticket.IsApprove == true && x.ticket.IsReTicket != false && x.ticket.IsTransfer != false && x.ticket.IsReDate != false && x.ticket.IsClosedApprove == null ? TicketingConString.OpenTicket
+                                        : x.ticket.IsTransfer == false ? TicketingConString.ForTransfer
+                                        : x.ticket.IsReTicket == false ? TicketingConString.ForReticket
+                                        : x.ticket.IsReDate == false ? TicketingConString.ForReDate
+                                        : x.ticket.IsClosedApprove == false ? TicketingConString.ForClosing
+                                        : x.ticket.IsClosedApprove == true && x.ticket.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
+                                        : x.ticket.IsClosedApprove == true && x.ticket.RequestConcern.Is_Confirm == true ? TicketingConString.Closed
                                         : "Unknown",
 
-                        Concern_Type = x.TicketType,
-                        Added_By = x.AddedByUser.Fullname,
-                        Created_At = x.CreatedAt,
-                        Remarks = x.Remarks,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        Updated_At = x.UpdatedAt,
-                        IsActive = x.IsActive,
+                        Concern_Type = x.ticket.TicketType,
+                        Added_By = x.ticket.AddedByUser.Fullname,
+                        Created_At = x.ticket.CreatedAt,
+                        Remarks = x.ticket.Remarks,
+                        Modified_By = x.ticket.ModifiedByUser.Fullname,
+                        Updated_At = x.ticket.UpdatedAt,
+                        IsActive = x.ticket.IsActive,
 
-                        Is_Closed = x.IsClosedApprove,
-                        Closed_At = x.Closed_At,
-                        Is_Transfer = x.IsTransfer,
-                        Transfer_At = x.TransferAt,
+                        Is_Closed = x.ticket.IsClosedApprove,
+                        Closed_At = x.ticket.Closed_At,
+                        Is_Transfer = x.ticket.IsTransfer,
+                        Transfer_At = x.ticket.TransferAt,
 
-                        GetForClosingTickets = x.ClosingTickets
+                        GetForClosingTickets = x.ticket.ClosingTickets
                        .Where(x => x.IsActive == true && x.IsRejectClosed == false)
                        .Where(x => x.IsClosing == true ? x.IsClosing == true : x.IsClosing == false)
                       .Select(x => new GetOpenTicketResult.GetForClosingTicket
@@ -431,7 +438,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                       }).ToList(),
 
-                        GetForTransferTickets = x.TransferTicketConcerns
+                        GetForTransferTickets = x.ticket.TransferTicketConcerns
                         .Where(x => x.IsActive == true && x.IsTransfer == false)
                         .Select(x => new GetOpenTicketResult.GetForTransferTicket
                         {
@@ -451,50 +458,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     });
 
-                //foreach (var confirmConcern in confirmConcernList)
-                //{
-
-                //    var daysClose = confirmConcern.Closed_At.Value.Day - dateToday.Day;
-
-                //    daysClose = Math.Abs(daysClose) * (1);
-
-                //    if (daysClose >= 1)
-                //    {
-                //        daysClose = daysClose * 24;
-                //    }
-
-                //    var hourConvert = (daysClose + confirmConcern.Closed_At.Value.Hour) - dateToday.Hour;
-
-                //    if (hourConvert >= hoursDiff)
-                //    {
-                //        var requestConcern = await _context.RequestConcerns
-                //            .FirstOrDefaultAsync(x => x.Id == confirmConcern.RequestConcernId);
-
-                //        requestConcern.Is_Confirm = true;
-                //        requestConcern.Confirm_At = DateTime.Today;
-                //        requestConcern.ConcernStatus = TicketingConString.Done;
-
-                //        var ticketConcernExist = await _context.TicketConcerns
-                //            .FirstOrDefaultAsync(x => x.Id == confirmConcern.Id);
-
-                //        var ticketHistory = await _context.TicketHistories
-                //            .Where(x => x.TicketConcernId == ticketConcernExist.Id
-                //             && x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
-                //            .FirstOrDefaultAsync();
-
-                //        if (ticketHistory is not null)
-                //        {
-                //            ticketHistory.TicketConcernId = ticketConcernExist.Id;
-                //            ticketHistory.TransactedBy = request.UserId;
-                //            ticketHistory.TransactionDate = DateTime.Now;
-                //            ticketHistory.Request = TicketingConString.CloseTicket;
-                //            ticketHistory.Status = TicketingConString.CloseConfirm;
-
-                //        }
-                //        await _context.SaveChangesAsync(cancellationToken);
-
-                //    }
-                //}
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);
             }

@@ -195,11 +195,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         transferTicketQuery = transferTicketQuery.Where(x => x.AddedByUser.Id == request.UserId);
                     }
 
+
                 }
 
 
 
-                var results = transferTicketQuery.Select(x => new GetTransferTicketResult
+                var results = transferTicketQuery
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Select(x => new GetTransferTicketResult
                 {
                     TicketConcernId = x.TicketConcernId,
                     TransferTicketId = x.Id,

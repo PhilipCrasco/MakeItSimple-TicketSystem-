@@ -38,7 +38,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public int ? TicketAttachmentId { get; set; }
                 public IFormFile Attachment { get; set; }
 
-
             }
 
         }
@@ -48,7 +47,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             private readonly MisDbContext _context;
             private readonly Cloudinary _cloudinary;
             private readonly TransformUrl _url;
-            private readonly string _assetsPath = @"C:\inetpub\wwwroot\mis_assets";
 
             public Handler(MisDbContext context, IOptions<CloudinaryOption> options , TransformUrl url)
             {
@@ -77,7 +75,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 {
                     return Result.Failure(UserError.UserNotExist());
                 }
-
 
                 var requestConcernIdExist = await _context.RequestConcerns
                     .Include(x => x.User)
@@ -318,20 +315,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
 
                         var fileName = $"{Guid.NewGuid()}{extension}";
-                        var filePath = Path.Combine(_assetsPath, fileName);
+                        var filePath = Path.Combine(TicketingConString.AttachmentPath, fileName);
 
                         uploadTasks.Add(Task.Run(async () =>
                         {
 
-                            if (!Directory.Exists(_assetsPath))
-                            {
-                                Directory.CreateDirectory(_assetsPath);
-                            }
 
-                            await using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await attachments.Attachment.CopyToAsync(stream);
-                            }
 
                             var ticketAttachment = await _context.TicketAttachments
                                 .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
@@ -355,6 +344,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 };
 
                                 await _context.TicketAttachments.AddAsync(addAttachment);
+                            }
+
+                            if (!Directory.Exists(TicketingConString.AttachmentPath))
+                            {
+                                Directory.CreateDirectory(TicketingConString.AttachmentPath);
+                            }
+
+                            await using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await attachments.Attachment.CopyToAsync(stream);
                             }
 
                         }, cancellationToken));

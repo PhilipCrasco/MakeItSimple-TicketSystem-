@@ -75,7 +75,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
 
         public const string Concern = "Concern";
         public const string Manual = "Manual";
-        public const string RequestTicket = "Request Ticket";  
+        public const string RequestTicket = "Request Ticket";
 
         public const string ForReticket = "For Re-Ticket";
         public const string ForClosing = "For Closing Ticket";
@@ -98,6 +98,12 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string RequestApproval = "For approval by ";
         public const string OnTime = "On-Time";
         public const string Delay = "Delay";
+
+
+        // Attachment
+
+        //public const string AttachmentPath = @"C:\inetpub\wwwroot\mis_assets";
+        public const string AttachmentPath = @"C:\MakeItSimplePic\Tickets";
 
 
     }

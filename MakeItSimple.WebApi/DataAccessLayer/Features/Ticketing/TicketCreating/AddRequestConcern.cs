@@ -296,13 +296,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var uploadTasks = new List<Task>();
 
-                string uploadDirectory = Path.Combine(Environment.CurrentDirectory, TicketingConString.AttachmentPath);
-
-                if (!Directory.Exists(uploadDirectory))
-                {
-                    Directory.CreateDirectory(uploadDirectory);
-                }
-
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
                 {
                     foreach (var attachments in command.RequestAttachmentsFiles.Where(a => a.Attachment.Length > 0))
@@ -324,45 +317,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         var fileName = $"{Guid.NewGuid()}{extension}";
                         var filePath = Path.Combine(TicketingConString.AttachmentPath, fileName);
 
-                        uploadTasks.Add(Task.Run(async () =>
+                        var ticketAttachment = await _context.TicketAttachments
+                            .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                        if (ticketAttachment != null)
                         {
-
-                            var ticketAttachment = await _context.TicketAttachments
-                                .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
-
-                            if (ticketAttachment != null)
+                            ticketAttachment.Attachment = filePath;
+                            ticketAttachment.FileName = attachments.Attachment.FileName;
+                            ticketAttachment.FileSize = attachments.Attachment.Length;
+                            ticketAttachment.UpdatedAt = DateTime.Now;
+                        }
+                        else
+                        {
+                            var addAttachment = new TicketAttachment
                             {
-                                ticketAttachment.Attachment = filePath;
-                                ticketAttachment.FileName = attachments.Attachment.FileName;
-                                ticketAttachment.FileSize = attachments.Attachment.Length;
-                                ticketAttachment.UpdatedAt = DateTime.Now;
-                            }
-                            else
-                            {
-                                var addAttachment = new TicketAttachment
-                                {
-                                    TicketConcernId = ticketConcernList.First().Id,
-                                    Attachment = filePath,
-                                    FileName = attachments.Attachment.FileName,
-                                    FileSize = attachments.Attachment.Length,
-                                    AddedBy = command.Added_By,
-                                };
+                                TicketConcernId = ticketConcernList.First().Id,
+                                Attachment = filePath,
+                                FileName = attachments.Attachment.FileName,
+                                FileSize = attachments.Attachment.Length,
+                                AddedBy = command.Added_By,
+                            };
 
-                                await _context.TicketAttachments.AddAsync(addAttachment);
-                            }
+                            await _context.TicketAttachments.AddAsync(addAttachment);
+                        }
 
-                            await using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await attachments.Attachment.CopyToAsync(stream);
-                            }
+                        string uploadDirectory = Path.Combine(Environment.CurrentDirectory, TicketingConString.AttachmentPath);
 
-                            await _context.SaveChangesAsync(cancellationToken);
+                        if (!Directory.Exists(uploadDirectory))
+                        {
+                            Directory.CreateDirectory(uploadDirectory);
+                        }
 
-                        }, cancellationToken));
+                        await using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await attachments.Attachment.CopyToAsync(stream);
+                        }
+
                     }
                 }
 
-                await Task.WhenAll(uploadTasks);
+
 
 
                 await _context.SaveChangesAsync(cancellationToken);

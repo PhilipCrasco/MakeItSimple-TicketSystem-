@@ -15,12 +15,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
         public class GetRequestorTicketConcernResult
         {
 
-            //public int? RequestConcernCount { get; set; }
-            //public int? ForApprovalCount { get; set; }
-            //public int? OnGoingCount { get; set; }
-            //public int? ForConfirmationCount { get; set; }
-            //public int? DoneCount { get; set; }
-
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
             public string Resolution { get; set; }

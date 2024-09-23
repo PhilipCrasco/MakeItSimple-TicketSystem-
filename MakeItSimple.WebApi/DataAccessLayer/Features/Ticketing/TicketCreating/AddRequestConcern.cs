@@ -72,7 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
-                {
+                {         
                     return Result.Failure(UserError.UserNotExist());
                 }
 
@@ -102,14 +102,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         ticketConcernExist.UpdatedAt = DateTime.Now;
                         ticketConcernExist.ModifiedBy = command.Modified_By;
                         ticketConcernExist.ConcernDetails = requestConcernIdExist.Concern;
-                    }
-
-                    if (ticketConcernExist.IsReject is true)
-                    {
-                        ticketConcernExist.IsReject = false;
-                        ticketConcernExist.Remarks = null;
-
-                        updateRequestList.Add(requestConcernIdExist);
                     }
 
                     ticketConcernList.Add(ticketConcernExist);
@@ -170,11 +162,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     var addNewTicketTransactionNotification = new TicketTransactionNotification
                     {
 
-                        Message = $"New concern received from : {userDetails.Fullname}",
+                        Message = $"New request concern number {addRequestConcern.Id} has received",
                         AddedBy = userDetails.Id,
                         Created_At = DateTime.Now,
                         ReceiveBy = userReceiver.UserId.Value,
-                        Modules = command.Modules
+                        Modules = command.Modules,
+                        PathId = addRequestConcern.Id
 
                     };
 
@@ -294,8 +287,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 }
 
 
-
-
                 if (!Directory.Exists(TicketingConString.AttachmentPath))
                 {
                     Directory.CreateDirectory(TicketingConString.AttachmentPath);
@@ -331,6 +322,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             ticketAttachment.FileName = attachments.Attachment.FileName;
                             ticketAttachment.FileSize = attachments.Attachment.Length;
                             ticketAttachment.UpdatedAt = DateTime.Now;
+
                         }
                         else
                         {
@@ -344,7 +336,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             };
 
                             await _context.TicketAttachments.AddAsync(addAttachment);
-
 
                         }
 

@@ -66,12 +66,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     Created_At = DateTime.Now,
                     ReceiveBy = userReceiver.UserId.Value,
                     Modules = command.Modules,
+                    PathId = ticketConcernExist.Id,
 
                 };
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
-
 
                 await _context.SaveChangesAsync(cancellationToken);  
                 return Result.Success();

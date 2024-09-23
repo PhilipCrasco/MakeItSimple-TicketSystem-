@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Threading;
+﻿ using System.Collections.Concurrent;
 
 namespace MakeItSimple.WebApi.Common.SignalR
 {

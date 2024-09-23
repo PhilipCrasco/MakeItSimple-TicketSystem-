@@ -28,8 +28,6 @@ namespace MakeItSimple.WebApi.Models
         public DateTime ? UpdatedAt { get; set;}
 
         
-
-
         [ForeignKey("AddedByUser")]
         public Guid ? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }
@@ -47,9 +45,6 @@ namespace MakeItSimple.WebApi.Models
 
         public int? BusinessUnitId { get; set; }
         public virtual BusinessUnit BusinessUnit { get; set; }
-
-        //public int ? ReceiverId { get; set; }
-        //public virtual Receiver Receiver { get; set; }
 
 
         public int ? DepartmentId { get; set; }

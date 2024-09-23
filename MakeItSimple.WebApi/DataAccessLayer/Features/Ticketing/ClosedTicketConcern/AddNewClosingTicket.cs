@@ -208,6 +208,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             Created_At = DateTime.Now,
                             ReceiveBy = addNewClosingConcern.TicketApprover.Value,
                             Modules = command.Modules,
+                            PathId = ticketConcernExist.Id
 
                         };
 
@@ -275,7 +276,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                         ticketAttachment.FileSize = attachments.Attachment.Length;
                                         ticketAttachment.UpdatedAt = DateTime.Now;
 
-                                    }
+                                    } 
 
                                 }
                                 else

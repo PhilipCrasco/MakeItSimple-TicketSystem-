@@ -191,6 +191,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         Created_At = DateTime.Now,
                         ReceiveBy = addTransferTicket.TicketApprover.Value,
                         Modules = command.Modules,
+                        PathId = ticketConcernExist.Id
 
                     };
 

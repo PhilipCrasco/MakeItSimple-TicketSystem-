@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
@@ -107,6 +108,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             Created_At = DateTime.Now,
                             ReceiveBy = validateUserApprover.UserId.Value,
                             Modules = command.Modules,
+                            PathId = transferTicketExist.TicketConcernId
 
                         };
 
@@ -146,16 +148,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         var addNewTicketTransactionNotification = new TicketTransactionNotification
                         {
 
-                            Message = $"New concern received from : {userDetails.Fullname}",
+                            Message = $"New request concern number {ticketConcernExist.RequestConcernId} has received",
                             AddedBy = userDetails.Id,
                             Created_At = DateTime.Now,
                             ReceiveBy = requestorReceiver.UserId.Value,
                             Modules = command.Modules,
+                            PathId = ticketConcernExist.RequestConcernId.Value,
 
                         };
 
                         await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
 
                     }
 

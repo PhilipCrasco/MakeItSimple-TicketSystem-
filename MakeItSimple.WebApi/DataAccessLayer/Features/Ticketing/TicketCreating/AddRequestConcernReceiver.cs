@@ -187,42 +187,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .Where(x => x.Id == upsertConcern.RequestConcernId)
                          .ToListAsync();
 
-                    //foreach (var request in requestUpsertConcern)
-                    //{
-                    //    //if (request.Concern != upsertConcern.ConcernDetails)
-                    //    //{
-                    //    //    request.Concern = upsertConcern.ConcernDetails;
-                    //    //    hasChanged = true;
-                            
-                    //    //    request.ModifiedBy = command.Modified_By;
-                    //    //    request.UpdatedAt = DateTime.Now;
-                    //    //    //if(request.IsReject is true)
-                    //    //    //{
-                    //    //    //    request.Remarks = null;
-                    //    //    //    request.IsReject = false;
-                    //    //    //}
-
-                    //    //}
-                    //}
-
                     if (hasChanged)
                     {
                         upsertConcern.ModifiedBy = command.Modified_By;
                         upsertConcern.UpdatedAt = DateTime.Now;
                         upsertConcern.IsAssigned = true;
-                         
-                        //if (upsertConcern.IsReject is true)
-                        //{
-                        //    upsertConcern.IsReject = false;
-                        //    upsertConcern.Remarks = null;
-                        //}
+                        
 
                     }
 
 
                     upsertConcern.TicketType = TicketingConString.Concern; 
 
-                    //removeTicketConcern.Add(upsertConcern);
 
                     var addNewTicketTransactionNotification = new TicketTransactionNotification
                     {
@@ -232,10 +208,32 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Created_At = DateTime.Now,
                         ReceiveBy = command.UserId.Value,
                         Modules = command.Modules,
+                        PathId = upsertConcern.Id,
 
                     };
 
                     await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+
+                    if(upsertConcern.IsApprove != true)
+                    {
+                        var addNewTicketTransactionOngoing = new TicketTransactionNotification
+                        {
+
+                            Message = $"Ticket number {upsertConcern.RequestConcernId} is now ongoing",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = command.UserId.Value,
+                            Modules = command.Modules,
+                            PathId = upsertConcern.RequestConcernId.Value,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionOngoing);
+
+                    }
+
+
 
                     await _context.SaveChangesAsync(cancellationToken);
                 }

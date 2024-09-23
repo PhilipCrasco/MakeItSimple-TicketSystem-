@@ -72,7 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var userId = await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
-                {         
+                {
                     return Result.Failure(UserError.UserNotExist());
                 }
 
@@ -172,6 +172,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     };
 
                     await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
 
                 }
 

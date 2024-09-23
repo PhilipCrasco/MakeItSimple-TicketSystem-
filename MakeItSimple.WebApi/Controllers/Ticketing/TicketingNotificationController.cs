@@ -13,6 +13,7 @@ using System.Text;
 using System.Security.Cryptography;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.GetTicketTransactionNotification;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.ClickedTransaction;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotification.GetAllTransactionNotification;
 
 [ApiController]
 [Route("api/ticketing-notification")]
@@ -133,6 +134,12 @@ public class TicketingNotificationController : ControllerBase
     public async Task<IActionResult> GetTicketTransactionNotification([FromQuery] GetTicketTransactionNotificationCommand command)
     {
         return await HandleNotification(command, "TransactionData");
+    }
+
+    [HttpGet("all-ticket-transaction")]
+    public async Task<IActionResult> GetAllTransactionNotification([FromQuery] GetAllTransactionNotificationCommand command)
+    {
+        return await HandleNotification(command, "NotificationBellData");
     }
 
 

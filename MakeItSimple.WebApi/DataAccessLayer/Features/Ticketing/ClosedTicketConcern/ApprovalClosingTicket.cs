@@ -130,6 +130,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 Created_At = DateTime.Now,
                                 ReceiveBy = requestorReceiver.UserId.Value,
                                 Modules = command.Modules,
+                                PathId = closingTicketExist.TicketConcernId
 
                             };
 
@@ -186,6 +187,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 Created_At = DateTime.Now,
                                 ReceiveBy = requestConcernExist.UserId.Value,
                                 Modules = command.Modules,
+                                PathId = closingTicketExist.TicketConcernId
 
                             };
 

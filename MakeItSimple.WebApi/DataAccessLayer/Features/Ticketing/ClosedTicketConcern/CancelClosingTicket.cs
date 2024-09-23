@@ -88,6 +88,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     Created_At = DateTime.Now,
                     ReceiveBy = closingTicketExist.TicketApprover.Value,
                     Modules = command.Modules,
+                    PathId = ticketConcernExist.Id,
 
                 };
 

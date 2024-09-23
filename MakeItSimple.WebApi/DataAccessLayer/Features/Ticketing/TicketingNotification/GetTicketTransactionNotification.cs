@@ -17,6 +17,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public string Receive_By { get; set; }
             public bool Is_Checked { get; set; }
             public string Modules { get; set; }
+            public int ? PathId { get; set; }
         }
 
 
@@ -54,7 +55,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         Created_At = x.Created_At,
                         Receive_By = x.ReceiveByUser.Fullname,
                         Is_Checked = x.IsChecked,
-                        Modules = x.Modules
+                        Modules = x.Modules,
+                        PathId = x.PathId,
 
                     }).OrderByDescending(x => x.Created_At)
                     .ToListAsync();

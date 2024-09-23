@@ -172,6 +172,66 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
  
                 await Task.WhenAll(uploadTasks);
 
+
+                if (!Directory.Exists(TicketingConString.AttachmentPath))
+                {
+                    Directory.CreateDirectory(TicketingConString.AttachmentPath);
+                }
+
+                if (command.ReturnTicketAttachments.Count(x => x.Attachment != null) > 0)
+                {
+                    foreach (var attachments in command.ReturnTicketAttachments.Where(a => a.Attachment.Length > 0))
+                    {
+
+                        if (attachments.Attachment.Length > 10 * 1024 * 1024)
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
+                        }
+
+                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
+                        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
+
+                        if (extension == null || !allowedFileTypes.Contains(extension))
+                        {
+                            return Result.Failure(TicketRequestError.InvalidAttachmentType());
+                        }
+
+                        var fileName = $"{Guid.NewGuid()}{extension}";
+                        var filePath = Path.Combine(TicketingConString.AttachmentPath, fileName);
+
+                        var ticketAttachment = await _context.TicketAttachments
+                            .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
+
+                        if (ticketAttachment != null)
+                        {
+                            ticketAttachment.Attachment = filePath;
+                            ticketAttachment.FileName = attachments.Attachment.FileName;
+                            ticketAttachment.FileSize = attachments.Attachment.Length;
+                            ticketAttachment.UpdatedAt = DateTime.Now;
+
+                        }
+                        else
+                        {
+                            var addAttachment = new TicketAttachment
+                            {
+                                TicketConcernId = requestConcernExist.Id,
+                                Attachment = filePath,
+                                FileName = attachments.Attachment.FileName,
+                                FileSize = attachments.Attachment.Length,
+                                AddedBy = command.Added_By,
+                            };
+
+                            await _context.TicketAttachments.AddAsync(addAttachment);
+
+                        }
+
+                        await using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await attachments.Attachment.CopyToAsync(stream);
+                        }
+                    }
+                }
+
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

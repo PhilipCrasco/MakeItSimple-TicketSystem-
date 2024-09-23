@@ -67,16 +67,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 }
 
-                //var addTicketHistory = new TicketHistory
-                //{
-                //    TicketConcernId = ticketConcernExist.Id,
-                //    TransactedBy = command.Transacted_By,
-                //    TransactionDate = DateTime.Now,
-                //    Request = TicketingConString.Confirm,
-                //    Status = TicketingConString.CloseConfirm,
-                //};
-
-                //await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {

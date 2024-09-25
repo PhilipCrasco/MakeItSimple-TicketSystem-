@@ -406,29 +406,26 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         //[HttpGet("download/{id}")]
         //public async Task<IActionResult> DownloadImageTicketing(int id)
         //{
-        //    try
-        //    {
-        //        var query = new DownloadImageTicketingCommand
-        //        {
-        //            TicketAttachmentId = id
-        //        };
+        //    //try
+        //    //{
+        //    //    var query = new DownloadImageTicketingCommand
+        //    //    {
+        //    //        TicketAttachmentId = id
+        //    //    };
 
-        //        var results = await _mediator.Send(query);
+        //    //    var result = await _mediator.Send(query);
 
-        //        if(results.IsFailure)
-        //        {
-        //            return BadRequest(results);
-        //        }
+        //    //    if (result.IsSuccess is FileStreamResult fileResult)
+        //    //    {
+        //    //        return fileResult;  
+        //    //    }
 
-        //        if (results.IsSuccess.Value is FileStreamResult fileStreamResult)
-        //        {
-        //            return fileStreamResult; 
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Conflict(ex.Message);
-        //    }
+        //    //    return BadRequest(result.IsFailure);
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    return Conflict(ex.Message);
+        //    //}
         //}
 
 

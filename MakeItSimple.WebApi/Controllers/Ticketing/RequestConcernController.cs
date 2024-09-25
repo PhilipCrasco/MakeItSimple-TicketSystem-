@@ -403,30 +403,36 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
         }
 
 
-        //[HttpGet("download/{id}")]
-        //public async Task<IActionResult> DownloadImageTicketing(int id)
-        //{
-        //    //try
-        //    //{
-        //    //    var query = new DownloadImageTicketingCommand
-        //    //    {
-        //    //        TicketAttachmentId = id
-        //    //    };
+        [HttpGet("download/{id}")]
+        public async Task<IActionResult> DownloadImageTicketing(int id)
+        {
+            try
+            {
+                var query = new DownloadImageTicketingCommand
+                {
+                    TicketAttachmentId = id
+                };
 
-        //    //    var result = await _mediator.Send(query);
+                var result = await _mediator.Send(query);
+                if (result.IsSuccess)
+                {
+                    var fileResult = result is Result<FileStreamResult> fileStreamResult ? fileStreamResult.Value : null;
 
-        //    //    if (result.IsSuccess is FileStreamResult fileResult)
-        //    //    {
-        //    //        return fileResult;  
-        //    //    }
+                    if (fileResult != null)
+                    {
+                        return fileResult;
+                    }
 
-        //    //    return BadRequest(result.IsFailure);
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    return Conflict(ex.Message);
-        //    //}
-        //}
+                    return BadRequest(result);
+                }
+
+                return BadRequest(new { ErrorCode = result.Error.Code, ErrorMessage = result.Error.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
 
     }

@@ -33,17 +33,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 if (ticketAttachment == null)
                 {
-                    return Result.Failure(TicketRequestError.AttachmentNotFound());
+                    return Result<FileStreamResult>.Failure(TicketRequestError.AttachmentNotFound());
                 }
 
                 var filePath = ticketAttachment.Attachment;
 
                 if (!System.IO.File.Exists(filePath))
                 {
-                    return Result.Failure(TicketRequestError.FileNotFound());
+                    return Result<FileStreamResult>.Failure(TicketRequestError.FileNotFound());
                 }
 
                 var fileName = Path.GetFileName(filePath);
+                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
                 var contentType = _contentType.GetContentType(fileName);
 
                 var fileResult = new FileStreamResult(new FileStream(filePath, FileMode.Open, FileAccess.Read), contentType)
@@ -51,7 +52,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     FileDownloadName = fileName
                 };
 
-                return Result.Success(fileResult);
+                return Result<FileStreamResult>.Success(fileResult);
             }
         }
     }

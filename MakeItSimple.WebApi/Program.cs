@@ -56,6 +56,7 @@ builder.Services.AddControllers( options =>
 builder.Services.AddScoped<ValidatorHandler>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddScoped<TransformUrl>();
+builder.Services.AddScoped<ContentType>();
 builder.Services.AddScoped<TimerControl>();
 builder.Services.AddScoped<IHubCaller, HubCaller>();
 

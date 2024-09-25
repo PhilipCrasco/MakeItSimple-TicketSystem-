@@ -89,5 +89,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
      public static Error TransactionNotExist() =>
      new Error("TicketRequest.TransactionNotExist", "Ticketing Transaction not exist!");
+
+
+        public static Error AttachmentNotFound() =>
+    new Error("TicketRequest.AttachmentNotFound", "Attachment not found!");
+
+        public static Error FileNotFound() =>
+new Error("TicketRequest.FileNotFound", "File not found!");
+
     }
 }

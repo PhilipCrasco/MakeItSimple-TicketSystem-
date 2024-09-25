@@ -18,6 +18,8 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.DownloadImageTicketing;
 
 
 
@@ -399,6 +401,35 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
+
+
+        //[HttpGet("download/{id}")]
+        //public async Task<IActionResult> DownloadImageTicketing(int id)
+        //{
+        //    try
+        //    {
+        //        var query = new DownloadImageTicketingCommand
+        //        {
+        //            TicketAttachmentId = id
+        //        };
+
+        //        var results = await _mediator.Send(query);
+
+        //        if(results.IsFailure)
+        //        {
+        //            return BadRequest(results);
+        //        }
+
+        //        if (results.IsSuccess.Value is FileStreamResult fileStreamResult)
+        //        {
+        //            return fileStreamResult; 
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Conflict(ex.Message);
+        //    }
+        //}
 
 
     }

@@ -207,7 +207,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             AddedBy = userDetails.Id,
                             Created_At = DateTime.Now,
                             ReceiveBy = addNewClosingConcern.TicketApprover.Value,
-                            Modules = command.Modules,
+                            Modules = PathConString.Approval,
+                            Modules_Parameter = PathConString.ForClosingTicket,
                             PathId = ticketConcernExist.Id
 
                         };
@@ -216,7 +217,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                     }
 
-
+ 
                     if (!Directory.Exists(TicketingConString.AttachmentPath))
                     {
                         Directory.CreateDirectory(TicketingConString.AttachmentPath);

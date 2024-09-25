@@ -129,7 +129,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 AddedBy = userDetails.Id,
                                 Created_At = DateTime.Now,
                                 ReceiveBy = requestorReceiver.UserId.Value,
-                                Modules = command.Modules,
+                                Modules = PathConString.Approval,
+                                Modules_Parameter = PathConString.ForClosingTicket,
                                 PathId = closingTicketExist.TicketConcernId
 
                             };
@@ -186,12 +187,30 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 AddedBy = userDetails.Id,
                                 Created_At = DateTime.Now,
                                 ReceiveBy = requestConcernExist.UserId.Value,
-                                Modules = command.Modules,
+                                Modules = PathConString.ConcernTickets,
+                                Modules_Parameter = PathConString.ForConfirmation,
                                 PathId = closingTicketExist.TicketConcernId
 
                             };
 
                             await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+
+
+                            var addNewTransactionConfirmationNotification = new TicketTransactionNotification
+                            {
+
+                                Message = $"Ticket number {closingTicketExist.TicketConcernId} is waiting for Confirmation",
+                                AddedBy = userDetails.Id,
+                                Created_At = DateTime.Now,
+                                ReceiveBy = ticketConcernExist.UserId.Value,
+                                Modules = PathConString.IssueHandlerConcerns,
+                                Modules_Parameter = PathConString.ForConfirmation,
+                                PathId = closingTicketExist.TicketConcernId
+
+                            };
+
+                            await _context.TicketTransactionNotifications.AddAsync(addNewTransactionConfirmationNotification);
 
                         }
                         else

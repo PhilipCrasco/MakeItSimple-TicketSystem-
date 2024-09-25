@@ -77,7 +77,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     AddedBy = ticketConcernExist.RequestorBy.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = userReceiver.UserId.Value,
-                    Modules = command.Modules,
+                    Modules = PathConString.ConcernTickets,
+                    Modules_Parameter = PathConString.ForApproval,
 
                 };
 

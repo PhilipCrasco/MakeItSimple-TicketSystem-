@@ -107,7 +107,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = userDetails.Id,
                             Created_At = DateTime.Now,
                             ReceiveBy = validateUserApprover.UserId.Value,
-                            Modules = command.Modules,
+                            Modules = PathConString.Approval,
+                            Modules_Parameter = PathConString.ForTransfer,
                             PathId = transferTicketExist.TicketConcernId
 
                         };
@@ -152,12 +153,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                             AddedBy = userDetails.Id,
                             Created_At = DateTime.Now,
                             ReceiveBy = requestorReceiver.UserId.Value,
-                            Modules = command.Modules,
+                            Modules = PathConString.ReceiverConcerns,
                             PathId = ticketConcernExist.RequestConcernId.Value,
 
                         };
 
                         await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+                        var addNewTransferTransactionNotification = new TicketTransactionNotification
+                        {
+
+                            Message = $"Ticket concern number {ticketConcernExist.RequestConcernId} has transfer",
+                            AddedBy = userDetails.Id,
+                            Created_At = DateTime.Now,
+                            ReceiveBy = transferTicketExist.TransferBy.Value,
+                            Modules = PathConString.ConcernTickets,
+                            Modules_Parameter = PathConString.ForTransfer,
+                            PathId = ticketConcernExist.RequestConcernId.Value,
+
+                        };
+
+                        await _context.TicketTransactionNotifications.AddAsync(addNewTransferTransactionNotification);
+
+
 
                     }
 

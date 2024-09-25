@@ -29,8 +29,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public string Concern { get; set; }
             public string Remarks { get; set; }
 
-            public string Modules { get; set; }
-
             public List<RequestAttachmentsFile> RequestAttachmentsFiles {  get; set; }
 
             public class RequestAttachmentsFile
@@ -166,7 +164,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         AddedBy = userDetails.Id,
                         Created_At = DateTime.Now,
                         ReceiveBy = userReceiver.UserId.Value,
-                        Modules = command.Modules,
+                        Modules = PathConString.ReceiverConcerns,
                         PathId = addRequestConcern.Id
 
                     };

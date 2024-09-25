@@ -99,7 +99,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
                 }
-
+   
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

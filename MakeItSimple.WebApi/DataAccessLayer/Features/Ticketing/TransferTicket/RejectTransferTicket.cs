@@ -115,7 +115,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     AddedBy = userDetails.Id,
                     Created_At = DateTime.Now,
                     ReceiveBy = ticketConcernExist.UserId.Value,
-                    Modules = command.Modules,
+                    Modules = PathConString.IssueHandlerConcerns,
+                    Modules_Parameter = PathConString.OpenTicket,
                     PathId = transferTicketExist.TicketConcernId,
 
                 };

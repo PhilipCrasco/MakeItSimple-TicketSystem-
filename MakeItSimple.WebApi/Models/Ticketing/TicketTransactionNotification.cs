@@ -16,11 +16,11 @@
 
         public int PathId { get; set; }
 
+        public string Modules_Parameter { get; set; }
+
         public bool IsChecked { get; set; } = false;
 
         public string Modules { get; set; }
-
-
 
     }
 }

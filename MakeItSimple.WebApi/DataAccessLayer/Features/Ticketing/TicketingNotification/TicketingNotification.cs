@@ -43,7 +43,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public Guid UserId { get; set; }
             public string Role {  get; set; }
 
-            public string Modules { get; set; }
 
         }
 
@@ -518,7 +517,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                             AddedBy = request.UserId,
                             Created_At = DateTime.Now,
                             ReceiveBy = confirm.UserId.Value,
-                            Modules = request.Modules,
+                            Modules = PathConString.IssueHandlerConcerns,
+                            Modules_Parameter = PathConString.Closed,
 
                         };
 

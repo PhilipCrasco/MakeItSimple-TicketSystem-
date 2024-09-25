@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
@@ -65,7 +66,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     AddedBy = requestTransactionExist.UserId.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = userReceiver.UserId.Value,
-                    Modules = command.Modules,
+                    Modules = PathConString.ConcernTickets,
+                    Modules_Parameter = PathConString.ForApproval,
                     PathId = ticketConcernExist.Id,
 
                 };

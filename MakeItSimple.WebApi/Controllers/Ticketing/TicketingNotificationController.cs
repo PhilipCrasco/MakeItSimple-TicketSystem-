@@ -43,8 +43,6 @@ public class TicketingNotificationController : ControllerBase
         }
     }
 
-
-
     private async Task<IActionResult> HandleNotification<T>(T command, string notificationType)
     {
         try

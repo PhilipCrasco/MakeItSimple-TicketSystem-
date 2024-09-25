@@ -207,8 +207,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         AddedBy = userDetails.Id,
                         Created_At = DateTime.Now,
                         ReceiveBy = command.UserId.Value,
-                        Modules = command.Modules,
+                        Modules = PathConString.IssueHandlerConcerns,
+                        Modules_Parameter = PathConString.OpenTicket,
                         PathId = upsertConcern.Id,
+                        
 
                     };
 
@@ -224,7 +226,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             AddedBy = userDetails.Id,
                             Created_At = DateTime.Now,
                             ReceiveBy = command.UserId.Value,
-                            Modules = command.Modules,
+                            Modules = PathConString.ConcernTickets,
+                            Modules_Parameter = PathConString.Ongoing,
                             PathId = upsertConcern.RequestConcernId.Value,
 
                         };
@@ -317,7 +320,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         AddedBy = userDetails.Id,
                         Created_At = DateTime.Now,
                         ReceiveBy = addRequestConcern.UserId.Value,
-                        Modules = command.Modules,
+                        Modules = PathConString.ConcernTickets,
+                        Modules_Parameter = PathConString.ForApproval,
                         PathId = addnewTicketConcern.Id,
                     };
 
@@ -383,8 +387,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         }
                     }
                 }
-
-
 
                 await _context.SaveChangesAsync(cancellationToken); 
                 return Result.Success();

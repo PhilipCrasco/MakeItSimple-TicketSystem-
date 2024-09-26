@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.DownloadImageTicketing;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ViewTicketImage;
 
 
 
@@ -420,6 +421,38 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     if (fileResult != null)
                     {
+                        return fileResult;
+                    }
+
+                    return BadRequest(result);
+                }
+
+                return BadRequest(new { ErrorCode = result.Error.Code, ErrorMessage = result.Error.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("view/{id}")]
+        public async Task<IActionResult> ViewTicketImage(int id)
+        {
+            try
+            {
+                var query = new ViewTicketImageCommand
+                {
+                    TicketAttachmentId = id
+                };
+
+                var result = await _mediator.Send(query);
+                if (result.IsSuccess)
+                {
+                    var fileResult = result is Result<FileStreamResult> fileStreamResult ? fileStreamResult.Value : null;
+
+                    if (fileResult != null)
+                    {
+                        Response.Headers.Add("Content-Disposition", "inline");
                         return fileResult;
                     }
 

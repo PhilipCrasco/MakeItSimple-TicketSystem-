@@ -74,7 +74,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Attachments = x.Select(a => new GetRequestAttachmentResult.TicketAttachment
                         {
                             TicketAttachmentId = a.Id,
-                            Attachment = ConvertToBase64(a.Attachment),
+                            Attachment = a.Attachment,
                             FileName = a.FileName,
                             FileSize = a.FileSize,
                             Added_By = a.AddedByUser.Fullname,
@@ -89,16 +89,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 return Result.Success(results);
             }
 
-            private static string ConvertToBase64(string filePath)
-            {
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    return null;
-                }
+            //private static string ConvertToBase64(string filePath)
+            //{
+            //    if (string.IsNullOrEmpty(filePath))
+            //    {
+            //        return null;
+            //    }
 
-                var fileBytes = Encoding.UTF8.GetBytes(filePath);
-                return Convert.ToBase64String(fileBytes);
-            }
+            //    var fileBytes = Encoding.UTF8.GetBytes(filePath);
+            //    return Convert.ToBase64String(fileBytes);
+            //}
         }
     }
 }

@@ -4,7 +4,8 @@
     {
         public string GetContentType(string fileName)
         {
-            return fileName switch
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return extension switch
             {
                 ".txt" => "text/plain",
                 ".pdf" => "application/pdf",
@@ -13,7 +14,12 @@
                 ".xls" => "application/vnd.ms-excel",
                 ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 ".csv" => "text/csv",
-                // Add more types as needed
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".tiff" => "image/tiff",
                 _ => "application/octet-stream", // Default for unknown types
             };
         }

@@ -99,15 +99,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             }
 
-            public List<TicketHistoryList> TicketHistoryLists { get; set; }
+            public DateTime Transaction_Date { get; set; }
 
-            public class TicketHistoryList
-            {
-                public int? Id { get; set; }
-                public int ? TicketConcernId { get; set; }
+            //public class TicketHistoryList
+            //{
+            //    public int? Id { get; set; }
+            //    public int ? TicketConcernId { get; set; }
 
-                public DateTime? Transaction_Date { get; set; }
-            }
+            //    public DateTime? Transaction_Date { get; set; }
+            //}
 
         }
 
@@ -359,20 +359,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 }
 
-
-                var ticketHistory = _context.TicketHistories
-                    .AsNoTrackingWithIdentityResolution()
-                    .Include(x => x.TicketConcern)
-                    .Where(x => x.TicketConcern.UserId == request.UserId)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.TicketConcernId,
-                        x.TransactionDate
-                    });
-
-
-                 
                 var results = ticketConcernQuery
                     .Select(x => new GetOpenTicketResult
                     {
@@ -471,17 +457,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                         }).ToList(),
 
-                        TicketHistoryLists = x.ticketHistories.Select(x => new GetOpenTicketResult.TicketHistoryList
-                        {
-                            Id = x.Id,
-                            TicketConcernId = x.TicketConcernId,
-                            Transaction_Date = x.TransactionDate,
-
-                        }).ToList(),
+                        Transaction_Date = x.ticketHistories.Max(x => x.TransactionDate).Value,
 
 
-                    }).OrderBy(x => x.TicketConcernId)
-                    .ThenByDescending(x => x.TicketHistoryLists.First().Transaction_Date);
+                    }).OrderBy(x => x.Transaction_Date);
+                     
+                   
 
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);

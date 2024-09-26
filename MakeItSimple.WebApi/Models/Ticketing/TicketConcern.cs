@@ -96,6 +96,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public ICollection<TicketComment> TicketComments { get; set; }
         public ICollection<TicketCommentView> TicketCommentViews { get; set; }
 
+        public ICollection<TicketHistory> ticketHistories { get; set; }
+
 
 
     }

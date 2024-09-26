@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
+using System.Text;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -11,7 +12,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
     {
         public class GetRequestAttachmentResult
         {
-            public int ? TicketConcernId { get; set; }
+            public int? TicketConcernId { get; set; }
 
             public List<TicketAttachment> Attachments { get; set; }
 
@@ -21,7 +22,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 public string Attachment { get; set; }
                 public string FileName { get; set; }
 
-                public decimal ? FileSize {  get; set; }
+                public decimal? FileSize { get; set; }
 
                 public string Added_By { get; set; }
                 public DateTime Created_At { get; set; }
@@ -33,11 +34,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
         }
 
-
         public class GetRequestAttachmentQuery : IRequest<Result>
         {
             public int? Id { get; set; }
-            public bool ? Status { get; set; }
+            public bool? Status { get; set; }
         }
 
         public class Handler : IRequestHandler<GetRequestAttachmentQuery, Result>
@@ -51,7 +51,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<Result> Handle(GetRequestAttachmentQuery request, CancellationToken cancellationToken)
             {
-                IQueryable<TicketAttachment>  ticketAttachmentQuery = _context.TicketAttachments
+                IQueryable<TicketAttachment> ticketAttachmentQuery = _context.TicketAttachments
                     .AsNoTracking()
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.AddedByUser)
@@ -62,39 +62,43 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.TicketConcernId == request.Id);
                 }
 
-
                 if (request.Status != null)
                 {
                     ticketAttachmentQuery = ticketAttachmentQuery.Where(x => x.IsActive == request.Status);
                 }
 
-
                 var results = await ticketAttachmentQuery.GroupBy(x => x.TicketConcernId)
                     .Select(x => new GetRequestAttachmentResult
-                {
-                    TicketConcernId = x.Key,
-                    Attachments = x.Select(x => new GetRequestAttachmentResult.TicketAttachment
                     {
-                        TicketAttachmentId = x.Id,
-                        Attachment = x.Attachment,
-                        FileName = x.FileName,
-                        FileSize = x.FileSize,
-                        Added_By = x.AddedByUser.Fullname, 
-                        Created_At = x.CreatedAt,
-                        Modified_By = x.ModifiedByUser.Fullname,
-                        Updated_At = x.UpdatedAt
+                        TicketConcernId = x.Key,
+                        Attachments = x.Select(a => new GetRequestAttachmentResult.TicketAttachment
+                        {
+                            TicketAttachmentId = a.Id,
+                            Attachment = ConvertToBase64(a.Attachment),
+                            FileName = a.FileName,
+                            FileSize = a.FileSize,
+                            Added_By = a.AddedByUser.Fullname,
+                            Created_At = a.CreatedAt,
+                            Modified_By = a.ModifiedByUser.Fullname,
+                            Updated_At = a.UpdatedAt
 
-                    }).ToList(),
+                        }).ToList(),
 
-
-                }).ToListAsync();
+                    }).ToListAsync();
 
                 return Result.Success(results);
+            }
 
+            private static string ConvertToBase64(string filePath)
+            {
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    return null;
+                }
+
+                var fileBytes = Encoding.UTF8.GetBytes(filePath);
+                return Convert.ToBase64String(fileBytes);
             }
         }
-
-
     }
-
 }

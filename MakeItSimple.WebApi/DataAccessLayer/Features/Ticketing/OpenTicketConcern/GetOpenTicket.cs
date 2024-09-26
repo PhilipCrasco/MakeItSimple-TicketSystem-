@@ -345,20 +345,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     }
 
                 }
-                 
-                var results = ticketConcernQuery
-                    .Join(_context.TicketHistories
-                    .AsNoTracking()
+
+
+                var ticketHistory = _context.TicketHistories
+                    .AsNoTrackingWithIdentityResolution()
+                    .Include(x => x.TicketConcern)
+                    .Where(x => x.TicketConcern.UserId == request.UserId)
                     .Select(x => new
                     {
                         x.Id,
                         x.TicketConcernId,
-                        x.TransactionDate,
-                    }), 
+                        x.TransactionDate
+                    });
+
+
+                 
+                var results = ticketConcernQuery
+                    .Join(ticketHistory, 
                     ticket => ticket.Id, history => history.TicketConcernId, 
                     (ticket, history) =>
                     new { ticket, history })
-                    .OrderByDescending(x => x.history.TransactionDate.Value)
+                    //.OrderByDescending(x => x.history.TransactionDate.Value)
                     .Select(x => new GetOpenTicketResult
                     {
 

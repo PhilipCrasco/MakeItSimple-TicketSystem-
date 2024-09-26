@@ -20,16 +20,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public string Modules_Parameter { get; set; }
             public int ? PathId { get; set; }
         }
-
-
-
-
+ 
         public class GetTicketTransactionNotificationCommand : IRequest<Result>
         {
             public Guid UserId{ get; set; }
             public string Role { get; set; }
-           
-
+          
         }
 
         public class Handler : IRequestHandler<GetTicketTransactionNotificationCommand, Result>

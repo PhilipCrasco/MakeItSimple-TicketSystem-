@@ -182,7 +182,7 @@ app.UseEndpoints(endpoints =>
         options.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
         options.CloseOnAuthenticationExpiration = true;
     });
+    
 });
-//app.MapControllers(); 
 
 app.Run();

@@ -6,7 +6,6 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 {
@@ -36,7 +35,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
             public string Search {  get; set; }
             public Guid ? UserId { get; set; }
-            public string Status { get; set; }
             public string Remarks { get; set; }
             public DateTime ? Date_From { get; set; }
             public DateTime ? Date_To { get; set; }
@@ -75,25 +73,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
                 }
 
-                if(!string.IsNullOrEmpty(request.Status))
-                {
-                    switch(request.Status)
-                    {
-                        case TicketingConString.OpenTicket:
-                            ticketQuery = ticketQuery
-                                .Where(x => x.IsApprove == true && x.IsClosedApprove != true); 
-                            break;
+                //if(!string.IsNullOrEmpty(request.Status))
+                //{
+                //    switch(request.Status)
+                //    {
+                //        case TicketingConString.OpenTicket:
+                //            ticketQuery = ticketQuery
+                //                .Where(x => x.IsApprove == true && x.IsClosedApprove != true); 
+                //            break;
 
-                        case TicketingConString.Closed:
-                            ticketQuery = ticketQuery
-                                .Where(x => x.IsApprove == true && x.IsClosedApprove == true);
-                            break;  
+                //        case TicketingConString.Closed:
+                //            ticketQuery = ticketQuery
+                //                .Where(x => x.IsApprove == true && x.IsClosedApprove == true);
+                //            break;  
                                
-                        default:
-                             return new PagedList<Reports>(new List<Reports>(), 0, request.PageNumber, request.PageSize);
+                //        default:
+                //             return new PagedList<Reports>(new List<Reports>(), 0, request.PageNumber, request.PageSize);
+                //    }
 
-                    }
-                }
+                //}
+
 
                 if (!string.IsNullOrEmpty(request.Remarks))
                 {
@@ -117,8 +116,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
                 if(string.IsNullOrEmpty(request.Search))
                 {
-                    ticketQuery = ticketQuery.Where(x => x.Id.ToString()
-                    .Contains(request.Search));
+                    ticketQuery = ticketQuery
+                        .Where(x => x.Id.ToString().Contains(request.Search)
+                        || x.User.Fullname.Contains(request.Search));
                 }
 
                 if(request.Date_From is not null && request.Date_To is not null)
@@ -128,6 +128,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                 }
 
                 var results = ticketQuery
+                    .Where(x => x.IsApprove == true && x.IsClosedApprove == true)
                     .Select(x => new Reports
                     {
                         Year = x.TargetDate.Value.Date.Year,

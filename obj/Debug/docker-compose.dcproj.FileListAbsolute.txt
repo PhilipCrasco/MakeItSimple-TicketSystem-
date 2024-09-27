@@ -56,6 +56,7 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.EntityFr
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\MediatR.Contracts.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\CloudinaryDotNet.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Options.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\ClosedXML.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Packaging.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\System.IdentityModel.Tokens.Jwt.dll
@@ -72,6 +73,12 @@ C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.AspNetCo
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\EFCore.NamingConventions.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\BCrypt.Net-Next.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Microsoft.Data.SqlClient.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\DocumentFormat.OpenXml.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\SixLabors.Fonts.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\ExcelNumberFormat.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\System.IO.Packaging.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\Irony.dll
+C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\XLParser.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Frameworks.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Versioning.dll
 C:\PhilipCrasco\Projects\MakeItSimple-TicketSystem-\bin\Debug\NuGet.Common.dll

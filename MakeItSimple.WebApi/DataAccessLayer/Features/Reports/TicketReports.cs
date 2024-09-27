@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 {
@@ -14,8 +15,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
         public record class Reports
         {
-            public int Year { get; set; }
-            public int Month { get; set; }
+            public string Year { get; set; }
+            public string Month { get; set; }
             public DateTime Start_Date { get; set; }
             public DateTime End_Date { get; set; }
             public string Personnel { get; set; }
@@ -129,10 +130,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
                 var results = ticketQuery
                     .Where(x => x.IsApprove == true && x.IsClosedApprove == true)
-                    .Select(x => new Reports
+                    .Select(x => new Reports                                                                                             
                     {
-                        Year = x.TargetDate.Value.Date.Year,
-                        Month = x.TargetDate.Value.Date.Month,                
+                        Year = x.TargetDate.Value.Date.Year.ToString(),
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x.TargetDate.Value.Date.Month),
                         Start_Date = new DateTime(x.TargetDate.Value.Date.Month, 1 , x.TargetDate.Value.Date.Year),
                         End_Date = new DateTime(x.TargetDate.Value.Date.Month, 
                         DateTime.DaysInMonth(x.TargetDate.Value.Date.Year , x.TargetDate.Value.Date.Month), x.TargetDate.Value.Date.Year),

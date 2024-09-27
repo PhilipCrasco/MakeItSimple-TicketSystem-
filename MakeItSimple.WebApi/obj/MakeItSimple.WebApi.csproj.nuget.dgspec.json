@@ -50,6 +50,10 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.102.3, )"
+            },
             "CloudinaryDotNet": {
               "target": "Package",
               "version": "[1.25.0, )"

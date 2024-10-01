@@ -72,10 +72,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
                 if (request.UserId is not null)
                 {
-                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
+                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId); 
                 }
 
-                if (string.IsNullOrEmpty(request.Search))
+                if (!string.IsNullOrEmpty(request.Search))
                 {
                     ticketQuery = ticketQuery
                         .Where(x => x.Id.ToString().Contains(request.Search)

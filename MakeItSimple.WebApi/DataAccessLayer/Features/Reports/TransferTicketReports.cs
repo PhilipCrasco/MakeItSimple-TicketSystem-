@@ -65,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     _transferQuery = _transferQuery.Where(x => x.TransferBy == request.UserId);
                 }
 
-                if (string.IsNullOrEmpty(request.Search))
+                if (!string.IsNullOrEmpty(request.Search))
                 {
                     _transferQuery = _transferQuery
                         .Where(x => x.TicketConcernId.ToString().Contains(request.Search)
@@ -99,7 +99,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                         Updated_At = x.UpdatedAt,
                        
                     });
-
 
 
                 return await PagedList<TransferTicketReportsResult>.CreateAsync(results, request.PageNumber, request.PageSize);

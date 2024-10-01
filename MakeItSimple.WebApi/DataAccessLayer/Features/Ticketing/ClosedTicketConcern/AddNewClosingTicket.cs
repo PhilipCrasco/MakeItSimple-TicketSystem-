@@ -260,6 +260,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 var addAttachment = new TicketAttachment
                                 {
                                     TicketConcernId = ticketConcernExist.Id,
+                                    ClosingTicketId = closingTicketExist.Id,
                                     Attachment = filePath,
                                     FileName = attachments.Attachment.FileName,
                                     FileSize = attachments.Attachment.Length,

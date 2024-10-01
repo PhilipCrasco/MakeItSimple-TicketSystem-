@@ -115,7 +115,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     }
                 }
 
-                if(string.IsNullOrEmpty(request.Search))
+                if(!string.IsNullOrEmpty(request.Search))
                 {
                     ticketQuery = ticketQuery
                         .Where(x => x.Id.ToString().Contains(request.Search)

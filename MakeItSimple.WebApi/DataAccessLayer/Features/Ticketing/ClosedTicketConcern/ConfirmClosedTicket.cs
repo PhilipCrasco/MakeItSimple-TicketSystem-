@@ -72,6 +72,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 {
 
                     Message = $"Ticket number {ticketConcernExist.Id} has been closed",
+
                     AddedBy = command.Transacted_By.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = requestConcernId.UserId.Value,

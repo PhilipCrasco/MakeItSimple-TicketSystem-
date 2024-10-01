@@ -27,14 +27,6 @@ namespace MakeItSimple.WebApi.Controllers.Report
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-                    }
-                }
 
                 var reports = await _mediator.Send(query);
 
@@ -77,15 +69,6 @@ namespace MakeItSimple.WebApi.Controllers.Report
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-                    }
-                }
-
                 var reports = await _mediator.Send(query);
 
                 Response.AddPaginationHeader(
@@ -127,14 +110,6 @@ namespace MakeItSimple.WebApi.Controllers.Report
         {
             try
             {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        query.UserId = userId;
-                    }
-                }
 
                 var reports = await _mediator.Send(query);
 

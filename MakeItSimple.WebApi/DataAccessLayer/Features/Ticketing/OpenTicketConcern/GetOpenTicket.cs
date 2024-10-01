@@ -70,6 +70,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 public string Resolution { get; set; }
                 public string Remarks { get; set; }
                 public bool? IsApprove { get; set; }
+                public string Approver { get; set; }
+
+                public List<ApproverList> ApproverLists { get; set; }
+
+                public class ApproverList
+                {
+                    public string ApproverName { get; set; }
+                    public int  Approver_Level { get; set; }
+                }
 
                 public List<GetAttachmentForClosingTicket> GetAttachmentForClosingTickets { get; set; }
                 public class GetAttachmentForClosingTicket
@@ -416,7 +425,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         Closed_At = x.Closed_At,
                         Is_Transfer = x.IsTransfer,
                         Transfer_At = x.TransferAt,
-
+                        
                         GetForClosingTickets = x.ClosingTickets
                        .Where(x => x.IsActive == true && x.IsRejectClosed == false)
                        .Where(x => x.IsClosing == true ? x.IsClosing == true : x.IsClosing == false)
@@ -426,6 +435,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                           Remarks = x.RejectRemarks,
                           Resolution = x.Resolution,
                           IsApprove = x.ApproverTickets.Any(x => x.IsApprove == null) ? false : true,
+                          ApproverLists  = x.ApproverTickets
+                          .Where(x => x.IsApprove != null)
+                          .Select(x => new GetOpenTicketResult.GetForClosingTicket.ApproverList
+                          {
+                              ApproverName = x.User.Fullname,
+                              Approver_Level = x.ApproverLevel.Value
+
+                          }).OrderByDescending(x => x.Approver_Level)
+                          .ToList(),
 
                           GetAttachmentForClosingTickets = x.TicketAttachments.Select(x => new GetOpenTicketResult.GetForClosingTicket.GetAttachmentForClosingTicket
                           {

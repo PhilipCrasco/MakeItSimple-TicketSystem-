@@ -1,8 +1,4 @@
-﻿using Azure.Core;
-using MakeItSimple.WebApi.DataAccessLayer.Data;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Export;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Export.ClosingTicketExport;
 
@@ -20,10 +16,10 @@ namespace MakeItSimple.WebApi.Controllers.Export
         }
 
 
-        [HttpGet("service-report")]
-        public async Task<IActionResult> GeneralLedgerExport([FromQuery] ClosingTicketExportCommand command)
+        [HttpGet("closing")]
+        public async Task<IActionResult> ClosingTicketExport([FromQuery] ClosingTicketExportCommand command)
         {
-            var filePath = $"ServiveReport {command.Date_From} - {command.Date_To}.xlsx";
+            var filePath = $"ClosingTicketReports {command.Date_From:MM-dd-yyyy} - {command.Date_To:MM-dd-yyyy}.xlsx";
 
             try
             {

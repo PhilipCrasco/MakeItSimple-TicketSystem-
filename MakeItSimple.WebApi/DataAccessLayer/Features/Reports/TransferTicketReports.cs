@@ -3,6 +3,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 {
@@ -32,8 +33,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
         public class TransferTicketReportsQuery : UserParams, IRequest<PagedList<TransferTicketReportsResult>>
         {
             public string Search { get; set; }
+            public int? Unit { get; set; }
             public Guid? UserId { get; set; }
+            [Required]
             public DateTime? Date_From { get; set; }
+            [Required]
             public DateTime? Date_To { get; set; }
 
         }
@@ -60,9 +64,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .Include(x => x.TicketConcern);
 
 
-                if (request.UserId is not null)
+                if (request.Unit is not null)
                 {
-                    _transferQuery = _transferQuery.Where(x => x.TransferBy == request.UserId);
+                    _transferQuery = _transferQuery.Where(x => x.TransferByUser.UnitId == request.Unit);
+
+                    if (request.UserId is not null)
+                    {
+                        _transferQuery = _transferQuery.Where(x => x.TransferBy == request.UserId);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(request.Search))
@@ -72,15 +81,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                         || x.TransferByUser.Fullname.Contains(request.Search));
                 }
 
-                if (request.Date_From is not null && request.Date_To is not null)
-                {
-                    _transferQuery = _transferQuery
-                        .Where(x => x.TransferAt >= request.Date_From && x.TransferAt < request.Date_To);
-                }
-
-
                 var results = _transferQuery
                     .Where(x => x.IsTransfer == true && x.TicketConcern.UserId != null)
+                     .Where(x => x.TransferAt >= request.Date_From && x.TransferAt < request.Date_To)
                     .Select(x => new TransferTicketReportsResult
                     {
                         TicketConcernId = x.TicketConcernId,

@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
+using MakeItSimple.WebApi.Common.Pagination;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
 
         public record class ClosingTicketExportResult
         {
+            public Guid ? UserId { get; set; }
+            public int ? Unit { get; set; }
             public string Year { get; set; }
             public string Month { get; set; }
-            public DateTime Start_Date { get; set; }
-            public DateTime End_Date { get; set; }
+            public string Start_Date { get; set; }
+            public string End_Date { get; set; }
             public string Personnel { get; set; }
-            public int Ticket_Number { get; set; }
+            public int ?Ticket_Number { get; set; }
             public string Description { get; set; }
             public DateTime Target_Date { get; set; }
             public DateTime Actual { get; set; }
@@ -32,13 +35,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
 
         }
 
-
-
         public class ClosingTicketExportCommand : IRequest<Unit>
         {
-            public DateTime ? Date_From  { get; set; }
+            public string Search { get; set; }
+            public int? Unit { get; set; }
+            public Guid? UserId { get; set; }
+            public string Remarks { get; set; }
+            public DateTime? Date_From { get; set; }
             public DateTime? Date_To { get; set; }
-            
+
         }
 
         public class Handler : IRequestHandler<ClosingTicketExportCommand, Unit>
@@ -66,30 +71,72 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                     .Include(x => x.TransferTicketConcerns)
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern)
-                    .Where(x => x.TargetDate >= request.Date_From && x.TargetDate < request.Date_To)
+                    .Where(x => x.TargetDate.Value.Date >= request.Date_From.Value.Date && x.TargetDate.Value.Date < request.Date_To.Value.Date)
+                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true)
                     .Select(x => new ClosingTicketExportResult
                     {
+                        Unit = x.User.UnitId,
+                        UserId = x.UserId,
                         Year = x.TargetDate.Value.Date.Year.ToString(),
                         Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x.TargetDate.Value.Date.Month),
-                        Start_Date = new DateTime(x.TargetDate.Value.Date.Month, 1, x.TargetDate.Value.Date.Year),
-                        End_Date = new DateTime(x.TargetDate.Value.Date.Month,
-                        DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month), x.TargetDate.Value.Date.Year),
+                        Start_Date = $"{x.TargetDate.Value.Date.Month}/01/{x.TargetDate.Value.Date.Year}",
+                        End_Date = $"{x.TargetDate.Value.Date.Month}/{DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month)}/{x.TargetDate.Value.Date.Year }",
                         Personnel = x.User.Fullname,
                         Ticket_Number = x.Id,
                         Description = x.ConcernDetails,
-                        Target_Date = new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
-                        Actual = x.Closed_At != null ? new DateTime(x.Closed_At.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year)
-                        : new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
+                        Target_Date = x.TargetDate.Value.Date,
+                        Actual = x.Closed_At.Value.Date,
                         Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date),
                         Efficeincy = x.Closed_At != null ? Math.Max(0, 100m - ((decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
-                       / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
+                        / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
                         Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
                         Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.OnTime : TicketingConString.Delay
-                    }).ToListAsync(cancellationToken);
+                    }).ToListAsync();
+
+
+                if (request.Unit is not null)
+                {
+                    closing = closing.Where(x => x.Unit == request.Unit).ToList();
+
+                    if (request.UserId is not null)
+                    {
+                        closing = closing.Where(x => x.UserId == request.UserId).ToList();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Remarks))
+                {
+                    switch (request.Remarks)
+                    {
+                        case TicketingConString.OnTime:
+                            closing = closing
+                                .Where(x => x.Actual.Date != null && x.Target_Date.Date > x.Actual.Date).ToList();
+                            break;
+
+                        case TicketingConString.Delay:
+                            closing = closing
+                                .Where(x => x.Actual.Date != null && x.Target_Date.Date < x.Actual.Date)
+                                .ToList();
+                            break;
+
+                        default:
+                            return Unit.Value;
+
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    closing = closing
+                        .Where(x => x.Ticket_Number.ToString().Contains(request.Search)
+                        || x.Personnel.Contains(request.Search))
+                        .ToList();
+                }
+
 
                 using (var workbook = new XLWorkbook())
                 {
-                    var worksheet = workbook.Worksheets.Add($"Service Report");
+                    var worksheet = workbook.Worksheets.Add($"Closing Ticket Report");
                     var headers = new List<string>
                     {
                         "Year",
@@ -138,7 +185,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                     }
 
                     worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs($"ServiceReport {request.Date_From} - {request.Date_To}.xlsx");
+                    workbook.SaveAs($"ClosingTicketReports {request.Date_From:MM-dd-yyyy} - {request.Date_To:MM-dd-yyyy}.xlsx");
 
                 }
 

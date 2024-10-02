@@ -38,6 +38,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
         {
 
             public string Search { get; set; }
+            public int? Unit { get; set; }
             public Guid? UserId { get; set; }
             public DateTime? Date_From { get; set; }
             public DateTime? Date_To { get; set; }
@@ -70,9 +71,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
 
-                if (request.UserId is not null)
+                if (request.Unit is not null)
                 {
-                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId); 
+                    ticketQuery = ticketQuery.Where(x => x.User.UnitId == request.Unit);
+
+                    if (request.UserId is not null)
+                    {
+                        ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(request.Search))
@@ -80,12 +86,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     ticketQuery = ticketQuery
                         .Where(x => x.Id.ToString().Contains(request.Search)
                         || x.User.Fullname.Contains(request.Search));
-                }
-
-                if (request.Date_From is not null && request.Date_To is not null)
-                {
-                    ticketQuery = ticketQuery
-                        .Where(x => x.TargetDate >= request.Date_From && x.TargetDate < request.Date_To);
                 }
 
                 var results = ticketQuery

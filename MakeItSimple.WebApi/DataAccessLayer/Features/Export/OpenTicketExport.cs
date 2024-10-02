@@ -51,7 +51,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
 
                 using (var workbook = new XLWorkbook())
                 {
-                    var worksheet = workbook.Worksheets.Add($"Service Report");
+                    var worksheet = workbook.Worksheets.Add($"Open Ticket Report");
                     var headers = new List<string>
                     {
                         "TicketConcernId",
@@ -95,23 +95,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         row.Cell(5).Value = openTicket[index - 1].Issue_Handler;
                         row.Cell(6).Value = openTicket[index - 1].Unit_Name;
                         row.Cell(7).Value = openTicket[index - 1].SubUnit_Name;
-                        row.Cell(8).Value = openTicket[index - 1].Category_Description;
-                        row.Cell(9).Value = openTicket[index - 1].SubCategory_Description;
-                        row.Cell(10).Value = openTicket[index - 1].Start_Date;
-                        row.Cell(11).Value = openTicket[index - 1].Target_Date;
-                        row.Cell(12).Value = openTicket[index - 1].Created_At;
-                        row.Cell(13).Value = openTicket[index - 1].Modified_By;
-                        row.Cell(14).Value = openTicket[index - 1].Updated_At;
-                        row.Cell(15).Value = openTicket[index - 1].Remarks;
+                        row.Cell(8).Value = openTicket[index - 1].Channel_Name;
+                        row.Cell(9).Value = openTicket[index - 1].Category_Description;
+                        row.Cell(10).Value = openTicket[index - 1].SubCategory_Description;
+                        row.Cell(11).Value = openTicket[index - 1].Start_Date;
+                        row.Cell(12).Value = openTicket[index - 1].Target_Date;
+                        row.Cell(13).Value = openTicket[index - 1].Created_At;
+                        row.Cell(14).Value = openTicket[index - 1].Modified_By;
+                        row.Cell(15).Value = openTicket[index - 1].Updated_At;
+                        row.Cell(16).Value = openTicket[index - 1].Remarks;
 
                     }
 
                     worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs($"ServiceReport {request.Date_From} - {request.Date_To}.xlsx");
+                    workbook.SaveAs($"OpenTicketReport {request.Date_From} - {request.Date_To}.xlsx");
 
                 }
-
-
 
                 return Unit.Value;
 

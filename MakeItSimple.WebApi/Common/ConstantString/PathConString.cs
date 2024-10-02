@@ -28,8 +28,5 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string Closed = "Closed";
 
 
-
-
-
     }
 }

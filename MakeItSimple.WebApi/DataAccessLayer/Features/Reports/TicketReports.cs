@@ -35,6 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
         {
 
             public string Search {  get; set; }
+            public int? Unit { get; set; }
             public Guid ? UserId { get; set; }
             public string Remarks { get; set; }
             public DateTime ? Date_From { get; set; }
@@ -69,31 +70,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
 
-                if(request.UserId is not null)
+                
+                if(request.Unit is not null)
                 {
-                    ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
+                    ticketQuery = ticketQuery.Where(x => x.User.UnitId == request.Unit);
+
+                    if (request.UserId is not null)
+                    {
+                        ticketQuery = ticketQuery.Where(x => x.UserId == request.UserId);
+                    }
                 }
-
-                //if(!string.IsNullOrEmpty(request.Status))
-                //{
-                //    switch(request.Status)
-                //    {
-                //        case TicketingConString.OpenTicket:
-                //            ticketQuery = ticketQuery
-                //                .Where(x => x.IsApprove == true && x.IsClosedApprove != true); 
-                //            break;
-
-                //        case TicketingConString.Closed:
-                //            ticketQuery = ticketQuery
-                //                .Where(x => x.IsApprove == true && x.IsClosedApprove == true);
-                //            break;  
-                               
-                //        default:
-                //             return new PagedList<Reports>(new List<Reports>(), 0, request.PageNumber, request.PageSize);
-                //    }
-
-                //}
-
 
                 if (!string.IsNullOrEmpty(request.Remarks))
                 {
@@ -115,21 +101,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     }
                 }
 
-                if(!   string.IsNullOrEmpty(request.Search))
+                if(!string.IsNullOrEmpty(request.Search))
                 {
                     ticketQuery = ticketQuery
                         .Where(x => x.Id.ToString().Contains(request.Search)
                         || x.User.Fullname.Contains(request.Search));
                 }
 
-                if(request.Date_From is not null && request.Date_To is not null)
-                {
-                    ticketQuery = ticketQuery
-                        .Where(x => x.TargetDate >= request.Date_From && x.TargetDate < request.Date_To);
-                }
 
                 var results = ticketQuery
-                    .Where(x => x.IsApprove == true && x.IsClosedApprove == true)
+                    .Where(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true)
+                    .Where(x => x.TargetDate.Value.Date >= request.Date_From.Value.Date && x.TargetDate.Value.Date < request.Date_To.Value.Date)
                     .Select(x => new Reports                                                                                             
                     {
                         Year = x.TargetDate.Value.Date.Year.ToString(),

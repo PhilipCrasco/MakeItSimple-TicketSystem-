@@ -1,5 +1,6 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup;
+using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.SubCategorySetup;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup.AddNewChannel;
 
@@ -17,6 +18,9 @@ namespace MakeItSimple.WebApi.Models.Setup.CategorySetup
         public User ModifiedByUser { get; set; }
 
         public string CategoryDescription { get; set; }
+
+        public int ? ChannelId { get; set; }
+        public virtual Channel Channel { get; set; }
 
         public ICollection<SubCategory> SubCategories { get; set; }
 

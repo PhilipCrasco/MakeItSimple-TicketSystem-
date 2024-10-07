@@ -7,10 +7,8 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
-using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 {
@@ -65,8 +63,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(AddRequestConcernReceiverCommand command, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
-                var ticketConcernList = new List<TicketConcern>();
-                var removeTicketConcern = new List<TicketConcern>();
 
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
@@ -97,19 +93,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         return Result.Failure(TicketRequestError.UserNotExist());
                 }
 
-                switch (await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.CategoryId))
-                {
-                    case null:
-                        return Result.Failure(TicketRequestError.CategoryNotExist());
-                }
-                switch (await _context.SubCategories.FirstOrDefaultAsync(x => x.Id == command.SubCategoryId))
-                {
-                    case null:
-                        return Result.Failure(TicketRequestError.SubCategoryNotExist());
-                }
 
 
-                if (command.Start_Date > command.Target_Date || dateToday > command.Target_Date)
+                if (dateToday > command.Target_Date)
                 {
                     return Result.Failure(TicketRequestError.DateTimeInvalid());
                 }
@@ -129,39 +115,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         hasChanged = true;
                     }
 
-                    if (upsertConcern.RequestorBy != command.Requestor_By)
-                    {
-                        upsertConcern.RequestorBy = command.Requestor_By;
-                        hasChanged = true;
-                    }
-
                     if (upsertConcern.UserId != command.UserId)
                     {
                         upsertConcern.UserId = command.UserId;
-                        hasChanged = true;
-                    }
-
-                    if (upsertConcern.ConcernDetails != command.Concern_Details)
-                    {
-                        upsertConcern.ConcernDetails = command.Concern_Details;
-                        hasChanged = true;
-                    }
-
-                    if (upsertConcern.CategoryId != command.CategoryId)
-                    {
-                        upsertConcern.CategoryId = command.CategoryId;
-                        hasChanged = true;
-                    }
-
-                    if (upsertConcern.SubCategoryId != command.SubCategoryId)
-                    {
-                        upsertConcern.SubCategoryId = command.SubCategoryId;
-                        hasChanged = true;
-                    }
-
-                    if (upsertConcern.StartDate != command.Start_Date)
-                    {
-                        upsertConcern.StartDate = command.Start_Date;
                         hasChanged = true;
                     }
 
@@ -172,8 +128,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
-                    ticketConcernList.Add(upsertConcern);
-
                     if (upsertConcern.RequestConcernId != null)
                     {
                         var requestConcern = await _context.RequestConcerns
@@ -182,23 +136,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         requestConcern.Remarks = null;
                     }
 
-
-                    var requestUpsertConcern = await _context.RequestConcerns
-                        .Where(x => x.Id == upsertConcern.RequestConcernId)
-                         .ToListAsync();
-
                     if (hasChanged)
                     {
                         upsertConcern.ModifiedBy = command.Modified_By;
                         upsertConcern.UpdatedAt = DateTime.Now;
                         upsertConcern.IsAssigned = true;
                         
-
                     }
-
-
-                    upsertConcern.TicketType = TicketingConString.Concern; 
-
 
                     var addNewTicketTransactionNotification = new TicketTransactionNotification
                     {
@@ -211,11 +155,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         Modules_Parameter = PathConString.OpenTicket,
                         PathId = upsertConcern.Id,
                         
-
                     };
 
                     await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
 
                     if(upsertConcern.IsApprove != true)
                     {
@@ -236,97 +178,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                     }
 
-
-
                     await _context.SaveChangesAsync(cancellationToken);
                 }
                 else
                 {
-
-                    var addnewTicketConcern = new TicketConcern
-                    {
-                        RequestorBy = command.Requestor_By,
-                        ChannelId = command.ChannelId,
-                        UserId = command.UserId,
-                        ConcernDetails = command.Concern_Details,
-                        CategoryId = command.CategoryId,
-                        SubCategoryId =command.SubCategoryId,
-                        AddedBy = command.Added_By,
-                        CreatedAt = DateTime.Now,
-                        StartDate = command.Start_Date,
-                        TargetDate = command.Target_Date,                      
-                        IsApprove = false,
-                        ConcernStatus = TicketingConString.ForApprovalTicket,
-                        IsAssigned = true,
-                        TicketType = TicketingConString.Concern
-                    };
-
-
-                    await _context.TicketConcerns.AddAsync(addnewTicketConcern);
-                    await _context.SaveChangesAsync(cancellationToken);
-
-                    upsertConcern = addnewTicketConcern;
-
-                   var addTicketHistory = new TicketHistory
-                    {
-                        TicketConcernId = addnewTicketConcern.Id,
-                        TransactedBy = command.Added_By,
-                        TransactionDate = DateTime.Now,
-                        Request = TicketingConString.Request,
-                        Status = $"{TicketingConString.RequestCreated} {userDetails.Fullname}"
-                    };
-
-                    await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
-                    var addRequestConcern = new RequestConcern
-                    {
-
-                        UserId = addnewTicketConcern.RequestorBy,
-                        Concern = command.Concern_Details,
-                        AddedBy = command.Added_By,
-                        ConcernStatus = TicketingConString.ForApprovalTicket,
-                        IsDone = false,
-
-                    };
-
-                    await _context.RequestConcerns.AddAsync(addRequestConcern);
-                    await _context.SaveChangesAsync(cancellationToken);
-
-                    addnewTicketConcern.RequestConcernId = addRequestConcern.Id;
-
-                    if (receiverPermissionList.Any(x => x.Contains(command.Role)))
-                    {
-                        addnewTicketConcern.IsApprove = true;
-
-                        var issueHandlerDetails = await _context.Users
-                            .FirstOrDefaultAsync(x => x.Id == addnewTicketConcern.UserId);
-
-                        var addAssignHistory = new TicketHistory
-                        {
-                            TicketConcernId = addnewTicketConcern.Id,
-                            TransactedBy = command.UserId,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.ConcernAssign,
-                            Status = $"{TicketingConString.RequestAssign} {issueHandlerDetails.Fullname}"
-                        };
-
-                        await _context.TicketHistories.AddAsync(addAssignHistory, cancellationToken);
-                    }
-
-                    var addNewTicketTransactionNotification = new TicketTransactionNotification
-                    {
-
-                        Message = $"New ticket number {addRequestConcern.Id} created",
-                        AddedBy = userDetails.Id,
-                        Created_At = DateTime.Now,
-                        ReceiveBy = addRequestConcern.UserId.Value,
-                        Modules = PathConString.ConcernTickets,
-                        Modules_Parameter = PathConString.ForApproval,
-                        PathId = addnewTicketConcern.Id,
-                    };
-
-                    await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
+                    return Result.Failure(TicketRequestError.TicketIdNotExist());
                 }
 
                 if (!Directory.Exists(TicketingConString.AttachmentPath))

@@ -24,6 +24,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data.Ticketing
            .HasForeignKey(u => u.TransferBy)
            .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(u => u.TransferToUser)
+           .WithMany()
+           .HasForeignKey(u => u.TransferTo)
+           .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(u => u.RejectTransferByUser)
            .WithMany()
            .HasForeignKey(u => u.RejectTransferBy)

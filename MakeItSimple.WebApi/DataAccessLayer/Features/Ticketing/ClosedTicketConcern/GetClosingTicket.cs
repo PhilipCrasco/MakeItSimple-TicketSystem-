@@ -14,10 +14,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
         public class GetClosingTicketResults
         {
-            //public int? TicketTransactionId { get; set; }
             public int ClosingTicketId { get; set; }
             public int TicketConcernId { get; set; }
             public string Resolution { get; set; }
+            public string Notes { get; set; }
             public int? DepartmentId { get; set; }
             public string Department_Name { get; set; }
             public int? ChannelId { get; set; }
@@ -98,13 +98,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.Channel)
                     .Include(x => x.TicketConcern)
-                    .ThenInclude(x => x.Category)
                     .Include(x => x.TicketConcern)
-                    .ThenInclude(x => x.SubCategory)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.RequestorByUser);
-
-
 
                 if (closingTicketsQuery.Any())
                 {
@@ -184,58 +180,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                     && userRequestIdApprovalList.Contains(x.Id));
 
                             }
-                        }
-
-                        else if (request.UserType == TicketingConString.Receiver)
-                        {
-
-                            var listOfRequest = await closingTicketsQuery.Select(x => new
-                            {
-                                x.TicketConcern.User.BusinessUnitId
-
-                            }).ToListAsync();
-
-                            foreach (var businessUnit in listOfRequest)
-                            {
-                                var businessUnitDefault = await _context.BusinessUnits
-                                    .AsNoTracking()
-                                    .FirstOrDefaultAsync(x => x.Id == businessUnit.BusinessUnitId && x.IsActive == true);
-                                businessUnitList.Add(businessUnitDefault);
-
-                            }
-
-                            var businessSelect = businessUnitList.Select(x => x.Id).ToList();
-
-                            var receiverList = await _context.Receivers
-                                .Include(x => x.BusinessUnit)
-                                .Where(x => businessSelect.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
-                                 x.UserId == request.UserId)
-                                .ToListAsync();
-
-                            var selectReceiver = receiverList.Select(x => x.BusinessUnitId);
-
-                            if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
-                            {
-
-                                var approverTransactList = await _context.ApproverTicketings
-                                    .AsNoTracking()
-                                    .Where(x => filterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
-                                    .ToListAsync();
-
-                                if (approverTransactList.Any())
-                                {
-                                    var generatedIdInApprovalList = approverTransactList
-                                        .Select(approval => approval.ClosingTicketId);
-
-                                    closingTicketsQuery = closingTicketsQuery
-                                        .Where(x => !generatedIdInApprovalList.Contains(x.Id));
-
-                                }
-
-                                closingTicketsQuery = closingTicketsQuery
-                                    .Where(x => selectReceiver.Contains(x.TicketConcern.User.BusinessUnitId));
-
-                            }
 
                         }
                         else if (request.UserType == TicketingConString.Users)
@@ -258,22 +202,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         ClosingTicketId = x.Id,
                         TicketConcernId = x.TicketConcernId,
                         Resolution = x.Resolution,
+                        Notes = x.Notes,
                         DepartmentId = x.TicketConcern.User.DepartmentId,
                         Department_Name = x.TicketConcern.User.Department.DepartmentName,
                         ChannelId = x.TicketConcern.ChannelId,
                         Channel_Name = x.TicketConcern.Channel.ChannelName,
                         UserId = x.TicketConcern.UserId,
                         Fullname = x.TicketConcern.User.Fullname,
-                        Concern_Details = x.TicketConcern.ConcernDetails,
-                        Category_Description = x.TicketConcern.Category.CategoryDescription,
-                        SubCategoryDescription = x.TicketConcern.SubCategory.SubCategoryDescription,
+                        //Concern_Details = x.TicketConcern.ConcernDetails,
+                        //Category_Description = x.TicketConcern.Category.CategoryDescription,
+                        //SubCategoryDescription = x.TicketConcern.SubCategory.SubCategoryDescription,
                         RejectClosed_By = x.RejectClosedByUser.Fullname,
                         RejectClosed_At = x.RejectClosedAt,
                         Reject_Remarks = x.RejectRemarks,
                         Closed_By = x.ClosedByUser.Fullname,
                         Closed_At = x.ClosingAt,
                         Closed_Remarks = x.ClosingRemarks,
-                        Start_Date = x.TicketConcern.StartDate,
                         Target_Date = x.TicketConcern.TargetDate,
                         Delay_Days = x.TicketConcern.TargetDate < dateToday && x.ClosingAt == null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, dateToday)
                             : x.TicketConcern.TargetDate < x.ClosingAt && x.ClosingAt != null ? Microsoft.EntityFrameworkCore.SqlServerDbFunctionsExtensions.DateDiffDay(EF.Functions, x.TicketConcern.TargetDate, x.ClosingAt) : 0,
@@ -295,8 +239,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             Modified_By = x.ModifiedByUser.Fullname,
                             Updated_At = x.UpdatedAt,
 
-                        }).ToList(),
-
+                        }).ToList()
 
                     });
 

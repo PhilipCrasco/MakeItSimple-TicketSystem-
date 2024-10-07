@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    partial class MisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241003012300_addTransferToAndNote")]
+    partial class addTransferToAndNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1051,10 +1054,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
                     b.Property<Guid?>("ClosedBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("closed_by");
@@ -1087,9 +1086,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<string>("Notes")
+                    b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("notes");
+                        .HasColumnName("note");
 
                     b.Property<DateTime?>("RejectClosedAt")
                         .HasColumnType("datetime2")
@@ -1111,10 +1110,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("resolution");
 
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_category_id");
-
                     b.Property<Guid?>("TicketApprover")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("ticket_approver");
@@ -1122,6 +1117,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<int>("TicketConcernId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
+
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
@@ -1133,9 +1132,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_closing_tickets_added_by");
 
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_closing_tickets_category_id");
-
                     b.HasIndex("ClosedBy")
                         .HasDatabaseName("ix_closing_tickets_closed_by");
 
@@ -1144,9 +1140,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("RejectClosedBy")
                         .HasDatabaseName("ix_closing_tickets_reject_closed_by");
-
-                    b.HasIndex("SubCategoryId")
-                        .HasDatabaseName("ix_closing_tickets_sub_category_id");
 
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_closing_tickets_ticket_concern_id");
@@ -1167,18 +1160,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("added_by");
 
-                    b.Property<int?>("BusinessUnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("business_unit_id");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int")
-                        .HasColumnName("company_id");
-
                     b.Property<string>("Concern")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("concern");
@@ -1194,14 +1175,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DateNeeded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_needed");
-
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int")
-                        .HasColumnName("department_id");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -1219,17 +1192,9 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_confirm");
 
-                    b.Property<int?>("LocationId")
-                        .HasColumnType("int")
-                        .HasColumnName("location_id");
-
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("notes");
 
                     b.Property<Guid?>("RejectBy")
                         .HasColumnType("uniqueidentifier")
@@ -1242,18 +1207,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<string>("Resolution")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("resolution");
-
-                    b.Property<int?>("SubCategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_category_id");
-
-                    b.Property<int?>("SubUnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("sub_unit_id");
-
-                    b.Property<int?>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("unit_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
@@ -1269,35 +1222,11 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("AddedBy")
                         .HasDatabaseName("ix_request_concerns_added_by");
 
-                    b.HasIndex("BusinessUnitId")
-                        .HasDatabaseName("ix_request_concerns_business_unit_id");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_request_concerns_category_id");
-
-                    b.HasIndex("CompanyId")
-                        .HasDatabaseName("ix_request_concerns_company_id");
-
-                    b.HasIndex("DepartmentId")
-                        .HasDatabaseName("ix_request_concerns_department_id");
-
-                    b.HasIndex("LocationId")
-                        .HasDatabaseName("ix_request_concerns_location_id");
-
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_request_concerns_modified_by");
 
                     b.HasIndex("RejectBy")
                         .HasDatabaseName("ix_request_concerns_reject_by");
-
-                    b.HasIndex("SubCategoryId")
-                        .HasDatabaseName("ix_request_concerns_sub_category_id");
-
-                    b.HasIndex("SubUnitId")
-                        .HasDatabaseName("ix_request_concerns_sub_unit_id");
-
-                    b.HasIndex("UnitId")
-                        .HasDatabaseName("ix_request_concerns_unit_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_request_concerns_user_id");
@@ -1345,10 +1274,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("notes");
 
                     b.Property<int?>("TicketConcernId")
                         .HasColumnType("int")
@@ -1519,6 +1444,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("approved_by");
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
+
                     b.Property<int?>("ChannelId")
                         .HasColumnType("int")
                         .HasColumnName("channel_id");
@@ -1530,6 +1459,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<DateTime?>("Closed_At")
                         .HasColumnType("datetime2")
                         .HasColumnName("closed_at");
+
+                    b.Property<string>("ConcernDetails")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("concern_details");
 
                     b.Property<string>("ConcernStatus")
                         .HasColumnType("nvarchar(max)")
@@ -1555,9 +1488,25 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_closed_approve");
 
+                    b.Property<bool>("IsClosedReject")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_closed_reject");
+
                     b.Property<bool?>("IsDone")
                         .HasColumnType("bit")
                         .HasColumnName("is_done");
+
+                    b.Property<bool?>("IsReDate")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_re_date");
+
+                    b.Property<bool?>("IsReTicket")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_re_ticket");
+
+                    b.Property<bool>("IsReject")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_reject");
 
                     b.Property<bool?>("IsTransfer")
                         .HasColumnType("bit")
@@ -1567,17 +1516,13 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("modified_by");
 
-                    b.Property<bool?>("OnHold")
-                        .HasColumnType("bit")
-                        .HasColumnName("on_hold");
-
-                    b.Property<DateTime?>("OnHoldAt")
+                    b.Property<DateTime?>("ReDateAt")
                         .HasColumnType("datetime2")
-                        .HasColumnName("on_hold_at");
+                        .HasColumnName("re_date_at");
 
-                    b.Property<string>("OnHoldReason")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("on_hold_reason");
+                    b.Property<Guid?>("ReDateBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("re_date_by");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)")
@@ -1591,13 +1536,37 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requestor_by");
 
-                    b.Property<DateTime?>("Resume_At")
+                    b.Property<DateTime?>("ReticketAt")
                         .HasColumnType("datetime2")
-                        .HasColumnName("resume_at");
+                        .HasColumnName("reticket_at");
+
+                    b.Property<Guid?>("ReticketBy")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("reticket_by");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
+
+                    b.Property<int?>("SubCategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("sub_category_id");
 
                     b.Property<DateTime?>("TargetDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("target_date");
+
+                    b.Property<Guid?>("TicketApprover")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ticket_approver");
+
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
+
+                    b.Property<string>("TicketType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_type");
 
                     b.Property<DateTime?>("TransferAt")
                         .HasColumnType("datetime2")
@@ -1624,6 +1593,9 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("ApprovedBy")
                         .HasDatabaseName("ix_ticket_concerns_approved_by");
 
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_ticket_concerns_category_id");
+
                     b.HasIndex("ChannelId")
                         .HasDatabaseName("ix_ticket_concerns_channel_id");
 
@@ -1633,11 +1605,20 @@ namespace MakeItSimple.WebApi.Migrations
                     b.HasIndex("ModifiedBy")
                         .HasDatabaseName("ix_ticket_concerns_modified_by");
 
+                    b.HasIndex("ReDateBy")
+                        .HasDatabaseName("ix_ticket_concerns_re_date_by");
+
                     b.HasIndex("RequestConcernId")
                         .HasDatabaseName("ix_ticket_concerns_request_concern_id");
 
                     b.HasIndex("RequestorBy")
                         .HasDatabaseName("ix_ticket_concerns_requestor_by");
+
+                    b.HasIndex("ReticketBy")
+                        .HasDatabaseName("ix_ticket_concerns_reticket_by");
+
+                    b.HasIndex("SubCategoryId")
+                        .HasDatabaseName("ix_ticket_concerns_sub_category_id");
 
                     b.HasIndex("TransferBy")
                         .HasDatabaseName("ix_ticket_concerns_transfer_by");
@@ -1810,6 +1791,10 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Property<int>("TicketConcernId")
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
+
+                    b.Property<string>("TicketNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ticket_no");
 
                     b.Property<DateTime?>("TransferAt")
                         .HasColumnType("datetime2")
@@ -2141,7 +2126,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_categories_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany("Categories")
+                        .WithMany()
                         .HasForeignKey("ChannelId")
                         .HasConstraintName("fk_categories_channels_channel_id");
 
@@ -2530,11 +2515,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_closing_tickets_users_added_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("fk_closing_tickets_categories_category_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ClosedByUser")
                         .WithMany()
                         .HasForeignKey("ClosedBy")
@@ -2553,11 +2533,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_closing_tickets_users_reject_closed_by_user_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("fk_closing_tickets_sub_categories_sub_category_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
                         .WithMany("ClosingTickets")
                         .HasForeignKey("TicketConcernId")
@@ -2567,15 +2542,11 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("AddedByUser");
 
-                    b.Navigation("Category");
-
                     b.Navigation("ClosedByUser");
 
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RejectClosedByUser");
-
-                    b.Navigation("SubCategory");
 
                     b.Navigation("TicketConcern");
                 });
@@ -2587,31 +2558,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("AddedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_request_concerns_users_user_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup.BusinessUnit", "BusinessUnit")
-                        .WithMany()
-                        .HasForeignKey("BusinessUnitId")
-                        .HasConstraintName("fk_request_concerns_business_units_business_unit_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("fk_request_concerns_categories_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .HasConstraintName("fk_request_concerns_companies_company_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.DepartmentSetup.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .HasConstraintName("fk_request_concerns_departments_department_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.LocationSetup.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .HasConstraintName("fk_request_concerns_locations_location_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ModifiedByUser")
                         .WithMany()
@@ -2625,21 +2571,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_request_concerns_users_user_id2");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("fk_request_concerns_sub_categories_sub_category_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubUnitSetup.SubUnit", "SubUnit")
-                        .WithMany()
-                        .HasForeignKey("SubUnitId")
-                        .HasConstraintName("fk_request_concerns_sub_units_sub_unit_id");
-
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.UnitSetup.Unit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .HasConstraintName("fk_request_concerns_units_unit_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany("RequestConcerns")
                         .HasForeignKey("UserId")
@@ -2647,25 +2578,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("AddedByUser");
 
-                    b.Navigation("BusinessUnit");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Company");
-
-                    b.Navigation("Department");
-
-                    b.Navigation("Location");
-
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RejectByUser");
-
-                    b.Navigation("SubCategory");
-
-                    b.Navigation("SubUnit");
-
-                    b.Navigation("Unit");
 
                     b.Navigation("User");
                 });
@@ -2780,6 +2695,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_concerns_users_user_id1");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.CategorySetup.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .HasConstraintName("fk_ticket_concerns_categories_category_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
@@ -2797,6 +2717,12 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_concerns_users_user_id3");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReDateByUser")
+                        .WithMany()
+                        .HasForeignKey("ReDateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_user_id4");
+
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.RequestConcern", "RequestConcern")
                         .WithMany("TicketConcerns")
                         .HasForeignKey("RequestConcernId")
@@ -2806,13 +2732,24 @@ namespace MakeItSimple.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("RequestorBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_user_id4");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id5");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.User", "ReticketByUser")
+                        .WithMany()
+                        .HasForeignKey("ReticketBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ticket_concerns_users_user_id6");
+
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.SubCategorySetup.SubCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .HasConstraintName("fk_ticket_concerns_sub_categories_sub_category_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "TransferByUser")
                         .WithMany()
                         .HasForeignKey("TransferBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_ticket_concerns_users_user_id5");
+                        .HasConstraintName("fk_ticket_concerns_users_user_id7");
 
                     b.HasOne("MakeItSimple.WebApi.Models.User", "User")
                         .WithMany("TicketConcerns")
@@ -2823,15 +2760,23 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("ApprovedByUser");
 
+                    b.Navigation("Category");
+
                     b.Navigation("Channel");
 
                     b.Navigation("ClosedApproveByUser");
 
                     b.Navigation("ModifiedByUser");
 
+                    b.Navigation("ReDateByUser");
+
                     b.Navigation("RequestConcern");
 
                     b.Navigation("RequestorByUser");
+
+                    b.Navigation("ReticketByUser");
+
+                    b.Navigation("SubCategory");
 
                     b.Navigation("TransferByUser");
 
@@ -3030,8 +2975,6 @@ namespace MakeItSimple.WebApi.Migrations
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", b =>
                 {
-                    b.Navigation("Categories");
-
                     b.Navigation("ChannelUsers");
                 });
 

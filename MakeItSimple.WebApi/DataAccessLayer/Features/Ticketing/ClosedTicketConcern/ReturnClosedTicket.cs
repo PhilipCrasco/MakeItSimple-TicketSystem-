@@ -110,68 +110,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
-                var uploadTasks = new List<Task>();
-
-                if (command.ReturnTicketAttachments.Count(x => x.Attachment != null) > 0)
-                {
-
-                    foreach (var attachments in command.ReturnTicketAttachments.Where(attachments => attachments.Attachment.Length > 0))
-                    {
-
-                        var ticketAttachment = await _context.TicketAttachments
-                         .FirstOrDefaultAsync(x => x.Id == attachments.TicketAttachmentId, cancellationToken);
-
-                        if (attachments.Attachment == null || attachments.Attachment.Length == 0)
-                        {
-                            return Result.Failure(TicketRequestError.AttachmentNotNull());
-                        }
-
-                        if (attachments.Attachment.Length > 10 * 1024 * 1024)
-                        {
-                            return Result.Failure(TicketRequestError.InvalidAttachmentSize());
-                        }
-
-                        var allowedFileTypes = new[] { ".jpeg", ".jpg", ".png", ".docx", ".pdf", ".xlsx" };
-                        var extension = Path.GetExtension(attachments.Attachment.FileName)?.ToLowerInvariant();
-                        
-                        if (extension == null || !allowedFileTypes.Contains(extension))
-                        {
-                            return Result.Failure(TicketRequestError.InvalidAttachmentType());
-                        }
-
-                        uploadTasks.Add(Task.Run(async () =>
-                        {
-                            await using var stream = attachments.Attachment.OpenReadStream();
-
-                            var attachmentsParams = new RawUploadParams
-                            {
-                                File = new FileDescription(attachments.Attachment.FileName, stream),
-                                PublicId = $"MakeITSimple/Ticketing/Request/{userDetails.Fullname}/{attachments.Attachment.FileName}"
-                            };
-
-
-                            var attachmentResult = await _cloudinary.UploadAsync(attachmentsParams);
-                            string attachmentUrl = attachmentResult.SecureUrl.ToString();
-                            string transformedUrl = _url.TransformUrlForViewOnly(attachmentUrl, attachments.Attachment.FileName);
-
-                            var addAttachment = new TicketAttachment
-                            {
-                                TicketConcernId = ticketConcernExist.Id,
-                                Attachment = attachmentResult.SecureUrl.ToString(),
-                                FileName = attachments.Attachment.FileName,
-                                FileSize = attachments.Attachment.Length,
-                                AddedBy = command.Added_By,
-
-                            };
-
-                            await _context.TicketAttachments.AddAsync(addAttachment);
-
-                        }, cancellationToken));
-
-                    }
-                }
-
-
                 if (!Directory.Exists(TicketingConString.AttachmentPath))
                 {
                     Directory.CreateDirectory(TicketingConString.AttachmentPath);

@@ -10,17 +10,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.RequestConcernIdNotExist", "Request concern not exist!");
       public static Error TicketConcernIdNotExist() =>
       new Error("TicketRequest.TicketConcernIdNotExist", "Ticket concern not exist!");
-      public static Error DepartmentNotExist() =>
-      new Error("TicketRequest.DepartmentNotExist", "Department not exist!");
       
       public static Error ConcernDetailsNotNull() =>
       new Error("TicketRequest.ConcernDetailsNotNull", "Concern details must not be empty!");
-      
-       public static Error UnitNotExist() =>
-      new Error("TicketRequest.UnitNotExist", "Unit not exist!");
-
-      public static Error SubUnitNotExist() =>
-      new Error("TicketRequest.SubUnitNotExist", "Sub unit not exist!");
 
       public static Error ChannelNotExist() =>
       new Error("TicketRequest.ChannelNotExist", "Channel not exist!");
@@ -35,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.SubCategoryNotExist", "Sub category not exist!");
 
       public static Error DateTimeInvalid() =>
-      new Error("TicketRequest.DateTimeInvalid", "Invalid start/target date!");
+      new Error("TicketRequest.DateTimeInvalid", "Invalid target date!");
 
       public static Error DuplicateConcern() =>
       new Error("TicketRequest.DuplicateConcern", "Concern ticket duplicated!");
@@ -96,6 +88,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
 
      public static Error FileNotFound() =>
      new Error("TicketRequest.FileNotFound", "File not found!");
+
+        public static Error CompanyNotExist() =>
+        new Error("TicketRequest.CompanyNotExist", "Company not exist!");
+
+        public static Error BusinessUnitNotExist() =>
+        new Error("TicketRequest.BusinessUnitNotExist", "Business unit not exist!");
+
+        public static Error DepartmentNotExist() =>
+        new Error("TicketRequest.DepartmentNotExist", "Department not exist!");
+
+        public static Error UnitNotExist() =>
+        new Error("TicketRequest.UnitNotExist", "Unit not exist!");
+
+        public static Error SubUnitNotExist() =>
+        new Error("TicketRequest.SubUnitNotExist", "Sub unit not exist!");
+
+        public static Error LocationNotExist() =>
+        new Error("TicketRequest.LocationNotExist", "Location not exist!");
 
     }
 }

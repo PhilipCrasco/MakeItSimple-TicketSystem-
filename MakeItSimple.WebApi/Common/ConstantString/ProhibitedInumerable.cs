@@ -18,7 +18,6 @@ namespace MakeItSimple.WebApi.Common.ConstantString
             "idiot",
             "bayot",
             
-
         };
     }
 }

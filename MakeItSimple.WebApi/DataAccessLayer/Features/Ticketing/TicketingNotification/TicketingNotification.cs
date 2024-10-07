@@ -144,7 +144,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         x.IsApprove,
                         x.IsClosedApprove,
                         x.IsTransfer,
-                        x.IsReject,
                         x.Closed_At,
                       
                     }).ToListAsync();
@@ -392,54 +391,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                     }
 
-
-                    if (closeQuery.Any())
-                    {
-                        var filterApproval = closeQuery
-                            .Select(x => x.Id)
-                            .ToList();
-
-                        var listOfRequest = closeQuery
-                            .Select(x => x.TicketConcern.User.BusinessUnitId)
-                            .ToList();
-
-                        var receiverList = await _context.Receivers
-                            .Include(x => x.BusinessUnit)
-                            .Where(x => listOfRequest.Contains(x.BusinessUnitId.Value) && x.IsActive == true &&
-                             x.UserId == request.UserId)
-                            .Select (x => x.BusinessUnitId)
-                            .ToListAsync();
-
-
-                        if (receiverPermissionList.Any(x => x.Contains(request.Role)) && receiverList.Any())
-                        {
-
-                            var approverTransactList = await _context.ApproverTicketings
-                                .AsNoTracking()
-                                .Where(x => filterApproval.Contains(x.ClosingTicketId.Value) && x.IsApprove == null)
-                                .ToListAsync();
-
-                            if (approverTransactList.Any())
-                            {
-                                var generatedIdInApprovalList = approverTransactList
-                                    .Select(approval => approval.ClosingTicketId);
-
-                                closeQuery = closeQuery
-                                    .Where(x => !generatedIdInApprovalList.Contains(x.Id))
-                                    .ToList();
-                            }
-
-                           var forClosingApproval = closeQuery
-                                .Where(x => receiverList.Contains(x.TicketConcern.User.BusinessUnitId))
-                                .Select(x => x.Id)
-                                .ToList();
- 
-                            forApprovalClosingNotif = forClosingApproval;
-
-                        }
-
-                    }
-
                 }
 
 
@@ -451,14 +402,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     NotConfirmNotif = notConfirmNotif.Count(),
                     DoneNotif = doneNotif.Count(),
                     ReceiverForApprovalNotif = receiverForApprovalNotif.Count(),
-
                     AllTicketNotif = allTicketNotif.Count(),
                     OpenTicketNotif = openTicketNotif.Count(),
                     ForTransferNotif = forTransferNotif.Count(),
                     ForCloseNotif = forCloseNotif.Count(),
                     NotConfirmCloseNotif = notCloseConfirmCloseNotif.Count(),
                     ClosedNotif = closedNotif.Count(),
-
                     ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
 
@@ -495,7 +444,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                         requestConcern.Confirm_At = DateTime.Today;
                         requestConcern.ConcernStatus = TicketingConString.Done;
 
-
                         var ticketHistory = await _context.TicketHistories
                             .Where(x => x.TicketConcernId == confirm.Id)
                             .Where(x => x.IsApprove == null && x.Request.Contains(TicketingConString.NotConfirm))
@@ -529,7 +477,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);
-
                 return Result.Success(notification);
 
             }

@@ -1,4 +1,5 @@
 ﻿using MakeItSimple.WebApi.Common;
+using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MakeItSimple.WebApi.Models.Setup.ChannelUserSetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.SubUnitSetup;
@@ -30,5 +31,6 @@ namespace MakeItSimple.WebApi.Models.Setup.ChannelSetup
 
         
         public ICollection<ChannelUser> ChannelUsers { get; set; }
+        public ICollection<Category> Categories { get; set; }
     }
 }

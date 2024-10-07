@@ -35,6 +35,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 public string UserRole { get; set; }
             }
 
+            public List<CategoriesList> Categories { get; set; }
+
+            public class CategoriesList
+            {
+                public int Id { get; set; }
+                public string Category_Description { get; set; }
+
+            }
+
         }
 
         public class GetChannelQuery : UserParams, IRequest<PagedList<GetChannelResult>>
@@ -93,7 +102,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                         UserRole = x.User.UserRole.UserRoleName
                         
 
-                    }).ToList()
+                    }).ToList(),
+                    Categories = x.Categories.Where(x => x.IsActive == true)
+                    .Select(x => new GetChannelResult.CategoriesList
+                    {
+                        Id = x.Id,
+                        Category_Description = x.CategoryDescription,
+
+                    }).ToList(),
 
                 });
 

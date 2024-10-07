@@ -23,6 +23,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             public int ? TicketConcernId { get; set; }
             public int? ClosingTicketId { get; set; }
             public string Resolution { get; set; } 
+            public string Notes { get; set; }
+            public int ? CategoryId { get; set; }
+            public string CategoryName { get; set; }
+
+            public int? SubCategoryId { get; set; }
+            public string SubCategoryName { get; set; }
             public string Modules { get; set; } 
             public List<AddClosingAttachment> AddClosingAttachments { get; set; }
 
@@ -82,6 +88,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             closingTicketExist.Resolution = command.Resolution;
                             IsChanged = true;
                         }
+                        if (closingTicketExist.Notes != command.Notes)
+                        {
+                            closingTicketExist.Notes = command.Notes;
+                            IsChanged = true;
+                        }
+                        if (closingTicketExist.CategoryId != command.CategoryId)
+                        {
+                            closingTicketExist.CategoryId = command.CategoryId;
+                            IsChanged = true;
+                        }
+                        if (closingTicketExist.SubCategoryId != command.SubCategoryId)
+                        {
+                            closingTicketExist.SubCategoryId = command.SubCategoryId;
+                            IsChanged = true;
+                        }
 
                         if (IsChanged)
                         {
@@ -112,9 +133,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             TicketConcernId = ticketConcernExist.Id,
                             Resolution = command.Resolution,
+                            CategoryId = command.CategoryId,
+                            SubCategoryId = command.SubCategoryId,
                             IsClosing = false,
                             TicketApprover = approverUser.UserId,
-                            AddedBy = command.Added_By
+                            AddedBy = command.Added_By,
+                            Notes = command.Notes,
                         };
 
                         await _context.ClosingTickets.AddAsync(addNewClosingConcern);
@@ -135,7 +159,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 CreatedAt = DateTime.Now,
                                 Status = TicketingConString.CloseTicket,
 
-                            };
+                            };  
 
                             await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
                         }
@@ -177,17 +201,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         var receiverList = await _context.Receivers
                             .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-
-                        var addReceiverHistory = new TicketHistory
-                        {
-                            TicketConcernId = closingTicketExist.TicketConcernId,
-                            TransactedBy = receiverList.UserId,
-                            TransactionDate = DateTime.Now,
-                            Request = TicketingConString.Approval,
-                            Status = $"{TicketingConString.CloseForApproval} {TicketingConString.Receiver}"
-                        };
-
-                        await _context.TicketHistories.AddAsync(addReceiverHistory, cancellationToken);
 
                         var addForConfirmationHistory = new TicketHistory
                         {

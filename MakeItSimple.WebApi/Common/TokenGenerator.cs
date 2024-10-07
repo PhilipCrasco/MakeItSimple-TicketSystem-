@@ -21,7 +21,7 @@ namespace MakeItSimple.WebApi.Common
             var key = _configuration.GetValue<string>("JwtConfig:Key");
             var audience = _configuration.GetValue<string>("JwtConfig:Audience");
             var issuer = _configuration.GetValue<string>("JwtConfig:Issuer");
-            var KeyBytes = Encoding.ASCII.GetBytes(key);
+            var KeyBytes = Encoding.ASCII.GetBytes(key); 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {

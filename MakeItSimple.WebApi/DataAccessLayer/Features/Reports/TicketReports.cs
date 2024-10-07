@@ -121,7 +121,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                         DateTime.DaysInMonth(x.TargetDate.Value.Date.Year , x.TargetDate.Value.Date.Month), x.TargetDate.Value.Date.Year),
                         Personnel = x.User.Fullname,
                         Ticket_Number = x.Id,
-                        Description = x.ConcernDetails,
+                        //Description = x.ConcernDetails,
                         Target_Date = new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
                         Actual = x.Closed_At != null ? new DateTime(x.Closed_At.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year)
                         : new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),

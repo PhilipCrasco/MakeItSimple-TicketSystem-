@@ -67,13 +67,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     return Result.Failure(TransferTicketError.TicketConcernIdNotExist());
                 }
 
-                if (ticketConcernExist.IsTransfer is not null)
+                if (ticketConcernExist.IsTransfer is not null && ticketConcernExist.IsClosedApprove is not null)
                 {
-                    if (ticketConcernExist.IsReDate is false || ticketConcernExist.IsReTicket is false
-                        || ticketConcernExist.IsClosedApprove is not null)
-                    {
-                        return Result.Failure(TransferTicketError.TransferInvalid());
-                    }
+                    return Result.Failure(TransferTicketError.TransferInvalid());
                 }
 
                 var approverList = await _context.Approvers
@@ -182,7 +178,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         await _context.TicketHistories.AddAsync(addApproverHistory, cancellationToken);
                     }
 
-
                     var addNewTicketTransactionNotification = new TicketTransactionNotification
                     {
 
@@ -193,7 +188,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         Modules = PathConString.Approval,
                         Modules_Parameter = PathConString.ForTransfer,
                         PathId = ticketConcernExist.Id,
-
 
                     };
 

@@ -15,8 +15,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+
         public Guid? AddedBy { get; set; }
         public virtual User AddedByUser { get; set; }
+
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
 
@@ -28,17 +30,28 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? ClosedBy { get; set; }
         public string ClosingRemarks { get; set; }
         public virtual User ClosedByUser { get; set; }
+
         public bool IsRejectClosed { get; set; }
         public DateTime? RejectClosedAt { get; set; }
         public Guid? RejectClosedBy { get; set; }
         public virtual User RejectClosedByUser { get; set; }
         public string RejectRemarks { get; set; }
+
         public Guid? TicketApprover { get; set; }
         public string Remarks { get; set; }
-        public string TicketNo { get; set; }
         public string Resolution { get; set; }
+        public string Notes { get; set; }
+
+        public int? CategoryId { get; set; }
+        public virtual Category Category { get; set; }
+
+        public int? SubCategoryId { get; set; }
+        public virtual SubCategory SubCategory { get; set; }
+
         public ICollection<TicketAttachment> TicketAttachments { get; set; }
         public ICollection<ApproverTicketing> ApproverTickets { get; set; }
+
+
 
         
 

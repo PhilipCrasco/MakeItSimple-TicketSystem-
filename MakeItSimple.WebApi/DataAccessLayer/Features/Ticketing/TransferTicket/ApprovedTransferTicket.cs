@@ -137,9 +137,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketConcernExist.Remarks = transferTicketExist.TransferRemarks;
                         ticketConcernExist.ChannelId = null;
                         ticketConcernExist.UserId = null;
-                        ticketConcernExist.CategoryId = null;
-                        ticketConcernExist.SubCategoryId = null;
-                        ticketConcernExist.StartDate = null;
+                        //ticketConcernExist.CategoryId = null;
+                        //ticketConcernExist.SubCategoryId = null;
                         ticketConcernExist.TargetDate = null;
                         ticketConcernExist.IsAssigned = null;
 

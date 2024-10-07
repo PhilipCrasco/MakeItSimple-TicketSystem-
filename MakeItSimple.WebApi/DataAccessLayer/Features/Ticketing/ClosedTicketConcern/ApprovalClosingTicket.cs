@@ -119,40 +119,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         {
                             closingTicketExist.TicketApprover = null;
 
-                            var requestorReceiver = await _context.Receivers
-                                .FirstOrDefaultAsync(x => x.BusinessUnitId == closingTicketExist.TicketConcern.RequestorByUser.BusinessUnitId);
-
-                            var addNewTicketTransactionNotification = new TicketTransactionNotification
-                            {
-
-                                Message = $"Ticket number {closingTicketExist.TicketConcernId} is pending for closing approval",
-                                AddedBy = userDetails.Id,
-                                Created_At = DateTime.Now,
-                                ReceiveBy = requestorReceiver.UserId.Value,
-                                Modules = PathConString.Approval,
-                                Modules_Parameter = PathConString.ForClosingTicket,
-                                PathId = closingTicketExist.TicketConcernId
-
-                            };
-
-                            await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-                        }
-
-                    }
-                    else
-                    {
-                        var businessUnitList = await _context.BusinessUnits
-                            .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcern.User.BusinessUnitId);
-
-                        var receiverList = await _context.Receivers
-                            .FirstOrDefaultAsync(x => x.BusinessUnitId == businessUnitList.Id);
-
-                        if (receiverList.UserId == command.Users && receiverPermissionList.Any(x => x.Contains(command.Role)))
-                        {
-
                             closingTicketExist.IsClosing = true;
                             closingTicketExist.ClosingAt = DateTime.Now;
-                            closingTicketExist.ClosedBy = command.Closed_By; 
+                            closingTicketExist.ClosedBy = command.Closed_By;
 
                             var ticketConcernExist = await _context.TicketConcerns
                                 .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcernId, cancellationToken);
@@ -167,18 +136,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                                 .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
 
                             requestConcernExist.IsDone = true;
-                            requestConcernExist.Resolution  = closingTicketExist.Resolution;
+                            requestConcernExist.Resolution = closingTicketExist.Resolution;
                             requestConcernExist.ConcernStatus = TicketingConString.NotConfirm;
-
-                            var ticketHistory = ticketHistoryList
-                                .FirstOrDefault(x => x.Id == ticketHistoryList.Max(x => x.Id));
-
-                            ticketHistory.TransactedBy = command.Transacted_By;
-                            ticketHistory.TransactionDate = DateTime.Now;
-                            ticketHistory.Request = TicketingConString.TicketClosed;
-                            ticketHistory.Status = TicketingConString.CloseApproveReceiver;
-                            ticketHistory.IsApprove = true;
-
 
                             var addNewTicketTransactionNotification = new TicketTransactionNotification
                             {
@@ -195,8 +154,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                             await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
-
-
                             var addNewTransactionConfirmationNotification = new TicketTransactionNotification
                             {
 
@@ -211,12 +168,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                             };
 
                             await _context.TicketTransactionNotifications.AddAsync(addNewTransactionConfirmationNotification);
+                        }
 
-                        }
-                        else
-                        {
-                            return Result.Failure(ClosingTicketError.ApproverUnAuthorized());
-                        }
+                    }
+                    else
+                    {
+                        return Result.Failure(ClosingTicketError.ApproverUnAuthorized());
 
                     }
 
@@ -224,7 +181,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
-               
             }
         }
     }

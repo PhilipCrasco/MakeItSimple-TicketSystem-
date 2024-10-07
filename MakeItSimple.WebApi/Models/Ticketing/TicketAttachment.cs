@@ -12,11 +12,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User AddedByUser { get; set; }
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
-        public string Attachment { get; set; }
 
+        public string Attachment { get; set; }
         public string FileName { get; set; }
         public decimal? FileSize { get; set; }
-
 
         public int? TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
@@ -26,6 +25,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public int? TransferTicketConcernId { get; set; }
         public virtual TransferTicketConcern TransferTicketConcern { get; set; }
+
+        public string Notes { get; set; }
 
 
 

@@ -8,19 +8,17 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreati
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelRequestConcern;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RejectRequestTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
 using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.DownloadImageTicketing;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ViewTicketImage;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
 
 
 
@@ -51,7 +49,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 {
                     command.Modified_By = userId;
                     command.Added_By = userId;
-                    command.UserId = userId;
+                    //command.UserId = userId;
                    
                 }
                 var result = await _mediator.Send(command);
@@ -158,35 +156,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
             }  
         }
 
-        [HttpPut("cancel-concern")]
-        public async Task<IActionResult> CancelTicketConcern(CancelTicketConcernCommand command)
-        {
-            try
-            {
-
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-                }
-
-                    var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-        }
-
-
         [HttpGet("requestor-page")]
         public async Task<IActionResult> GetRequestorTicketConcern([FromQuery] GetRequestorTicketConcernQuery query)
         {
@@ -279,42 +248,6 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
                 return Conflict(ex.Message);
             }
         }
-
-
-        [HttpPut("reject")]
-        public async Task<IActionResult> RejectRequestTicket([FromBody] RejectRequestTicketCommand command)
-        {
-            try
-            {
-                if (User.Identity is ClaimsIdentity identity)
-                {
-                    var userRole = identity.FindFirst(ClaimTypes.Role);
-                    if (userRole != null)
-                    {
-                        command.Role = userRole.Value;
-                    }
-
-                    if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
-                    {
-                        command.Reject_By = userId;
-
-                    }
-                }
-
-                    var results = await _mediator.Send(command);
-                if (results.IsFailure)
-                {
-                    return BadRequest(results);
-                }
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Conflict(ex.Message);
-            }
-
-        }
-
 
         [HttpPost("add-comment")]
         public async Task<IActionResult> AddTicketComment([FromForm] AddTicketCommentCommand command)

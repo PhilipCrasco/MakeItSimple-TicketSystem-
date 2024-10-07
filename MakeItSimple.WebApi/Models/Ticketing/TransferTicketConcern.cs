@@ -19,12 +19,14 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int TicketConcernId { get; set; }
         public virtual TicketConcern TicketConcern { get; set; }
 
-
         public bool? IsTransfer { get; set; }
         public DateTime? TransferAt { get; set; }
         public Guid? TransferBy { get; set; }
         public string TransferRemarks { get; set; }
         public virtual User TransferByUser { get; set; }
+
+        public Guid ? TransferTo { get; set; }
+        public virtual User TransferToUser { get; set; }
 
         public bool IsRejectTransfer { get; set; }
         public DateTime? RejectTransferAt { get; set; }
@@ -32,9 +34,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public virtual User RejectTransferByUser { get; set; }
         public string RejectRemarks { get; set; }
         public Guid? TicketApprover { get; set; }
-
         public string Remarks { get; set; }
-        public string TicketNo { get; set; }
 
         public ICollection<ApproverTicketing> ApproverTickets { get; set; }
         public ICollection<TicketAttachment> TicketAttachments { get; set; }

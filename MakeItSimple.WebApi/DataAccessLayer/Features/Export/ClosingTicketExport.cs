@@ -83,7 +83,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         End_Date = $"{x.TargetDate.Value.Date.Month}/{DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month)}/{x.TargetDate.Value.Date.Year }",
                         Personnel = x.User.Fullname,
                         Ticket_Number = x.Id,
-                        Description = x.ConcernDetails,
+                        //Description = x.ConcernDetails,
                         Target_Date = x.TargetDate.Value.Date,
                         Actual = x.Closed_At.Value.Date,
                         Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date),

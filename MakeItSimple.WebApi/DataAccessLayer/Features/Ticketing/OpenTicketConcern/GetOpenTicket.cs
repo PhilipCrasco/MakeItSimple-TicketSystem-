@@ -15,33 +15,37 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
         {
             public int? TicketConcernId { get; set; }
             public int? RequestConcernId { get; set; }
-
-            public string Closed_Status { get; set; }
-
             public string Concern_Description { get; set; }
+
+            public string Company_Code { get; set; }
+            public string Company_Name { get; set; }
+
+            public string BusinessUnit_Code { get; set; }
+            public string BusinessUnit_Name { get; set; }
+
+            public string Department_Code { get; set; }
+            public string Department_Name { get; set; }
+
+            public string Unit_Code { get; set; }
+            public string Unit_Name { get; set; }
+
+            public string SubUnit_Code { get; set; }
+            public string SubUnit_Name { get; set; }
+
+            public string Location_Code { get; set; }
+            public string Location_Name { get; set; }
 
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
 
-            public int? DepartmentId { get; set; }
-            public string Department_Name { get; set; }
+            public string Category_Description { get; set; }
+            public string SubCategory_Description { get; set; }
+            public DateTime? Date_Needed { get; set; }
+            public string Notes { get; set; }
 
-            public int? UnitId { get; set; }
-            public string Unit_Name { get; set; }
-            public int? SubUnitId { get; set; }
-            public string SubUnit_Name { get; set; }
-            public int? ChannelId { get; set; }
             public string Channel_Name { get; set; }
-
             public Guid? UserId { get; set; }
             public string Issue_Handler { get; set; }
-
-            public int? CategoryId { get; set; }
-            public string Category_Description { get; set; }
-            public int? SubCategoryId { get; set; }
-            public string SubCategory_Description { get; set; }
-
-            public DateTime? Start_Date { get; set; }
             public DateTime? Target_Date { get; set; }
 
             public string Ticket_Status { get; set; }
@@ -59,15 +63,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public bool? Is_Closed { get; set; }
             public DateTime? Closed_At { get; set; }
 
+            public string Closed_Status { get; set; }
+
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
-
-
-
+  
             public class GetForClosingTicket
             {
                 public int? ClosingTicketId { get; set; }
                 public string Resolution { get; set; }
+                public int? CategoryId { get; set; }
+                public string Category_Description { get; set; }
+                public int? SubCategoryId { get; set; }
+                public string SubCategory_Description { get; set; }
+                public string Notes { get; set; }
                 public string Remarks { get; set; }
                 public bool? IsApprove { get; set; }
                 public string Approver { get; set; }
@@ -110,14 +119,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public DateTime Transaction_Date { get; set; }
 
-            //public class TicketHistoryList
-            //{
-            //    public int? Id { get; set; }
-            //    public int ? TicketConcernId { get; set; }
-
-            //    public DateTime? Transaction_Date { get; set; }
-            //}
-
         }
 
         public class GetOpenTicketQuery : UserParams, IRequest<PagedList<GetOpenTicketResult>>
@@ -125,7 +126,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string Search { get; set; }
             public bool? Status { get; set; }
             public string Concern_Status { get; set; }
-
             public string History_Status { get; set; }
             public string UserType { get; set; }
             public Guid? UserId { get; set; }
@@ -147,7 +147,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public async Task<PagedList<GetOpenTicketResult>> Handle(GetOpenTicketQuery request, CancellationToken cancellationToken)
             {
                 var dateToday = DateTime.Today;
-                int hoursDiff = 24;
 
                 IQueryable<TicketConcern> ticketConcernQuery = _context.TicketConcerns
                     .AsNoTracking()
@@ -177,7 +176,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                             x.UserRoleName,
                             x.Permissions
 
-                        }).ToListAsync();
+                        })
+                        .ToListAsync();
 
                     var receiverPermissionList = allUserList
                          .Where(x => x.Permissions
@@ -199,8 +199,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     {
                         ticketConcernQuery = ticketConcernQuery
                             .Where(x => x.User.Fullname.Contains(request.Search)
-                        || x.User.SubUnit.SubUnitName.Contains(request.Search)
-                        || x.TicketNo.Contains(request.Search));
+                        || x.User.SubUnit.SubUnitName.Contains(request.Search));
 
                     }
 
@@ -221,8 +220,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                             case TicketingConString.Open:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
-                                    && x.IsReTicket != false && x.IsClosedApprove == null);
+                                    .Where(x => x.IsApprove == true && x.IsTransfer != false 
+                                    && x.IsClosedApprove == null);
                                 break;
 
                             case TicketingConString.ForTransfer:
@@ -264,8 +263,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                             case TicketingConString.Open:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsApprove == true && x.IsTransfer != false && x.IsReDate != false
-                                    && x.IsReTicket != false && x.IsClosedApprove == null);
+                                    .Where(x => x.IsApprove == true && x.IsTransfer != false
+                                     && x.IsClosedApprove == null);
                                 break;
 
                             case TicketingConString.ForTransfer:
@@ -295,7 +294,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         }
                     }
 
-                    if (request.Date_From is not null && request.Date_From is not null)
+                    if (request.Date_From is not null && request.Date_To is not null)
                     {
                         ticketConcernQuery = ticketConcernQuery
                             .Where(x => x.TargetDate >= request.Date_From.Value && x.TargetDate <= request.Date_To.Value);
@@ -377,55 +376,47 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         ? TicketingConString.Delay : null,
                         TicketConcernId = x.Id,
                         RequestConcernId = x.RequestConcernId,
-                        Concern_Description = x.ConcernDetails,
+                        Concern_Description = x.RequestConcern.Concern,
+                        Company_Code = x.RequestConcern.Company.CompanyCode,
+                        Company_Name = x.RequestConcern.Company.CompanyName,
+                        BusinessUnit_Code = x.RequestConcern.BusinessUnit.BusinessCode,
+                        BusinessUnit_Name = x.RequestConcern.BusinessUnit.BusinessName,
+                        Department_Code = x.RequestorByUser.Department.DepartmentCode,
+                        Department_Name = x.RequestorByUser.Department.DepartmentName,
+                        Unit_Code = x.RequestConcern.Unit.UnitCode,
+                        Unit_Name = x.RequestConcern.Unit.UnitName,
+                        SubUnit_Code = x.RequestorByUser.SubUnit.SubUnitCode,
+                        SubUnit_Name = x.User.SubUnit.SubUnitName,
+                        Location_Code = x.RequestConcern.Location.LocationCode,
+                        Location_Name = x.RequestConcern.Location.LocationName,
                         Requestor_By = x.RequestorBy,
                         Requestor_Name = x.RequestorByUser.Fullname,
-
-                        DepartmentId = x.RequestorByUser.DepartmentId,
-                        Department_Name = x.RequestorByUser.Department.DepartmentName,
-
-                        UnitId = x.User.UnitId,
-                        Unit_Name = x.User.Units.UnitName,
-                        SubUnitId = x.User.SubUnitId,
-                        SubUnit_Name = x.User.SubUnit.SubUnitName,
-                        ChannelId = x.ChannelId,
+                        Category_Description = x.RequestConcern.Category.CategoryDescription,
+                        SubCategory_Description = x.RequestConcern.SubCategory.SubCategoryDescription,
+                        Date_Needed = x.RequestConcern.DateNeeded,
+                        Notes  = x.RequestConcern.Notes,
                         Channel_Name = x.Channel.ChannelName,
-
                         UserId = x.UserId,
                         Issue_Handler = x.User.Fullname,
-
-                        CategoryId = x.CategoryId,
-                        Category_Description = x.Category.CategoryDescription,
-
-                        SubCategoryId = x.SubCategoryId,
-                        SubCategory_Description = x.SubCategory.SubCategoryDescription,
-
-                        Start_Date = x.StartDate,
                         Target_Date = x.TargetDate,
-
                         Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
-                                        : x.IsApprove == true && x.IsReTicket != false && x.IsTransfer != false && x.IsReDate != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
+                                        : x.IsApprove == true != false && x.IsTransfer != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
                                         : x.IsTransfer == false ? TicketingConString.ForTransfer
-                                        : x.IsReTicket == false ? TicketingConString.ForReticket
-                                        : x.IsReDate == false ? TicketingConString.ForReDate
                                         : x.IsClosedApprove == false ? TicketingConString.ForClosing
                                         : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
                                         : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true ? TicketingConString.Closed
                                         : "Unknown",
 
-                        Concern_Type = x.TicketType,
                         Added_By = x.AddedByUser.Fullname,
                         Created_At = x.CreatedAt,
                         Remarks = x.Remarks,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
                         IsActive = x.IsActive,
-
                         Is_Closed = x.IsClosedApprove,
                         Closed_At = x.Closed_At,
                         Is_Transfer = x.IsTransfer,
                         Transfer_At = x.TransferAt,
-                        
                         GetForClosingTickets = x.ClosingTickets
                        .Where(x => x.IsActive == true && x.IsRejectClosed == false)
                        .Where(x => x.IsClosing == true ? x.IsClosing == true : x.IsClosing == false)
@@ -434,6 +425,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                           ClosingTicketId = x.Id,
                           Remarks = x.RejectRemarks,
                           Resolution = x.Resolution,
+                          CategoryId = x.CategoryId,
+                          Category_Description = x.Category.CategoryDescription,
+                          SubCategoryId = x.SubCategoryId,
+                          SubCategory_Description = x.SubCategory.SubCategoryDescription,
+                          Notes = x.Notes,
                           IsApprove = x.ApproverTickets.Any(x => x.IsApprove == null) ? false : true,
                           ApproverLists  = x.ApproverTickets
                           .Where(x => x.IsApprove != null)

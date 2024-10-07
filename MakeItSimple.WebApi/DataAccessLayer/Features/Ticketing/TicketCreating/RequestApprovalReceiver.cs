@@ -74,7 +74,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     ticketConcernExist.IsApprove = true;
                     ticketConcernExist.ApprovedBy = command.Approved_By;
                     ticketConcernExist.ApprovedAt = DateTime.Now;
-                    ticketConcernExist.IsReject = false;
                     ticketConcernExist.ConcernStatus = TicketingConString.CurrentlyFixing;
 
                     if (ticketConcernExist.RequestConcernId != null)
@@ -84,7 +83,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         .FirstOrDefaultAsync();
 
                         requestConcernList.ConcernStatus = TicketingConString.CurrentlyFixing;
-
                     }
 
                     var addTicketHistory = new TicketHistory
@@ -97,7 +95,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     };
 
                     await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
-
+ 
                 }
    
                 await _context.SaveChangesAsync(cancellationToken);

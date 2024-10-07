@@ -92,9 +92,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     .ThenInclude(x => x.Department)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.Channel)
-                    .Include(x => x.TicketConcern)
-                    .ThenInclude(x => x.Category)
-                    .ThenInclude(x => x.SubCategories)
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser);
@@ -212,10 +209,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     Channel_Name = x.TicketConcern.Channel.ChannelName,
                     UserId = x.TicketConcern.UserId,
                     Fullname = x.TicketConcern.User.Fullname,
-                    Concern_Details = x.TicketConcern.ConcernDetails,
-                    Category_Description = x.TicketConcern.Category.CategoryDescription,
-                    SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
-                    Start_Date = x.TicketConcern.StartDate,
+                    //Concern_Details = x.TicketConcern.ConcernDetails,
+                    //Category_Description = x.TicketConcern.Category.CategoryDescription,
+                    //SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
                     Target_Date = x.TicketConcern.TargetDate,
                     IsActive = x.IsActive,
                     Transfer_By = x.TransferByUser.Fullname,

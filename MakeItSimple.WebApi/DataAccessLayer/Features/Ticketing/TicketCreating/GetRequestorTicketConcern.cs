@@ -17,15 +17,44 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public int? RequestConcernId { get; set; }
             public string Concern { get; set; }
+
             public string Resolution { get; set; }
+
+            public int ? CompanyId { get; set; }
+            public string Company_Code { get; set; }
+            public string Company_Name { get; set; }
+
+            public int ? BusineesUnitId { get; set; }
+            public string BusinessUnit_Code { get; set; }
+            public string BusinessUnit_Name { get; set; }
+
             public int? DepartmentId { get; set; }
+            public string Department_Code { get; set; }
             public string Department_Name { get; set; }
+
+            public int? UnitId { get; set; }
+            public string Unit_Code { get; set; }
+            public string Unit_Name { get; set; }
+
+            public int? SubUnitId { get; set; }
+            public string SubUnit_Code { get; set; }    
+            public string SubUnit_Name { get; set; }
+
+            public int? LocationId { get; set; }
+            public string Location_Code { get; set; }
+            public string Location_Name { get; set; }
+
             public Guid? RequestorId { get; set; }
-            public string EmpId { get; set; }
             public string FullName { get; set; }
+            public int? CategoryId { get; set; }
+            public string Category_Description { get; set; }
+            public int? SubCategoryId { get; set; }
+            public string SubCategory_Description { get; set; }
             public string Concern_Status { get; set; }
             public bool? Is_Done { get; set; }
             public string Remarks { get; set; }
+            public string Notes { get; set; }
+            public DateTime ? Date_Needed { get; set; }
             public string Added_By { get; set; }
             public DateTime Created_At { get; set; }
             public string Modified_By { get; set; }
@@ -38,35 +67,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             {
 
                 public int? TicketConcernId { get; set; }
-                public string Ticket_No { get; set; }
-                public string Concern_Description { get; set; }
-                public int? DepartmentId { get; set; }
-                public string Department_Name { get; set; }
                 public int? ChannelId { get; set; }
                 public string Channel_Name { get; set; }
-                public int? UnitId { get; set; }
-                public string Unit_Name { get; set; }
-                public int? SubUnitId { get; set; }
-                public string SubUnit_Name { get; set; }
+
                 public Guid? UserId { get; set; }
                 public string Issue_Handler { get; set; }
-                public int? CategoryId { get; set; }
-                public string Category_Description { get; set; }
-                public int? SubCategoryId { get; set; }
-                public string SubCategory_Description { get; set; }
-                public DateTime? Start_Date { get; set; }
                 public DateTime? Target_Date { get; set; }
-                public string Ticket_Status { get; set; }
                 public bool? Is_Assigned { get; set; }
-                //public string Concern_Status {  get; set; }
                 public string Remarks { get; set; }
                 public string Concern_Type { get; set; }
+                public string Closing_Notes { get; set; }
                 public string Added_By { get; set; }
                 public DateTime Created_At { get; set; }
                 public string Modified_By { get; set; }
                 public DateTime? Updated_At { get; set; }
                 public bool Is_Active { get; set; }
-                public bool Is_Reject { get; set; }
                 public DateTime? Closed_At { get; set; }
                 public bool? Is_Transfer { get; set; }
                 public DateTime? Transfer_At { get; set; }
@@ -102,7 +117,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
             public async Task<PagedList<GetRequestorTicketConcernResult>> Handle(GetRequestorTicketConcernQuery request, CancellationToken cancellationToken)
             {
-                int hourDif = 24;
+
                 var dateToday = DateTime.Now;
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
@@ -120,7 +135,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                      .ThenInclude(x => x.Channel)
                      .ThenInclude(x => x.ChannelUsers)
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.TransferByUser);
+                     .ThenInclude(x => x.TransferByUser)
+                     .Include(x => x.TicketConcerns)
+                     .ThenInclude(x => x.ClosingTickets);
+               
 
                 if (requestConcernsQuery.Any())
                 {
@@ -182,12 +200,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                            .Where(x => ticketStatusList.Contains(x.Id));
                     }
 
-
-                    if (request.Is_Reject != null)
-                    {
-                        requestConcernsQuery = requestConcernsQuery
-                            .Where(x => x.IsReject == request.Is_Reject);
-                    }
 
                     if (request.Ascending != null)
                     {
@@ -278,9 +290,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     }
 
 
-
-
-
                 }
 
                 var results = requestConcernsQuery
@@ -290,15 +299,46 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                         RequestConcernId = g.Id,
                         Concern = g.Concern,
                         Resolution = g.Resolution,
-                        DepartmentId = g.User.DepartmentId,
-                        Department_Name = g.User.Department.DepartmentName,
+
+                        CompanyId = g.CompanyId,
+                        Company_Code = g.Company.CompanyCode,
+                        Company_Name = g.Company.CompanyName,
+
+                        BusineesUnitId = g.BusinessUnitId,
+                        BusinessUnit_Code = g.BusinessUnit.BusinessCode,
+                        BusinessUnit_Name = g.BusinessUnit.BusinessName,
+
+                        DepartmentId = g.DepartmentId,
+                        Department_Code = g.Department.DepartmentCode,
+                        Department_Name = g.Department.DepartmentName,
+
+                        UnitId = g.UnitId,
+                        Unit_Code = g.Unit.UnitCode,
+                        Unit_Name = g.Unit.UnitName,
+
+                        SubUnitId = g.SubUnitId,
+                        SubUnit_Code = g.SubUnit.SubUnitCode,
+                        SubUnit_Name = g.SubUnit.SubUnitName,
+
+                        LocationId = g.LocationId,
+                        Location_Code = g.Location.LocationCode,
+                        Location_Name = g.Location.LocationName,
+
                         RequestorId = g.UserId,
-                        EmpId = g.User.EmpId,
                         FullName = g.User.Fullname,
+
+                        CategoryId = g.CategoryId,
+                        Category_Description = g.Category.CategoryDescription,
+
+                        SubCategoryId = g.SubCategoryId,
+                        SubCategory_Description = g.SubCategory.SubCategoryDescription,
+
                         Concern_Status = g.ConcernStatus,
                         Is_Done = g.IsDone,
                         Remarks = g.Remarks,
+                        Notes = g.Notes,
                         Added_By = g.AddedByUser.Fullname,
+                        Date_Needed = g.DateNeeded,
                         Created_At = g.CreatedAt,
                         Modified_By = g.ModifiedByUser.Fullname,
                         updated_At = g.UpdatedAt,
@@ -309,38 +349,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                             {
 
                                 TicketConcernId = tc.Id,
-                                Ticket_No = tc.TicketNo,
-                                Concern_Description = tc.ConcernDetails,
-                                DepartmentId = tc.User.DepartmentId,
-                                Department_Name = tc.User.Department.DepartmentName,
-                                UnitId = tc.User.UnitId,
-                                Unit_Name = tc.User.Units.UnitName,
-                                SubUnitId = tc.User.SubUnitId,
-                                SubUnit_Name = tc.User.SubUnit.SubUnitName,
                                 ChannelId = tc.ChannelId,
                                 Channel_Name = tc.Channel.ChannelName,
                                 UserId = tc.UserId,
                                 Issue_Handler = tc.User.Fullname,
-                                CategoryId = tc.CategoryId,
-                                Category_Description = tc.Category.CategoryDescription,
-                                SubCategoryId = tc.SubCategoryId,
-                                SubCategory_Description = tc.SubCategory.SubCategoryDescription,
-                                Start_Date = tc.StartDate,
                                 Target_Date = tc.TargetDate,
                                 Remarks = tc.Remarks,
-                                Concern_Type = tc.TicketType,
-                                Ticket_Status = tc.IsApprove == true ? "Ticket Approve" : tc.IsReject ? "Rejected" :
-                                tc.ConcernStatus != TicketingConString.ForApprovalTicket ? tc.ConcernStatus
-                                : tc.IsApprove == false && tc.IsReject == false ? "For Approval" : "Unknown",
-
                                 Is_Assigned = tc.IsAssigned,
                                 Added_By = tc.AddedByUser.Fullname,
                                 Created_At = tc.CreatedAt,
                                 Modified_By = tc.ModifiedByUser.Fullname,
                                 Updated_At = tc.UpdatedAt,
                                 Is_Active = tc.IsActive,
-                                Is_Reject = tc.IsReject,
                                 Closed_At = tc.Closed_At,
+                                Closing_Notes = tc.IsClosedApprove == true ? tc.ClosingTickets.Max().Notes : null,
                                 Is_Transfer = tc.IsTransfer,
                                 Transfer_At = tc.TransferAt,
                                 Transfer_By = tc.TransferByUser.Fullname,

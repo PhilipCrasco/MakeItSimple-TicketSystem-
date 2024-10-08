@@ -4,21 +4,20 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddCommentNotificationValidator;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcern;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequestConcernReceiver;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddRequest.AddRequestConcern;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AssignTicket.AddRequestConcernReceiver;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.AddTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelRequestConcern;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestAttachment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicket.CancelRequestConcern;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetAttachment.GetRequestAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetConcernTicket.GetRequestorTicketConcern;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetTicketComment;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment.RemoveTicketAttachment;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketComment;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.DownloadImageTicketing;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ViewTicketImage;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RequestApprovalReceiver;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ViewImage.ViewTicketImage;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ApprovalTicket.RequestApprovalReceiver;
 
 
 

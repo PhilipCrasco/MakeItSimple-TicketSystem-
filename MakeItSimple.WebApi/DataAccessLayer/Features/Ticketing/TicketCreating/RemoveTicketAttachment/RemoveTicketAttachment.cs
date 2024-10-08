@@ -4,14 +4,10 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.RemoveTicketAttachment
 {
-    public class RemoveTicketAttachment
+    public partial class RemoveTicketAttachment
     {
-        public class RemoveTicketAttachmentCommand : IRequest<Result>
-        {
-            public int? TicketAttachmentId { get; set; }
-        }
 
         public class Handler : IRequestHandler<RemoveTicketAttachmentCommand, Result>
         {
@@ -25,17 +21,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
             public async Task<Result> Handle(RemoveTicketAttachmentCommand command, CancellationToken cancellationToken)
             {
 
-                    var attachmentExist = await _context.TicketAttachments
-                        .FirstOrDefaultAsync(x => x.Id == command.TicketAttachmentId,cancellationToken);
+                var attachmentExist = await _context.TicketAttachments
+                    .FirstOrDefaultAsync(x => x.Id == command.TicketAttachmentId, cancellationToken);
 
 
-                    if (attachmentExist == null)
-                    {
-                        return Result.Failure(TicketRequestError.AttachmentNotExist());
-                    }
+                if (attachmentExist == null)
+                {
+                    return Result.Failure(TicketRequestError.AttachmentNotExist());
+                }
 
-                    _context.Remove(attachmentExist);
-                
+                _context.Remove(attachmentExist);
+
 
                 await _context.SaveChangesAsync(cancellationToken);
 

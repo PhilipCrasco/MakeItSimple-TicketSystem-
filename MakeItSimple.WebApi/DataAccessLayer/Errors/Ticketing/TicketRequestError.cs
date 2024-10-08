@@ -57,14 +57,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing
       new Error("TicketRequest.NotAutorizeToEdit", "User not Autorize to delete!");
 
         public static Error NotAutorize() =>
-        new Error("TicketRequest.NotAutorize", "User not Autorize!");
+        new Error("TicketRequest.NotAutorize", "User not authorized!");
 
         public static Error ProhibitedWord(string comment) =>
       new Error("TicketRequest.ProhibitedWord", $"Warning Inappropriate word '{comment}'!");
       public static Error TicketCommentNotExist() =>
       new Error("TicketRequest.TicketCommentNotExist", "Comment not Exist!");
 
-     public static Error UnAuthorizedReceiver() =>
+        public static Error NoReceiver() =>
+            new Error("TicketRequest.NoReceiver", "Receiver is not configured");
+
+        public static Error UnAuthorizedReceiver() =>
      new Error("TicketRequest.UnAuthorizedReceiver", "Receiver not authorized!");
 
      public static Error NoComment() =>

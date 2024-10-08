@@ -1,12 +1,12 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.Extension;
 using MakeItSimple.WebApi.Common.SignalR;
+using MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddClosingTicket;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddNewClosingTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosingTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosing.ApprovalClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosingTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ConfirmClosedTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.GetClosingTicket;

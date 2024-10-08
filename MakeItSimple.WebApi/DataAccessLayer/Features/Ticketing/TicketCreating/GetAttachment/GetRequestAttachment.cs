@@ -6,39 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using System.Text;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetAttachment
 {
-    public class GetRequestAttachment
+    public partial class GetRequestAttachment
     {
-        public class GetRequestAttachmentResult
-        {
-            public int? TicketConcernId { get; set; }
-
-            public List<TicketAttachment> Attachments { get; set; }
-
-            public class TicketAttachment
-            {
-                public int TicketAttachmentId { get; set; }
-                public string Attachment { get; set; }
-                public string FileName { get; set; }
-
-                public decimal? FileSize { get; set; }
-
-                public string Added_By { get; set; }
-                public DateTime Created_At { get; set; }
-
-                public string Modified_By { get; set; }
-                public DateTime? Updated_At { get; set; }
-
-            }
-
-        }
-
-        public class GetRequestAttachmentQuery : IRequest<Result>
-        {
-            public int? Id { get; set; }
-            public bool? Status { get; set; }
-        }
 
         public class Handler : IRequestHandler<GetRequestAttachmentQuery, Result>
         {
@@ -89,16 +60,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 return Result.Success(results);
             }
 
-            //private static string ConvertToBase64(string filePath)
-            //{
-            //    if (string.IsNullOrEmpty(filePath))
-            //    {
-            //        return null;
-            //    }
-
-            //    var fileBytes = Encoding.UTF8.GetBytes(filePath);
-            //    return Convert.ToBase64String(fileBytes);
-            //}
         }
     }
 }

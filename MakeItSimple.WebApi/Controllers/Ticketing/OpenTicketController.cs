@@ -1,11 +1,11 @@
 ﻿using MakeItSimple.WebApi.Common.Extension;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetOpenTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ViewOpenTicket.GetOpenTicket;
 using System.Security.Claims;
 using MediatR;
 using MakeItSimple.WebApi.Common;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.GetTicketHistory;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ViewTicketHistory.GetTicketHistory;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
 

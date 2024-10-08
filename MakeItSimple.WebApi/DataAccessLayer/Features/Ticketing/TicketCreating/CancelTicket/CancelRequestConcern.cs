@@ -2,22 +2,16 @@
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models;
+using MakeItSimple.WebApi.Models.Setup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.CancelTicket
 {
-    public class CancelRequestConcern
+    public partial class CancelRequestConcern
     {
-        public class CancelRequestConcernCommand : IRequest<Result>
-        {
-
-            public int? RequestConcernId { get; set; }
-            public string Modules { get; set; }
-
-
-        }
         public class Handler : IRequestHandler<CancelRequestConcernCommand, Result>
         {
             private readonly MisDbContext _context;
@@ -32,17 +26,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var requestTransactionExist = await _context.RequestConcerns
                     .Include(x => x.User)
-                    .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId);
+                    .FirstOrDefaultAsync(x => x.Id == command.RequestConcernId,cancellationToken);
 
-                if (requestTransactionExist == null)
-                {
+                if (requestTransactionExist is null)
                     return Result.Failure(TicketRequestError.RequestConcernIdNotExist());
-                }
-
+                
                 requestTransactionExist.IsActive = false;
 
                 var ticketConcernExist = await _context.TicketConcerns
-                .FirstOrDefaultAsync(x => x.Id == requestTransactionExist.Id);
+                .FirstOrDefaultAsync(x => x.Id == requestTransactionExist.Id,cancellationToken);
 
                 ticketConcernExist.IsActive = false;
 
@@ -55,28 +47,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     cancelAttachment.IsActive = false;
                 }
 
-                var userReceiver = await _context.Receivers
-                    .FirstOrDefaultAsync(x => x.BusinessUnitId == requestTransactionExist.User.BusinessUnitId);
 
+                await TicketNotification(ticketConcernExist, requestTransactionExist, command, cancellationToken);
+
+                await _context.SaveChangesAsync(cancellationToken);
+                return Result.Success();
+            }
+
+            private async Task<TicketTransactionNotification> TicketNotification(TicketConcern ticketConcern, RequestConcern requestConcern, CancelRequestConcernCommand command, CancellationToken cancellationToken)
+            {
+                var userReceiver = await _context.Receivers
+                    .FirstOrDefaultAsync(x => x.BusinessUnitId == requestConcern.User.BusinessUnitId);
 
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    Message = $"Ticket number {ticketConcernExist.Id} has been canceled",
-                    AddedBy = requestTransactionExist.UserId.Value,
+                    Message = $"Ticket number {ticketConcern.Id} has been canceled",
+                    AddedBy = requestConcern.UserId.Value,
                     Created_At = DateTime.Now,
                     ReceiveBy = userReceiver.UserId.Value,
                     Modules = PathConString.ConcernTickets,
                     Modules_Parameter = PathConString.ForApproval,
-                    PathId = ticketConcernExist.Id,
+                    PathId = ticketConcern.Id,
 
                 };
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
-                await _context.SaveChangesAsync(cancellationToken);  
-                return Result.Success();
+                return addNewTicketTransactionNotification;
+
             }
+
+
         }
     }
 }

@@ -6,105 +6,12 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CompanySetup.GetCompany.GetCompanyResult;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetConcernTicket.GetRequestorTicketConcern.GetRequestorTicketConcernResult;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.GetConcernTicket
 {
-    public class GetRequestorTicketConcern
+    public partial class GetRequestorTicketConcern
     {
-        public class GetRequestorTicketConcernResult
-        {
-
-            public int? RequestConcernId { get; set; }
-            public string Concern { get; set; }
-
-            public string Resolution { get; set; }
-
-            public int ? CompanyId { get; set; }
-            public string Company_Code { get; set; }
-            public string Company_Name { get; set; }
-
-            public int ? BusineesUnitId { get; set; }
-            public string BusinessUnit_Code { get; set; }
-            public string BusinessUnit_Name { get; set; }
-
-            public int? DepartmentId { get; set; }
-            public string Department_Code { get; set; }
-            public string Department_Name { get; set; }
-
-            public int? UnitId { get; set; }
-            public string Unit_Code { get; set; }
-            public string Unit_Name { get; set; }
-
-            public int? SubUnitId { get; set; }
-            public string SubUnit_Code { get; set; }    
-            public string SubUnit_Name { get; set; }
-
-            public int? LocationId { get; set; }
-            public string Location_Code { get; set; }
-            public string Location_Name { get; set; }
-
-            public Guid? RequestorId { get; set; }
-            public string FullName { get; set; }
-            public int? CategoryId { get; set; }
-            public string Category_Description { get; set; }
-            public int? SubCategoryId { get; set; }
-            public string SubCategory_Description { get; set; }
-            public string Concern_Status { get; set; }
-            public bool? Is_Done { get; set; }
-            public string Remarks { get; set; }
-            public string Notes { get; set; }
-            public DateTime ? Date_Needed { get; set; }
-            public string Added_By { get; set; }
-            public DateTime Created_At { get; set; }
-            public string Modified_By { get; set; }
-            public DateTime? updated_At { get; set; }
-            public bool? Is_Confirmed { get; set; }
-            public DateTime? Confirmed_At { get; set; }
-
-            public List<TicketRequestConcern> TicketRequestConcerns { get; set; }
-            public class TicketRequestConcern
-            {
-
-                public int? TicketConcernId { get; set; }
-                public int? ChannelId { get; set; }
-                public string Channel_Name { get; set; }
-
-                public Guid? UserId { get; set; }
-                public string Issue_Handler { get; set; }
-                public DateTime? Target_Date { get; set; }
-                public bool? Is_Assigned { get; set; }
-                public string Remarks { get; set; }
-                public string Concern_Type { get; set; }
-                public string Closing_Notes { get; set; }
-                public string Added_By { get; set; }
-                public DateTime Created_At { get; set; }
-                public string Modified_By { get; set; }
-                public DateTime? Updated_At { get; set; }
-                public bool Is_Active { get; set; }
-                public DateTime? Closed_At { get; set; }
-                public bool? Is_Transfer { get; set; }
-                public DateTime? Transfer_At { get; set; }
-                public string Transfer_By { get; set; }
-
-            }
-
-        }
-
-
-        public class GetRequestorTicketConcernQuery : UserParams, IRequest<PagedList<GetRequestorTicketConcernResult>>
-        {
-
-            public string UserType { get; set; }
-            public string Role { get; set; }
-            public Guid? UserId { get; set; }
-            public string Concern_Status { get; set; }
-            public string Search { get; set; }
-            public bool? Status { get; set; }
-            public bool? Is_Reject { get; set; }
-            public bool? Is_Approve { get; set; }
-            public bool? Ascending { get; set; }
-        }
 
         public class Handler : IRequestHandler<GetRequestorTicketConcernQuery, PagedList<GetRequestorTicketConcernResult>>
         {
@@ -125,20 +32,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                     .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
-                     .Include(x => x.User)
-                     .ThenInclude(x => x.Department)
-                     .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.User)
-                     .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.RequestorByUser)
+                     .Include(x => x.Company)
+                     .Include(x => x.BusinessUnit)
+                     .Include(x => x.Department)
+                     .Include(x => x.Unit)
+                     .Include(x => x.SubUnit)
+                     .Include(x => x.Location)
+                     .Include(x => x.Category)
+                     .Include(x => x.SubCategory)
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
-                     .ThenInclude(x => x.ChannelUsers)
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.TransferByUser)
-                     .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.ClosingTickets);
-               
+                     .ThenInclude(x => x.User);
+
 
                 if (requestConcernsQuery.Any())
                 {
@@ -279,7 +185,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                                 requestConcernsQuery = requestConcernsQuery
                                     .Where(x => receiverList.Contains(x.User.BusinessUnitId));
-                  
+
                             }
                             else
                             {
@@ -362,7 +268,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                                 Updated_At = tc.UpdatedAt,
                                 Is_Active = tc.IsActive,
                                 Closed_At = tc.Closed_At,
-                                Closing_Notes = tc.IsClosedApprove == true ? tc.ClosingTickets.Max().Notes : null,
+                                Closing_Notes = tc.IsClosedApprove == true ? 
+                                tc.ClosingTickets.Where(x => x.IsClosing == true)
+                                .OrderByDescending(x => x.ClosingAt)
+                                .First().Notes : null,
                                 Is_Transfer = tc.IsTransfer,
                                 Transfer_At = tc.TransferAt,
                                 Transfer_By = tc.TransferByUser.Fullname,

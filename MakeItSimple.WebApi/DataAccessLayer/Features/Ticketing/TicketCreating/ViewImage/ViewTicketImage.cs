@@ -4,18 +4,15 @@ using Azure;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
+using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.ViewImage
 {
-    public class ViewTicketImage
+    public partial class ViewTicketImage
     {
-        public  class ViewTicketImageCommand : IRequest<Result>
-        {  
-            public int TicketAttachmentId { get; set; }
-        }
 
         public class Handler : IRequestHandler<ViewTicketImageCommand, Result>
         {
@@ -34,17 +31,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
                 var ticketAttachment = await _context.TicketAttachments
                     .FirstOrDefaultAsync(x => x.Id == request.TicketAttachmentId, cancellationToken);
 
-                if (ticketAttachment == null)
-                {
-                    return Result<FileStreamResult>.Failure(TicketRequestError.AttachmentNotFound());
-                }
+                if (ticketAttachment is null)
+                    return Result.Failure(TicketRequestError.AttachmentNotFound());
 
                 var filePath = ticketAttachment.Attachment;
 
-                if (!System.IO.File.Exists(filePath))
-                {
-                    return Result<FileStreamResult>.Failure(TicketRequestError.FileNotFound());
-                }
+                if (!File.Exists(filePath))
+                    return Result.Failure(TicketRequestError.FileNotFound());
+                
 
                 var fileName = Path.GetFileName(filePath);
                 var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
@@ -52,8 +46,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating
 
                 var fileResult = new FileStreamResult(new FileStream(filePath, FileMode.Open, FileAccess.Read), contentType);
 
-                return Result<FileStreamResult>.Success(fileResult);
+                return Result.Success(fileResult);
             }
+
         }
     }
 }

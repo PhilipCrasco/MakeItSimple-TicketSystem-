@@ -6,6 +6,7 @@ using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.ApprovalClosing
 {
@@ -30,11 +31,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 var allUserList = await _context.UserRoles
                     .ToListAsync();
 
-                var receiverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Receiver)).Select(x => x.UserRoleName).ToList();
+                var receiverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                .Contains(TicketingConString.Receiver))
+                    .Select(x => x.UserRoleName)
+                .ToList();
 
-                var approverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                var approverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                .Contains(TicketingConString.Approver))
+                    .Select(x => x.UserRoleName)
+                    .ToList();
 
                 foreach (var close in command.ApproveClosingRequests)
                 {
@@ -88,64 +95,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                         if (validateUserApprover is not null)
                         {
-                            closingTicketExist.TicketApprover = validateUserApprover.UserId;
 
-                            await ApprovalClosingNotification(closingTicketExist,userDetails,validateUserApprover,command,cancellationToken);
+                            await ApprovalClosingNotification(closingTicketExist, userDetails, validateUserApprover, command, cancellationToken);
 
                         }
                         else
                         {
-                            closingTicketExist.TicketApprover = null;
+                            await UpdateClosingTicket(closingTicketExist, userDetails,validateUserApprover,command, cancellationToken);
 
-                            closingTicketExist.IsClosing = true;
-                            closingTicketExist.ClosingAt = DateTime.Now;
-                            closingTicketExist.ClosedBy = command.Closed_By;
-
-                            var ticketConcernExist = await _context.TicketConcerns
-                                .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcernId, cancellationToken);
-
-                            ticketConcernExist.IsClosedApprove = true;
-                            ticketConcernExist.Closed_At = DateTime.Now;
-                            ticketConcernExist.ClosedApproveBy = command.Closed_By;
-                            ticketConcernExist.IsDone = true;
-                            ticketConcernExist.ConcernStatus = TicketingConString.Done;
-
-                            var requestConcernExist = await _context.RequestConcerns
-                                .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
-
-                            requestConcernExist.IsDone = true;
-                            requestConcernExist.Resolution = closingTicketExist.Resolution;
-                            requestConcernExist.ConcernStatus = TicketingConString.NotConfirm;
-
-                            var addNewTicketTransactionNotification = new TicketTransactionNotification
-                            {
-
-                                Message = $"Ticket number {closingTicketExist.TicketConcernId} is pending for closing Confirmation",
-                                AddedBy = userDetails.Id,
-                                Created_At = DateTime.Now,
-                                ReceiveBy = requestConcernExist.UserId.Value,
-                                Modules = PathConString.ConcernTickets,
-                                Modules_Parameter = PathConString.ForConfirmation,
-                                PathId = closingTicketExist.TicketConcernId
-
-                            };
-
-                            await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
-                            var addNewTransactionConfirmationNotification = new TicketTransactionNotification
-                            {
-
-                                Message = $"Ticket number {closingTicketExist.TicketConcernId} is waiting for Confirmation",
-                                AddedBy = userDetails.Id,
-                                Created_At = DateTime.Now,
-                                ReceiveBy = ticketConcernExist.UserId.Value,
-                                Modules = PathConString.IssueHandlerConcerns,
-                                Modules_Parameter = PathConString.ForConfirmation,
-                                PathId = closingTicketExist.TicketConcernId
-
-                            };
-
-                            await _context.TicketTransactionNotifications.AddAsync(addNewTransactionConfirmationNotification);
                         }
 
                     }
@@ -156,9 +113,43 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     }
 
                 }
-
+                
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
+            }
+
+            
+            private async Task<ClosingTicket> UpdateClosingTicket(ClosingTicket closingTicket,User user,ApproverTicketing approver ,ApproveClosingTicketCommand command, CancellationToken cancellationToken)
+            {
+
+                closingTicket.TicketApprover = approver.UserId;
+
+                closingTicket.TicketApprover = null;
+                closingTicket.IsClosing = true;
+                closingTicket.ClosingAt = DateTime.Now;
+                closingTicket.ClosedBy = command.Closed_By;
+
+                var ticketConcernExist = await _context.TicketConcerns
+                    .FirstOrDefaultAsync(x => x.Id == closingTicket.TicketConcernId, cancellationToken);
+
+                ticketConcernExist.IsClosedApprove = true;
+                ticketConcernExist.Closed_At = DateTime.Now;
+                ticketConcernExist.ClosedApproveBy = command.Closed_By;
+                ticketConcernExist.IsDone = true;
+                ticketConcernExist.ConcernStatus = TicketingConString.Done;
+
+                var requestConcernExist = await _context.RequestConcerns
+                    .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestConcernId);
+
+                requestConcernExist.IsDone = true;
+                requestConcernExist.Resolution = closingTicket.Resolution;
+                requestConcernExist.ConcernStatus = TicketingConString.NotConfirm;
+
+                await ConfirmationNotification(closingTicket, user, requestConcernExist, command, cancellationToken);
+
+                await ForConfirmationNotification(closingTicket, user, ticketConcernExist, command, cancellationToken);
+
+                return closingTicket;
             }
 
             private async Task<TicketTransactionNotification> ApprovalClosingNotification(ClosingTicket closingTicket, User user, ApproverTicketing approverTicketing, ApproveClosingTicketCommand command , CancellationToken cancellationToken ) 
@@ -179,10 +170,50 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
+
                 return addNewTicketTransactionNotification;
             }
 
+            private async Task<TicketTransactionNotification> ConfirmationNotification(ClosingTicket closingTicket, User user, RequestConcern requestConcern, ApproveClosingTicketCommand command, CancellationToken cancellationToken)
+            {
+                var addNewTicketTransactionNotification = new TicketTransactionNotification
+                {
 
+                    Message = $"Ticket number {closingTicket.TicketConcernId} is pending for closing Confirmation",
+                    AddedBy = user.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = requestConcern.UserId.Value,
+                    Modules = PathConString.ConcernTickets,
+                    Modules_Parameter = PathConString.ForConfirmation,
+                    PathId = closingTicket.TicketConcernId
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
+
+                return addNewTicketTransactionNotification;
+
+            }
+
+            private async Task<TicketTransactionNotification> ForConfirmationNotification(ClosingTicket closingTicket, User user, TicketConcern ticketConcern , ApproveClosingTicketCommand command, CancellationToken cancellationToken)
+            {
+                var addNewTransactionConfirmationNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket number {closingTicket.TicketConcernId} is waiting for Confirmation",
+                    AddedBy = user.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = ticketConcern.UserId.Value,
+                    Modules = PathConString.IssueHandlerConcerns,
+                    Modules_Parameter = PathConString.ForConfirmation,
+                    PathId = closingTicket.TicketConcernId
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTransactionConfirmationNotification);
+
+                return addNewTransactionConfirmationNotification;
+            }
         }
     }
 }

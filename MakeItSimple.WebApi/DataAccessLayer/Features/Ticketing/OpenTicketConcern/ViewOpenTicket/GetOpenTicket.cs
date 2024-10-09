@@ -352,7 +352,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         Transaction_Date = x.ticketHistories.Max(x => x.TransactionDate).Value,
 
 
-                    })/*.OrderBy(x => x.Transaction_Date)*/; 
+                    }).OrderBy(x => x.Transaction_Date); 
 
 
 

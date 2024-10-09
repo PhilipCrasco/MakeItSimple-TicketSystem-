@@ -40,6 +40,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
         public class UpdateUserCommand : IRequest<Result>
         {
             public Guid Id { get; set; }
+            public string EmpId { get; set; }
+            public string Fullname { get; set; }
             public int UserRoleId { get; set; }
             public int? DepartmentId { get; set; }
             public string UserName { get; set; }
@@ -159,6 +161,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.LocationId = LocationNotExist.Id;
                 user.BusinessUnitId = command.BusinessUnitId;
                 user.UnitId = command.UnitId;
+                user.EmpId = command.EmpId;
+                user.Fullname = command.Fullname;
                 //user.TeamId = command.TeamId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;

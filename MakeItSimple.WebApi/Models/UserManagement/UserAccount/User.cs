@@ -67,6 +67,8 @@ namespace MakeItSimple.WebApi.Models
         public string FileName { get; set; }
         public decimal? FileSize { get; set; }
 
+        public bool? IsStore { get; set; }
+
         public ICollection<TicketConcern> TicketConcerns { get; set;}
         public ICollection<Channel> Channels { get; set; }
         public ICollection<Approver> Approvers { get; set; }

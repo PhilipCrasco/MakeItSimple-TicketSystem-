@@ -27,6 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
 
             //public int ? TeamId { get; set; }
 
+
             public Guid ? Added_By { get; set; }
 
         }
@@ -49,6 +50,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
             public string LocationCode { get; set; }
 
             public int? BusinessUnitId { get; set; }
+
+            public bool? Is_Store { get; set; }
 
             public Guid ? Added_By { get; set; }
 
@@ -151,7 +154,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                     BusinessUnitId = command.BusinessUnitId,  
                     UnitId = command.UnitId,
                     AddedBy = command.Added_By,
-                    //ReceiverId = receiverExist.Id,
+                    IsStore = command.Is_Store,
                
                 };
                 

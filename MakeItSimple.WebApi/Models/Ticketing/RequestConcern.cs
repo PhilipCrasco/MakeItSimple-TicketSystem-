@@ -1,6 +1,7 @@
 ﻿using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Models.Setup.BusinessUnitSetup;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
+using MakeItSimple.WebApi.Models.Setup.ChannelSetup;
 using MakeItSimple.WebApi.Models.Setup.CompanySetup;
 using MakeItSimple.WebApi.Models.Setup.DepartmentSetup;
 using MakeItSimple.WebApi.Models.Setup.LocationSetup;
@@ -55,6 +56,9 @@ namespace MakeItSimple.WebApi.Models.Ticketing
 
         public int ? SubUnitId {  get; set; }
         public virtual SubUnit SubUnit { get; set; }
+
+        public int? ChannelId { get; set; }
+        public virtual Channel Channel { get; set; }
 
         public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }

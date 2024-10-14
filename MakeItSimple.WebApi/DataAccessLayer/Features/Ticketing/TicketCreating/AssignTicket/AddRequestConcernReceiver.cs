@@ -119,12 +119,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
 
                 bool hasChanged = false;
 
-                if (ticketConcern.ChannelId != command.ChannelId)
-                {
-                    ticketConcern.ChannelId = command.ChannelId;
-                    hasChanged = true;
-                }
-
                 if (ticketConcern.UserId != command.UserId)
                 {
                     ticketConcern.UserId = command.UserId;

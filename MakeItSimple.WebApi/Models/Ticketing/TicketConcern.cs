@@ -22,9 +22,6 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? ModifiedBy { get; set; }
         public virtual User ModifiedByUser { get; set; }
 
-        public int ? ChannelId { get; set; }
-        public virtual Channel Channel { get; set; }
-
         public Guid ? UserId { get; set; }
         public virtual User User { get; set; }
 

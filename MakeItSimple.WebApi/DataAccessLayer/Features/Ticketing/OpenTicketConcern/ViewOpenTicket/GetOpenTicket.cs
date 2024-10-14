@@ -31,7 +31,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
-                    .Include(x => x.Channel)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
@@ -66,11 +65,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     var issueHandlerPermissionList = allUserList
                         .Where(x => x.Permissions.Contains(TicketingConString.IssueHandler))
-                        .Select(x => x.UserRoleName)
-                        .ToList();
-
-                    var supportPermissionList = allUserList
-                        .Where(x => x.Permissions.Contains(TicketingConString.Support))
                         .Select(x => x.UserRoleName)
                         .ToList();
 
@@ -193,25 +187,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         {
                             ticketConcernQuery = ticketConcernQuery.Where(x => x.UserId == request.UserId);
                         }
-                        else if (request.UserType == TicketingConString.Support)
-                        {
-                            if (supportPermissionList.Any(x => x.Contains(request.Role)))
-                            {
-                                var channelUserValidation = await _context.ChannelUsers
-                                    .AsNoTracking()
-                                    .Where(x => x.UserId == request.UserId)
-                                    .Select(x => x.ChannelId)
-                                    .ToListAsync();
-
-                                ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => channelUserValidation.Contains(x.ChannelId.Value));
-                            }
-                            else
-                            {
-                                return new PagedList<GetOpenTicketResult>(new List<GetOpenTicketResult>(), 0, request.PageNumber, request.PageSize);
-                            }
-
-                        }
                         else if (request.UserType == TicketingConString.Receiver)
                         {
                             var listOfRequest = await ticketConcernQuery
@@ -283,7 +258,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         Notes = x.RequestConcern.Notes,
                         Contact_Number = x.RequestConcern.ContactNumber,
                         Request_Type = x.RequestConcern.RequestType,
-                        Channel_Name = x.Channel.ChannelName,
+                        Channel_Name = x.RequestConcern.Channel.ChannelName,
                         UserId = x.UserId,
                         Issue_Handler = x.User.Fullname,
                         Target_Date = x.TargetDate,

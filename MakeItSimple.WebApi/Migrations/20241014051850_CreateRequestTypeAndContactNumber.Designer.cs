@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    partial class MisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241014051850_CreateRequestTypeAndContactNumber")]
+    partial class CreateRequestTypeAndContactNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1175,10 +1178,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
-                    b.Property<int?>("ChannelId")
-                        .HasColumnType("int")
-                        .HasColumnName("channel_id");
-
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int")
                         .HasColumnName("company_id");
@@ -1286,9 +1285,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("ix_request_concerns_category_id");
-
-                    b.HasIndex("ChannelId")
-                        .HasDatabaseName("ix_request_concerns_channel_id");
 
                     b.HasIndex("CompanyId")
                         .HasDatabaseName("ix_request_concerns_company_id");
@@ -1541,6 +1537,10 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("approved_by");
 
+                    b.Property<int?>("ChannelId")
+                        .HasColumnType("int")
+                        .HasColumnName("channel_id");
+
                     b.Property<Guid?>("ClosedApproveBy")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("closed_approve_by");
@@ -1641,6 +1641,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("ApprovedBy")
                         .HasDatabaseName("ix_ticket_concerns_approved_by");
+
+                    b.HasIndex("ChannelId")
+                        .HasDatabaseName("ix_ticket_concerns_channel_id");
 
                     b.HasIndex("ClosedApproveBy")
                         .HasDatabaseName("ix_ticket_concerns_closed_approve_by");
@@ -2666,11 +2669,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("CategoryId")
                         .HasConstraintName("fk_request_concerns_categories_category_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .HasConstraintName("fk_request_concerns_channels_channel_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Setup.CompanySetup.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
@@ -2723,8 +2721,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("BusinessUnit");
 
                     b.Navigation("Category");
-
-                    b.Navigation("Channel");
 
                     b.Navigation("Company");
 
@@ -2862,6 +2858,11 @@ namespace MakeItSimple.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_ticket_concerns_users_user_id1");
 
+                    b.HasOne("MakeItSimple.WebApi.Models.Setup.ChannelSetup.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .HasConstraintName("fk_ticket_concerns_channels_channel_id");
+
                     b.HasOne("MakeItSimple.WebApi.Models.User", "ClosedApproveByUser")
                         .WithMany()
                         .HasForeignKey("ClosedApproveBy")
@@ -2899,6 +2900,8 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("AddedByUser");
 
                     b.Navigation("ApprovedByUser");
+
+                    b.Navigation("Channel");
 
                     b.Navigation("ClosedApproveByUser");
 

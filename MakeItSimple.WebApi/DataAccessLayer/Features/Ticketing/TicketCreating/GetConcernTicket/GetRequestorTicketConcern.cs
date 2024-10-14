@@ -40,8 +40,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                      .Include(x => x.Location)
                      .Include(x => x.Category)
                      .Include(x => x.SubCategory)
-                     .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.Channel)
+                     .Include(x => x.Channel)
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.User)
                      .OrderBy(x => x.Id)
@@ -236,8 +235,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                         RequestorId = g.UserId,
                         FullName = g.User.Fullname,
 
+                        ChannelId = g.ChannelId,
+                        Channel_Name = g.Channel.ChannelName,
+
                         CategoryId = g.CategoryId,
                         Category_Description = g.Category.CategoryDescription,
+
 
                         SubCategoryId = g.SubCategoryId,
                         SubCategory_Description = g.SubCategory.SubCategoryDescription,
@@ -260,8 +263,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                             {
 
                                 TicketConcernId = tc.Id,
-                                ChannelId = tc.ChannelId,
-                                Channel_Name = tc.Channel.ChannelName,
                                 UserId = tc.UserId,
                                 Issue_Handler = tc.User.Fullname,
                                 Target_Date = tc.TargetDate,

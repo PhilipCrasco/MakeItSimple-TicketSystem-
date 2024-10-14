@@ -16,9 +16,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
             public int? DepartmentId { get; set; }
             public int? UnitId { get; set; }
             public int? SubUnitId { get; set; }
+            public int? LocationId { get; set; }
+            public int? ChannelId { get; set; }
             public int? CategoryId { get; set; }
             public int? SubCategoryId { get; set; }
-            public int? LocationId { get; set; }
+
             public DateTime? DateNeeded { get; set; }
             public Guid? UserId { get; set; }
 

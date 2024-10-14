@@ -38,7 +38,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .ThenInclude(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.TicketConcern)
-                    .ThenInclude(x => x.Channel)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.RequestConcern)
                     .Include(x => x.TicketConcern)
@@ -148,8 +147,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         Notes = x.Notes,
                         DepartmentId = x.TicketConcern.User.DepartmentId,
                         Department_Name = x.TicketConcern.User.Department.DepartmentName,
-                        ChannelId = x.TicketConcern.ChannelId,
-                        Channel_Name = x.TicketConcern.Channel.ChannelName,
+                        ChannelId = x.TicketConcern.RequestConcern.ChannelId,
+                        Channel_Name = x.TicketConcern.RequestConcern.Channel.ChannelName,
                         UserId = x.TicketConcern.UserId,
                         Fullname = x.TicketConcern.User.Fullname,
                         Concern_Details = x.TicketConcern.RequestConcern.Concern,

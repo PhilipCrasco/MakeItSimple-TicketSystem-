@@ -103,7 +103,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             if (command.AddClosingAttachments.Count(x => x.Attachment != null) > 0)
             {
-                await AttachmentHandler(closingTicketExist, ticketConcernExist, command, cancellationToken);
+              var attachment =  await AttachmentHandler(closingTicketExist, ticketConcernExist, command, cancellationToken);
+                if(attachment is not null)
+                    return attachment;
             }
 
             await _context.SaveChangesAsync(cancellationToken);

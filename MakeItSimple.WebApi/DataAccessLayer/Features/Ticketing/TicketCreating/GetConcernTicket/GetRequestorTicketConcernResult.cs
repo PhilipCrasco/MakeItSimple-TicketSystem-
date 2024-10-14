@@ -36,6 +36,8 @@
 
             public Guid? RequestorId { get; set; }
             public string FullName { get; set; }
+            public int? ChannelId { get; set; }
+            public string Channel_Name { get; set; }
             public int? CategoryId { get; set; }
             public string Category_Description { get; set; }
             public int? SubCategoryId { get; set; }
@@ -59,8 +61,6 @@
             {
 
                 public int? TicketConcernId { get; set; }
-                public int? ChannelId { get; set; }
-                public string Channel_Name { get; set; }
 
                 public Guid? UserId { get; set; }
                 public string Issue_Handler { get; set; }

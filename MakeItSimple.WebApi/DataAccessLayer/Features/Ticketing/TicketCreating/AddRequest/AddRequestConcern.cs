@@ -87,7 +87,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
 
                 if (command.RequestAttachmentsFiles.Count(x => x.Attachment != null) > 0)
                 {
-                    await AttachmentHandler(command, ticketConcernList, cancellationToken);
+                   var attachment =  await AttachmentHandler(command, ticketConcernList, cancellationToken);
+                    if(attachment is not null)
+                        return attachment;
                 }
 
                 await _context.SaveChangesAsync(cancellationToken);
@@ -123,6 +125,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 if (requestConcernIdExist.LocationId != command.LocationId)
                 {
                     requestConcernIdExist.LocationId = command.LocationId;
+                    isChange = true;
+                }
+                if (requestConcernIdExist.ChannelId != command.ChannelId)
+                {
+                    requestConcernIdExist.ChannelId = command.ChannelId;
                     isChange = true;
                 }
                 if (requestConcernIdExist.CategoryId != command.CategoryId)
@@ -252,6 +259,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 var categoryExist = await _context.Categories
                   .FirstOrDefaultAsync(c => c.Id == command.CategoryId, cancellationToken);
 
+                var channelExist = await _context.Channels
+                  .FirstOrDefaultAsync(c => c.Id == command.ChannelId, cancellationToken);
+
                 if (categoryExist is null)
                     return Result.Failure(TicketRequestError.CategoryNotExist());
 
@@ -279,6 +289,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     SubUnitId = command.SubUnitId,
                     LocationId = command.LocationId,
                     DateNeeded = command.DateNeeded,
+                    ChannelId = command.ChannelId,
                     CategoryId = command.CategoryId,
                     SubCategoryId = command.SubCategoryId,
                     Notes = command.Notes,

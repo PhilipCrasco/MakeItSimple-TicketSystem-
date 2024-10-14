@@ -63,7 +63,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
-                    .Include(x => x.Channel)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)

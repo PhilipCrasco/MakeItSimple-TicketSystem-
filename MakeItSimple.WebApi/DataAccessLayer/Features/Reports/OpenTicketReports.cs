@@ -61,7 +61,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
-                    .Include(x => x.Channel)
                     .Include(x => x.User)
                     .ThenInclude(x => x.SubUnit)
                     .Include(x => x.ClosingTickets)
@@ -103,7 +102,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                         Category_Description = t.RequestConcern.Category.CategoryDescription,
                         SubCategory_Description = t.RequestConcern.SubCategory.SubCategoryDescription,
                         Issue_Handler = t.User.Fullname,
-                        Channel_Name = t.Channel.ChannelName,
+                        Channel_Name = t.RequestConcern.Channel.ChannelName,
                         Target_Date = t.TargetDate,
                         Created_At = t.CreatedAt,
                         Modified_By = t.ModifiedByUser.Fullname,

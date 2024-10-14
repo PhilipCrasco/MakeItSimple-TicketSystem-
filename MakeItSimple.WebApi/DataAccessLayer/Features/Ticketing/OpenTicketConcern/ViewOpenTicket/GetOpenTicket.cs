@@ -281,6 +281,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         SubCategory_Description = x.RequestConcern.SubCategory.SubCategoryDescription,
                         Date_Needed = x.RequestConcern.DateNeeded,
                         Notes = x.RequestConcern.Notes,
+                        Contact_Number = x.RequestConcern.ContactNumber,
+                        Request_Type = x.RequestConcern.RequestType,
                         Channel_Name = x.Channel.ChannelName,
                         UserId = x.UserId,
                         Issue_Handler = x.User.Fullname,

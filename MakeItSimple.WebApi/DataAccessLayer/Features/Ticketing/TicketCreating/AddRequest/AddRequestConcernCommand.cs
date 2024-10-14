@@ -25,6 +25,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
             public string Concern { get; set; }
             public string Remarks { get; set; }
             public string Notes { get; set; }
+            public int? Contact_Number { get; set; }
+            public string Request_Type { get; set; }
 
             public List<RequestAttachmentsFile> RequestAttachmentsFiles { get; set; }
 

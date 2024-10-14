@@ -246,6 +246,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                         Is_Done = g.IsDone,
                         Remarks = g.Remarks,
                         Notes = g.Notes,
+                        Contact_Number = g.ContactNumber,
+                        Request_Type = g.RequestType,
                         Added_By = g.AddedByUser.Fullname,
                         Date_Needed = g.DateNeeded,
                         Created_At = g.CreatedAt,

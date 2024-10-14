@@ -9,20 +9,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.ApprovalTransfer
 {
-    public class ApprovedTransferTicket
+    public partial class ApprovedTransferTicket
     {
-
-        public class ApprovedTransferTicketCommand : IRequest<Result>
-        {
-            public string Role { get; set; }
-            public Guid? Users { get; set; }
-            public Guid? Transacted_By { get; set; }
-            public int TransferTicketId { get; set; }
-            public string Modules { get; set; }
-
-        }
 
         public class Handler : IRequestHandler<ApprovedTransferTicketCommand, Result>
         {
@@ -137,8 +127,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                         ticketConcernExist.Remarks = transferTicketExist.TransferRemarks;
                         ticketConcernExist.ChannelId = null;
                         ticketConcernExist.UserId = null;
-                        //ticketConcernExist.CategoryId = null;
-                        //ticketConcernExist.SubCategoryId = null;
                         ticketConcernExist.TargetDate = null;
                         ticketConcernExist.IsAssigned = null;
 

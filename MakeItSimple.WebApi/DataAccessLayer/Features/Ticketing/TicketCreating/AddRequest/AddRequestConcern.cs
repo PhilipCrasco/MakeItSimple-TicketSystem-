@@ -130,6 +130,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     requestConcernIdExist.SubCategoryId = command.SubCategoryId;
                     isChange = true;
                 }
+                if (requestConcernIdExist.ContactNumber != command.Contact_Number)
+                {
+                    requestConcernIdExist.ContactNumber = command.Contact_Number;
+                    isChange = true;
+                }
+                if (requestConcernIdExist.RequestType != command.Request_Type)
+                {
+                    requestConcernIdExist.RequestType = command.Request_Type;
+                    isChange = true;
+                }
 
                 if (isChange)
                 {
@@ -272,7 +282,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     CategoryId = command.CategoryId,
                     SubCategoryId = command.SubCategoryId,
                     Notes = command.Notes,
-                    IsDone = false
+                    IsDone = false,
+                    ContactNumber = command.Contact_Number,
+                    RequestType = command.Request_Type,
 
                 };
 

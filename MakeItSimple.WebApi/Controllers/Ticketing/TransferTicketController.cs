@@ -7,7 +7,7 @@ using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTick
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.CancelTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.GetTransferTicket;
 using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.RejectTransferTicket;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.AddNewTransferTicket;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.CreateTransfer.AddNewTransferTicket;
 using Microsoft.AspNetCore.SignalR;
 using MakeItSimple.WebApi.Common.SignalR;
 

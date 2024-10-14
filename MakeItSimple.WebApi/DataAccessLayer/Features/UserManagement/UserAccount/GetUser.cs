@@ -60,6 +60,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
 
             public bool Is_Use {  get; set; }
 
+            public bool ? Is_Store { get; set; }
+
 
         }
 
@@ -146,6 +148,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     (x.UserRole.UserRoleName.Contains(TicketingConString.IssueHandler)
                     && x.TicketConcerns.Any(x => x.IsApprove == true && x.IsClosedApprove == null)) ?
                       true : false,
+                    Is_Store = x.IsStore,
 
                 });
 

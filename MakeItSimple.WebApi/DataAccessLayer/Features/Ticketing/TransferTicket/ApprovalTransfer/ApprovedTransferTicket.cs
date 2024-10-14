@@ -28,10 +28,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
-                var allUserList = await _context.UserRoles.ToListAsync();
+                var allUserList = await _context.UserRoles
+                    .Select(r => new
+                    {
+                        r.Id,
+                        r.Permissions,
+                        r.UserRoleName,
+                        
+                    })
+                    .ToListAsync();
 
-                var approverPermissionList = allUserList.Where(x => x.Permissions
-                .Contains(TicketingConString.Approver)).Select(x => x.UserRoleName).ToList();
+                var approverPermissionList = allUserList
+                    .Where(x => x.Permissions
+                    .Contains(TicketingConString.Approver))
+                    .Select(x => x.UserRoleName)
+                    .ToList();
 
                 var transferTicketExist = await _context.TransferTicketConcerns
                     .Include(x => x.TicketConcern)
@@ -66,49 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
                     ticketHistoryApproval.Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}";
                     ticketHistoryApproval.IsApprove = true;
 
-                        transferTicketExist.TicketApprover = null;
-
-                        transferTicketExist.IsTransfer = true;
-                        transferTicketExist.TransferBy = transferTicketExist.TicketConcern.UserId;
-                        transferTicketExist.TransferAt = DateTime.Now;
-
-                        var ticketConcernExist = await _context.TicketConcerns
-                            .Include(x => x.RequestorByUser)
-                            .FirstOrDefaultAsync(x => x.Id == transferTicketExist.TicketConcernId);
-
-                        ticketConcernExist.IsTransfer = null;
-                        ticketConcernExist.Remarks = transferTicketExist.TransferRemarks;
-                        ticketConcernExist.UserId = transferTicketExist.TransferTo;
-                        ticketConcernExist.TargetDate = command.Target_Date;
-
-                        var addNewTicketTransactionNotification = new TicketTransactionNotification
-                        {
-
-                            Message = $"New request concern number {ticketConcernExist.RequestConcernId} has received",
-                            AddedBy = userDetails.Id,
-                            Created_At = DateTime.Now,
-                            ReceiveBy = transferTicketExist.TransferTo.Value,
-                            Modules = PathConString.ReceiverConcerns,
-                            PathId = ticketConcernExist.RequestConcernId.Value,
-
-                        };
-
-                        await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
-                        var addNewTransferTransactionNotification = new TicketTransactionNotification
-                        {
-
-                            Message = $"Ticket concern number {ticketConcernExist.RequestConcernId} has transfer",
-                            AddedBy = userDetails.Id,
-                            Created_At = DateTime.Now,
-                            ReceiveBy = transferTicketExist.TransferBy.Value,
-                            Modules = PathConString.ConcernTickets,
-                            Modules_Parameter = PathConString.ForTransfer,
-                            PathId = ticketConcernExist.RequestConcernId.Value,
-
-                        };
-
-                        await _context.TicketTransactionNotifications.AddAsync(addNewTransferTransactionNotification);
+                    await UpdateTransferTicket(transferTicketExist,userDetails,command,cancellationToken);
 
                 }
                 else
@@ -118,6 +87,49 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
 
                 await _context.SaveChangesAsync(cancellationToken);
                 return Result.Success();
+            }
+
+
+
+            private async Task UpdateTransferTicket(TransferTicketConcern transferTicketConcern,User user ,ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
+            {
+                transferTicketConcern.TicketApprover = null;
+
+                transferTicketConcern.IsTransfer = true;
+                transferTicketConcern.TransferBy = transferTicketConcern.TicketConcern.UserId;
+                transferTicketConcern.TransferAt = DateTime.Now;
+
+                var ticketConcernExist = await _context.TicketConcerns
+                    .Include(x => x.RequestorByUser)
+                    .FirstOrDefaultAsync(x => x.Id == transferTicketConcern.TicketConcernId);
+
+                ticketConcernExist.IsTransfer = null;
+                ticketConcernExist.Remarks = transferTicketConcern.TransferRemarks;
+                ticketConcernExist.UserId = transferTicketConcern.TransferTo;
+                ticketConcernExist.TargetDate = command.Target_Date;
+
+                await CreateTicketHistory(transferTicketConcern, ticketConcernExist, user, command, cancellationToken);
+
+            }
+
+            private async Task CreateTicketHistory(TransferTicketConcern transferTicketConcern,TicketConcern ticketConcern,User user, ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
+            {
+
+                var addNewTransferTransactionNotification = new TicketTransactionNotification
+                {
+
+                    Message = $"Ticket concern number {ticketConcern.Id} has transfer",
+                    AddedBy = user.Id,
+                    Created_At = DateTime.Now,
+                    ReceiveBy = transferTicketConcern.TransferBy.Value,
+                    Modules = PathConString.ConcernTickets,
+                    Modules_Parameter = PathConString.ForTransfer,
+                    PathId = ticketConcern.Id ,
+
+                };
+
+                await _context.TicketTransactionNotifications.AddAsync(addNewTransferTransactionNotification);
+
             }
         }
     }

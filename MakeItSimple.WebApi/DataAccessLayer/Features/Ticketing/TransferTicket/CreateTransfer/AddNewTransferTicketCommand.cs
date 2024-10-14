@@ -11,10 +11,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
             public Guid? Modified_By { get; set; }
             public Guid? Transacted_By { get; set; }
             public Guid? Transfer_By { get; set; }
+            public Guid ? Transfer_To { get; set; }
+            public DateTime? Current_Target_Date { get; set; }
             public int? TransferTicketId { get; set; }
             public int? TicketConcernId { get; set; }
             public string TransferRemarks { get; set; }
-            public string Modules { get; set; }
             public List<AddTransferAttachment> AddTransferAttachments { get; set; }
 
             public class AddTransferAttachment

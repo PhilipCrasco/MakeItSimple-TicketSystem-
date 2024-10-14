@@ -36,6 +36,8 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public Guid? TicketApprover { get; set; }
         public string Remarks { get; set; }
 
+        public DateTime? Current_Target_Date { get; set; }
+
         public ICollection<ApproverTicketing> ApproverTickets { get; set; }
         public ICollection<TicketAttachment> TicketAttachments { get; set; }
 

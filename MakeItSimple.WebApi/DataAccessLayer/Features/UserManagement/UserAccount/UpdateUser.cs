@@ -161,8 +161,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.UserFeatures
                 user.LocationId = LocationNotExist.Id;
                 user.BusinessUnitId = command.BusinessUnitId;
                 user.UnitId = command.UnitId;
-                user.EmpId = command.EmpId;
-                user.Fullname = command.Fullname;
+                //user.EmpId = command.EmpId;
+                //user.Fullname = command.Fullname;
                 //user.TeamId = command.TeamId;
                 user.UpdatedAt = DateTime.Now;
                 user.ModifiedBy = command.Modified_By;

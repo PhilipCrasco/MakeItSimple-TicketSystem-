@@ -23,7 +23,6 @@
 
         public bool? IsClicked { get; set; }
 
-
         public ICollection<TicketCommentView>  TicketCommentViews { get; set; }
 
     }

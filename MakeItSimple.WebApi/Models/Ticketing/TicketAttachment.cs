@@ -26,9 +26,10 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public int? TransferTicketConcernId { get; set; }
         public virtual TransferTicketConcern TransferTicketConcern { get; set; }
 
+        public int? TicketOnHoldId { get; set; }
+        public virtual TicketOnHold TicketOnHold { get; set; }
+
         public string Notes { get; set; }
-
-
 
 
     }

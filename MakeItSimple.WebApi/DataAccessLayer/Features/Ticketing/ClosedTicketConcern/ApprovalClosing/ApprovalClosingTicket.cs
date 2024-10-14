@@ -29,13 +29,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
                 var allUserList = await _context.UserRoles
-                    .ToListAsync();
+                    .AsNoTracking()
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.UserRoleName,
+                        x.Permissions
 
-                var receiverPermissionList = allUserList
-                    .Where(x => x.Permissions
-                .Contains(TicketingConString.Receiver))
-                    .Select(x => x.UserRoleName)
-                .ToList();
+                    })
+                    .ToListAsync();
 
                 var approverPermissionList = allUserList
                     .Where(x => x.Permissions
@@ -53,6 +55,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         .ThenInclude(x => x.RequestorByUser)
                         .FirstOrDefaultAsync(x => x.Id == close.ClosingTicketId);
 
+                    if (closingTicketExist is null)
+                        return Result.Failure(ClosingTicketError.ClosingTicketIdNotExist());
+
                     var closedRequestId = await _context.ApproverTicketings
                         .Where(x => x.ClosingTicketId == closingTicketExist.Id && x.IsApprove == null)
                         .ToListAsync();
@@ -69,11 +74,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     {
 
                         if (closingTicketExist.TicketApprover != command.Users
-                            || !approverPermissionList.Any(x => x.Contains(command.Role)))
-                        {
+                            || !approverPermissionList.Any(x => x.Contains(command.Role)))                    
                             return Result.Failure(TransferTicketError.ApproverUnAuthorized());
-                        }
-
+                        
                         selectClosedRequestId.IsApprove = true;
 
                         var userApprovalId = await _context.ApproverTicketings
@@ -83,25 +86,19 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                         var validateUserApprover = userApprovalId
                             .FirstOrDefault(x => x.ApproverLevel == selectClosedRequestId.ApproverLevel + 1);
 
-                        var ticketHistoryApproval = ticketHistoryList
-                            .FirstOrDefault(x => x.Approver_Level != null
-                            && x.Approver_Level == ticketHistoryList.Min(x => x.Approver_Level));
 
-                        ticketHistoryApproval.TransactedBy = command.Transacted_By;
-                        ticketHistoryApproval.TransactionDate = DateTime.Now;
-                        ticketHistoryApproval.Request = TicketingConString.Approve;
-                        ticketHistoryApproval.Status = $"{TicketingConString.CloseApprove} {userDetails.Fullname}";
-                        ticketHistoryApproval.IsApprove = true;
+                        await ApprovalTicketHistory(ticketHistoryList,userDetails, command, cancellationToken);
 
                         if (validateUserApprover is not null)
                         {
+
 
                             await ApprovalClosingNotification(closingTicketExist, userDetails, validateUserApprover, command, cancellationToken);
 
                         }
                         else
                         {
-                            await UpdateClosingTicket(closingTicketExist, userDetails,validateUserApprover,command, cancellationToken);
+                            await UpdateClosingTicket(closingTicketExist, userDetails,command, cancellationToken);
 
                         }
 
@@ -118,11 +115,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                 return Result.Success();
             }
 
-            
-            private async Task<ClosingTicket> UpdateClosingTicket(ClosingTicket closingTicket,User user,ApproverTicketing approver ,ApproveClosingTicketCommand command, CancellationToken cancellationToken)
+
+            private async Task<TicketHistory> ApprovalTicketHistory(List<TicketHistory> ticketHistory, User user, ApproveClosingTicketCommand command,CancellationToken cancellationToken)
+            {
+                var ticketHistoryApproval = ticketHistory
+                    .FirstOrDefault(x => x.Approver_Level != null
+                    && x.Approver_Level == ticketHistory.Min(x => x.Approver_Level));
+
+                ticketHistoryApproval.TransactedBy = command.Transacted_By;
+                ticketHistoryApproval.TransactionDate = DateTime.Now;
+                ticketHistoryApproval.Request = TicketingConString.Approve;
+                ticketHistoryApproval.Status = $"{TicketingConString.CloseApprove} {user.Fullname}";
+                ticketHistoryApproval.IsApprove = true;
+
+                return ticketHistoryApproval;
+
+            }
+
+            private async Task<ClosingTicket> UpdateClosingTicket(ClosingTicket closingTicket,User user,ApproveClosingTicketCommand command, CancellationToken cancellationToken)
             {
 
-                closingTicket.TicketApprover = approver.UserId;
+                closingTicket.TicketApprover = null;
 
                 closingTicket.TicketApprover = null;
                 closingTicket.IsClosing = true;
@@ -154,6 +167,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
             private async Task<TicketTransactionNotification> ApprovalClosingNotification(ClosingTicket closingTicket, User user, ApproverTicketing approverTicketing, ApproveClosingTicketCommand command , CancellationToken cancellationToken ) 
             {
+
+                closingTicket.TicketApprover = approverTicketing.UserId;
 
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {

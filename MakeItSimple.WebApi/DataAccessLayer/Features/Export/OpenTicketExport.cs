@@ -9,6 +9,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
 {
     public class OpenTicketExport
     {
+
+
+
         public class OpenTicketExportCommand : IRequest<Unit>
         {
             public DateTime? Date_From { get; set; }
@@ -31,15 +34,18 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                     .Select(t => new OpenTicketReportsResult
                     {
                         TicketConcernId = t.Id,
-                        //Concern_Description = t.ConcernDetails,
+                        Concern_Description = t.RequestConcern.Concern,
                         Requestor_Name = t.RequestorByUser.Fullname,
-                        Department_Name = t.RequestorByUser.Department.DepartmentName,
+                        CompanyName = t.RequestConcern.Company.CompanyName,
+                        Business_Unit_Name = t.RequestConcern.BusinessUnit.BusinessName,
+                        Department_Name = t.RequestConcern.Department.DepartmentName,
+                        Unit_Name = t.RequestConcern.Unit.UnitName,
+                        SubUnit_Name = t.RequestConcern.SubUnit.SubUnitName,
+                        Location_Name = t.RequestConcern.Location.LocationName,
+                        Category_Description = t.RequestConcern.Category.CategoryDescription,
+                        SubCategory_Description = t.RequestConcern.SubCategory.SubCategoryDescription,
                         Issue_Handler = t.User.Fullname,
-                        Unit_Name = t.User.Units.UnitName,
-                        SubUnit_Name = t.User.SubUnit.SubUnitName,
                         Channel_Name = t.Channel.ChannelName,
-                        //Category_Description = t.Category.CategoryDescription,
-                        //SubCategory_Description = t.SubCategory.SubCategoryDescription,
                         Target_Date = t.TargetDate,
                         Created_At = t.CreatedAt,
                         Modified_By = t.ModifiedByUser.Fullname,
@@ -97,7 +103,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         row.Cell(8).Value = openTicket[index - 1].Channel_Name;
                         row.Cell(9).Value = openTicket[index - 1].Category_Description;
                         row.Cell(10).Value = openTicket[index - 1].SubCategory_Description;
-                        row.Cell(11).Value = openTicket[index - 1].Start_Date;
+                        //row.Cell(11).Value = openTicket[index - 1].Start_Date;
                         row.Cell(12).Value = openTicket[index - 1].Target_Date;
                         row.Cell(13).Value = openTicket[index - 1].Created_At;
                         row.Cell(14).Value = openTicket[index - 1].Modified_By;

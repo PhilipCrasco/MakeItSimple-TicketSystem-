@@ -8,17 +8,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.CancelClosing
 {
-    public class CancelClosingTicket
+    public partial class CancelClosingTicket
     {
-        public class CancelClosingTicketCommand : IRequest<Result>
-        {
-            public Guid ? Transacted_By {  get; set; }
-            public int? ClosingTicketId { get; set; }
-
-            public string Modules { get; set; }
-        }
 
         public class Handler : IRequestHandler<CancelClosingTicketCommand, Result>
         {
@@ -37,16 +30,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .FirstOrDefaultAsync();
 
                 if (closingTicketExist == null)
-                {
                     return Result.Failure(ClosingTicketError.ClosingTicketIdNotExist());
-                }
-
-                closingTicketExist.IsActive = false;
 
                 var ticketConcernExist = await _context.TicketConcerns
                     .FirstOrDefaultAsync(x => x.Id == closingTicketExist.TicketConcernId);
-
-                ticketConcernExist.IsClosedApprove = null;
 
                 var approverList = await _context.ApproverTicketings
                     .Where(x => x.ClosingTicketId == command.ClosingTicketId)
@@ -59,7 +46,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 var ticketHistory = await _context.TicketHistories
                     .Where(x => x.TicketConcernId == ticketConcernExist.Id)
-                    .Where(x => (x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                    .Where(x => x.IsApprove == null && x.Request.Contains(TicketingConString.Approval)
                      || x.Request.Contains(TicketingConString.NotConfirm))
                     .ToListAsync();
 
@@ -68,9 +55,22 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     _context.TicketHistories.Remove(item);
                 }
 
+                closingTicketExist.IsActive = false;
+                ticketConcernExist.IsClosedApprove = null;  
+
+                await CancelTicketHistory(closingTicketExist, command, cancellationToken); 
+
+                await TransactionHistory(ticketConcernExist,closingTicketExist,command, cancellationToken);
+
+                await _context.SaveChangesAsync(cancellationToken);
+                return Result.Success();
+            }
+
+            private async Task<TicketHistory> CancelTicketHistory(ClosingTicket closingTicket, CancelClosingTicketCommand command, CancellationToken cancellationToken)
+            {
                 var addTicketHistory = new TicketHistory
                 {
-                    TicketConcernId = closingTicketExist.Id,
+                    TicketConcernId = closingTicket.Id,
                     TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.Cancel,
@@ -80,22 +80,29 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
+                return addTicketHistory;
+
+            }
+
+            private async Task<TicketTransactionNotification> TransactionHistory(TicketConcern ticketConcern,ClosingTicket closingTicket, CancelClosingTicketCommand command, CancellationToken cancellationToken)
+            {
+
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    Message = $"Ticket closing request #{ticketConcernExist.Id} has been canceled",
-                    AddedBy = closingTicketExist.AddedBy.Value,
+                    Message = $"Ticket closing request #{ticketConcern.Id} has been canceled",
+                    AddedBy = closingTicket.AddedBy.Value,
                     Created_At = DateTime.Now,
-                    ReceiveBy = closingTicketExist.TicketApprover.Value,
+                    ReceiveBy = closingTicket.TicketApprover.Value,
                     Modules = PathConString.IssueHandlerConcerns,
                     Modules_Parameter = PathConString.OpenTicket,
-                    PathId = ticketConcernExist.Id,
+                    PathId = ticketConcern.Id,
                 };
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
 
-                await _context.SaveChangesAsync(cancellationToken);
-                return Result.Success();
+                return addNewTicketTransactionNotification;
+
             }
         }
     }

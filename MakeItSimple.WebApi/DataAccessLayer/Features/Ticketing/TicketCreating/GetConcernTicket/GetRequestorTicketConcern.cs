@@ -28,7 +28,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 var dateToday = DateTime.Now;
 
                 IQueryable<RequestConcern> requestConcernsQuery = _context.RequestConcerns
-                    .AsNoTracking()
+                     .AsNoTrackingWithIdentityResolution()
                     .Include(x => x.User)
                      .Include(x => x.AddedByUser)
                      .Include(x => x.ModifiedByUser)
@@ -43,14 +43,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                      .Include(x => x.TicketConcerns)
                      .ThenInclude(x => x.Channel)
                      .Include(x => x.TicketConcerns)
-                     .ThenInclude(x => x.User);
+                     .ThenInclude(x => x.User)
+                     .OrderBy(x => x.Id)
+                     .AsSplitQuery()
+                     ;
 
 
                 if (requestConcernsQuery.Any())
                 {
 
                     var allUserList = await _context.UserRoles
-                        .AsNoTracking()
+                        .AsNoTrackingWithIdentityResolution()
                         .Select(x => new
                         {
                             x.Id,
@@ -116,7 +119,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                             .OrderByDescending(x => x.Id);
                     }
 
-                    if (request.Concern_Status != null)
+                    if (request.Concern_Status is not null)
                     {
 
                         switch (request.Concern_Status)

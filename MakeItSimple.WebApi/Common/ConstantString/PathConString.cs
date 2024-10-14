@@ -7,7 +7,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string RequestsPage = "/requestor";
 
         public const string ConcernTickets = "/requestor/requestor-concerns";
-
+ 
         public const string ReceiverConcerns = "/receiver/receiver-concerns";
 
         public const string ReceiverCloseTickets = "/receiver/close-tickets";

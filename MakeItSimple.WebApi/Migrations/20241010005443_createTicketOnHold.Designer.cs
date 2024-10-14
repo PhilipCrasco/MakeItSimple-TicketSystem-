@@ -4,6 +4,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakeItSimple.WebApi.Migrations
 {
     [DbContext(typeof(MisDbContext))]
-    partial class MisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010005443_createTicketOnHold")]
+    partial class createTicketOnHold
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1354,10 +1357,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ticket_concern_id");
 
-                    b.Property<int?>("TicketOnHoldId")
-                        .HasColumnType("int")
-                        .HasColumnName("ticket_on_hold_id");
-
                     b.Property<int?>("TransferTicketConcernId")
                         .HasColumnType("int")
                         .HasColumnName("transfer_ticket_concern_id");
@@ -1380,9 +1379,6 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.HasIndex("TicketConcernId")
                         .HasDatabaseName("ix_ticket_attachments_ticket_concern_id");
-
-                    b.HasIndex("TicketOnHoldId")
-                        .HasDatabaseName("ix_ticket_attachments_ticket_on_hold_id");
 
                     b.HasIndex("TransferTicketConcernId")
                         .HasDatabaseName("ix_ticket_attachments_transfer_ticket_concern_id");
@@ -2750,11 +2746,6 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasForeignKey("TicketConcernId")
                         .HasConstraintName("fk_ticket_attachments_ticket_concerns_ticket_concern_id");
 
-                    b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketOnHold", "TicketOnHold")
-                        .WithMany("TicketAttachments")
-                        .HasForeignKey("TicketOnHoldId")
-                        .HasConstraintName("fk_ticket_attachments_ticket_on_holds_ticket_on_hold_id");
-
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", "TransferTicketConcern")
                         .WithMany("TicketAttachments")
                         .HasForeignKey("TransferTicketConcernId")
@@ -2765,8 +2756,6 @@ namespace MakeItSimple.WebApi.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("TicketConcern");
-
-                    b.Navigation("TicketOnHold");
 
                     b.Navigation("TransferTicketConcern");
                 });
@@ -2928,7 +2917,7 @@ namespace MakeItSimple.WebApi.Migrations
                         .HasConstraintName("fk_ticket_on_holds_users_added_by_user_id");
 
                     b.HasOne("MakeItSimple.WebApi.Models.Ticketing.TicketConcern", "TicketConcern")
-                        .WithMany("TicketOnHolds")
+                        .WithMany()
                         .HasForeignKey("TicketConcernId")
                         .HasConstraintName("fk_ticket_on_holds_ticket_concerns_ticket_concern_id");
 
@@ -3181,16 +3170,9 @@ namespace MakeItSimple.WebApi.Migrations
 
                     b.Navigation("TicketComments");
 
-                    b.Navigation("TicketOnHolds");
-
                     b.Navigation("TransferTicketConcerns");
 
                     b.Navigation("ticketHistories");
-                });
-
-            modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TicketOnHold", b =>
-                {
-                    b.Navigation("TicketAttachments");
                 });
 
             modelBuilder.Entity("MakeItSimple.WebApi.Models.Ticketing.TransferTicketConcern", b =>

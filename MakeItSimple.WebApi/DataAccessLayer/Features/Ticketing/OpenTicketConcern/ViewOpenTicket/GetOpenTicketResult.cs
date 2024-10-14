@@ -1,4 +1,6 @@
-﻿namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ViewOpenTicket
+﻿using MakeItSimple.WebApi.Models.Ticketing;
+
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ViewOpenTicket
 {
     public partial class GetOpenTicket
     {
@@ -58,6 +60,7 @@
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
+            public List<GetOnHold> GetOnHolds { get; set; }
 
             public class GetForClosingTicket
             {
@@ -105,6 +108,28 @@
                     public string FileName { get; set; }
                     public decimal? FileSize { get; set; }
                 }
+
+            }
+
+            public class GetOnHold
+            {
+                public int Id { get; set; }
+                public string Reason { get; set; }
+                public string AddedBy { get; set; }
+                public DateTime CreatedAt { get; set; }
+                public bool? IsHold { get; set; }
+                public DateTime? ResumeAt { get; set; }
+
+                public List<GetAttachmentForOnHoldTicket> GetAttachmentForOnHoldTickets { get; set; }
+                public class GetAttachmentForOnHoldTicket
+                {
+                    public int? TicketAttachmentId { get; set; }
+                    public string Attachment { get; set; }
+                    public string FileName { get; set; }
+                    public decimal? FileSize { get; set; }
+                }
+
+
 
             }
 

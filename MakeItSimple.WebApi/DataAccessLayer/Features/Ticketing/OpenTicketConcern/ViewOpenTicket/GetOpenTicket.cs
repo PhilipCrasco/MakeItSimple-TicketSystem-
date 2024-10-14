@@ -44,7 +44,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                 if (ticketConcernQuery.Any())
                 {
 
-                    var fillterApproval = ticketConcernQuery.Select(x => x.Id);
+                    var fillterApproval = ticketConcernQuery
+                        .Select(x => x.Id);
 
                     var allUserList = await _context.UserRoles
                         .AsNoTracking()
@@ -81,7 +82,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                     }
 
-                    if (request.Status != null)
+                    if (request.Status is not null)
                     {
                         ticketConcernQuery = ticketConcernQuery
                             .Where(x => x.IsActive == request.Status);
@@ -93,35 +94,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         {
                             case TicketingConString.PendingRequest:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsApprove == false);
+                                    .Where(x => x.IsApprove == false && x.OnHold != true);
                                 break;
 
                             case TicketingConString.Open:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsApprove == true && x.IsTransfer != false
-                                    && x.IsClosedApprove == null);
+                                    && x.IsClosedApprove == null && x.OnHold != true);
                                 break;
 
                             case TicketingConString.ForTransfer:
-
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsTransfer == false);
+                                    .Where(x => x.IsTransfer == false && x.OnHold != true);
                                 break;
 
+                            case TicketingConString.OnHold:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.OnHold == true);
+                                break;
 
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == false);
+                                    .Where(x => x.IsClosedApprove == false && x.OnHold != true);
                                 break;
 
                             case TicketingConString.NotConfirm:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null && x.OnHold != true);
                                 break;
 
                             case TicketingConString.Closed:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true && x.OnHold != true);
                                 break;
 
                             default:
@@ -136,34 +140,38 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         {
                             case TicketingConString.PendingRequest:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsApprove == false);
+                                    .Where(x => x.IsApprove == false && x.OnHold != true);
                                 break;
 
                             case TicketingConString.Open:
                                 ticketConcernQuery = ticketConcernQuery
                                     .Where(x => x.IsApprove == true && x.IsTransfer != false
-                                     && x.IsClosedApprove == null);
+                                    && x.IsClosedApprove == null && x.OnHold != true);
                                 break;
 
                             case TicketingConString.ForTransfer:
-
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsTransfer == false);
+                                    .Where(x => x.IsTransfer == false && x.OnHold != true);
+                                break;
+
+                            case TicketingConString.OnHold:
+                                ticketConcernQuery = ticketConcernQuery
+                                    .Where(x => x.OnHold == true);
                                 break;
 
                             case TicketingConString.ForClosing:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == false);
+                                    .Where(x => x.IsClosedApprove == false && x.OnHold != true);
                                 break;
 
                             case TicketingConString.NotConfirm:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null);
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null && x.OnHold != true);
                                 break;
 
                             case TicketingConString.Closed:
                                 ticketConcernQuery = ticketConcernQuery
-                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true);
+                                    .Where(x => x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true && x.OnHold != true);
                                 break;
 
                             default:
@@ -277,12 +285,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                         UserId = x.UserId,
                         Issue_Handler = x.User.Fullname,
                         Target_Date = x.TargetDate,
-                        Ticket_Status = x.IsApprove == false ? TicketingConString.PendingRequest
-                                        : x.IsApprove == true != false && x.IsTransfer != false && x.IsClosedApprove == null ? TicketingConString.OpenTicket
-                                        : x.IsTransfer == false ? TicketingConString.ForTransfer
-                                        : x.IsClosedApprove == false ? TicketingConString.ForClosing
-                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null ? TicketingConString.NotConfirm
-                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true ? TicketingConString.Closed
+                        Ticket_Status = x.IsApprove == false && x.OnHold != true ? TicketingConString.PendingRequest
+                                        : x.IsApprove == true != false && x.IsTransfer != false && x.IsClosedApprove == null && x.OnHold != true ? TicketingConString.OpenTicket
+                                        : x.IsTransfer == false && x.OnHold != true ? TicketingConString.ForTransfer
+                                        : x.OnHold == true && x.OnHold != true ? TicketingConString.OnHold
+                                        : x.IsClosedApprove == false && x.OnHold != true ? TicketingConString.ForClosing
+                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == null && x.OnHold != true ? TicketingConString.NotConfirm
+                                        : x.IsClosedApprove == true && x.RequestConcern.Is_Confirm == true && x.OnHold != true ? TicketingConString.Closed
                                         : "Unknown",
 
                         Added_By = x.AddedByUser.Fullname,
@@ -329,7 +338,31 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
                           }).ToList(),
 
 
-                      }).ToList(),
+                      })
+                      .ToList(),
+
+                        GetOnHolds = x.TicketOnHolds
+                        .Where(x => x.IsHold == true)
+
+                        .Select(h => new GetOpenTicketResult.GetOnHold
+                        {
+                            Id = h.Id,
+                            Reason = h.Reason,
+                            AddedBy = h.AddedByUser.Fullname,
+                            CreatedAt = h.CreatedAt,
+                            IsHold = h.IsHold,
+                            ResumeAt = h.ResumeAt,
+                            GetAttachmentForOnHoldTickets = h.TicketAttachments
+                            .Select(t => new GetOpenTicketResult.GetOnHold.GetAttachmentForOnHoldTicket
+                            {
+                                TicketAttachmentId = t.Id,
+                                Attachment = t.Attachment,
+                                FileName = t.FileName,
+                                FileSize = t.FileSize,
+
+                            }).ToList(),
+
+                        }).ToList(),
 
                         GetForTransferTickets = x.TransferTicketConcerns
                         .Where(x => x.IsActive == true && x.IsTransfer == false)
@@ -347,14 +380,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                             }).ToList(),
 
-                        }).ToList(),
+                        })
+                        .ToList(),
 
                         Transaction_Date = x.ticketHistories.Max(x => x.TransactionDate).Value,
 
-
                     }).OrderBy(x => x.Transaction_Date); 
-
-
 
 
                 return await PagedList<GetOpenTicketResult>.CreateAsync(results, request.PageNumber, request.PageSize);

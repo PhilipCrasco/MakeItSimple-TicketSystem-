@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using MakeItSimple.WebApi.Models.Setup.ApproverSetup;
 using System.Threading;
 using MakeItSimple.WebApi.Models;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConcern.ViewOpenTicket.GetOpenTicket.GetOpenTicketResult.GetForClosingTicket;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketConcern.AddClosingTicket
 {
@@ -63,8 +64,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
                     .Where(x => x.SubUnitId == ticketConcernExist.User.SubUnitId)
                     .ToListAsync();
 
-                if (!approverList.Any())
-                    return Result.Failure(ClosingTicketError.NoApproverHasSetup());
+                var validation = await ValidationHandler(approverList, command, cancellationToken);
+                if (validation is not null)
+                    return validation;
                 
                 var approverUser = approverList
                     .First(x => x.ApproverLevel == approverList.Min(x => x.ApproverLevel));
@@ -75,7 +77,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
 
                 foreach (var approver in approverList)
                 {
-                    await AddApproverTicketing(ticketConcernExist, closingTicketExist, approverUser, command, cancellationToken);
+                    await AddApproverTicketing(ticketConcernExist, closingTicketExist, approver, command, cancellationToken);
                 }
 
                 await AddClosingHistory(ticketConcernExist, command, cancellationToken);
@@ -148,6 +150,25 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.ClosedTicketCon
             await _context.ApproverTicketings.AddAsync(addNewApprover, cancellationToken);
 
             return addNewApprover;
+
+        }
+
+        private async Task<Result?> ValidationHandler(List<Approver> approver, AddNewClosingTicketCommand command, CancellationToken cancellationToken)
+        {
+            if (!approver.Any())
+                return Result.Failure(ClosingTicketError.NoApproverHasSetup());
+
+            var categoryExist = await _context.Categories
+                .FirstOrDefaultAsync(x => x.Id == command.CategoryId,cancellationToken);
+            if (categoryExist is null)
+                return Result.Failure(TicketRequestError.CategoryNotExist());
+
+            var subCategoryExist = await _context.SubCategories
+                .FirstOrDefaultAsync(x => x.Id == command.SubCategoryId, cancellationToken);
+            if (subCategoryExist is null)
+                return Result.Failure(TicketRequestError.SubCategoryNotExist());
+
+            return null;
 
         }
 

@@ -60,6 +60,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 if (receiverList.UserId == command.UserId && receiverPermissionList.Contains(command.Role))
                 {
                     await UpdateTicket(ticketConcernExist, command, cancellationToken);
+
                     await RequestTicketHistory(userDetails, ticketConcernExist,command,cancellationToken);
 
                 }

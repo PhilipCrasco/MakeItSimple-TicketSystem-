@@ -73,6 +73,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
         public virtual DbSet<TicketComment> TicketComments { get; set; }
         public virtual DbSet<TicketCommentView> TicketCommentViews { get; set; }
         public virtual DbSet<TicketTransactionNotification> TicketTransactionNotifications { get; set; }
+        public virtual DbSet<TicketOnHold> TicketOnHolds { get; set; }
 
         //Phase 2 
 
@@ -85,7 +86,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
 
-        
         }
 
         protected override async void OnModelCreating(ModelBuilder modelBuilder)
@@ -114,6 +114,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Data
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentViewConfiguration());
             modelBuilder.ApplyConfiguration(new TicketTransactionNotificationConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketOnHoldConfiguration());
 
 
             modelBuilder.ApplyConfiguration(new FormConfiguration());

@@ -6,7 +6,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
     {
         public class GetOpenTicketQuery : UserParams, IRequest<PagedList<GetOpenTicketResult>>
         {
-            public string Search { get; set; }
+            public string Search { get; set; } 
             public bool? Status { get; set; }
             public string Concern_Status { get; set; }
             public string History_Status { get; set; }

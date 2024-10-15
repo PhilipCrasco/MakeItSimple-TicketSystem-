@@ -24,6 +24,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
             public int AllTicketNotif { get; set; }
             public int OpenTicketNotif { get; set; }
             public int ForTransferNotif { get; set; }
+            public int TransferApprovalNotif { get; set; }
             public int ForCloseNotif { get; set; }
 
             public int OnHold {  get; set; }    
@@ -51,15 +52,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
         public class Handler : IRequestHandler<TicketingNotificationCommand, Result>
         {
-            private IMemoryCache _cache;
             private readonly MisDbContext _context;
             private readonly IMediator _mediator;
 
-            public Handler(MisDbContext context, IMediator mediator , IMemoryCache cache)
+            public Handler(MisDbContext context, IMediator mediator)
             {
                 _context = context;
                 _mediator = mediator;   
-                _cache = cache;
             }
 
             public async Task<Result> Handle(TicketingNotificationCommand request, CancellationToken cancellationToken)
@@ -71,16 +70,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 var notConfirmNotif = new List<int>();
                 var doneNotif = new List<int>();
                 var receiverForApprovalNotif = new List<int?>();
-                var onHoldNotif = new List<int>();
                 var allTicketNotif = new List<int>();
                 var pendingTicketNotif = new List<int>();
                 var openTicketNotif = new List<int>();
                 var forTransferNotif = new List<int>();
+                var transferApprovalNotif = new List<int>();
                 var forCloseNotif = new List<int>();
+                var onHoldNotif = new List<int>();
                 var notCloseConfirmCloseNotif = new List<int>();
                 var closedNotif = new List<int>();
-
-                var forApprovalTransferNotif = new List<int>();
                 var forApprovalClosingNotif = new List<int>();
 
                 var allUserList = await _context.UserRoles
@@ -164,7 +162,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     x.TicketConcern,
                     x.TicketConcernId,
                     x.TicketApprover,
-                    x.IsTransfer
+                    x.IsTransfer,
+                    x.TransferBy,
+                    x.TransferTo,
             
 
 
@@ -190,8 +190,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                 if (requestorPermissionList.Any(x => x.Contains(request.Role)))
                 {
 
+                    var transferApprovalList = _context.TransferTicketConcerns
+                        .Where(t => t.IsTransfer == false && t.TransferTo == request.UserId)
+                        .Select(t => t.TicketConcernId);
+
                     requestConcernsQuery = requestConcernsQuery
-                        .Where(x => x.UserId == request.UserId && requestConcernsQuery.Any())
+                        .Where(x => x.UserId == request.UserId || transferApprovalList.Contains(x.Id) && requestConcernsQuery.Any())
                         .ToList();
 
                     var allRequestTicket = requestConcernsQuery
@@ -253,8 +257,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                     openTicketNotif = openTicket;
 
-                    var forTransferTicket = ticketConcernQuery
-                         .Where(x => x.IsTransfer == false)
+                    var forTransferTicket = transferQuery
+                         .Where(x => x.IsTransfer == false && x.TransferBy == request.UserId)
                          .Select (x => x.Id)
                          .ToList();
 
@@ -262,6 +266,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     forTransferNotif = forTransferTicket;
 
 
+                    var transferApproval = transferQuery
+                        .Where(t => t.IsTransfer == false && t.TransferTo == request.UserId)
+                        .Select(x => x.Id)
+                        .ToList();
+
+                    transferApprovalNotif = transferApproval;
 
                     var forClosedTicket = ticketConcernQuery
                         .Where(x => x.IsClosedApprove == false)
@@ -323,27 +333,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
 
                         }).ToListAsync();
 
-                    if(transferQuery.Any())
-                    {
-                        var userRequestIdApprovalList = approverTransactList
-                            .Select(x => x.TransferTicketConcernId);
-
-                        var userIdsInApprovalList = approverTransactList
-                            .Select(approval => approval.UserId);
-
-                        var forApprovalTransfer = transferQuery
-                               .Where(x => x.IsTransfer == false)
-                               .Where(x => userIdsInApprovalList.Contains(x.TicketApprover)
-                            && userRequestIdApprovalList.Contains(x.Id))
-                               .Select(x => x.Id)
-                               .ToList();
-
-
-                        forApprovalTransferNotif = forApprovalTransfer;
-
-
-
-                    }
 
                     if(closeQuery.Any())
                     {
@@ -416,10 +405,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketingNotifi
                     AllTicketNotif = allTicketNotif.Count(),
                     OpenTicketNotif = openTicketNotif.Count(),
                     ForTransferNotif = forTransferNotif.Count(),
+                    TransferApprovalNotif = transferApprovalNotif.Count(),
                     ForCloseNotif = forCloseNotif.Count(),
                     NotConfirmCloseNotif = notCloseConfirmCloseNotif.Count(),
                     ClosedNotif = closedNotif.Count(),
-                    ForApprovalTransferNotif = forApprovalTransferNotif.Count(),
                     ForApprovalClosingNotif = forApprovalClosingNotif.Count(),
 
                 };

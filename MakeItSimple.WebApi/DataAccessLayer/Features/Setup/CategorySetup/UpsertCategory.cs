@@ -12,26 +12,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
     public class UpsertCategory
     {
 
-        public class AddNewCategoryResult
-        {
-            public int Id { get; set; }
-            public int? ChannelId { get; set; }
-            public string Category_Description { get; set; }
-            public Guid ? Added_By { get; set; }
-            public DateTime Created_At { get; set; }
-
-        }
-
-        public class UpdateCategoryResult
-        {
-            public int Id { get; set; }
-            public int? ChannelId { get; set; }
-            public string Category_Description { get; set; }
-            public Guid? Modified_By { get; set; }
-            public DateTime ? Updated_At { get; set; }
-
-        }
-
 
         public class UpsertCategoryCommand : IRequest<Result>
         {
@@ -93,23 +73,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    var results = new UpdateCategoryResult
-                    {
-                        Id = category.Id,
-                        Category_Description = category.CategoryDescription,
-                        Modified_By = category.ModifiedBy,
-                        Updated_At = category.UpdatedAt
-                    };
-
-                    return Result.Success(results);
+                    return Result.Success();
                 }
                 else
                 {
                     var addCategory = new Category
                     {
+                        ChannelId = command.ChannelId,
                         CategoryDescription = command.Category_Description,
                         AddedBy = command.Added_By,
-                        ChannelId = command.ChannelId,
+
 
                     };
 
@@ -117,15 +90,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    var results = new AddNewCategoryResult
-                    {
-                        Id = addCategory.Id,
-                        Category_Description = addCategory.CategoryDescription,
-                        Added_By = addCategory.AddedBy,
-                        Created_At = addCategory.CreatedAt
-                    };
 
-                    return Result.Success(results);
+                    return Result.Success();
                 }
      
             }

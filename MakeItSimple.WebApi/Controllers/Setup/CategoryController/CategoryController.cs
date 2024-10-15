@@ -32,12 +32,6 @@ namespace MakeItSimple.WebApi.Controllers.Setup.CategoryController
 
             try
             {
-                var validationResult = await _validatorHandler.UpsertCategoryValidator.ValidateAsync(command);
-
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);
-                }
 
                 if (User.Identity is ClaimsIdentity identity && Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                 {

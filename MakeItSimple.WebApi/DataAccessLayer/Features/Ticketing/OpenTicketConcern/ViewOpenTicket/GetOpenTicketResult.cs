@@ -62,6 +62,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
             public List<GetForClosingTicket> GetForClosingTickets { get; set; }
             public List<GetForTransferTicket> GetForTransferTickets { get; set; }
+
+            public List<TransferApprovalTicket> TransferApprovalTickets { get; set; }
+
             public List<GetOnHold> GetOnHolds { get; set; }
 
             public class GetForClosingTicket
@@ -104,6 +107,23 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
 
                 public List<GetAttachmentForTransferTicket> GetAttachmentForTransferTickets { get; set; }
                 public class GetAttachmentForTransferTicket
+                {
+                    public int? TicketAttachmentId { get; set; }
+                    public string Attachment { get; set; }
+                    public string FileName { get; set; }
+                    public decimal? FileSize { get; set; }
+                }
+
+            }
+
+            public class TransferApprovalTicket
+            {
+                public int? TransferTicketConcernId { get; set; }
+                public string Transfer_Remarks { get; set; }
+                public bool? IsApprove { get; set; }
+
+                public List<GetAttachmentTransferApprovalTicket> GetAttachmentTransferApprovalTickets { get; set; }
+                public class GetAttachmentTransferApprovalTicket
                 {
                     public int? TicketAttachmentId { get; set; }
                     public string Attachment { get; set; }

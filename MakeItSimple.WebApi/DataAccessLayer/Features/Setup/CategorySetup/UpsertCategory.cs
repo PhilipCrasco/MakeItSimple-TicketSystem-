@@ -2,6 +2,7 @@
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Setup;
+using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Setup.CategorySetup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
         public class AddNewCategoryResult
         {
             public int Id { get; set; }
+            public int? ChannelId { get; set; }
             public string Category_Description { get; set; }
             public Guid ? Added_By { get; set; }
             public DateTime Created_At { get; set; }
@@ -23,6 +25,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
         public class UpdateCategoryResult
         {
             public int Id { get; set; }
+            public int? ChannelId { get; set; }
             public string Category_Description { get; set; }
             public Guid? Modified_By { get; set; }
             public DateTime ? Updated_At { get; set; }
@@ -33,6 +36,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
         public class UpsertCategoryCommand : IRequest<Result>
         {
             public int ? Id { get; set; }
+            public int? ChannelId { get; set; }
             public string Category_Description { get; set; }
             public Guid? Added_By { get; set; }
             public Guid ? Modified_By { get; set; }
@@ -59,6 +63,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
                     return Result.Failure(CategoryError.CategoryAlreadyExist(command.Category_Description));
                 }
 
+                var channelExist = await _context.Channels
+                    .FirstOrDefaultAsync(x => x.Id == command.ChannelId , cancellationToken);
+
+                if (channelExist is null)
+                    return Result.Failure(TicketRequestError.ChannelNotExist());
+
+
                 var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
                 
                 if (category != null )
@@ -78,6 +89,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
                     category.CategoryDescription = command.Category_Description;
                     category.ModifiedBy = command.Modified_By;
                     category.UpdatedAt = DateTime.Now;
+                    category.ChannelId = command.ChannelId;
 
                     await _context.SaveChangesAsync(cancellationToken);
 
@@ -97,6 +109,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
                     {
                         CategoryDescription = command.Category_Description,
                         AddedBy = command.Added_By,
+                        ChannelId = command.ChannelId,
 
                     };
 

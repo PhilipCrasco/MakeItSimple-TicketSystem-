@@ -94,12 +94,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
             {
                 var dateToday = DateTime.Today;
 
-                var channelExist = await _context.Channels
-                     .FirstOrDefaultAsync(x => x.Id == command.ChannelId, cancellationToken);
-
-                if (channelExist == null)
-                    return Result.Failure(TicketRequestError.ChannelNotExist());
-
 
                 switch (await _context.Users.FirstOrDefaultAsync(x => x.Id == command.UserId))
                 {

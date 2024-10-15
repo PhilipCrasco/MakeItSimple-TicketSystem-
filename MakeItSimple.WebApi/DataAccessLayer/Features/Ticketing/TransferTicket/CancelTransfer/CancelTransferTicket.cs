@@ -5,20 +5,12 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 {
-    public class CancelTransferTicket
+    public partial class CancelTransferTicket
     {
-        public class CancelTransferTicketCommand : IRequest<Result>
-        {
-
-            public int TransferTicketId { get; set; }
-            public Guid ? Transacted_By {  get; set; }
-            public string Modules { get; set; }
-
-
-        }
 
         public class Handler : IRequestHandler<CancelTransferTicketCommand, Result>
         {
@@ -36,9 +28,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                 .FirstOrDefaultAsync(x => x.Id == command.TransferTicketId);
 
                 if (transferTicketExist == null)
-                {
                     return Result.Failure(TransferTicketError.TransferTicketConcernIdNotExist());
-                }
+                
 
                 transferTicketExist.IsActive = false;
 
@@ -58,8 +49,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 var ticketHistory = await _context.TicketHistories
                     .Where(x => (x.TicketConcernId == ticketConcernExist.Id
-                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
-                     || x.Request.Contains(TicketingConString.NotConfirm))
+                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval)))
                     .ToListAsync();
 
                 foreach (var item in ticketHistory)
@@ -67,9 +57,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
                     _context.TicketHistories.Remove(item);
                 }
 
+                await CreateTicketHistory(ticketConcernExist, command, cancellationToken);
+
+                await CreateTransactionNotification(ticketConcernExist,transferTicketExist,command,cancellationToken);
+
+
+                await _context.SaveChangesAsync(cancellationToken);
+                return Result.Success();
+            }
+
+            private async Task CreateTicketHistory(TicketConcern ticketConcern, CancelTransferTicketCommand command, CancellationToken cancellationToken)
+            {
                 var addTicketHistory = new TicketHistory
                 {
-                    TicketConcernId = ticketConcernExist.Id,
+                    TicketConcernId = ticketConcern.Id,
                     TransactedBy = command.Transacted_By,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.Cancel,
@@ -78,24 +79,27 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);
 
+            }
+
+            private async Task CreateTransactionNotification(TicketConcern ticketConcern, TransferTicketConcern transferTicketConcern, CancelTransferTicketCommand command, CancellationToken cancellationToken)
+            {
                 var addNewTicketTransactionNotification = new TicketTransactionNotification
                 {
 
-                    Message = $"Ticket transfer request #{ticketConcernExist.Id} has been canceled",
-                    AddedBy = transferTicketExist.AddedBy.Value,
+                    Message = $"Ticket transfer request #{ticketConcern.Id} has been canceled",
+                    AddedBy = transferTicketConcern.AddedBy.Value,
                     Created_At = DateTime.Now,
-                    ReceiveBy = transferTicketExist.TicketApprover.Value,
+                    ReceiveBy = transferTicketConcern.TicketApprover.Value,
                     Modules = PathConString.IssueHandlerConcerns,
                     Modules_Parameter = PathConString.OpenTicket,
-                    PathId = ticketConcernExist.Id
+                    PathId = ticketConcern.Id
 
                 };
 
                 await _context.TicketTransactionNotifications.AddAsync(addNewTicketTransactionNotification);
-
-                await _context.SaveChangesAsync(cancellationToken);
-                return Result.Success();
             }
+
+
         }
     }
 }

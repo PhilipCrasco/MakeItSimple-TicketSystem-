@@ -9,7 +9,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
     public class GetChannel
     {
 
-        public class GetChannelResult
+        public record GetChannelResult
         {
             public int Id { get; set; }
             public string Channel_Name { get; set; }
@@ -23,7 +23,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
 
             public List<ChannelUser> channelUsers  { get; set; }
 
-            public class ChannelUser
+            public List<CategoryList> CategoryLists { get; set; }
+
+
+            public record ChannelUser
             {
                 public int ? ChannelId { get; set; }
                 public int ? DepartmentId { get; set; }
@@ -33,6 +36,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.ChannelSetup
                 public Guid ? UserId { get; set; }
                 public string Fullname { get; set; }
                 public string UserRole { get; set; }
+            }
+
+            public record CategoryList
+            {
+                public int ? Id { get; set; }
+                public string Category_Description { get; set; }
+
             }
 
             public List<CategoriesList> Categories { get; set; }

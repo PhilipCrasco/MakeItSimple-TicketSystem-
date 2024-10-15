@@ -46,6 +46,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     .FirstOrDefaultAsync(x => x.Id == command.TicketConcernId
                     && x.IsApprove != true, cancellationToken);
 
+                if (ticketConcernExist is null)
+                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
+
                 var businessUnitList = await _context.BusinessUnits
                 .FirstOrDefaultAsync(x => x.Id == ticketConcernExist.RequestorByUser.BusinessUnitId);
 
@@ -77,10 +80,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
 
 
             private async Task<Result?> ValidationHandler(TicketConcern ticketConcern , Receiver receiver , RequestApprovalReceiverCommand command, CancellationToken cancellationToken)
-            {
-                if (ticketConcern is null)
-                    return Result.Failure(TicketRequestError.TicketConcernIdNotExist());
-                
+            {   
 
                 if (receiver is null)        
                     return Result.Failure(TicketRequestError.NoReceiver());

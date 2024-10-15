@@ -28,21 +28,6 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
                 var userDetails = await _context.Users
                     .FirstOrDefaultAsync(x => x.Id == command.Transacted_By);
 
-                var allUserList = await _context.UserRoles
-                    .Select(r => new
-                    {
-                        r.Id,
-                        r.Permissions,
-                        r.UserRoleName,
-                        
-                    })
-                    .ToListAsync();
-
-                var approverPermissionList = allUserList
-                    .Where(x => x.Permissions
-                    .Contains(TicketingConString.Approver))
-                    .Select(x => x.UserRoleName)
-                    .ToList();
 
                 var transferTicketExist = await _context.TransferTicketConcerns
                     .Include(x => x.TicketConcern)
@@ -57,26 +42,11 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
 
                 if (transferApprover is not null)
                 {
-
-                    if (!approverPermissionList.Any(x => x.Contains(command.Role)))
-                        return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                     
                     if (transferTicketExist.TicketApprover != command.Users)
                         return Result.Failure(TransferTicketError.ApproverUnAuthorized());
                     
                     transferApprover.IsApprove = true;
-
-                    var ticketHistoryApproval = await _context.TicketHistories
-                    .Where(x => x.TicketConcernId == transferTicketExist.TicketConcernId
-                     && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
-                    .FirstOrDefaultAsync(x => x.Approver_Level != null);
-
-                    ticketHistoryApproval.TransactedBy = command.Transacted_By;
-                    ticketHistoryApproval.TransactionDate = DateTime.Now;
-                    ticketHistoryApproval.Request = TicketingConString.Approve;
-                    ticketHistoryApproval.Status = $"{TicketingConString.TransferApprove} {userDetails.Fullname}";
-                    ticketHistoryApproval.IsApprove = true;
-
                     await UpdateTransferTicket(transferTicketExist,userDetails,command,cancellationToken);
 
                 }
@@ -90,6 +60,20 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TransferTicket.
             }
 
 
+            private async Task UpdateTicketHistory(TransferTicketConcern transferTicketConcern, User user, ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
+            {
+                var ticketHistoryApproval = await _context.TicketHistories
+                .Where(x => x.TicketConcernId == transferTicketConcern.TicketConcernId
+                 && x.IsApprove == null && x.Request.Contains(TicketingConString.Approval))
+                .FirstOrDefaultAsync(x => x.Approver_Level != null);
+
+                ticketHistoryApproval.TransactedBy = command.Transacted_By;
+                ticketHistoryApproval.TransactionDate = DateTime.Now;
+                ticketHistoryApproval.Request = TicketingConString.Approve;
+                ticketHistoryApproval.Status = $"{TicketingConString.TransferApprove} {user.Fullname}";
+                ticketHistoryApproval.IsApprove = true;
+
+            }
 
             private async Task UpdateTransferTicket(TransferTicketConcern transferTicketConcern,User user ,ApprovedTransferTicketCommand command, CancellationToken cancellationToken)
             {

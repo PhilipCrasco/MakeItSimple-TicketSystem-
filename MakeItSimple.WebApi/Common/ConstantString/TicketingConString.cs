@@ -49,6 +49,8 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string TransferReject = "Ticket transfer request rejected by";
         public const string TransferApprove = "Ticket transfer request approved by";
 
+        public const string TransferApproval = "Transfer Approval";
+
         // OnHold History
 
         public const string OnHoldRequest = "Ticket was on-hold";

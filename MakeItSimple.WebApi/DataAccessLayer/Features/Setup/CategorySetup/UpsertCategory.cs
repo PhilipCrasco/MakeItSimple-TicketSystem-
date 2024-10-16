@@ -65,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Setup.CategorySetup
                     {
                         return Result.Failure(CategoryError.CategoryIsUse(category.CategoryDescription));
                     }
-
+                           
                     category.CategoryDescription = command.Category_Description;
                     category.ModifiedBy = command.Modified_By;
                     category.UpdatedAt = DateTime.Now;

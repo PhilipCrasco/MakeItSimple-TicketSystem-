@@ -3,43 +3,10 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export.TransferExport
 {
-    public class TransferTicketExport
+    public partial class TransferTicketExport
     {
-
-        public class TransferTicketExportResult
-        {
-            public Guid ? UserId { get; set; }
-            public int? Unit { get; set; }
-            public int? TicketConcernId { get; set; }
-            public int? TransferTicketId { get; set; }
-            public string Concern_Details { get; set; }
-            public string Transfer_By { get; set; }
-            public string Transfer_To { get; set; }
-            public string Channel_Name { get; set; }
-            public string Category_Description { get; set; }
-            public string SubCategory_Description { get; set; }
-            public DateTime? Start_Date { get; set; }
-            public DateTime? Target_Date { get; set; }
-            public DateTime? Transfer_At { get; set; }
-            public string Transfer_Remarks { get; set; }
-            public string Remarks { get; set; }
-            public string Modified_By { get; set; }
-            public DateTime? Updated_At { get; set; }
-        }
-
-
-        public class TransferTicketExportCommand : IRequest<Unit>
-        {
-
-            public string Search { get; set; }
-            public int? Unit { get; set; }
-            public Guid? UserId { get; set; }
-            public DateTime? Date_From { get; set; }
-            public DateTime? Date_To { get; set; }
-
-        }
 
         public class Handler : IRequestHandler<TransferTicketExportCommand, Unit>
         {
@@ -68,18 +35,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         UserId = x.TransferBy,
                         TicketConcernId = x.TicketConcernId,
                         TransferTicketId = x.Id,
-                        //Concern_Details = x.TicketConcern.ConcernDetails,
-                        Transfer_By = x.TransferByUser.Fullname,
-                        Transfer_To = x.TicketConcern.User.Fullname,
-                        //Category_Description = x.TicketConcern.Category.CategoryDescription,
-                        //SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
-                        Target_Date = x.TicketConcern.TargetDate,
+                        Concern_Details = x.TicketConcern.RequestConcern.Concern,
+                        Transfered_By = x.TransferByUser.Fullname,
+                        Transfered_To = x.TransferToUser.Fullname,
+                        Current_Target_Date = x.Current_Target_Date.Value.Date,
+                        Target_Date = x.TicketConcern.TargetDate.Value.Date,
                         Transfer_At = x.TicketConcern.TransferAt,
                         Transfer_Remarks = x.TransferRemarks,
                         Remarks = x.TransferRemarks,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
-                         
+
                     }).ToListAsync(cancellationToken);
 
 
@@ -99,7 +65,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                 {
                     _transferQuery = _transferQuery
                         .Where(x => x.TicketConcernId.ToString().Contains(request.Search)
-                        || x.Transfer_By.Contains(request.Search))
+                        || x.Transfered_By.Contains(request.Search))
                         .ToList();
                 }
 
@@ -109,13 +75,10 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                     var headers = new List<string>
                     {
                         "TicketConcernId",
-                        "TransferTicketId",
                         "Concern Details",
                         "Transfer By",
                         "Transfer To",
-                        "Category Description",
-                        "Sub Category Description",
-                        "Start Date",
+                        "Current Target Date",
                         "Target Date",
                         "Transfer At",
                         "Transfer Remarks",
@@ -141,24 +104,21 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         var row = worksheet.Row(index + 1);
 
                         row.Cell(1).Value = _transferQuery[index - 1].TicketConcernId;
-                        row.Cell(2).Value = _transferQuery[index - 1].TransferTicketId;
-                        row.Cell(3).Value = _transferQuery[index - 1].Concern_Details;
-                        row.Cell(4).Value = _transferQuery[index - 1].Transfer_By;
-                        row.Cell(5).Value = _transferQuery[index - 1].Transfer_To;
-                        row.Cell(6).Value = _transferQuery[index - 1].Category_Description;
-                        row.Cell(7).Value = _transferQuery[index - 1].SubCategory_Description;
-                        row.Cell(8).Value = _transferQuery[index - 1].Start_Date;
-                        row.Cell(9).Value = _transferQuery[index - 1].Target_Date;
-                        row.Cell(10).Value = _transferQuery[index - 1].Transfer_At;
-                        row.Cell(11).Value = _transferQuery[index - 1].Transfer_Remarks;
-                        row.Cell(12).Value = _transferQuery[index - 1].Remarks;
-                        row.Cell(13).Value = _transferQuery[index - 1].Modified_By;
-                        row.Cell(14).Value = _transferQuery[index - 1].Updated_At;
+                        row.Cell(2).Value = _transferQuery[index - 1].Concern_Details;
+                        row.Cell(3).Value = _transferQuery[index - 1].Transfered_By;
+                        row.Cell(4).Value = _transferQuery[index - 1].Transfered_To;
+                        row.Cell(5).Value = _transferQuery[index - 1].Current_Target_Date;
+                        row.Cell(6).Value = _transferQuery[index - 1].Target_Date;
+                        row.Cell(7).Value = _transferQuery[index - 1].Transfer_At;
+                        row.Cell(8).Value = _transferQuery[index - 1].Transfer_Remarks;
+                        row.Cell(9).Value = _transferQuery[index - 1].Remarks;
+                        row.Cell(10).Value = _transferQuery[index - 1].Modified_By;
+                        row.Cell(11).Value = _transferQuery[index - 1].Updated_At;
 
                     }
 
                     worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs($"TransferTicketReport {request.Date_From} - {request.Date_To}.xlsx");
+                    workbook.SaveAs($"TransferTicketReport {request.Date_From:MM-dd-yyyy} - {request.Date_To:MM-dd-yyyy}.xlsx");
 
                 }
 

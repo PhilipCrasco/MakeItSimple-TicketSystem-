@@ -1,4 +1,4 @@
-﻿ using Humanizer;
+﻿using Humanizer;
 using MakeItSimple.WebApi.Common;
 using MakeItSimple.WebApi.Common.ConstantString;
 using MakeItSimple.WebApi.Common.Pagination;
@@ -8,40 +8,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports.CloseReport
 {
-    public class TicketReports
+    public partial class TicketReports
     {
-
-        public record class Reports
-        {
-            public string Year { get; set; }
-            public string Month { get; set; }
-            public DateTime Start_Date { get; set; }
-            public DateTime End_Date { get; set; }
-            public string Personnel { get; set; }
-            public int Ticket_Number { get; set; }
-            public string Description { get; set; }
-            public DateTime Target_Date { get; set; }
-            public DateTime Actual { get; set; }
-            public int Varience {get; set;}
-            public decimal ? Efficeincy { get; set; }
-            public string Status { get; set; }
-            public string Remarks { get; set; }
-
-        }
-
-        public class TicketReportsQuery : UserParams , IRequest<PagedList<Reports>>
-        {
-
-            public string Search {  get; set; }
-            public int? Unit { get; set; }
-            public Guid ? UserId { get; set; }
-            public string Remarks { get; set; }
-            public DateTime ? Date_From { get; set; }
-            public DateTime ? Date_To { get; set; }
-
-        }
 
 
         public class Handler : IRequestHandler<TicketReportsQuery, PagedList<Reports>>
@@ -57,7 +27,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
             {
 
                 IQueryable<TicketConcern> ticketQuery = _context.TicketConcerns
-                    .AsNoTracking() 
+                    .AsNoTracking()
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.RequestorByUser)
@@ -69,8 +39,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     .ThenInclude(x => x.TicketAttachments)
                     .Include(x => x.RequestConcern);
 
-                
-                if(request.Unit is not null)
+
+                if (request.Unit is not null)
                 {
                     ticketQuery = ticketQuery.Where(x => x.User.UnitId == request.Unit);
 
@@ -86,7 +56,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     {
                         case TicketingConString.OnTime:
                             ticketQuery = ticketQuery
-                                .Where(x => x.Closed_At != null  && x.TargetDate.Value > x.Closed_At.Value);
+                                .Where(x => x.Closed_At != null && x.TargetDate.Value > x.Closed_At.Value);
                             break;
 
                         case TicketingConString.Delay:
@@ -100,7 +70,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     }
                 }
 
-                if(!string.IsNullOrEmpty(request.Search))
+                if (!string.IsNullOrEmpty(request.Search))
                 {
                     ticketQuery = ticketQuery
                         .Where(x => x.Id.ToString().Contains(request.Search)
@@ -111,24 +81,24 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                 var results = ticketQuery
                     .Where(x => x.RequestConcern.Is_Confirm == true && x.IsClosedApprove == true)
                     .Where(x => x.TargetDate.Value.Date >= request.Date_From.Value.Date && x.TargetDate.Value.Date < request.Date_To.Value.Date)
-                    .Select(x => new Reports                                                                                             
+                    .Select(x => new Reports
                     {
                         Year = x.TargetDate.Value.Date.Year.ToString(),
                         Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x.TargetDate.Value.Date.Month),
-                        Start_Date = new DateTime(x.TargetDate.Value.Date.Month, 1 , x.TargetDate.Value.Date.Year),
-                        End_Date = new DateTime(x.TargetDate.Value.Date.Month, 
-                        DateTime.DaysInMonth(x.TargetDate.Value.Date.Year , x.TargetDate.Value.Date.Month), x.TargetDate.Value.Date.Year),
+                        Start_Date = new DateTime(x.TargetDate.Value.Date.Month, 1, x.TargetDate.Value.Date.Year),
+                        End_Date = new DateTime(x.TargetDate.Value.Date.Month,
+                        DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month), x.TargetDate.Value.Date.Year),
                         Personnel = x.User.Fullname,
                         Ticket_Number = x.Id,
                         Description = x.RequestConcern.Concern,
                         Target_Date = new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
                         Actual = x.Closed_At != null ? new DateTime(x.Closed_At.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year)
                         : new DateTime(x.TargetDate.Value.Date.Month, x.TargetDate.Value.Date.Day, x.TargetDate.Value.Date.Year),
-                       Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date , x.Closed_At.Value.Date),
-                       Efficeincy = x.Closed_At != null ? Math.Max(0,100m - ((decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
-                       / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
-                       Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
-                       Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.OnTime : TicketingConString.Delay
+                        Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date),
+                        Efficeincy = x.Closed_At != null ? Math.Max(0, 100m - (decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
+                       / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m) : null,
+                        Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
+                        Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.OnTime : TicketingConString.Delay
                     });
 
                 return await PagedList<Reports>.CreateAsync(results, request.PageNumber, request.PageSize);

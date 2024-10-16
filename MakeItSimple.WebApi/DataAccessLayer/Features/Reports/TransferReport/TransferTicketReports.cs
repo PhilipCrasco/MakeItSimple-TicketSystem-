@@ -3,46 +3,13 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports.TransferReport
 {
-    public class TransferTicketReports
+    public partial class TransferTicketReports
     {
-       
-        public class TransferTicketReportsResult
-        {
-            public int? TicketConcernId { get; set; }
-            public int? TransferTicketId { get; set; }
-            public string Concern_Details { get; set; }
-            public string Transfer_By { get; set; }
-            public string Transfer_To { get; set; }
-            public string Channel_Name { get; set; }
-            public string Category_Description { get; set; }
-            public string SubCategory_Description { get; set; }
-            public DateTime? Start_Date { get; set; }
-            public DateTime? Target_Date { get; set; }
-            public DateTime? Transfer_At { get; set; }
-            public string Transfer_Remarks { get; set; }
-            public string Remarks { get; set; }
-            public string Modified_By { get; set; }
-            public DateTime? Updated_At { get; set; }
 
-        }
-
-        public class TransferTicketReportsQuery : UserParams, IRequest<PagedList<TransferTicketReportsResult>>
-        {
-            public string Search { get; set; }
-            public int? Unit { get; set; }
-            public Guid? UserId { get; set; }
-            [Required]
-            public DateTime? Date_From { get; set; }
-            [Required]
-            public DateTime? Date_To { get; set; }
-
-        }
-
-        public class Handler : IRequestHandler<TransferTicketReportsQuery, PagedList<TransferTicketReportsResult>>
+         public class Handler : IRequestHandler<TransferTicketReportsQuery, PagedList<TransferTicketReportsResult>>
         {
             private readonly MisDbContext _context;
 
@@ -55,13 +22,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
             {
 
                 IQueryable<TransferTicketConcern> _transferQuery = _context.TransferTicketConcerns
-                    .AsNoTracking()
+                    .AsNoTrackingWithIdentityResolution()
                     .Include(x => x.AddedByUser)
                     .Include(x => x.ModifiedByUser)
                     .Include(x => x.TransferByUser)
+                    .Include(x => x.TransferToUser)
                     .Include(x => x.TicketConcern)
                     .ThenInclude(x => x.User)
-                    .Include(x => x.TicketConcern);
+                    .Include(x => x.TicketConcern)
+                    .ThenInclude(x => x.RequestConcern);
 
 
                 if (request.Unit is not null)
@@ -88,18 +57,17 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
                     {
                         TicketConcernId = x.TicketConcernId,
                         TransferTicketId = x.Id,
-                        //Concern_Details = x.TicketConcern.ConcernDetails,
-                        Transfer_By  = x.TransferByUser.Fullname,
-                        Transfer_To = x.TicketConcern.User.Fullname,
-                        //Category_Description = x.TicketConcern.Category.CategoryDescription,
-                        //SubCategory_Description = x.TicketConcern.SubCategory.SubCategoryDescription,
+                        Concern_Details = x.TicketConcern.RequestConcern.Concern,
+                        Transfered_By = x.TransferByUser.Fullname,
+                        Transfered_To = x.TransferToUser.Fullname,
+                        Current_Target_Date = x.Current_Target_Date.Value.Date,
                         Target_Date = x.TicketConcern.TargetDate,
                         Transfer_At = x.TicketConcern.TransferAt,
                         Transfer_Remarks = x.TransferRemarks,
                         Remarks = x.TransferRemarks,
                         Modified_By = x.ModifiedByUser.Fullname,
                         Updated_At = x.UpdatedAt,
-                       
+
                     });
 
 

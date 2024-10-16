@@ -7,44 +7,13 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.TicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.CloseReport.TicketReports;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export.ClosingExport
 {
-    public class ClosingTicketExport
+    public partial class ClosingTicketExport
     {
-
-        public record class ClosingTicketExportResult
-        {
-            public Guid ? UserId { get; set; }
-            public int ? Unit { get; set; }
-            public string Year { get; set; }
-            public string Month { get; set; }
-            public string Start_Date { get; set; }
-            public string End_Date { get; set; }
-            public string Personnel { get; set; }
-            public int ?Ticket_Number { get; set; }
-            public string Description { get; set; }
-            public DateTime Target_Date { get; set; }
-            public DateTime Actual { get; set; }
-            public int Varience { get; set; }
-            public decimal? Efficeincy { get; set; }
-            public string Status { get; set; }
-            public string Remarks { get; set; }
-
-        }
-
-        public class ClosingTicketExportCommand : IRequest<Unit>
-        {
-            public string Search { get; set; }
-            public int? Unit { get; set; }
-            public Guid? UserId { get; set; }
-            public string Remarks { get; set; }
-            public DateTime? Date_From { get; set; }
-            public DateTime? Date_To { get; set; }
-
-        }
 
         public class Handler : IRequestHandler<ClosingTicketExportCommand, Unit>
         {
@@ -79,15 +48,15 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         Year = x.TargetDate.Value.Date.Year.ToString(),
                         Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(x.TargetDate.Value.Date.Month),
                         Start_Date = $"{x.TargetDate.Value.Date.Month}/01/{x.TargetDate.Value.Date.Year}",
-                        End_Date = $"{x.TargetDate.Value.Date.Month}/{DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month)}/{x.TargetDate.Value.Date.Year }",
+                        End_Date = $"{x.TargetDate.Value.Date.Month}/{DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month)}/{x.TargetDate.Value.Date.Year}",
                         Personnel = x.User.Fullname,
                         Ticket_Number = x.Id,
                         Description = x.RequestConcern.Concern,
                         Target_Date = x.TargetDate.Value.Date,
                         Actual = x.Closed_At.Value.Date,
                         Varience = EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date),
-                        Efficeincy = x.Closed_At != null ? Math.Max(0, 100m - ((decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
-                        / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m)) : null,
+                        Efficeincy = x.Closed_At != null ? Math.Max(0, 100m - (decimal)EF.Functions.DateDiffDay(x.TargetDate.Value.Date, x.Closed_At.Value.Date)
+                        / DateTime.DaysInMonth(x.TargetDate.Value.Date.Year, x.TargetDate.Value.Date.Month) * 100m) : null,
                         Status = x.Closed_At != null ? TicketingConString.Closed : TicketingConString.OpenTicket,
                         Remarks = x.Closed_At == null ? null : x.TargetDate.Value > x.Closed_At.Value ? TicketingConString.OnTime : TicketingConString.Delay
                     }).ToListAsync();

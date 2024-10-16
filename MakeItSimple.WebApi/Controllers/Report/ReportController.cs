@@ -4,10 +4,10 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.TicketReports;
-using MakeItSimple.WebApi.DataAccessLayer.Features.Reports;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OpenTicketReports;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.TransferTicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.CloseReport.TicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OpenReport.OpenTicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.TransferReport.TransferTicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OnHoldReport.OnHoldTicketReport;
 
 namespace MakeItSimple.WebApi.Controllers.Report
 {
@@ -145,6 +145,49 @@ namespace MakeItSimple.WebApi.Controllers.Report
             }
 
         }
+
+        [HttpGet("on-hold")]
+        public async Task<IActionResult> OnHoldTicketReport([FromQuery] OnHoldTicketReportQuery query)
+        {
+            try
+            {
+
+                var reports = await _mediator.Send(query);
+
+                Response.AddPaginationHeader(
+
+                reports.CurrentPage,
+                reports.PageSize,
+                reports.TotalCount,
+                reports.TotalPages,
+                reports.HasPreviousPage,
+                reports.HasNextPage
+
+                );
+
+                var result = new
+                {
+                    reports,
+                    reports.CurrentPage,
+                    reports.PageSize,
+                    reports.TotalCount,
+                    reports.TotalPages,
+                    reports.HasPreviousPage,
+                    reports.HasNextPage
+                };
+
+                var successResult = Result.Success(result);
+
+                return Ok(successResult);
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+
+        }
+
+
 
 
     }

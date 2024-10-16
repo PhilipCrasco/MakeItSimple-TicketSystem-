@@ -5,46 +5,12 @@ using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OpenReport
 {
-    public class OpenTicketReports
+    public partial class OpenTicketReports
     {
 
-        public record OpenTicketReportsResult
-        {
-
-            public int? TicketConcernId { get; set; }
-            public string Concern_Description { get; set; }
-            public string Requestor_Name { get; set; }
-            public string CompanyName { get; set; }
-            public string Business_Unit_Name { get; set; }
-            public string Department_Name { get; set; }
-            public string Unit_Name { get; set; }
-            public string SubUnit_Name { get; set; }
-            public string Location_Name { get; set; }
-            public string Category_Description { get; set; }
-            public string SubCategory_Description { get; set; }
-            public string Issue_Handler { get; set; }
-            public string Channel_Name { get; set; }
-            public DateTime? Target_Date { get; set; }
-            public DateTime Created_At { get; set; }
-            public string Modified_By { get; set; }
-            public DateTime? Updated_At { get; set; }
-            public string Remarks { get; set; }
-        }
-
-        public class OpenTicketReportsQuery : UserParams , IRequest<PagedList<OpenTicketReportsResult>>
-        {
-
-            public string Search { get; set; }
-            public int? Unit { get; set; }
-            public Guid? UserId { get; set; }
-            public DateTime? Date_From { get; set; }
-            public DateTime? Date_To { get; set; }
-
-        }
-
-        public  class Handler : IRequestHandler<OpenTicketReportsQuery, PagedList<OpenTicketReportsResult>>
+        public class Handler : IRequestHandler<OpenTicketReportsQuery, PagedList<OpenTicketReportsResult>>
         {
             private readonly MisDbContext _context;
 
@@ -88,6 +54,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
 
                 var results = ticketQuery
                     .Where(x => x.IsApprove == true && x.IsClosedApprove != true && x.OnHold != true && x.IsTransfer != true)
+                    .Where(x => x.TargetDate.Value.Date >= request.Date_From.Value.Date && x.TargetDate.Value.Date <=  request.Date_To.Value.Date)
                     .Select(t => new OpenTicketReportsResult
                     {
                         TicketConcernId = t.Id,
@@ -118,4 +85,3 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Reports
         }
     }
 }
- 

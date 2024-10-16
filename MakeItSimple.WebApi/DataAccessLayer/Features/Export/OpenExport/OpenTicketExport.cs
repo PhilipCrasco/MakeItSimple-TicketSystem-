@@ -3,20 +3,12 @@ using MakeItSimple.WebApi.DataAccessLayer.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
-using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OpenTicketReports;
+using static MakeItSimple.WebApi.DataAccessLayer.Features.Reports.OpenReport.OpenTicketReports;
 
-namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
+namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export.OpenExport
 {
-    public class OpenTicketExport
+    public partial class OpenTicketExport
     {
-
-
-
-        public class OpenTicketExportCommand : IRequest<Unit>
-        {
-            public DateTime? Date_From { get; set; }
-            public DateTime? Date_To { get; set; }
-        }
 
         public class Handler : IRequestHandler<OpenTicketExportCommand, Unit>
         {
@@ -30,9 +22,14 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
             public async Task<Unit> Handle(OpenTicketExportCommand request, CancellationToken cancellationToken)
             {
                 var openTicket = await _context.TicketConcerns
-                    .Where(x => x.IsApprove == true && x.IsClosedApprove != true && x.IsTransfer != true)
-                    .Select(t => new OpenTicketReportsResult
+                    .Include(x => x.RequestConcern)
+                    .ThenInclude(x => x.Category)
+                    .Where(x => x.IsApprove == true && x.IsClosedApprove != true && x.IsTransfer != true )
+                    .Where(x => x.TargetDate.Value.Date >= request.Date_From.Value.Date && x.TargetDate.Value.Date <= request.Date_To.Value.Date)
+                    .Select(t => new OpenTicketExportResult
                     {
+                        UserId = t.UserId,
+                        UnitId = t.User.UnitId,
                         TicketConcernId = t.Id,
                         Concern_Description = t.RequestConcern.Concern,
                         Requestor_Name = t.RequestorByUser.Fullname,
@@ -46,13 +43,35 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         SubCategory_Description = t.RequestConcern.SubCategory.SubCategoryDescription,
                         Issue_Handler = t.User.Fullname,
                         Channel_Name = t.RequestConcern.Channel.ChannelName,
-                        Target_Date = t.TargetDate,
-                        Created_At = t.CreatedAt,
+                        Target_Date = t.TargetDate.Value.Date,
+                        Created_At = t.CreatedAt.Date,
                         Modified_By = t.ModifiedByUser.Fullname,
                         Updated_At = t.UpdatedAt,
                         Remarks = t.Remarks,
 
                     }).ToListAsync(cancellationToken);
+
+                if (request.Unit is not null)
+                {
+                    openTicket = openTicket
+                        .Where(x => x.UnitId == request.Unit)
+                        .ToList();
+
+                    if (request.UserId is not null)
+                    {
+                        openTicket = openTicket
+                            .Where(x => x.UserId == request.UserId)
+                            .ToList();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    openTicket = openTicket
+                        .Where(x => x.TicketConcernId.ToString().Contains(request.Search)
+                        || x.Issue_Handler.Contains(request.Search))
+                        .ToList();
+                }
 
                 using (var workbook = new XLWorkbook())
                 {
@@ -62,14 +81,16 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         "TicketConcernId",
                         "Concern Description",
                         "Requestor Name",
+                        "Company Name", 
+                        "Business Unit Name",
                         "Department Name",
-                        "Issue Handler",
                         "Unit Name",
                         "Sub Unit Name",
+                        "Location Name",
                         "Channel Name",
                         "Category Description",
                         "Sub Category Description",
-                        "Start Date",
+                        "Issue Handler",
                         "Target Date",
                         "Created At",
                         "Modified By",
@@ -96,24 +117,26 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Export
                         row.Cell(1).Value = openTicket[index - 1].TicketConcernId;
                         row.Cell(2).Value = openTicket[index - 1].Concern_Description;
                         row.Cell(3).Value = openTicket[index - 1].Requestor_Name;
-                        row.Cell(4).Value = openTicket[index - 1].Department_Name;
-                        row.Cell(5).Value = openTicket[index - 1].Issue_Handler;
-                        row.Cell(6).Value = openTicket[index - 1].Unit_Name;
-                        row.Cell(7).Value = openTicket[index - 1].SubUnit_Name;
-                        row.Cell(8).Value = openTicket[index - 1].Channel_Name;
-                        row.Cell(9).Value = openTicket[index - 1].Category_Description;
-                        row.Cell(10).Value = openTicket[index - 1].SubCategory_Description;
-                        //row.Cell(11).Value = openTicket[index - 1].Start_Date;
-                        row.Cell(12).Value = openTicket[index - 1].Target_Date;
-                        row.Cell(13).Value = openTicket[index - 1].Created_At;
-                        row.Cell(14).Value = openTicket[index - 1].Modified_By;
-                        row.Cell(15).Value = openTicket[index - 1].Updated_At;
-                        row.Cell(16).Value = openTicket[index - 1].Remarks;
+                        row.Cell(4).Value = openTicket[index - 1].CompanyName;
+                        row.Cell(5).Value = openTicket[index - 1].Business_Unit_Name;
+                        row.Cell(6).Value = openTicket[index - 1].Department_Name;
+                        row.Cell(7).Value = openTicket[index - 1].Unit_Name;
+                        row.Cell(8).Value = openTicket[index - 1].SubUnit_Name;
+                        row.Cell(9).Value = openTicket[index - 1].Location_Name;
+                        row.Cell(10).Value = openTicket[index - 1].Channel_Name;
+                        row.Cell(11).Value = openTicket[index - 1].Category_Description;
+                        row.Cell(12).Value = openTicket[index - 1].SubCategory_Description;
+                        row.Cell(13).Value = openTicket[index - 1].Issue_Handler;
+                        row.Cell(14).Value = openTicket[index - 1].Target_Date;
+                        row.Cell(15).Value = openTicket[index - 1].Created_At;
+                        row.Cell(16).Value = openTicket[index - 1].Modified_By;
+                        row.Cell(17).Value = openTicket[index - 1].Updated_At;
+                        row.Cell(18).Value = openTicket[index - 1].Remarks;
 
                     }
 
                     worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs($"OpenTicketReport {request.Date_From} - {request.Date_To}.xlsx");
+                    workbook.SaveAs($"OpenTicketReport {request.Date_From:MM-dd-yyyy} - {request.Date_To:MM-dd-yyyy}.xlsx");
 
                 }
 

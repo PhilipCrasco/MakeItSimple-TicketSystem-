@@ -35,7 +35,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public string SubCategory_Description { get; set; }
             public DateTime? Date_Needed { get; set; }
             public string Notes { get; set; }
-            public int? Contact_Number { get; set; }
+            public string Contact_Number { get; set; }
             public string Request_Type { get; set; }
 
             public string Channel_Name { get; set; }

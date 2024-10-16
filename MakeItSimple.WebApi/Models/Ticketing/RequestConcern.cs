@@ -73,7 +73,7 @@ namespace MakeItSimple.WebApi.Models.Ticketing
         public string Notes { get; set; }
 
 
-        public int? ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
 
         public string RequestType { get; set; }
 

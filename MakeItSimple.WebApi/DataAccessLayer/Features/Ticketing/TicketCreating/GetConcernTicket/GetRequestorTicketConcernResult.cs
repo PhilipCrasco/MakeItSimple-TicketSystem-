@@ -46,7 +46,7 @@
             public bool? Is_Done { get; set; }
             public string Remarks { get; set; }
             public string Notes { get; set; }
-            public int? Contact_Number { get; set; }
+            public string Contact_Number { get; set; }
             public string Request_Type { get; set; }
             public DateTime? Date_Needed { get; set; }
             public string Added_By { get; set; }

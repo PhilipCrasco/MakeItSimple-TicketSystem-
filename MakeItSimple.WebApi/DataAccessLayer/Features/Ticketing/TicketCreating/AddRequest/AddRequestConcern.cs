@@ -8,6 +8,7 @@ using MakeItSimple.WebApi.DataAccessLayer.Errors;
 using MakeItSimple.WebApi.DataAccessLayer.Errors.Ticketing;
 using MakeItSimple.WebApi.Models;
 using MakeItSimple.WebApi.Models.Setup;
+using MakeItSimple.WebApi.Models.Setup.LocationSetup;
 using MakeItSimple.WebApi.Models.Ticketing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,13 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     .FirstOrDefaultAsync(x => x.Id == command.UserId);
                 if (userId == null)
                     return Result.Failure(UserError.UserNotExist());
-                
 
+                var locationExist = await _context.Locations
+                    .FirstOrDefaultAsync(l => l.LocationCode == command.Location_Code, cancellationToken);
+
+                if (locationExist is null)
+                    return Result.Failure(TicketRequestError.LocationNotExist());
+                
                 var validationResult = await ValidateEntities(command, cancellationToken);
                 if (validationResult is not null)
                     return validationResult;
@@ -62,7 +68,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     var ticketConcernExist = await _context.TicketConcerns
                         .FirstOrDefaultAsync(x => x.RequestConcernId == requestConcernIdExist.Id, cancellationToken);
 
-                    await UpdateRequest(requestConcernIdExist, ticketConcernExist,command, cancellationToken);
+                    await UpdateRequest(requestConcernIdExist,locationExist ,ticketConcernExist,command, cancellationToken);
 
                     ticketConcernList.Add(ticketConcernExist);
 
@@ -70,7 +76,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 else
                 {
 
-                    var addRequestConcern = await AddRequestConcern(userId, command, cancellationToken);
+                    var addRequestConcern = await AddRequestConcern(userId,locationExist ,command, cancellationToken);
                     var addTicketConcern = await AddTicketConcern(addRequestConcern, command, cancellationToken);
 
                     ticketConcernList.Add(addTicketConcern);
@@ -98,7 +104,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
             }
 
 
-            private async Task<RequestConcern> UpdateRequest(RequestConcern requestConcernIdExist,TicketConcern ticketConcernExist, AddRequestConcernCommand command , CancellationToken cancellationToken)
+            private async Task<RequestConcern> UpdateRequest(RequestConcern requestConcernIdExist,Location location,TicketConcern ticketConcernExist, AddRequestConcernCommand command , CancellationToken cancellationToken)
             {
                 bool isChange = false;
 
@@ -122,9 +128,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     requestConcernIdExist.BusinessUnitId = command.BusinessUnitId;
                     isChange = true;
                 }
-                if (requestConcernIdExist.LocationId != command.LocationId)
+                if (requestConcernIdExist.LocationId != location.Id)
                 {
-                    requestConcernIdExist.LocationId = command.LocationId;
+                    requestConcernIdExist.LocationId = location.Id;
                     isChange = true;
                 }
                 if (requestConcernIdExist.ChannelId != command.ChannelId)
@@ -274,7 +280,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 return null;
             }
 
-            private async Task<RequestConcern> AddRequestConcern(User user, AddRequestConcernCommand command, CancellationToken cancellationToken)
+            private async Task<RequestConcern> AddRequestConcern(User user,Location location ,AddRequestConcernCommand command, CancellationToken cancellationToken)
             {
                 var addRequestConcern = new RequestConcern
                 {
@@ -287,7 +293,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     DepartmentId = command.DepartmentId,
                     UnitId = command.UnitId,
                     SubUnitId = command.SubUnitId,
-                    LocationId = command.LocationId,
+                    LocationId = location.Id,
                     DateNeeded = command.DateNeeded,
                     ChannelId = command.ChannelId,
                     CategoryId = command.CategoryId,

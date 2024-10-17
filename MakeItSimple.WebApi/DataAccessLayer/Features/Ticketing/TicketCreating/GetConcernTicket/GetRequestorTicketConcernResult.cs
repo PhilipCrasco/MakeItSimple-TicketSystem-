@@ -14,7 +14,7 @@
             public string Company_Code { get; set; }
             public string Company_Name { get; set; }
 
-            public int? BusineesUnitId { get; set; }
+            public int? BusinessUnitId { get; set; }
             public string BusinessUnit_Code { get; set; }
             public string BusinessUnit_Name { get; set; }
 

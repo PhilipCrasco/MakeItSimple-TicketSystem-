@@ -212,7 +212,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                         Company_Code = g.Company.CompanyCode,
                         Company_Name = g.Company.CompanyName,
 
-                        BusineesUnitId = g.BusinessUnitId,
+                        BusinessUnitId = g.BusinessUnitId,
                         BusinessUnit_Code = g.BusinessUnit.BusinessCode,
                         BusinessUnit_Name = g.BusinessUnit.BusinessName,
 

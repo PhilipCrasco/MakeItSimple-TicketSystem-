@@ -106,6 +106,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
 
             private async Task<RequestConcern> UpdateRequest(RequestConcern requestConcernIdExist,Location location,TicketConcern ticketConcernExist, AddRequestConcernCommand command , CancellationToken cancellationToken)
             {
+                
                 bool isChange = false;
 
                 if (requestConcernIdExist.Concern != command.Concern)
@@ -113,6 +114,8 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     requestConcernIdExist.Concern = command.Concern;
                     isChange = true;
                 }
+
+
                 if (requestConcernIdExist.CompanyId != command.CompanyId)
                 {
                     requestConcernIdExist.CompanyId = command.CompanyId;
@@ -151,6 +154,12 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 if (requestConcernIdExist.RequestType != command.Request_Type)
                 {
                     requestConcernIdExist.RequestType = command.Request_Type;
+                    isChange = true;
+                }
+
+                if (requestConcernIdExist.DateNeeded != command.DateNeeded)
+                {
+                    requestConcernIdExist.DateNeeded = command.DateNeeded;
                     isChange = true;
                 }
 

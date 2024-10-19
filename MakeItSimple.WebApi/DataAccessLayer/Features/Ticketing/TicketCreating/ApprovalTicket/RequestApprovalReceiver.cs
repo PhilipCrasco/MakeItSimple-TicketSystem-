@@ -64,7 +64,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                 {
                     await UpdateTicket(ticketConcernExist, command, cancellationToken);
 
-                    await RequestTicketHistory(userDetails, ticketConcernExist,command,cancellationToken);
+                    await RequestTicketHistory( ticketConcernExist,command,cancellationToken);
 
                 }
                 else
@@ -109,7 +109,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
 
             }
 
-            private async Task<TicketHistory> RequestTicketHistory(User user,TicketConcern ticketConcern, RequestApprovalReceiverCommand command, CancellationToken cancellationToken)
+            private async Task<TicketHistory> RequestTicketHistory(TicketConcern ticketConcern, RequestApprovalReceiverCommand command, CancellationToken cancellationToken)
             {
                 var addTicketHistory = new TicketHistory
                 {
@@ -117,7 +117,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
                     TransactedBy = command.UserId,
                     TransactionDate = DateTime.Now,
                     Request = TicketingConString.ConcernAssign,
-                    Status = $"{TicketingConString.RequestAssign} {user.Fullname}"
+                    Status = $"{TicketingConString.RequestAssign} {ticketConcern.User.Fullname}"
                 };
 
                 await _context.TicketHistories.AddAsync(addTicketHistory, cancellationToken);

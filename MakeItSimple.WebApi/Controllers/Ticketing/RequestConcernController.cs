@@ -116,7 +116,7 @@ namespace MakeItSimple.WebApi.Controllers.Ticketing
 
                     if (Guid.TryParse(identity.FindFirst("id")?.Value, out var userId))
                     {
-                        command.Added_By = userId;
+                        //command.Added_By = userId;
                         command.Modified_By = userId;
 
                     }

@@ -24,7 +24,7 @@ namespace MakeItSimple.WebApi.Common.ConstantString
 
         //Request History
 
-        public const string RequestCreated = "A concern was created by ";
+        public const string RequestCreated = "A concern was request by ";
         public const string RequestAssign = "A concern was assigned to ";
 
         //Close History

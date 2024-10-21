@@ -31,7 +31,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.TicketCreating.
             {
 
                 var userDetails = await _context.Users
-                    .FirstOrDefaultAsync(x => x.Id == command.Added_By, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Id == command.Modified_By, cancellationToken);
 
                 var allUserList = await _context.UserRoles
                     .ToListAsync();

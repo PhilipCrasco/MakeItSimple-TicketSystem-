@@ -92,6 +92,7 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Feature.UserFeatures
                     //.Include(x => x.acc);
                     
 
+
                 if(!string.IsNullOrEmpty(request.Search))
                 {
                     userQuery = userQuery.Where(x => x.Fullname.Contains(request.Search) 

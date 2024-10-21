@@ -31,7 +31,9 @@ namespace MakeItSimple.WebApi.DataAccessLayer.Features.Ticketing.OpenTicketConce
             public Guid? Requestor_By { get; set; }
             public string Requestor_Name { get; set; }
 
+            public int ? CategoryId { get; set; }
             public string Category_Description { get; set; }
+            public int ? SubCategoryId { get; set; }
             public string SubCategory_Description { get; set; }
             public DateTime? Date_Needed { get; set; }
             public string Notes { get; set; }

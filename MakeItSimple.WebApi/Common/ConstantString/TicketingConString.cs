@@ -1,4 +1,4 @@
-﻿using System.Reflection.Metadata;
+﻿
 
 namespace MakeItSimple.WebApi.Common.ConstantString
 {
@@ -93,7 +93,6 @@ namespace MakeItSimple.WebApi.Common.ConstantString
         public const string OnTime = "On-Time";
         public const string Delay = "Delay";
 
-        
         // Attachment
 
         public const string AttachmentPath = @"C:\inetpub\vhosts\rdfmis.com\httpdocs\MIS_Assets\Tickets";
